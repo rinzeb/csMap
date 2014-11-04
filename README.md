@@ -21,4 +21,4 @@ Technically, we use the following frameworks:
 
 NOTE
 ====
-csMap is the front-end of the mapping framework. Most components are actually defined in another open source project on GitHub, [https://github.com/TNOCS/csWeb](csWeb). Check-out this project to see how they relate. 
+csMap is the front-end of the mapping framework. Most components are actually defined in another open source project on GitHub, [csWeb](https://github.com/TNOCS/csWeb). Check-out this project to see how they relate. 
