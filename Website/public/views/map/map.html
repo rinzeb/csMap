@@ -1,0 +1,104 @@
+﻿<!--
+
+$1$ Right side panel #1#
+<div class="rightpanel" data-ng-cloak data-ng-show="showMenuRight">
+    <featureprops class="rightpanel-content"></featureprops>
+    <caretoolright class="rightpanel-content"></caretoolright>
+</div>
+-->
+
+<!--
+    <tabset vertical="true" id="rightpanelTabs" class="rightpanel tabs-left">
+        <tab heading="i">features</tab>
+        <tab heading="C">Caretool</tab>
+    </tabset>
+    -->
+
+<div class="rightpanel" style="background-color: transparent; ">
+    <div id="rightpanelTabContainer" class="tabbable tabs-left" style="position:relative;height:100%;padding:0px">
+        <!-- Nav tabs -->
+        <!--<div id="rightPanelToggle">
+                <i class="fa fa-2x fa-chevron-right" style="margin-left: 10px;margin-top: 108px;"></i>
+            </div>-->
+        
+        <ul id="rightpanelTabs" class="nav nav-tabs" style="margin-right:0px; margin-top:100px; display:inline-block">
+            <li class="rightPanelTab rightPanelTabAnimated active" ng-show="featureSelected"><a href="#info" style="" data-toggle="tab"><span class="fa fa-info fa-lg"></span></a></li>
+            <li class="rightPanelTab rightPanelTabAnimated" ng-show="showCaretool" ng-click="connectCareTool()"><a href="#caretool" style="" data-toggle="tab" popover="Restschuld" popover-placement="left" popover-trigger="mouseenter"><img src="images/9001 rekening.png" width="20" /></a></li>
+        </ul>
+        <div id="rightpanelTabPanes" class="tab-content" style="display: inline-block; height:100%; background-color: white;">
+            <div class="tab-pane active" id="info">
+                <featureprops class="rightpanel-content"></featureprops>
+            </div>
+            <div class="tab-pane" id="caretool" style="max-width: 700px">
+                <caretoolright></caretoolright>
+            </div>
+        </div>
+        
+    </div>
+
+</div>
+
+<script>
+    
+        
+        
+
+    $('#rightpanelTabs a').click(function (e) {
+        var tab = $(this);
+        if (tab.parent('li').hasClass('tab-toggle')) {
+            var foo = $("#rightpanelTabPanes").children(".tab-pane");
+            if (foo.hasClass('active')) {
+                foo.removeClass('active');
+            } else {
+                foo.addClass('active');
+            }
+
+        }
+        if (tab.parent('li').hasClass('active')) {
+            window.setTimeout(function() {
+                var foo = $("#rightpanelTabPanes").children(".tab-pane");
+                foo.removeClass('active');
+                tab.parent('li').removeClass('active');
+                $('.leaflet-control-zoom').css('visibility', 'visible');
+                $('.leaflet-control-locate').css('visibility', 'visible');
+            }, 1);
+        } else {
+            $('.leaflet-control-zoom').css('visibility', 'hidden');
+            $('.leaflet-control-locate').css('visibility', 'hidden');
+        }
+    });
+
+</script>
+
+<div class="leftpanel" ng-cloak>
+    <div class="col-xs-3 leftpanel-tab">
+        <!-- required for floating -->
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs tabs-left" id="leftPanelTab">
+            <!-- 'tabs-right' for right tabs -->
+            <li><a href="#basestyles" data-toggle="tab"><img src="includes/images/map-black.png" width="30" alt="map" /></a></li>
+            <li class="active"><a href="#layers" data-toggle="tab"><img src="includes/images/layers-black.png" width="30" alt="layers" /></a></li>
+            <li><a href="#filters" data-toggle="tab"><img src="includes/images/filter-black.png" width="30" alt="filter" /></a></li>
+            <li><a href="#styles" data-toggle="tab"><img src="includes/images/style-black.png" width="30" alt="styles" /></a></li>
+            <li><a href="#features" data-toggle="tab"><img src="includes/images/marker-black.png" width="30" alt="features" /></a></li>
+            <li><a href="#legend" data-toggle="tab"><img src="includes/images/legend.png" width="30" alt="legend" /></a></li>
+        </ul>
+    </div>
+
+    <div class="col-xs-9 leftpanel-content">
+        <!-- Tab panes -->
+        <div class="tab-content">
+            <base-map-list class="tab-pane" id="basestyles"></base-map-list>
+
+            <layers-directive class="tab-pane active" id="layers"></layers-directive>
+
+            <filter-list class="tab-pane" id="filters"></filter-list>
+
+            <style-list class="tab-pane" id="styles"></style-list>
+
+            <feature-list class="tab-pane" id="features"></feature-list>
+            
+            <legend-list class="tab-pane" id="legend"></legend-list>
+        </div>
+    </div>
+</div>
