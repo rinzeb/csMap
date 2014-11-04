@@ -19,3 +19,6 @@ Technically, we use the following frameworks:
 * Leaflet for mapping
 * d3, dc, crossfilter for filtering and styling
 
+NOTE
+====
+csMap is the front-end of the mapping framework. Most components are actually defined in another open source project on GitHub, [https://github.com/TNOCS/csWeb](csWeb). Check-out this project to see how they relate. 
