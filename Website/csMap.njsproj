@@ -1,0 +1,166 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+    <Name>ExpressApp7</Name>
+    <RootNamespace>ExpressApp7</RootNamespace>
+    <LaunchUrl>
+    </LaunchUrl>
+    <NameOfLastUsedPublishProfile>commonsensetest</NameOfLastUsedPublishProfile>
+  </PropertyGroup>
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>83aac9f6-1094-40fc-8ce9-2ca0fe8ccbac</ProjectGuid>
+    <ProjectHome>.</ProjectHome>
+    <StartupFile>server.js</StartupFile>
+    <SearchPath>
+    </SearchPath>
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <ProjectTypeGuids>{3AF33F2E-1136-4D97-BBB7-1795711AC8B8};{349c5851-65df-11da-9384-00065b846f21};{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}</ProjectTypeGuids>
+    <ProjectView>ShowAllFiles</ProjectView>
+    <NodejsPort>1331</NodejsPort>
+    <TypeScriptSourceMap>true</TypeScriptSourceMap>
+    <TypeScriptModuleKind>CommonJS</TypeScriptModuleKind>
+    <EnableTypeScript>true</EnableTypeScript>
+    <StartWebBrowser>True</StartWebBrowser>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+  <ItemGroup>
+    <TypeScriptCompile Include="public\app\search\SearchCtrl.ts" />
+    <TypeScriptCompile Include="Scripts\typings\angular-ui\angular-ui-router.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\angularjs\angular-cookies.d.ts" />
+    <TypeScriptCompile Include="public\app\app.ts" />
+    <TypeScriptCompile Include="public\views\map\MapViewCtrl.ts" />
+    <TypeScriptCompile Include="Scripts\typings\angularjs\angular.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\angularLocalStorage\angularLocalStorage.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\chroma-js\chroma-js.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\crossfilter\crossfilter.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\cs\csComp.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\cs\csServerComp.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\d3\d3.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\dc\dc.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\express\express.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\leaflet\control-sidebar.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\leaflet\leaflet.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\node\node.d.ts" />
+    <Content Include="package.json" />
+    <Content Include="public\bower.json" />
+    <Content Include="public\css\csStyles.css" />
+    <Content Include="public\css\dc.css" />
+    <Content Include="public\css\font-awesome.css" />
+    <Content Include="public\css\markers.css" />
+    <Content Include="public\css\pnotify.custom.min.css" />
+    <Content Include="public\css\style.css" />
+    <Content Include="public\css\xbbcode.css" />
+    <Content Include="public\data\projects\ais\layer1.json" />
+    <Content Include="public\data\projects\ais\project.json" />
+    <Content Include="public\data\projects\projects.json">
+      <Publish>True</Publish>
+    </Content>
+    <Content Include="public\data\projects\vws\project.json" />
+    <Content Include="public\data\projects\vws\Ziekenhuizen.json" />
+    <Content Include="public\data\projects\vws_private\project.json" />
+    <Content Include="public\images\CareToolIcon.png" />
+    <Content Include="public\images\langdurigezorg.png" />
+    <Content Include="public\images\verzorgingstehuis.png" />
+    <Content Include="public\images\ziekenhuis.png" />
+    <Content Include="public\images\Zorgkantoor.png" />
+    <Content Include="public\includes\ROsanswebtextregular.eot" />
+    <Content Include="public\includes\ROsanswebtextregular.ttf" />
+    <Content Include="public\index.html" />
+    <Content Include="public\views\map\map.html" />
+    <TypeScriptCompile Include="Scripts\typings\q\Q.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\xbbcode\xbbcode.d.ts" />
+    <TypeScriptCompile Include="server.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="public\" />
+    <Folder Include="public\app\search\" />
+    <Folder Include="public\css\" />
+    <Folder Include="public\app\" />
+    <Folder Include="public\data\" />
+    <Folder Include="public\data\projects\" />
+    <Folder Include="public\data\projects\ais\" />
+    <Folder Include="public\data\projects\vws_private\" />
+    <Folder Include="public\data\projects\vws\" />
+    <Folder Include="public\images\" />
+    <Folder Include="public\includes\" />
+    <Folder Include="public\js\" />
+    <Folder Include="public\js\cs\" />
+    <Folder Include="public\views\" />
+    <Folder Include="public\views\map\" />
+    <Folder Include="Scripts\" />
+    <Folder Include="Scripts\typings\" />
+    <Folder Include="Scripts\typings\angular-ui\" />
+    <Folder Include="Scripts\typings\angularjs\" />
+    <Folder Include="Scripts\typings\angularLocalStorage\" />
+    <Folder Include="Scripts\typings\chroma-js\" />
+    <Folder Include="Scripts\typings\crossfilter\" />
+    <Folder Include="Scripts\typings\cs\" />
+    <Folder Include="Scripts\typings\d3\" />
+    <Folder Include="Scripts\typings\dc\" />
+    <Folder Include="Scripts\typings\express\" />
+    <Folder Include="Scripts\typings\jquery\" />
+    <Folder Include="Scripts\typings\leaflet\" />
+    <Folder Include="Scripts\typings\node\" />
+    <Folder Include="Scripts\typings\q\" />
+    <Folder Include="Scripts\typings\xbbcode\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="public\js\cs\csComp.js" />
+    <Compile Include="public\js\cs\jqueryinjectCSS.min.js" />
+    <Compile Include="public\js\cs\pnotify.custom.min.js" />
+  </ItemGroup>
+  <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsTools.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>False</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>0</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:48022/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>True</UseCustomServer>
+          <CustomServerUrl>http://localhost:1337</CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}" User="">
+        <WebProjectProperties>
+          <StartPageUrl>
+          </StartPageUrl>
+          <StartAction>CurrentPage</StartAction>
+          <AspNetDebugging>True</AspNetDebugging>
+          <SilverlightDebugging>False</SilverlightDebugging>
+          <NativeDebugging>False</NativeDebugging>
+          <SQLDebugging>False</SQLDebugging>
+          <ExternalProgram>
+          </ExternalProgram>
+          <StartExternalURL>
+          </StartExternalURL>
+          <StartCmdLineArguments>
+          </StartCmdLineArguments>
+          <StartWorkingDirectory>
+          </StartWorkingDirectory>
+          <EnableENC>False</EnableENC>
+          <AlwaysStartWebServerOnDebug>False</AlwaysStartWebServerOnDebug>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
+</Project>

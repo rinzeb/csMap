@@ -1,0 +1,210 @@
+﻿var App;
+(function (App) {
+    'use strict';
+
+    
+
+    var AppCtrl = (function () {
+        // dependencies are injected via AngularJS $injector
+        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
+        function AppCtrl($scope, $location, $mapService, $layerService, $messageBusService) {
+            var _this = this;
+            this.$scope = $scope;
+            this.$location = $location;
+            this.$mapService = $mapService;
+            this.$layerService = $layerService;
+            this.$messageBusService = $messageBusService;
+            this.showMap = true;
+            this.layerMessageReceived = function (title, layer) {
+                switch (title) {
+                    case "deactivate":
+                        break;
+                }
+
+                // NOTE EV: You need to call apply only when an event is received outside the angular scope.
+                // However, make sure you are not calling this inside an angular apply cycle, as it will generate an error.
+                if (_this.$scope.$root.$$phase != '$apply' && _this.$scope.$root.$$phase != '$digest') {
+                    _this.$scope.$apply();
+                }
+            };
+            this.featureMessageReceived = function (title) {
+                switch (title) {
+                    case "onFeatureSelect":
+                        _this.$scope.featureSelected = true;
+                        break;
+                    case "onFeatureDeselect":
+                        _this.$scope.featureSelected = false;
+                        break;
+                }
+
+                // NOTE EV: You need to call apply only when an event is received outside the angular scope.
+                // However, make sure you are not calling this inside an angular apply cycle, as it will generate an error.
+                if (_this.$scope.$root.$$phase != '$apply' && _this.$scope.$root.$$phase != '$digest') {
+                    _this.$scope.$apply();
+                }
+            };
+            /**
+            * Callback function
+            * @see {http://stackoverflow.com/questions/12756423/is-there-an-alias-for-this-in-typescript}
+            * @see {http://stackoverflow.com/questions/20627138/typescript-this-scoping-issue-when-called-in-jquery-callback}
+            * @todo {notice the strange syntax, which is to preserve the this reference!}
+            */
+            this.sidebarMessageReceived = function (title) {
+                switch (title) {
+                    case "toggle":
+                        _this.$scope.showMenuRight = !_this.$scope.showMenuRight;
+
+                        break;
+                    case "show":
+                        _this.$scope.showMenuRight = true;
+                        break;
+                    case "hide":
+                        _this.$scope.showMenuRight = false;
+                        break;
+                    default:
+                }
+            };
+            //console.log('$location: ' + JSON.stringify($location));
+            //console.log('$$search : ' + JSON.stringify($location.$$search));
+            //console.log('layers   : ' + JSON.stringify($location.$$search.layers));
+            sffjs.setCulture("nl-NL");
+
+            $scope.vm = this;
+            $scope.showMenuRight = false;
+            $scope.featureSelected = false;
+
+            $messageBusService.subscribe("project", function () {
+                // NOTE EV: You may run into problems here when calling this inside an angular apply cycle.
+                // Alternatively, check for it or use (dependency injected) $timeout.
+                // E.g. if (this.$scope.$root.$$phase != '$apply' && this.$scope.$root.$$phase != '$digest') { this.$scope.$apply(); }
+                $scope.$apply();
+            });
+
+            $messageBusService.subscribe("sidebar", this.sidebarMessageReceived);
+            $messageBusService.subscribe("feature", this.featureMessageReceived);
+            $messageBusService.subscribe("layer", this.layerMessageReceived);
+
+            this.$layerService.openSolution("data/projects/projects.json", $location.$$search.layers);
+            $messageBusService.notify('Welcome to csMap', 'Your mapping solution.');
+
+            this.showMap = this.$location.path() === "/map";
+        }
+        /**
+        * Publish a toggle request.
+        */
+        AppCtrl.prototype.toggleMenuRight = function () {
+            this.$messageBusService.publish("sidebar", "toggle");
+        };
+
+        AppCtrl.prototype.toggleMenu = function () {
+            this.$mapService.invalidate();
+        };
+
+        AppCtrl.prototype.toggleSidebar = function () {
+            this.$messageBusService.publish("sidebar", "toggle");
+            window.console.log("Publish toggle sidebar");
+        };
+
+        AppCtrl.prototype.showTable = function () {
+            this.$scope.showMap = false;
+        };
+
+        AppCtrl.prototype.isActive = function (viewLocation) {
+            return viewLocation === this.$location.path();
+        };
+        AppCtrl.$inject = [
+            '$scope',
+            '$location',
+            'mapService',
+            'layerService',
+            'messageBusService'
+        ];
+        return AppCtrl;
+    })();
+    App.AppCtrl = AppCtrl;
+
+    
+
+    // Start the application
+    angular.module('csWebApp', [
+        'ui.router',
+        'ui.bootstrap',
+        'LocalStorageModule',
+        'angularUtils.directives.dirPagination',
+        'csWeb.featureprops',
+        'csWeb.layersDirective',
+        'csWeb.featureList',
+        'csWeb.filterList',
+        'csWeb.baseMapList',
+        'csWeb.styleList',
+        'csWeb.legendList',
+        'csWeb.resize',
+        'csWeb.datatable',
+        'ngCookies'
+    ]).config(function (localStorageServiceProvider) {
+        localStorageServiceProvider.prefix = 'csMap';
+    }).config(function ($stateProvider, $urlRouterProvider) {
+        // For any unmatched url, send to /
+        $urlRouterProvider.otherwise("/map");
+        $stateProvider.state('map', {
+            url: "/map?layers",
+            templateUrl: "views/map/map.html",
+            sticky: true,
+            deepStateRedirect: true
+        }).state('table', {
+            url: "/table",
+            template: "<datatable id='datatable'></datatable>",
+            sticky: true
+        });
+    }).controller('appCtrl', AppCtrl).controller('mapLayersCtrl', csComp.Services.MapCtrl).controller('searchFormCtrl', csComp.Search.SearchFormCtrl).controller('mapViewCtrl', MapView.MapViewCtrl).controller('searchCtrl', Search.SearchCtrl).service('messageBusService', csComp.Services.MessageBusService).service('mapService', csComp.Services.MapService).service('layerService', csComp.Services.LayerService).filter('csmillions', [
+        '$filter', '$locale', function (filter, locale) {
+            return function (amount, currencySymbol) {
+                if (isNaN(amount))
+                    return "";
+                var millions = amount / 1000000;
+
+                return String.format("{0:N1}", millions);
+            };
+        }
+    ]).filter('format', [
+        '$filter', '$locale', function (filter, locale) {
+            return function (value, format) {
+                return String.format(format, value);
+            };
+        }
+    ]).directive('percentage', function () {
+        return {
+            require: 'ngModel',
+            link: function (scope, element, attrs, ngModelController) {
+                ngModelController.$parsers.push(function (data) {
+                    if (data == null)
+                        return 0;
+                    return parseInt(data.replace('%', '')) / 100;
+                });
+
+                ngModelController.$formatters.push(function (data) {
+                    if (data == null)
+                        return '';
+                    return Math.round((data * 100)) + '%';
+                });
+            }
+        };
+    }).directive('ngModelOnblur', function () {
+        return {
+            restrict: 'A',
+            require: 'ngModel',
+            priority: 1,
+            link: function (scope, elm, attr, ngModelCtrl) {
+                if (attr.type === 'radio' || attr.type === 'checkbox')
+                    return;
+                elm.unbind('input').unbind('keydown').unbind('change');
+                elm.bind('blur', function () {
+                    scope.$apply(function () {
+                        ngModelCtrl.$setViewValue(elm.val());
+                    });
+                });
+            }
+        };
+    });
+})(App || (App = {}));
+//# sourceMappingURL=app.js.map
