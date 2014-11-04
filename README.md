@@ -3,6 +3,8 @@ csMap
 
 csMap, short for common sense Map, is a userfriendly web application for showing (GIS) data on a map. It allows you to apply multiple filters to filter your data, and to style it, so you can immediately see what's important. In addition, in the most basic form, you don't even need a web server, and a public folder on a website is sufficient to be up and running.
 
+[Click here to see a demo](http://tnocs.github.io/csMap)
+
 Features include:
 * Basic map interactions (zooming, geo-locating, selecting different base layers)
 * Displaying geojson files
