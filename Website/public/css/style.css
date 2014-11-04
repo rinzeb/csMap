@@ -301,14 +301,15 @@ input[type="checkbox"] { margin: 0; }
 	margin-top: 5px;
 }
 
+/*TODO Specify the color for the navigation bar: default black */
 .navbar {
-    /*#B5A3C1*/
-    background: #42145F; 
+    background: black; 
     left: 0;
 }
 
+/*TODO Specify the color for the menu bars: default #CCC */
 .leftpanel-tab {
-    background-color: #B5A3C1;  
+    background-color: #CCC;  
     height:100%; 
     width: 70px;
 }
@@ -320,22 +321,21 @@ input[type="checkbox"] { margin: 0; }
     top:0;
     width: 52px;
     height: 43px;     
-    background: #B5A3C1;
-    position: absolute
-;border-radius: 4px 0 0 4px;
+    background: #CCC;
+    position: absolute;
+    border-radius: 4px 0 0 4px;
 }
 
 .table-condensed>tbody>tr>td {  
     border-bottom: 1px;
-border-bottom-style: groove;
-border-top-style: none;
+    border-bottom-style: groove;
+    border-top-style: none;
 }
-
 
 .rightpanel-header {
     width: 100%;
     padding-bottom: 10px;
-    background: #B5A3C1; 
+    background: #CCC; 
     height:35px; 
     padding-top: 5px; 
     margin-top: 1px; 
@@ -361,7 +361,7 @@ border-top-style: none;
 .leftpanel-collapsed .navbar { left: 0; }
 
 .leftpanel-content {
-    border-top: solid 40px #B5A3C1;    
+    border-top: solid 40px #CCC;    
     width: 280px;
 }
 /* Header bar should be overwritten by children, so if you increase the border-top height above, you should match it here */
@@ -814,7 +814,7 @@ border-top-style: none;
 
 
 .rightpanel-tabs {
-    background: #B5A3C1;
+    background: #CCC;
 margin-top: -10px;
 }
 
@@ -961,7 +961,7 @@ margin-top: -10px;
 }
 
 .leaflet-popup-content-wrapper {
-  background:#B5A3C1;
+  background:#CCC;
   color:black;
   font-size:16px;
   line-height:24px;
