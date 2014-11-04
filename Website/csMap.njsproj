@@ -23,7 +23,7 @@
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <ProjectTypeGuids>{3AF33F2E-1136-4D97-BBB7-1795711AC8B8};{349c5851-65df-11da-9384-00065b846f21};{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}</ProjectTypeGuids>
     <ProjectView>ShowAllFiles</ProjectView>
-    <NodejsPort>1337</NodejsPort>
+    <NodejsPort>1331</NodejsPort>
     <TypeScriptSourceMap>true</TypeScriptSourceMap>
     <TypeScriptModuleKind>CommonJS</TypeScriptModuleKind>
     <EnableTypeScript>true</EnableTypeScript>
@@ -37,31 +37,32 @@
   </PropertyGroup>
   <ItemGroup>
     <TypeScriptCompile Include="public\app\search\SearchCtrl.ts" />
+    <TypeScriptCompile Include="Scripts\typings\angular-ui\angular-ui-router.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular-cookies.d.ts" />
     <TypeScriptCompile Include="public\app\app.ts" />
     <TypeScriptCompile Include="public\views\map\MapViewCtrl.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularLocalStorage\angularLocalStorage.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\chroma-js\chroma-js.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\crossfilter\crossfilter.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\cs\csComp.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\cs\csServerComp.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\d3\d3.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\dc\dc.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\express\express.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\leaflet\control-sidebar.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\leaflet\leaflet.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\node\node.d.ts" />
     <Content Include="package.json" />
-    <TypeScriptCompile Include="public\app\CareTool\CareRegion.ts" />
-    <TypeScriptCompile Include="public\app\CareTool\CareToolCtrl.ts" />
-    <TypeScriptCompile Include="public\app\CareTool\ExcelSession.ts" />
-    <TypeScriptCompile Include="public\app\CareTool\NameValue.ts" />
-    <Content Include="public\app\CareTool\Views\CareTool-right - v2.html" />
-    <Content Include="public\app\CareTool\Views\CareTool-right.html" />
-    <Content Include="public\app\CareTool\Views\CareTool-right_old.html" />
-    <Content Include="public\app\CareTool\Views\CareTool-bottom.html" />
     <Content Include="public\bower.json" />
+    <Content Include="public\css\csStyles.css" />
+    <Content Include="public\css\dc.css" />
+    <Content Include="public\css\font-awesome.css" />
+    <Content Include="public\css\markers.css" />
     <Content Include="public\css\pnotify.custom.min.css" />
     <Content Include="public\css\style.css" />
+    <Content Include="public\css\xbbcode.css" />
     <Content Include="public\data\projects\ais\layer1.json" />
     <Content Include="public\data\projects\ais\project.json" />
     <Content Include="public\data\projects\projects.json">
@@ -79,15 +80,12 @@
     <Content Include="public\includes\ROsanswebtextregular.ttf" />
     <Content Include="public\index.html" />
     <Content Include="public\views\map\map.html" />
-    <Content Include="README.md" />
-    <TypeScriptCompile Include="Scripts\typings\signalr\signalr.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\q\Q.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\xbbcode\xbbcode.d.ts" />
     <TypeScriptCompile Include="server.ts" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="public\" />
-    <Folder Include="public\app\CareTool\" />
-    <Folder Include="public\app\CareTool\Views\" />
     <Folder Include="public\app\search\" />
     <Folder Include="public\css\" />
     <Folder Include="public\app\" />
@@ -104,15 +102,19 @@
     <Folder Include="public\views\map\" />
     <Folder Include="Scripts\" />
     <Folder Include="Scripts\typings\" />
+    <Folder Include="Scripts\typings\angular-ui\" />
     <Folder Include="Scripts\typings\angularjs\" />
     <Folder Include="Scripts\typings\angularLocalStorage\" />
+    <Folder Include="Scripts\typings\chroma-js\" />
     <Folder Include="Scripts\typings\crossfilter\" />
     <Folder Include="Scripts\typings\cs\" />
+    <Folder Include="Scripts\typings\d3\" />
+    <Folder Include="Scripts\typings\dc\" />
     <Folder Include="Scripts\typings\express\" />
     <Folder Include="Scripts\typings\jquery\" />
     <Folder Include="Scripts\typings\leaflet\" />
     <Folder Include="Scripts\typings\node\" />
-    <Folder Include="Scripts\typings\signalr\" />
+    <Folder Include="Scripts\typings\q\" />
     <Folder Include="Scripts\typings\xbbcode\" />
   </ItemGroup>
   <ItemGroup>
