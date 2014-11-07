@@ -117,7 +117,6 @@
             switch (title) {
             case "toggle":
                 this.$scope.showMenuRight = !this.$scope.showMenuRight;
-
                 break;
             case "show":
                 this.$scope.showMenuRight = true;
@@ -156,6 +155,7 @@
             'ui.bootstrap',
             'LocalStorageModule',
             'angularUtils.directives.dirPagination',
+            'pascalprecht.translate',
             'csWeb.featureprops',
             'csWeb.layersDirective',
             'csWeb.featureList',
@@ -170,6 +170,95 @@
         .config(localStorageServiceProvider => {
             localStorageServiceProvider.prefix = 'csMap';
         })
+        .config($translateProvider => {
+            $translateProvider.translations('en', {
+                MAP: 'Maps',
+                LAYERS: 'Layers',
+                FILTERS: 'Filters',
+                FILTER_INFO: 'At the moment, no filters have been selected. In order to add a filter, click on an icon or area on the map, and click on the filter icon (<span class="fa fa-filter"></span>) in the right menu. This will create a filter for the selected property.',
+                STYLES: 'Styles',
+                STYLE_INFO: 'At the moment, no style has been selected. In order to add a style, click on an icon or area on the map, and click on the style icon (<span class="fa fa-eye"></span>) in the right menu. This will create a filter for the selected property.',
+                FEATURES: 'Features',
+                LEGEND: 'Legend',
+                SEARCH: 'Search',
+                SHOW5: 'Show 5 items',
+                SHOW10: 'Show 10 items',
+                SHOW15: 'Show 15 items',
+                SHOW20: 'Show 20 items',
+                SHOW25: 'Show 25 items',
+                SHOW30: 'Show 30 items',
+                SHOW35: 'Show 35 items',
+                SHOW40: 'Show 40 items'
+            });
+            $translateProvider.translations('nl', {
+                MAP: 'Kaarten',
+                LAYERS: 'Kaartlagen',
+                FILTERS: 'Filters',
+                FILTER_INFO: 'Momenteel zijn er geen filters geselecteerd. Klik op een icoon of gebied op de kaart, en klik op het filter icoontje (<span class="fa fa-filter"></span>) in het rechter menu om een filter toe te voegen. Dan wordt er een filter aangemaakt voor de geselecteerde eigenschap.',
+                STYLES: 'Stijlen',
+                STYLE_INFO: 'Momenteel zijn er geen stijlen geselecteerd. Klik op een icoon of gebied op de kaart, en klik op het stijl icoontje (<span class="fa fa-eye"></span>) in het rechter menu om een stijl toe te voegen. Dan wordt er een stijl aangemaakt voor de geselecteerde eigenschap.',
+                FEATURES: 'Features',
+                LEGEND: 'Legenda',
+                SEARCH: 'Zoeken',
+                SHOW5: 'Toon 5 regels',
+                SHOW10: 'Toon 10 regels',
+                SHOW15: 'Toon 15 regels',
+                SHOW20: 'Toon 20 regels',
+                SHOW25: 'Toon 25 regels',
+                SHOW30: 'Toon 30 regels',
+                SHOW35: 'Toon 35 regels',
+                SHOW40: 'Toon 40 regels'
+            });
+            $translateProvider.preferredLanguage('nl');
+        })
+        .controller('Ctrl', ($scope, $translate) => {
+            $scope.changeLanguage = key => {
+                $translate.use(key);
+            };
+        })
+        .filter('unique', function () {
+            // See https://github.com/angular-ui/angular-ui-OLDREPO/blob/master/modules/filters/unique/unique.js
+            return (items, filterOn) => {
+
+                    if (filterOn === false) {
+                        return items;
+                    }
+
+                    if ((filterOn || angular.isUndefined(filterOn)) && angular.isArray(items)) {
+                        var hashCheck = {}, newItems = [];
+
+                        var extractValueToCompare = function (item) {
+                            if (angular.isObject(item) && angular.isString(filterOn)) {
+                                return item[filterOn];
+                            } else {
+                                return item;
+                            }
+                        };
+
+                        angular.forEach(items, function (item) {
+                            var valueToCheck, isDuplicate = false;
+
+                            for (var i = 0; i < newItems.length; i++) {
+                                if (angular.equals(extractValueToCompare(newItems[i]), extractValueToCompare(item))) {
+                                    isDuplicate = true;
+                                    break;
+                                }
+                            }
+                            if (!isDuplicate) {
+                                newItems.push(item);
+                            }
+
+                        });
+                        items = newItems;
+                    }
+                    return items;
+            };
+        })
+    // Example switching the language (see http://angular-translate.github.io/).
+    // <div ng-controller="Ctrl" class="ng-scope">
+    //    <button class="btn ng-scope" ng-click="changeLanguage('en')" translate="BUTTON_LANG_EN"></button>
+    //    <button class="btn ng-scope" ng-click="changeLanguage('de')" translate="BUTTON_LANG_DE"></button>
+    // </div>
         .config(($stateProvider, $urlRouterProvider) => {
             // For any unmatched url, send to /
             $urlRouterProvider.otherwise("/map");

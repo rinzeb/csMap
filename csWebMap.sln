@@ -1,13 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
+VisualStudioVersion = 12.0.31010.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "csMap", "Website\csMap.njsproj", "{83AAC9F6-1094-40FC-8CE9-2CA0FE8CCBAC}"
 	ProjectSection(ProjectDependencies) = postProject
 		{21733626-B7BA-4A05-A2E2-7A050EA2B1FC} = {21733626-B7BA-4A05-A2E2-7A050EA2B1FC}
 		{039381A7-A689-41AD-9DDE-7518B33B5DF6} = {039381A7-A689-41AD-9DDE-7518B33B5DF6}
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "csComp", "..\..\csWeb\csComp\csComp.csproj", "{21733626-B7BA-4A05-A2E2-7A050EA2B1FC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "csServerComp", "..\..\csWeb\csServerComp\csServerComp.csproj", "{039381A7-A689-41AD-9DDE-7518B33B5DF6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

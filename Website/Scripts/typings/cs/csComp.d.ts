@@ -184,11 +184,14 @@ declare module LegendList {
     var myModule: any;
 }
 declare module LegendList {
+    interface ILegendItem {
+        title: string;
+        uri: string;
+    }
     interface ILegendListScope extends ng.IScope {
         vm: LegendListCtrl;
         numberOfItems: number;
-        legendImage: Function;
-        legendName: Function;
+        legendItems: Function;
     }
     class LegendListCtrl {
         private $scope;
@@ -197,6 +200,8 @@ declare module LegendList {
         private scope;
         static $inject: string[];
         constructor($scope: ILegendListScope, $layerService: csComp.Services.LayerService, $mapService: csComp.Services.MapService);
+        private getImageUri(ft);
+        private getName(key, ft);
     }
 }
 declare module FeatureList {

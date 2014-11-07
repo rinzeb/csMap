@@ -58,7 +58,6 @@
     <Content Include="public\bower.json" />
     <Content Include="public\css\csStyles.css" />
     <Content Include="public\css\dc.css" />
-    <Content Include="public\css\font-awesome.css" />
     <Content Include="public\css\markers.css" />
     <Content Include="public\css\pnotify.custom.min.css" />
     <Content Include="public\css\style.css" />
