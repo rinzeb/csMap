@@ -1,7 +1,24 @@
 /// <reference path="../crossfilter/crossfilter.d.ts" />
 /// <reference path="../leaflet/leaflet.d.ts" />
 declare module csComp.GeoJson {
-    class Feature implements IFeature {
+    interface IFeature {
+        id: string;
+        layerId: string;
+        type: string;
+        geometry: IGeoJsonGeometry;
+        properties: IStringToString[];
+        isSelected: boolean;
+        htmlStyle: string;
+        featureTypeName: string;
+        fType: IFeatureType;
+        isInitialized: boolean;
+    }
+    /**
+    * A feature is a single object that is show on a map (e.g. point, polyline, etc)
+    * Features are part of a layer and filtered and styled using group filters and styles
+    *
+    */
+    class Feature {
         public id: string;
         public layerId: string;
         public type: string;
@@ -12,6 +29,220 @@ declare module csComp.GeoJson {
         public featureTypeName: string;
         public fType: IFeatureType;
         public isInitialized: boolean;
+    }
+    interface IStringToString {
+        [key: string]: string;
+    }
+    interface IGeoJsonGeometry {
+        type: string;
+        coordinates: any;
+    }
+    enum DrawingModeType {
+        None = 0,
+        Image = 1,
+        Point = 2,
+        Square = 3,
+        Rectangle = 4,
+        Line = 5,
+        Circle = 6,
+        Freehand = 7,
+        Polyline = 8,
+        Polygon = 9,
+        MultiPolygon = 10,
+    }
+    enum featureFilterType {
+        /** Turn filtering off */
+        none = 0,
+        /** Default for numbers: histogram */
+        bar = 1,
+        /** Default for text */
+        text = 2,
+    }
+    interface IMetaInfo {
+        label?: string;
+        title?: string;
+        description?: string;
+        type?: string;
+        section?: string;
+        stringFormat?: string;
+        visibleInCallOut?: boolean;
+        canEdit?: boolean;
+        filterType?: string;
+        isSearchable?: boolean;
+        minValue?: number;
+        maxValue?: number;
+        defaultValue?: number;
+    }
+    interface IFeatureTypeStyle {
+        nameLabel?: string;
+        fillColor?: string;
+        strokeColor?: string;
+        drawingMode?: string;
+        strokeWidth?: number;
+        iconWidth?: number;
+        iconHeight?: number;
+        iconUri?: string;
+        maxTitleResolution?: string;
+        analysisMetaInfo?: any;
+    }
+    interface IFeatureType {
+        name?: string;
+        style?: IFeatureTypeStyle;
+        metaInfoData?: IMetaInfo[];
+        /**
+        * Optional list of MetaInfo keys, separated by semi-colons.
+        * The keys can be resolved in the project's metaInfoData dictionary, or in the local metaInfoData.
+        */
+        metaInfoKeys?: string;
+    }
+    interface IGeoJsonFile {
+        poiTypes?: {
+            [key: string]: IFeatureType;
+        };
+        type: string;
+        features: Feature[];
+    }
+}
+declare module csComp.Services {
+    /** a project group contains a list of layers that can be grouped together.
+    * Filters, styles can clustering is always defined on the group level.
+    * If a filter is selected (e.g. show only the features within a certain property range)
+    * this filter is applied to all layers within this group.
+    * If clustering is enabled all features in all layers are grouped together
+    */
+    class ProjectGroup {
+        public id: string;
+        public title: string;
+        public description: string;
+        public layers: ProjectLayer[];
+        public filters: GroupFilter[];
+        public styles: GroupStyle[];
+        public showTitle: boolean;
+        public cluster: L.MarkerClusterGroup;
+        public vectors: L.LayerGroup<L.ILayer>;
+        /** Turn on the leaflet markercluster */
+        public clustering: boolean;
+        /** If set, at this zoom level and below markers will not be clustered. This defaults to disabled */
+        public clusterLevel: number;
+        /**  The maximum radius that a cluster will cover from the central marker (in pixels). Default 80. Decreasing will make more smaller clusters. You can also use a function that accepts the current map zoom and returns the maximum cluster radius in pixels. */
+        public maxClusterRadius: number;
+        public clusterFunction: Function;
+        /** Creates radio buttons instead of checkboxes in the level */
+        public oneLayerActive: boolean;
+        public ndx: any;
+        public filterResult: GeoJson.IFeature[];
+        public markers: any;
+        public styleProperty: string;
+    }
+    /**
+    * Filters are used to select a subset of features within a group.
+    */
+    class GroupFilter {
+        public id: string;
+        public title: string;
+        public enabled: boolean;
+        public filterType: string;
+        public property: string;
+        public criteria: string;
+        public dimension: any;
+        public value: any;
+        public stringValue: string;
+        public rangex: number[];
+        public meta: GeoJson.IMetaInfo;
+    }
+    /**
+    * Styles can determine how features are shown on the map
+    */
+    class GroupStyle {
+        public id: string;
+        public title: string;
+        public enabled: boolean;
+        public layers: string[];
+        public visualAspect: string;
+        public property: string;
+        public colors: string[];
+        public group: ProjectGroup;
+        public availableAspects: string[];
+        public canSelectColor: boolean;
+        public colorScales: any;
+        public info: PropertyInfo;
+        public meta: GeoJson.IMetaInfo;
+        constructor($translate: ng.translate.ITranslateService);
+    }
+}
+declare module csComp.Services {
+    /**
+    * Represents to the overall solution class. A solution can contain multiple project.
+    * This can be usefull when you want to have the same website, but with different content.
+    * e.g. you could make it so that you can switch between different regions
+    */
+    class Solution {
+        public title: string;
+        public maxBounds: IBoundingBox;
+        public viewBounds: IBoundingBox;
+        public baselayers: IBaseLayer[];
+        public projects: SolutionProject[];
+    }
+    /** project within a solution file, refers to a project url*/
+    class SolutionProject {
+        public title: string;
+        public url: string;
+    }
+    /** project configuration. */
+    class Project {
+        public title: string;
+        public description: string;
+        public logo: string;
+        public featureTypes: {
+            [id: string]: GeoJson.IFeatureType;
+        };
+        public metaInfoData: {
+            [id: string]: GeoJson.IMetaInfo;
+        };
+        public groups: ProjectGroup[];
+        public startposition: Coordinates;
+        public features: GeoJson.IFeature[];
+        public markers: {};
+    }
+    /** bouding box to specify a region. */
+    interface IBoundingBox {
+        southWest: L.LatLng;
+        northEast: L.LatLng;
+    }
+    /** layer information. a layer is described in a project file and is always part of a group */
+    class ProjectLayer {
+        public title: string;
+        public description: string;
+        public type: string;
+        public url: string;
+        public styleurl: string;
+        public enabled: boolean;
+        public opacity: number;
+        public isLoading: boolean;
+        public isSublayer: boolean;
+        public mapLayer: L.LayerGroup<L.ILayer>;
+        public group: ProjectGroup;
+        /** Internal ID, e.g. for the Excel service */
+        public id: string;
+        /** Reference for URL params: if the URL contains layers=REFERENCE1;REFERENCE2, the two layers will be turned on.  */
+        public reference: string;
+    }
+    /**
+    * Baselayers are background maps (e.g. openstreetmap, nokia here, etc).
+    * They are described in the project file
+    */
+    interface IBaseLayer {
+        id: string;
+        title: string;
+        isDefault: boolean;
+        subtitle: string;
+        preview: string;
+        url: string;
+        maxZoom: number;
+        minZoom: number;
+        subdomains: string[];
+        attribution: string;
+        test: string;
     }
 }
 declare module csComp.StringExt {
@@ -80,92 +311,6 @@ declare module csComp.Services {
         public trigger(event: any, ...args: any[]): void;
         public registerEvent(evtname: string): void;
         public registerEvents(evtnames: string[]): void;
-    }
-}
-declare module csComp.GeoJson {
-    interface IStringToString {
-        [key: string]: string;
-    }
-    interface IGeoJsonGeometry {
-        type: string;
-        coordinates: any;
-    }
-    interface IFeature {
-        id: string;
-        layerId: string;
-        type: string;
-        geometry: IGeoJsonGeometry;
-        properties: IStringToString[];
-        isSelected: boolean;
-        htmlStyle: string;
-        featureTypeName: string;
-        fType: IFeatureType;
-        isInitialized: boolean;
-    }
-    enum DrawingModeType {
-        None = 0,
-        Image = 1,
-        Point = 2,
-        Square = 3,
-        Rectangle = 4,
-        Line = 5,
-        Circle = 6,
-        Freehand = 7,
-        Polyline = 8,
-        Polygon = 9,
-        MultiPolygon = 10,
-    }
-    enum featureFilterType {
-        /** Turn filtering off */
-        none = 0,
-        /** Default for numbers: histogram */
-        bar = 1,
-        /** Default for text */
-        text = 2,
-    }
-    interface IMetaInfo {
-        label?: string;
-        title?: string;
-        description?: string;
-        type?: string;
-        section?: string;
-        stringFormat?: string;
-        visibleInCallOut?: boolean;
-        canEdit?: boolean;
-        filterType?: string;
-        isSearchable?: boolean;
-        minValue?: number;
-        maxValue?: number;
-        defaultValue?: number;
-    }
-    interface IFeatureTypeStyle {
-        nameLabel?: string;
-        fillColor?: string;
-        strokeColor?: string;
-        drawingMode?: string;
-        strokeWidth?: number;
-        iconWidth?: number;
-        iconHeight?: number;
-        iconUri?: string;
-        maxTitleResolution?: string;
-        analysisMetaInfo?: any;
-    }
-    interface IFeatureType {
-        name?: string;
-        style?: IFeatureTypeStyle;
-        metaInfoData?: IMetaInfo[];
-        /**
-        * Optional list of MetaInfo keys, separated by semi-colons.
-        * The keys can be resolved in the project's metaInfoData dictionary, or in the local metaInfoData.
-        */
-        metaInfoKeys?: string;
-    }
-    interface IGeoJsonFile {
-        poiTypes?: {
-            [key: string]: IFeatureType;
-        };
-        type: string;
-        features: Feature[];
     }
 }
 declare module Helpers.Resize {
@@ -296,52 +441,6 @@ declare module LayersDirective {
     }
 }
 declare module csComp.Services {
-    class SolutionProject {
-        public title: string;
-        public url: string;
-    }
-    interface IBaseLayer {
-        id: string;
-        title: string;
-        isDefault: boolean;
-        subtitle: string;
-        preview: string;
-        url: string;
-        maxZoom: number;
-        minZoom: number;
-        subdomains: string[];
-        attribution: string;
-        test: string;
-    }
-    interface IBoundingBox {
-        southWest: L.LatLng;
-        northEast: L.LatLng;
-    }
-    /**
-    * Represents to the overall projects class.
-    */
-    class Solution {
-        public title: string;
-        public maxBounds: IBoundingBox;
-        public viewBounds: IBoundingBox;
-        public baselayers: IBaseLayer[];
-        public projects: SolutionProject[];
-    }
-    class Project {
-        public title: string;
-        public description: string;
-        public logo: string;
-        public featureTypes: {
-            [id: string]: GeoJson.IFeatureType;
-        };
-        public metaInfoData: {
-            [id: string]: GeoJson.IMetaInfo;
-        };
-        public groups: ProjectGroup[];
-        public startposition: Coordinates;
-        public features: GeoJson.IFeature[];
-        public markers: {};
-    }
     class PropertyInfo {
         public max: number;
         public min: number;
@@ -351,76 +450,6 @@ declare module csComp.Services {
         public sd: number;
         public sdMax: number;
         public sdMin: number;
-    }
-    class ProjectLayer {
-        public title: string;
-        public description: string;
-        public type: string;
-        public url: string;
-        public styleurl: string;
-        public enabled: boolean;
-        public opacity: number;
-        public isLoading: boolean;
-        public isSublayer: boolean;
-        public mapLayer: L.LayerGroup<L.ILayer>;
-        public group: ProjectGroup;
-        /** Internal ID, e.g. for the Excel service */
-        public id: string;
-        /** Reference for URL params: if the URL contains layers=REFERENCE1;REFERENCE2, the two layers will be turned on.  */
-        public reference: string;
-    }
-    class GroupFilter {
-        public id: string;
-        public title: string;
-        public enabled: boolean;
-        public filterType: string;
-        public property: string;
-        public criteria: string;
-        public dimension: any;
-        public value: any;
-        public stringValue: string;
-        public rangex: number[];
-        public meta: GeoJson.IMetaInfo;
-    }
-    class GroupStyle {
-        public id: string;
-        public title: string;
-        public enabled: boolean;
-        public layers: string[];
-        public visualAspect: string;
-        public property: string;
-        public colors: string[];
-        public group: ProjectGroup;
-        public availableAspects: string[];
-        public canSelectColor: boolean;
-        public colorScales: any;
-        public info: PropertyInfo;
-        public meta: GeoJson.IMetaInfo;
-        constructor($translate: ng.translate.ITranslateService);
-    }
-    class ProjectGroup {
-        public id: string;
-        public title: string;
-        public description: string;
-        public layers: ProjectLayer[];
-        public filters: GroupFilter[];
-        public styles: GroupStyle[];
-        public showTitle: boolean;
-        public cluster: L.MarkerClusterGroup;
-        public vectors: L.LayerGroup<L.ILayer>;
-        /** Turn on the leaflet markercluster */
-        public clustering: boolean;
-        /** If set, at this zoom level and below markers will not be clustered. This defaults to disabled */
-        public clusterLevel: number;
-        /**  The maximum radius that a cluster will cover from the central marker (in pixels). Default 80. Decreasing will make more smaller clusters. You can also use a function that accepts the current map zoom and returns the maximum cluster radius in pixels. */
-        public maxClusterRadius: number;
-        public clusterFunction: Function;
-        /** Creates radio buttons instead of checkboxes in the level */
-        public oneLayerActive: boolean;
-        public ndx: any;
-        public filterResult: GeoJson.IFeature[];
-        public markers: any;
-        public styleProperty: string;
     }
     class LayerService implements ILayerService {
         private $location;

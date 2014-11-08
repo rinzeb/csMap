@@ -1,14 +1,180 @@
 var csComp;
 (function (csComp) {
     (function (GeoJson) {
+        /**
+        * A feature is a single object that is show on a map (e.g. point, polyline, etc)
+        * Features are part of a layer and filtered and styled using group filters and styles
+        *
+        */
         var Feature = (function () {
             function Feature() {
             }
             return Feature;
         })();
         GeoJson.Feature = Feature;
+
+        (function (DrawingModeType) {
+            DrawingModeType[DrawingModeType["None"] = 0] = "None";
+            DrawingModeType[DrawingModeType["Image"] = 1] = "Image";
+            DrawingModeType[DrawingModeType["Point"] = 2] = "Point";
+            DrawingModeType[DrawingModeType["Square"] = 3] = "Square";
+            DrawingModeType[DrawingModeType["Rectangle"] = 4] = "Rectangle";
+            DrawingModeType[DrawingModeType["Line"] = 5] = "Line";
+            DrawingModeType[DrawingModeType["Circle"] = 6] = "Circle";
+            DrawingModeType[DrawingModeType["Freehand"] = 7] = "Freehand";
+            DrawingModeType[DrawingModeType["Polyline"] = 8] = "Polyline";
+            DrawingModeType[DrawingModeType["Polygon"] = 9] = "Polygon";
+            DrawingModeType[DrawingModeType["MultiPolygon"] = 10] = "MultiPolygon";
+        })(GeoJson.DrawingModeType || (GeoJson.DrawingModeType = {}));
+        var DrawingModeType = GeoJson.DrawingModeType;
+
+        //export enum MetaInfoType {
+        //    Text,
+        //    TextArea,
+        //    Rating,
+        //    Number,
+        //    Bbcode,
+        //    Boolean,
+        //    Bit,
+        //    Sensor,
+        //    Xml,
+        //    Options,
+        //    Unknown,
+        //    Image,
+        //    DateTime,
+        //    Mediafolder
+        //}
+        (function (featureFilterType) {
+            /** Turn filtering off */
+            featureFilterType[featureFilterType["none"] = 0] = "none";
+
+            /** Default for numbers: histogram */
+            featureFilterType[featureFilterType["bar"] = 1] = "bar";
+
+            /** Default for text */
+            featureFilterType[featureFilterType["text"] = 2] = "text";
+        })(GeoJson.featureFilterType || (GeoJson.featureFilterType = {}));
+        var featureFilterType = GeoJson.featureFilterType;
     })(csComp.GeoJson || (csComp.GeoJson = {}));
     var GeoJson = csComp.GeoJson;
+})(csComp || (csComp = {}));
+var csComp;
+(function (csComp) {
+    (function (Services) {
+        /** a project group contains a list of layers that can be grouped together.
+        * Filters, styles can clustering is always defined on the group level.
+        * If a filter is selected (e.g. show only the features within a certain property range)
+        * this filter is applied to all layers within this group.
+        * If clustering is enabled all features in all layers are grouped together
+        */
+        var ProjectGroup = (function () {
+            function ProjectGroup() {
+            }
+            return ProjectGroup;
+        })();
+        Services.ProjectGroup = ProjectGroup;
+
+        /**
+        * Filters are used to select a subset of features within a group.
+        */
+        var GroupFilter = (function () {
+            function GroupFilter() {
+            }
+            return GroupFilter;
+        })();
+        Services.GroupFilter = GroupFilter;
+
+        /**
+        * Styles can determine how features are shown on the map
+        */
+        var GroupStyle = (function () {
+            function GroupStyle($translate) {
+                var _this = this;
+                this.availableAspects = ["strokeColor", "fillColor", "strokeWidth"];
+                this.colorScales = {};
+
+                $translate('WHITE_RED').then(function (translation) {
+                    _this.colorScales[translation] = ["white", "red"];
+                });
+                $translate('RED_WHITE').then(function (translation) {
+                    _this.colorScales[translation] = ["red", "white"];
+                });
+                $translate('GREEN_RED').then(function (translation) {
+                    _this.colorScales[translation] = ["green", "red"];
+                });
+                $translate('RED_GREEN').then(function (translation) {
+                    _this.colorScales[translation] = ["red", "green"];
+                });
+                $translate('WHITE_BLUE').then(function (translation) {
+                    _this.colorScales[translation] = ["white", "blue"];
+                });
+                $translate('BLUE_WHITE').then(function (translation) {
+                    _this.colorScales[translation] = ["blue", "white"];
+                });
+                $translate('WHITE_GREEN').then(function (translation) {
+                    _this.colorScales[translation] = ["white", "green"];
+                });
+                $translate('GREEN_WHITE').then(function (translation) {
+                    _this.colorScales[translation] = ["green", "white"];
+                });
+                $translate('WHITE_ORANGE').then(function (translation) {
+                    _this.colorScales[translation] = ["white", "orange"];
+                });
+                $translate('ORANGE_WHITE').then(function (translation) {
+                    _this.colorScales[translation] = ["orange", "white"];
+                });
+            }
+            return GroupStyle;
+        })();
+        Services.GroupStyle = GroupStyle;
+    })(csComp.Services || (csComp.Services = {}));
+    var Services = csComp.Services;
+})(csComp || (csComp = {}));
+var csComp;
+(function (csComp) {
+    (function (Services) {
+        /**
+        * Represents to the overall solution class. A solution can contain multiple project.
+        * This can be usefull when you want to have the same website, but with different content.
+        * e.g. you could make it so that you can switch between different regions
+        */
+        var Solution = (function () {
+            function Solution() {
+            }
+            return Solution;
+        })();
+        Services.Solution = Solution;
+
+        /** project within a solution file, refers to a project url*/
+        var SolutionProject = (function () {
+            function SolutionProject() {
+            }
+            return SolutionProject;
+        })();
+        Services.SolutionProject = SolutionProject;
+
+        /** project configuration. */
+        var Project = (function () {
+            function Project() {
+                this.markers = {};
+            }
+            return Project;
+        })();
+        Services.Project = Project;
+
+        
+
+        /** layer information. a layer is described in a project file and is always part of a group */
+        var ProjectLayer = (function () {
+            function ProjectLayer() {
+            }
+            return ProjectLayer;
+        })();
+        Services.ProjectLayer = ProjectLayer;
+
+        
+    })(csComp.Services || (csComp.Services = {}));
+    var Services = csComp.Services;
 })(csComp || (csComp = {}));
 var csComp;
 (function (csComp) {
@@ -262,54 +428,6 @@ var csComp;
         Services.EventObj = EventObj;
     })(csComp.Services || (csComp.Services = {}));
     var Services = csComp.Services;
-})(csComp || (csComp = {}));
-var csComp;
-(function (csComp) {
-    (function (GeoJson) {
-        (function (DrawingModeType) {
-            DrawingModeType[DrawingModeType["None"] = 0] = "None";
-            DrawingModeType[DrawingModeType["Image"] = 1] = "Image";
-            DrawingModeType[DrawingModeType["Point"] = 2] = "Point";
-            DrawingModeType[DrawingModeType["Square"] = 3] = "Square";
-            DrawingModeType[DrawingModeType["Rectangle"] = 4] = "Rectangle";
-            DrawingModeType[DrawingModeType["Line"] = 5] = "Line";
-            DrawingModeType[DrawingModeType["Circle"] = 6] = "Circle";
-            DrawingModeType[DrawingModeType["Freehand"] = 7] = "Freehand";
-            DrawingModeType[DrawingModeType["Polyline"] = 8] = "Polyline";
-            DrawingModeType[DrawingModeType["Polygon"] = 9] = "Polygon";
-            DrawingModeType[DrawingModeType["MultiPolygon"] = 10] = "MultiPolygon";
-        })(GeoJson.DrawingModeType || (GeoJson.DrawingModeType = {}));
-        var DrawingModeType = GeoJson.DrawingModeType;
-
-        //export enum MetaInfoType {
-        //    Text,
-        //    TextArea,
-        //    Rating,
-        //    Number,
-        //    Bbcode,
-        //    Boolean,
-        //    Bit,
-        //    Sensor,
-        //    Xml,
-        //    Options,
-        //    Unknown,
-        //    Image,
-        //    DateTime,
-        //    Mediafolder
-        //}
-        (function (featureFilterType) {
-            /** Turn filtering off */
-            featureFilterType[featureFilterType["none"] = 0] = "none";
-
-            /** Default for numbers: histogram */
-            featureFilterType[featureFilterType["bar"] = 1] = "bar";
-
-            /** Default for text */
-            featureFilterType[featureFilterType["text"] = 2] = "text";
-        })(GeoJson.featureFilterType || (GeoJson.featureFilterType = {}));
-        var featureFilterType = GeoJson.featureFilterType;
-    })(csComp.GeoJson || (csComp.GeoJson = {}));
-    var GeoJson = csComp.GeoJson;
 })(csComp || (csComp = {}));
 var Helpers;
 (function (Helpers) {
@@ -818,99 +936,12 @@ var LayersDirective;
 var csComp;
 (function (csComp) {
     (function (Services) {
-        var SolutionProject = (function () {
-            function SolutionProject() {
-            }
-            return SolutionProject;
-        })();
-        Services.SolutionProject = SolutionProject;
-
-        /**
-        * Represents to the overall projects class.
-        */
-        var Solution = (function () {
-            function Solution() {
-            }
-            return Solution;
-        })();
-        Services.Solution = Solution;
-
-        var Project = (function () {
-            function Project() {
-                this.markers = {};
-            }
-            return Project;
-        })();
-        Services.Project = Project;
-
         var PropertyInfo = (function () {
             function PropertyInfo() {
             }
             return PropertyInfo;
         })();
         Services.PropertyInfo = PropertyInfo;
-
-        var ProjectLayer = (function () {
-            function ProjectLayer() {
-            }
-            return ProjectLayer;
-        })();
-        Services.ProjectLayer = ProjectLayer;
-
-        var GroupFilter = (function () {
-            function GroupFilter() {
-            }
-            return GroupFilter;
-        })();
-        Services.GroupFilter = GroupFilter;
-
-        var GroupStyle = (function () {
-            function GroupStyle($translate) {
-                var _this = this;
-                this.availableAspects = ["strokeColor", "fillColor", "strokeWidth"];
-                this.colorScales = {};
-
-                $translate('WHITE_RED').then(function (translation) {
-                    _this.colorScales[translation] = ["white", "red"];
-                });
-                $translate('RED_WHITE').then(function (translation) {
-                    _this.colorScales[translation] = ["red", "white"];
-                });
-                $translate('GREEN_RED').then(function (translation) {
-                    _this.colorScales[translation] = ["green", "red"];
-                });
-                $translate('RED_GREEN').then(function (translation) {
-                    _this.colorScales[translation] = ["red", "green"];
-                });
-                $translate('WHITE_BLUE').then(function (translation) {
-                    _this.colorScales[translation] = ["white", "blue"];
-                });
-                $translate('BLUE_WHITE').then(function (translation) {
-                    _this.colorScales[translation] = ["blue", "white"];
-                });
-                $translate('WHITE_GREEN').then(function (translation) {
-                    _this.colorScales[translation] = ["white", "green"];
-                });
-                $translate('GREEN_WHITE').then(function (translation) {
-                    _this.colorScales[translation] = ["green", "white"];
-                });
-                $translate('WHITE_ORANGE').then(function (translation) {
-                    _this.colorScales[translation] = ["white", "orange"];
-                });
-                $translate('ORANGE_WHITE').then(function (translation) {
-                    _this.colorScales[translation] = ["orange", "white"];
-                });
-            }
-            return GroupStyle;
-        })();
-        Services.GroupStyle = GroupStyle;
-
-        var ProjectGroup = (function () {
-            function ProjectGroup() {
-            }
-            return ProjectGroup;
-        })();
-        Services.ProjectGroup = ProjectGroup;
 
         var LayerService = (function () {
             function LayerService($location, $translate, $messageBusService, $mapService) {
@@ -1466,7 +1497,7 @@ var csComp;
                 if (f != null) {
                     this.noStyles = false;
                     var layer = this.findLayer(f.layerId);
-                    var gs = new GroupStyle(this.$translate);
+                    var gs = new Services.GroupStyle(this.$translate);
                     gs.id = this.getGuid();
                     gs.title = property.key;
                     gs.visualAspect = "fillColor";
@@ -1516,7 +1547,7 @@ var csComp;
             LayerService.prototype.addFilter = function (group, prop) {
                 var filter = this.findFilter(group, prop);
                 if (filter == null) {
-                    var gf = new GroupFilter();
+                    var gf = new Services.GroupFilter();
                     gf.property = prop;
 
                     //gf.filterType = "row";
@@ -1544,7 +1575,7 @@ var csComp;
                     if (layer != null) {
                         var filter = this.findFilter(layer.group, prop);
                         if (filter == null) {
-                            var gf = new GroupFilter();
+                            var gf = new Services.GroupFilter();
                             gf.property = prop;
                             gf.meta = property.meta;
                             gf.filterType = "bar";
