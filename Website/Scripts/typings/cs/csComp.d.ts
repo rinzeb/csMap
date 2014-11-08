@@ -191,15 +191,17 @@ declare module LegendList {
     interface ILegendListScope extends ng.IScope {
         vm: LegendListCtrl;
         numberOfItems: number;
-        legendItems: Function;
+        legendItems: ILegendItem[];
     }
     class LegendListCtrl {
         private $scope;
         private $layerService;
         private $mapService;
+        private $messageBusService;
         private scope;
         static $inject: string[];
-        constructor($scope: ILegendListScope, $layerService: csComp.Services.LayerService, $mapService: csComp.Services.MapService);
+        constructor($scope: ILegendListScope, $layerService: csComp.Services.LayerService, $mapService: csComp.Services.MapService, $messageBusService: csComp.Services.MessageBusService);
+        private updateLegendItems();
         private getImageUri(ft);
         private getName(key, ft);
     }
@@ -394,7 +396,7 @@ declare module csComp.Services {
         public colorScales: any;
         public info: PropertyInfo;
         public meta: GeoJson.IMetaInfo;
-        constructor();
+        constructor($translate: ng.translate.ITranslateService);
     }
     class ProjectGroup {
         public id: string;
@@ -422,6 +424,7 @@ declare module csComp.Services {
     }
     class LayerService implements ILayerService {
         private $location;
+        private $translate;
         private $messageBusService;
         private $mapService;
         public maxBounds: IBoundingBox;
@@ -444,7 +447,7 @@ declare module csComp.Services {
         public noStyles: boolean;
         public lastSelectedFeature: GeoJson.IFeature;
         public selectedLayerId: string;
-        constructor($location: ng.ILocationService, $messageBusService: MessageBusService, $mapService: MapService);
+        constructor($location: ng.ILocationService, $translate: ng.translate.ITranslateService, $messageBusService: MessageBusService, $mapService: MapService);
         /**
         * Add a layer
         */
