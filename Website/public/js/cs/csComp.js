@@ -1,6 +1,6 @@
 var csComp;
 (function (csComp) {
-    (function (GeoJson) {
+    (function (Services) {
         /**
         * A feature is a single object that is show on a map (e.g. point, polyline, etc)
         * Features are part of a layer and filtered and styled using group filters and styles
@@ -11,7 +11,7 @@ var csComp;
             }
             return Feature;
         })();
-        GeoJson.Feature = Feature;
+        Services.Feature = Feature;
 
         (function (DrawingModeType) {
             DrawingModeType[DrawingModeType["None"] = 0] = "None";
@@ -25,8 +25,8 @@ var csComp;
             DrawingModeType[DrawingModeType["Polyline"] = 8] = "Polyline";
             DrawingModeType[DrawingModeType["Polygon"] = 9] = "Polygon";
             DrawingModeType[DrawingModeType["MultiPolygon"] = 10] = "MultiPolygon";
-        })(GeoJson.DrawingModeType || (GeoJson.DrawingModeType = {}));
-        var DrawingModeType = GeoJson.DrawingModeType;
+        })(Services.DrawingModeType || (Services.DrawingModeType = {}));
+        var DrawingModeType = Services.DrawingModeType;
 
         //export enum propertyTypeType {
         //    Text,
@@ -53,10 +53,10 @@ var csComp;
 
             /** Default for text */
             featureFilterType[featureFilterType["text"] = 2] = "text";
-        })(GeoJson.featureFilterType || (GeoJson.featureFilterType = {}));
-        var featureFilterType = GeoJson.featureFilterType;
-    })(csComp.GeoJson || (csComp.GeoJson = {}));
-    var GeoJson = csComp.GeoJson;
+        })(Services.featureFilterType || (Services.featureFilterType = {}));
+        var featureFilterType = Services.featureFilterType;
+    })(csComp.Services || (csComp.Services = {}));
+    var Services = csComp.Services;
 })(csComp || (csComp = {}));
 var csComp;
 (function (csComp) {

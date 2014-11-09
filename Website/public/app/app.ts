@@ -1,7 +1,7 @@
 ﻿module App {
     'use strict';
 
-    import IFeature = csComp.GeoJson.IFeature;
+    import IFeature = csComp.Services.IFeature;
 
     export interface IAppLocationService extends ng.ILocationService {
         $$search: { layers: string };
@@ -64,7 +64,7 @@
             $messageBusService.subscribe("feature", this.featureMessageReceived);
             $messageBusService.subscribe("layer", this.layerMessageReceived);
 
-            this.$layerService.openSolution("data/projects/projects.json", $location.$$search.layers);
+            this.$layerService.openSolution("data/projects/solution.json", $location.$$search.layers);
             $messageBusService.notify('Welcome to csMap', 'Your mapping solution.');
 
             this.showMap = this.$location.path() === "/map";

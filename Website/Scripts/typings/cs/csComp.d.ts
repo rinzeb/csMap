@@ -1,6 +1,6 @@
 /// <reference path="../crossfilter/crossfilter.d.ts" />
 /// <reference path="../leaflet/leaflet.d.ts" />
-declare module csComp.GeoJson {
+declare module csComp.Services {
     interface IFeature {
         id: string;
         layerId: string;
@@ -130,7 +130,7 @@ declare module csComp.Services {
         /** Creates radio buttons instead of checkboxes in the level */
         public oneLayerActive: boolean;
         public ndx: any;
-        public filterResult: GeoJson.IFeature[];
+        public filterResult: IFeature[];
         public markers: any;
         public styleProperty: string;
     }
@@ -148,7 +148,7 @@ declare module csComp.Services {
         public value: any;
         public stringValue: string;
         public rangex: number[];
-        public meta: GeoJson.IPropertyType;
+        public meta: IPropertyType;
     }
     /**
     * Styles can determine how features are shown on the map
@@ -166,7 +166,7 @@ declare module csComp.Services {
         public canSelectColor: boolean;
         public colorScales: any;
         public info: PropertyInfo;
-        public meta: GeoJson.IPropertyType;
+        public meta: IPropertyType;
         constructor($translate: ng.translate.ITranslateService);
     }
 }
@@ -194,14 +194,14 @@ declare module csComp.Services {
         public description: string;
         public logo: string;
         public featureTypes: {
-            [id: string]: GeoJson.IFeatureType;
+            [id: string]: IFeatureType;
         };
         public propertyTypeData: {
-            [id: string]: GeoJson.IPropertyType;
+            [id: string]: IPropertyType;
         };
         public groups: ProjectGroup[];
         public startposition: Coordinates;
-        public features: GeoJson.IFeature[];
+        public features: IFeature[];
         public markers: {};
     }
     /** bouding box to specify a region. */
@@ -400,23 +400,6 @@ declare module csComp.Services {
         GeoJson = 0,
         Kml = 1,
     }
-    interface ILayerService {
-        title: string;
-        accentColor: string;
-        project: Project;
-        maxBounds: IBoundingBox;
-        findLayer(id: string): ProjectLayer;
-        selectFeature(feature: GeoJson.IFeature): any;
-        mb: MessageBusService;
-        map: MapService;
-        layerGroup: L.LayerGroup<L.ILayer>;
-        featureTypes: {
-            [key: string]: GeoJson.IFeatureType;
-        };
-        propertyTypeData: {
-            [key: string]: GeoJson.IPropertyType;
-        };
-    }
 }
 declare module LayersDirective {
     var html: string;
@@ -441,6 +424,23 @@ declare module LayersDirective {
     }
 }
 declare module csComp.Services {
+    interface ILayerService {
+        title: string;
+        accentColor: string;
+        project: Project;
+        maxBounds: IBoundingBox;
+        findLayer(id: string): ProjectLayer;
+        selectFeature(feature: IFeature): any;
+        mb: MessageBusService;
+        map: MapService;
+        layerGroup: L.LayerGroup<L.ILayer>;
+        featureTypes: {
+            [key: string]: IFeatureType;
+        };
+        propertyTypeData: {
+            [key: string]: IPropertyType;
+        };
+    }
     class PropertyInfo {
         public max: number;
         public min: number;
@@ -463,10 +463,10 @@ declare module csComp.Services {
         public mb: MessageBusService;
         public map: MapService;
         public featureTypes: {
-            [key: string]: GeoJson.IFeatureType;
+            [key: string]: IFeatureType;
         };
         public propertyTypeData: {
-            [key: string]: GeoJson.IPropertyType;
+            [key: string]: IPropertyType;
         };
         public project: Project;
         public layerGroup: L.LayerGroup<L.ILayer>;
@@ -474,7 +474,7 @@ declare module csComp.Services {
         public info: L.Control;
         public noFilters: boolean;
         public noStyles: boolean;
-        public lastSelectedFeature: GeoJson.IFeature;
+        public lastSelectedFeature: IFeature;
         public selectedLayerId: string;
         constructor($location: ng.ILocationService, $translate: ng.translate.ITranslateService, $messageBusService: MessageBusService, $mapService: MapService);
         /**
@@ -501,7 +501,7 @@ declare module csComp.Services {
         private getDefaultMarkerStyle(feature);
         private updatePolygonStyle(m, feature);
         private getColor(v, gs);
-        public style(feature: GeoJson.IFeature, layer: ProjectLayer): {
+        public style(feature: IFeature, layer: ProjectLayer): {
             fillColor: string;
             weight: number;
             opacity: number;
@@ -512,20 +512,20 @@ declare module csComp.Services {
         * init feature (add to feature list, crossfilter)
         */
         private initFeature(feature, layer);
-        public removeFeature(feature: GeoJson.IFeature, layer: ProjectLayer): void;
+        public removeFeature(feature: IFeature, layer: ProjectLayer): void;
         /**
         * create icon based of feature style
         */
-        public getPointIcon(feature: GeoJson.IFeature, layer: ProjectLayer): any;
+        public getPointIcon(feature: IFeature, layer: ProjectLayer): any;
         /**
         * Update icon for features
         */
-        public updateFeatureIcon(feature: GeoJson.IFeature, layer: ProjectLayer): any;
+        public updateFeatureIcon(feature: IFeature, layer: ProjectLayer): any;
         /**
         * add a feature
         */
-        public addFeature(feature: GeoJson.IFeature, latlng: any, layer: ProjectLayer): any;
-        public selectFeature(feature: GeoJson.IFeature): void;
+        public addFeature(feature: IFeature, latlng: any, layer: ProjectLayer): any;
+        public selectFeature(feature: IFeature): void;
         /**
         * find a filter for a specific group/property combination
         */
@@ -546,7 +546,7 @@ declare module csComp.Services {
         * First, look for a layer specific feature type, otherwise, look for a project-specific feature type.
         * In case both fail, create a default feature type at the layer level.
         */
-        public getFeatureType(feature: GeoJson.IFeature): GeoJson.IFeatureType;
+        public getFeatureType(feature: IFeature): IFeatureType;
         /**
         * In case we are dealing with a regular JSON file without type information, create a default type.
         */
@@ -649,7 +649,7 @@ declare module csComp.Services {
         /**
         * Zoom to a feature on the map.
         */
-        public zoomTo(feature: GeoJson.IFeature): void;
+        public zoomTo(feature: IFeature): void;
         /**
         * Compute the bounding box.
         * Returns [min_x, max_x, min_y, max_y]
@@ -705,7 +705,7 @@ declare module FeatureProps {
     interface IFeaturePropsScope extends ng.IScope {
         vm: FeaturePropsCtrl;
         showMenu: boolean;
-        poi: csComp.GeoJson.IFeature;
+        poi: csComp.Services.IFeature;
         callOut: CallOut;
         featureTabActivated(sectionTitle: string, section: CallOutSection): any;
         autocollapse(init: boolean): void;
@@ -716,9 +716,9 @@ declare module FeatureProps {
         property: string;
         canFilter: boolean;
         canStyle: boolean;
-        feature: csComp.GeoJson.IFeature;
+        feature: csComp.Services.IFeature;
         description?: string;
-        meta?: csComp.GeoJson.IPropertyType;
+        meta?: csComp.Services.IPropertyType;
         isFilter: boolean;
     }
     class CallOutProperty implements ICallOutProperty {
@@ -727,30 +727,30 @@ declare module FeatureProps {
         public property: string;
         public canFilter: boolean;
         public canStyle: boolean;
-        public feature: csComp.GeoJson.IFeature;
+        public feature: csComp.Services.IFeature;
         public isFilter: boolean;
         public description: string;
-        public meta: csComp.GeoJson.IPropertyType;
-        constructor(key: string, value: string, property: string, canFilter: boolean, canStyle: boolean, feature: csComp.GeoJson.IFeature, isFilter: boolean, description?: string, meta?: csComp.GeoJson.IPropertyType);
+        public meta: csComp.Services.IPropertyType;
+        constructor(key: string, value: string, property: string, canFilter: boolean, canStyle: boolean, feature: csComp.Services.IFeature, isFilter: boolean, description?: string, meta?: csComp.Services.IPropertyType);
     }
     interface ICallOutSection {
         propertyTypes: {
-            [label: string]: csComp.GeoJson.IPropertyType;
+            [label: string]: csComp.Services.IPropertyType;
         };
         properties: ICallOutProperty[];
         sectionIcon: string;
-        addProperty(key: string, value: string, property: string, canFilter: boolean, canStyle: boolean, feature: csComp.GeoJson.IFeature, isFilter: boolean, description?: string, meta?: csComp.GeoJson.IPropertyType): void;
+        addProperty(key: string, value: string, property: string, canFilter: boolean, canStyle: boolean, feature: csComp.Services.IFeature, isFilter: boolean, description?: string, meta?: csComp.Services.IPropertyType): void;
         hasProperties(): boolean;
     }
     class CallOutSection implements ICallOutSection {
         public propertyTypes: {
-            [label: string]: csComp.GeoJson.IPropertyType;
+            [label: string]: csComp.Services.IPropertyType;
         };
         public properties: ICallOutProperty[];
         public sectionIcon: string;
         constructor(sectionIcon?: string);
         public showSectionIcon(): boolean;
-        public addProperty(key: string, value: string, property: string, canFilter: boolean, canStyle: boolean, feature: csComp.GeoJson.IFeature, isFilter: boolean, description?: string, meta?: csComp.GeoJson.IPropertyType): void;
+        public addProperty(key: string, value: string, property: string, canFilter: boolean, canStyle: boolean, feature: csComp.Services.IFeature, isFilter: boolean, description?: string, meta?: csComp.Services.IPropertyType): void;
         public hasProperties(): boolean;
     }
     class CallOut {
@@ -761,8 +761,8 @@ declare module FeatureProps {
         public sections: {
             [title: string]: ICallOutSection;
         };
-        constructor(type: csComp.GeoJson.IFeatureType, feature: csComp.GeoJson.IFeature, propertyTypeData: {
-            [key: string]: csComp.GeoJson.IPropertyType;
+        constructor(type: csComp.Services.IFeatureType, feature: csComp.Services.IFeature, propertyTypeData: {
+            [key: string]: csComp.Services.IPropertyType;
         });
         private getOrCreateCallOutSection(sectionTitle);
         /**
@@ -815,12 +815,12 @@ declare module DataTable {
         private $localStorageService;
         private $messageBusService;
         public mapLabel: string;
-        public dataset: csComp.GeoJson.IGeoJsonFile;
-        public selectedType: csComp.GeoJson.IFeatureType;
+        public dataset: csComp.Services.IGeoJsonFile;
+        public selectedType: csComp.Services.IFeatureType;
         public numberOfItems: number;
         public selectedLayerId: string;
         public layerOptions: any[];
-        public propertyTypes: csComp.GeoJson.IPropertyType[];
+        public propertyTypes: csComp.Services.IPropertyType[];
         public headers: string[];
         public sortingColumn: number;
         public rows: TableField[][];

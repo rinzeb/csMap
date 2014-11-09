@@ -69,7 +69,7 @@
     <Content Include="public\data\projects\20141104_csMap\project.json" />
     <Content Include="public\data\projects\20141104_csMap\veiligheidsregios.json" />
     <Content Include="public\data\projects\20141104_csMap\Ziekenhuizen.json" />
-    <Content Include="public\data\projects\projects.json">
+    <Content Include="public\data\projects\solution.json">
       <Publish>True</Publish>
     </Content>
     <Content Include="public\images\CareToolIcon.png" />
