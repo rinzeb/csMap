@@ -28,7 +28,7 @@ var csComp;
         })(GeoJson.DrawingModeType || (GeoJson.DrawingModeType = {}));
         var DrawingModeType = GeoJson.DrawingModeType;
 
-        //export enum MetaInfoType {
+        //export enum propertyTypeType {
         //    Text,
         //    TextArea,
         //    Rating,
@@ -959,7 +959,7 @@ var csComp;
                 this.title = "";
                 this.layerGroup = new L.LayerGroup();
                 this.featureTypes = {};
-                this.metaInfoData = {};
+                this.propertyTypeData = {};
                 this.map.map.addLayer(this.layerGroup);
                 this.noStyles = true;
             }
@@ -1649,26 +1649,26 @@ var csComp;
             LayerService.prototype.createDefaultType = function (feature) {
                 var type = {};
                 type.style = { nameLabel: "Name" };
-                type.metaInfoData = [];
+                type.propertyTypeData = [];
 
                 for (var key in feature.properties) {
-                    var metaInfo = [];
-                    metaInfo.label = key;
-                    metaInfo.title = key.replace("_", " ");
-                    metaInfo.isSearchable = true;
-                    metaInfo.visibleInCallOut = true;
-                    metaInfo.canEdit = false;
+                    var propertyType = [];
+                    propertyType.label = key;
+                    propertyType.title = key.replace("_", " ");
+                    propertyType.isSearchable = true;
+                    propertyType.visibleInCallOut = true;
+                    propertyType.canEdit = false;
                     var value = feature.properties[key];
                     if (csComp.StringExt.isNumber(value))
-                        metaInfo.type = "number";
+                        propertyType.type = "number";
                     else if (csComp.StringExt.isBoolean(value))
-                        metaInfo.type = "boolean";
+                        propertyType.type = "boolean";
                     else if (csComp.StringExt.isBbcode(value))
-                        metaInfo.type = "bbcode";
+                        propertyType.type = "bbcode";
                     else
-                        metaInfo.type = "text";
+                        propertyType.type = "text";
 
-                    type.metaInfoData.push(metaInfo);
+                    type.propertyTypeData.push(propertyType);
                 }
                 return type;
             };
@@ -1845,10 +1845,10 @@ var csComp;
                         }
                     }
 
-                    if (_this.project.metaInfoData) {
-                        for (var key in _this.project.metaInfoData) {
-                            var metaInfo = _this.project.metaInfoData[key];
-                            _this.metaInfoData[key] = metaInfo;
+                    if (_this.project.propertyTypeData) {
+                        for (var key in _this.project.propertyTypeData) {
+                            var propertyType = _this.project.propertyTypeData[key];
+                            _this.propertyTypeData[key] = propertyType;
                         }
                     }
 
@@ -1950,8 +1950,8 @@ var csComp;
                     r.sdMin = r.min;
                 if (r.sdMax == NaN)
                     r.sdMax = r.max;
-                if (this.metaInfoData.hasOwnProperty(property)) {
-                    var mid = this.metaInfoData[property];
+                if (this.propertyTypeData.hasOwnProperty(property)) {
+                    var mid = this.propertyTypeData[property];
                     if (mid.maxValue != null)
                         r.sdMax = mid.maxValue;
                     if (mid.minValue != null)
@@ -2715,7 +2715,7 @@ var FeatureProps;
 
     var CallOutSection = (function () {
         function CallOutSection(sectionIcon) {
-            this.metaInfos = {};
+            this.propertyTypes = {};
             this.properties = [];
             this.sectionIcon = sectionIcon;
         }
@@ -2738,11 +2738,11 @@ var FeatureProps;
     FeatureProps.CallOutSection = CallOutSection;
 
     var CallOut = (function () {
-        function CallOut(type, feature, metaInfoData) {
+        function CallOut(type, feature, propertyTypeData) {
             var _this = this;
             this.type = type;
             this.feature = feature;
-            this.metaInfoData = metaInfoData;
+            this.propertyTypeData = propertyTypeData;
             this.sections = {};
 
             //if (type == null) this.createDefaultType();
@@ -2752,26 +2752,26 @@ var FeatureProps;
             var searchCallOutSection = new CallOutSection('fa-filter');
             var displayValue;
             if (type != null) {
-                var metaInfos = [];
-                if (type.metaInfoKeys != null) {
-                    var keys = type.metaInfoKeys.split(';');
+                var propertyTypes = [];
+                if (type.propertyTypeKeys != null) {
+                    var keys = type.propertyTypeKeys.split(';');
                     keys.forEach(function (key) {
-                        if (key in metaInfoData)
-                            metaInfos.push(metaInfoData[key]);
-                        else if (type.metaInfoData != null) {
-                            var result = $.grep(type.metaInfoData, function (e) {
+                        if (key in propertyTypeData)
+                            propertyTypes.push(propertyTypeData[key]);
+                        else if (type.propertyTypeData != null) {
+                            var result = $.grep(type.propertyTypeData, function (e) {
                                 return e.label === key;
                             });
                             if (result.length >= 1)
-                                metaInfos.push(result);
+                                propertyTypes.push(result);
                         }
                     });
-                } else if (type.metaInfoData != null) {
-                    metaInfos = type.metaInfoData;
+                } else if (type.propertyTypeData != null) {
+                    propertyTypes = type.propertyTypeData;
                 }
-                metaInfos.forEach(function (mi) {
+                propertyTypes.forEach(function (mi) {
                     var callOutSection = _this.getOrCreateCallOutSection(mi.section) || infoCallOutSection;
-                    callOutSection.metaInfos[mi.label] = mi;
+                    callOutSection.propertyTypes[mi.label] = mi;
                     var text = feature.properties[mi.label];
                     if (!StringExt.isNullOrEmpty(text) && !$.isNumeric(text))
                         text = text.replace(/&amp;/g, '&');
@@ -2826,14 +2826,14 @@ var FeatureProps;
         //private createDefaultType(): void {
         //    this.type              = [];
         //    this.type.style        = { nameLabel: "Name", iconHeight: 30, iconWidth: 30 };
-        //    this.type.metaInfoData = [];
+        //    this.type.propertyTypeData = [];
         //    for (var kvp in this.feature.properties) {
-        //        var metaInfo: IMetaInfo = [];
-        //        metaInfo.label          = kvp.key;
-        //        metaInfo.title          = kvp.key.replace("_", " ");
-        //        metaInfo.isSearchable   = true;
-        //        metaInfo.type           = MetaInfoType.Text;
-        //        this.type.metaInfoData.push(metaInfo);
+        //        var propertyType: IpropertyType = [];
+        //        propertyType.label          = kvp.key;
+        //        propertyType.title          = kvp.key.replace("_", " ");
+        //        propertyType.isSearchable   = true;
+        //        propertyType.type           = propertyTypeType.Text;
+        //        this.type.propertyTypeData.push(propertyType);
         //    }
         //}
         CallOut.prototype.getOrCreateCallOutSection = function (sectionTitle) {
@@ -2996,7 +2996,7 @@ var FeatureProps;
 
         FeaturePropsCtrl.prototype.displayFeature = function (feature) {
             var featureType = this.$layerService.featureTypes[feature.featureTypeName];
-            this.$scope.callOut = new CallOut(featureType, feature, this.$layerService.metaInfoData);
+            this.$scope.callOut = new CallOut(featureType, feature, this.$layerService.propertyTypeData);
 
             // Probably not needed
             if (this.$scope.$root.$$phase != '$apply' && this.$scope.$root.$$phase != '$digest') {
@@ -3021,7 +3021,7 @@ var DataTable;
 
     /**
     * Represents a field in the table.
-    * The value is the actual displayValue shown, the type is the metainfo type (e.g. number or text, useful when aligning the data), and the header is used for sorting.
+    * The value is the actual displayValue shown, the type is the propertyType type (e.g. number or text, useful when aligning the data), and the header is used for sorting.
     */
     var TableField = (function () {
         function TableField(displayValue, originalValue, type, header) {
@@ -3047,7 +3047,7 @@ var DataTable;
             this.mapLabel = "map";
             this.numberOfItems = 10;
             this.layerOptions = [];
-            this.metaInfos = [];
+            this.propertyTypes = [];
             this.headers = [];
             this.rows = [];
             // 'vm' stands for 'view model'. We're adding a reference to the controller to the scope
@@ -3113,7 +3113,7 @@ var DataTable;
                         data.poiTypes[f.featureTypeName] = _this.$layerService.featureTypes[f.featureTypeName];
                 });
 
-                _this.updateMetaInfo(data);
+                _this.updatepropertyType(data);
             }).error(function (data, status, headers, config) {
                 _this.$messageBusService.notify("ERROR opening " + selectedLayer.title, "Could not get the data.");
             });
@@ -3149,12 +3149,12 @@ var DataTable;
             });
 
             this.dataset = data;
-            this.updateMetaInfo(data);
+            this.updatepropertyType(data);
         };
 
-        DataTableCtrl.prototype.updateMetaInfo = function (data) {
+        DataTableCtrl.prototype.updatepropertyType = function (data) {
             var _this = this;
-            this.metaInfos = [];
+            this.propertyTypes = [];
             this.headers = [];
             this.rows = [];
             var titles = [];
@@ -3172,28 +3172,28 @@ var DataTable;
             var featureType;
             for (var key in data.poiTypes) {
                 featureType = data.poiTypes[key];
-                if (featureType.metaInfoKeys != null) {
-                    var keys = featureType.metaInfoKeys.split(';');
+                if (featureType.propertyTypeKeys != null) {
+                    var keys = featureType.propertyTypeKeys.split(';');
                     keys.forEach(function (k) {
-                        if (k in _this.$layerService.metaInfoData)
-                            mis.push(_this.$layerService.metaInfoData[k]);
-                        else if (featureType.metaInfoData != null) {
-                            var result = $.grep(featureType.metaInfoData, function (e) {
+                        if (k in _this.$layerService.propertyTypeData)
+                            mis.push(_this.$layerService.propertyTypeData[k]);
+                        else if (featureType.propertyTypeData != null) {
+                            var result = $.grep(featureType.propertyTypeData, function (e) {
                                 return e.label === k;
                             });
                             if (result.length >= 1)
                                 mis.push(result);
                         }
                     });
-                } else if (featureType.metaInfoData != null) {
-                    featureType.metaInfoData.forEach(function (mi) {
+                } else if (featureType.propertyTypeData != null) {
+                    featureType.propertyTypeData.forEach(function (mi) {
                         return mis.push(mi);
                     });
                 }
                 mis.forEach(function (mi) {
                     if ((mi.visibleInCallOut || mi.label === "Name") && titles.indexOf(mi.title) < 0) {
                         titles.push(mi.title);
-                        _this.metaInfos.push(mi);
+                        _this.propertyTypes.push(mi);
                     }
                 });
             }
@@ -3206,14 +3206,14 @@ var DataTable;
             this.rows = this.getRows();
         };
 
-        DataTableCtrl.prototype.toggleSelection = function (metaInfoTitle) {
-            var idx = this.headers.indexOf(metaInfoTitle);
+        DataTableCtrl.prototype.toggleSelection = function (propertyTypeTitle) {
+            var idx = this.headers.indexOf(propertyTypeTitle);
 
             // is currently selected
             if (idx > -1) {
                 this.headers.splice(idx, 1);
             } else {
-                this.headers.push(metaInfoTitle);
+                this.headers.push(propertyTypeTitle);
             }
             this.rows = this.getRows();
         };
@@ -3237,7 +3237,7 @@ var DataTable;
         DataTableCtrl.prototype.getRows = function () {
             var _this = this;
             var meta = [this.headers.length];
-            this.metaInfos.forEach(function (mi) {
+            this.propertyTypes.forEach(function (mi) {
                 // Keep headers and mi in the right order
                 var index = _this.headers.indexOf(mi.title);
                 if (index >= 0)
@@ -3357,7 +3357,7 @@ var DataTable;
 })(DataTable || (DataTable = {}));
 var DataTable;
 (function (DataTable) {
-    DataTable.html = '<div>    <div style="width:100%; margin: 10px auto;">        <div style="float: left; width: 15%; margin: 0; padding: 1em">            <!-- Pull down of map layers -->            <select data-ng-model="vm.selectedLayerId"                    data-ng-change="vm.loadLayer()"                    data-ng-options="layer.id as layer.title group by layer.group for layer in vm.layerOptions"                    class="form-control tt-input"></select>            <!-- List of headers -->            <ul class="form-group" style="margin-top: 1em; margin-left: -2em; overflow-y: auto; overflow-x: hidden;"                resize resize-y="150">                <li ng-repeat="mi in vm.metaInfos" class="list-unstyled" style="white-space: nowrap; text-overflow: ellipsis">                    <label>                        <input type="checkbox" name="vm.selectedTitles[]" value="{{mi.title}}"                               data-ng-checked="vm.headers.indexOf(mi.title) > -1"                               data-ng-click="vm.toggleSelection(mi.title)">&nbsp;&nbsp;{{mi.title}}                    </label>                    <!--<div class="checkbox">                        <label>                            <input type="checkbox" name="vm.selectedTitles[]" value="{{mi.title}}"                                   data-ng-checked="vm.headers.indexOf(mi.title) > -1"                                   data-ng-click="vm.toggleSelection(mi.title)">&nbsp;&nbsp;{{mi.title}}                        </label>                    </div>-->                </li>            </ul>            <!--       <pre>{{vm.headers|json}}</pre>-->        </div>        <!-- Right side of the table view -->        <div style="margin-left: 16%; border-left: 1px solid gray; padding: 1em;" ng-init="poiTypeFilter">            <!-- Filter -->            <div class="has-feedback" style="margin-bottom: 1em; float: right; width: 16%; min-width: 200px;">                <span style="direction: ltr; position: static; display: block;">                    <input id="searchbox" data-ng-model="featureFilter" type="text"                           placeholder="Filter" autocomplete="off" spellcheck="false"                           style="position: relative; vertical-align: top;" class="form-control tt-input">                </span>                <span id="searchicon" class="fa form-control-feedback fa-filter" style="padding-top: 0px;"></span>            </div>            <!--Download to CSV option-->            <a href="" data-ng-click="vm.downloadCsv()" alt="Download CSV" style="margin-top: 5px; margin-right: 1em; float: right;"><i class="fa fa-download fa-2x"></i></a>            <!-- Specify how many items to show -->            <select data-ng-model="vm.numberOfItems" style="margin-bottom: 1em; margin-right: 10px; float: left; width: 16%; min-width: 200px;" class="form-control tt-input">                <option value="5" translate="SHOW5"></option>                <option value="10" translate="SHOW10"></option>                <option value="15" translate="SHOW15"></option>                <option value="20" translate="SHOW20"></option>                <option value="25" translate="SHOW25"></option>                <option value="30" translate="SHOW30"></option>                <option value="35" translate="SHOW35"></option>                <option value="40" translate="SHOW40"></option>            </select>            <!-- Data table -->            <table class="table table-striped table-condensed">                <tr>                    <th data-ng-repeat="header in vm.headers">                        {{header}}&nbsp;                        <a data-ng-click="reverseSort = !reverseSort; vm.orderBy($index, reverseSort);"><i data-ng-class="vm.sortOrderClass($index, reverseSort)">&nbsp;&nbsp;</i></a>                    </th>                </tr>                <tr dir-paginate="row in vm.rows | filter:featureFilter | itemsPerPage: vm.numberOfItems"                    style="cursor: pointer; vertical-align: central">                    <td data-ng-class="{\'text-right\': field.type == \'number\'}" data-ng-repeat="field in row track by $index" data-ng-bind-html="vm.toTrusted(field.displayValue)"></td>                </tr>            </table>            <dir-pagination-controls style="" max-size="10" boundary-links="true" direction-links="true"                                     template-url="bower_components/angular-utils-pagination/dirPagination.tpl.html"></dir-pagination-controls>        </div>    </div>    <div style="clear: both; margin: 0; padding: .5em"></div></div>';
+    DataTable.html = '<div>    <div style="width:100%; margin: 10px auto;">        <div style="float: left; width: 15%; margin: 0; padding: 1em">            <!-- Pull down of map layers -->            <select data-ng-model="vm.selectedLayerId"                    data-ng-change="vm.loadLayer()"                    data-ng-options="layer.id as layer.title group by layer.group for layer in vm.layerOptions"                    class="form-control tt-input"></select>            <!-- List of headers -->            <ul class="form-group" style="margin-top: 1em; margin-left: -2em; overflow-y: auto; overflow-x: hidden;"                resize resize-y="150">                <li ng-repeat="mi in vm.propertyTypes" class="list-unstyled" style="white-space: nowrap; text-overflow: ellipsis">                    <label>                        <input type="checkbox" name="vm.selectedTitles[]" value="{{mi.title}}"                               data-ng-checked="vm.headers.indexOf(mi.title) > -1"                               data-ng-click="vm.toggleSelection(mi.title)">&nbsp;&nbsp;{{mi.title}}                    </label>                    <!--<div class="checkbox">                        <label>                            <input type="checkbox" name="vm.selectedTitles[]" value="{{mi.title}}"                                   data-ng-checked="vm.headers.indexOf(mi.title) > -1"                                   data-ng-click="vm.toggleSelection(mi.title)">&nbsp;&nbsp;{{mi.title}}                        </label>                    </div>-->                </li>            </ul>            <!--       <pre>{{vm.headers|json}}</pre>-->        </div>        <!-- Right side of the table view -->        <div style="margin-left: 16%; border-left: 1px solid gray; padding: 1em;" ng-init="poiTypeFilter">            <!-- Filter -->            <div class="has-feedback" style="margin-bottom: 1em; float: right; width: 16%; min-width: 200px;">                <span style="direction: ltr; position: static; display: block;">                    <input id="searchbox" data-ng-model="featureFilter" type="text"                           placeholder="Filter" autocomplete="off" spellcheck="false"                           style="position: relative; vertical-align: top;" class="form-control tt-input">                </span>                <span id="searchicon" class="fa form-control-feedback fa-filter" style="padding-top: 0px;"></span>            </div>            <!--Download to CSV option-->            <a href="" data-ng-click="vm.downloadCsv()" alt="Download CSV" style="margin-top: 5px; margin-right: 1em; float: right;"><i class="fa fa-download fa-2x"></i></a>            <!-- Specify how many items to show -->            <select data-ng-model="vm.numberOfItems" style="margin-bottom: 1em; margin-right: 10px; float: left; width: 16%; min-width: 200px;" class="form-control tt-input">                <option value="5" translate="SHOW5"></option>                <option value="10" translate="SHOW10"></option>                <option value="15" translate="SHOW15"></option>                <option value="20" translate="SHOW20"></option>                <option value="25" translate="SHOW25"></option>                <option value="30" translate="SHOW30"></option>                <option value="35" translate="SHOW35"></option>                <option value="40" translate="SHOW40"></option>            </select>            <!-- Data table -->            <table class="table table-striped table-condensed">                <tr>                    <th data-ng-repeat="header in vm.headers">                        {{header}}&nbsp;                        <a data-ng-click="reverseSort = !reverseSort; vm.orderBy($index, reverseSort);"><i data-ng-class="vm.sortOrderClass($index, reverseSort)">&nbsp;&nbsp;</i></a>                    </th>                </tr>                <tr dir-paginate="row in vm.rows | filter:featureFilter | itemsPerPage: vm.numberOfItems"                    style="cursor: pointer; vertical-align: central">                    <td data-ng-class="{\'text-right\': field.type == \'number\'}" data-ng-repeat="field in row track by $index" data-ng-bind-html="vm.toTrusted(field.displayValue)"></td>                </tr>            </table>            <dir-pagination-controls style="" max-size="10" boundary-links="true" direction-links="true"                                     template-url="bower_components/angular-utils-pagination/dirPagination.tpl.html"></dir-pagination-controls>        </div>    </div>    <div style="clear: both; margin: 0; padding: .5em"></div></div>';
 })(DataTable || (DataTable = {}));
 var DataTable;
 (function (DataTable) {

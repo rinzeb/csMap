@@ -4,7 +4,7 @@
 	"url": "https://github.com/TNOCS/csMap",
 	"logo": "images/CommonSenseRound.png",
 	"accentColor": "Green",
-	"metaInfoData": {
+	"propertyTypeData": {
 		"aant_gem": {
 			"label": "aant_gem",
 			"type": "number",
@@ -2449,7 +2449,7 @@
 			"iconHeight": 32,
 			"iconUri": "images/ziekenhuis.png"
 		},
-		"metaInfoData": [{
+		"propertyTypeData": [{
 				"label": "naam",
 				"type": "text",
 				"title": "Naam",
@@ -2530,7 +2530,7 @@
 				"iconHeight": 30,
 				"iconUri": "images/brandweerposten/Brandweerkazerne.png"
 			},
-			"metaInfoKeys": "Id;BAG_id;Organisatie;LOC_TYPE;LOC_NAAM;LOC_STRAAT;Huisnr;Postcode;Plaats;Gemeente;Regio;Telefoon;GeoAddress;Regio;Website"
+			"propertyTypeKeys": "Id;BAG_id;Organisatie;LOC_TYPE;LOC_NAAM;LOC_STRAAT;Huisnr;Postcode;Plaats;Gemeente;Regio;Telefoon;GeoAddress;Regio;Website"
 		},
 		"Bedrijfsbrandweerkazerne": {
 			"name": "Bedrijfsbrandweerkazerne",
@@ -2543,7 +2543,7 @@
 				"iconHeight": 32,
 				"iconUri": "images/brandweerposten/Bedrijfsbrandweerkazerne.png"
 			},
-			"metaInfoKeys": "Id;BAG_id;Organisatie;LOC_TYPE;LOC_NAAM;LOC_STRAAT;Huisnr;Postcode;Plaats;Gemeente;Regio;Telefoon;GeoAddress;Regio;Website"
+			"propertyTypeKeys": "Id;BAG_id;Organisatie;LOC_TYPE;LOC_NAAM;LOC_STRAAT;Huisnr;Postcode;Plaats;Gemeente;Regio;Telefoon;GeoAddress;Regio;Website"
 		},
 		"RegionaalopleidingscentrumBrandweer": {
 			"name": "Regionaalopleidingscentrum Brandweer",
@@ -2556,7 +2556,7 @@
 				"iconHeight": 32,
 				"iconUri": "images/brandweerposten/RegionaalopleidingscentrumBrandweer.png"
 			},
-			"metaInfoKeys": "Id;BAG_id;Organisatie;LOC_TYPE;LOC_NAAM;LOC_STRAAT;Huisnr;Postcode;Plaats;Gemeente;Regio;Telefoon;GeoAddress;Regio;Website"
+			"propertyTypeKeys": "Id;BAG_id;Organisatie;LOC_TYPE;LOC_NAAM;LOC_STRAAT;Huisnr;Postcode;Plaats;Gemeente;Regio;Telefoon;GeoAddress;Regio;Website"
 		},
 		"VestigingVeiligheidsregio": {
 			"name": "Veiligheidsregio",
@@ -2569,7 +2569,7 @@
 				"iconHeight": 32,
 				"iconUri": "images/brandweerposten/VestigingVeiligheidsregio.png"
 			},
-			"metaInfoKeys": "Id;BAG_id;Organisatie;LOC_TYPE;LOC_NAAM;LOC_STRAAT;Huisnr;Postcode;Plaats;Gemeente;Regio;Telefoon;GeoAddress;Regio;Website"
+			"propertyTypeKeys": "Id;BAG_id;Organisatie;LOC_TYPE;LOC_NAAM;LOC_STRAAT;Huisnr;Postcode;Plaats;Gemeente;Regio;Telefoon;GeoAddress;Regio;Website"
 		},
 		"Aanrijtijden": {
 			"name": "Aanrijtijden brandweer",
@@ -2582,7 +2582,7 @@
 				"iconHeight": 32,
 				"iconUri": "images/brandweerposten/aanrijdtijd_brandweer.png"
 			},
-			"metaInfoKeys": "Name;soort_zorgaanbieder;Locatiecode_AGB;Adres;Huisnummer;Postcode;Plaats;Brandweerlocatie;Brandweerorganisatie;Brandweeraanrijtijd_min;Tweede_brandweeraanrijtijd_min"
+			"propertyTypeKeys": "Name;soort_zorgaanbieder;Locatiecode_AGB;Adres;Huisnummer;Postcode;Plaats;Brandweerlocatie;Brandweerorganisatie;Brandweeraanrijtijd_min;Tweede_brandweeraanrijtijd_min"
 		}
 	},
 	"baselayers": {

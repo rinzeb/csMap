@@ -63,14 +63,15 @@
     <Content Include="public\css\pnotify.custom.min.css" />
     <Content Include="public\css\style.css" />
     <Content Include="public\css\xbbcode.css" />
-    <Content Include="public\data\projects\ais\layer1.json" />
-    <Content Include="public\data\projects\ais\project.json" />
+    <Content Include="public\data\projects\20141104_csMap\Aanrijtijden.json" />
+    <Content Include="public\data\projects\20141104_csMap\brandweerposten.json" />
+    <Content Include="public\data\projects\20141104_csMap\gemeente.json" />
+    <Content Include="public\data\projects\20141104_csMap\project.json" />
+    <Content Include="public\data\projects\20141104_csMap\veiligheidsregios.json" />
+    <Content Include="public\data\projects\20141104_csMap\Ziekenhuizen.json" />
     <Content Include="public\data\projects\projects.json">
       <Publish>True</Publish>
     </Content>
-    <Content Include="public\data\projects\vws\project.json" />
-    <Content Include="public\data\projects\vws\Ziekenhuizen.json" />
-    <Content Include="public\data\projects\vws_private\project.json" />
     <Content Include="public\images\CareToolIcon.png" />
     <Content Include="public\images\langdurigezorg.png" />
     <Content Include="public\images\verzorgingstehuis.png" />
@@ -91,9 +92,7 @@
     <Folder Include="public\app\" />
     <Folder Include="public\data\" />
     <Folder Include="public\data\projects\" />
-    <Folder Include="public\data\projects\ais\" />
-    <Folder Include="public\data\projects\vws_private\" />
-    <Folder Include="public\data\projects\vws\" />
+    <Folder Include="public\data\projects\20141104_csMap\" />
     <Folder Include="public\images\" />
     <Folder Include="public\includes\" />
     <Folder Include="public\js\" />

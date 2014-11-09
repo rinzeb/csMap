@@ -58,7 +58,7 @@ declare module csComp.GeoJson {
         /** Default for text */
         text = 2,
     }
-    interface IMetaInfo {
+    interface IPropertyType {
         label?: string;
         title?: string;
         description?: string;
@@ -83,17 +83,17 @@ declare module csComp.GeoJson {
         iconHeight?: number;
         iconUri?: string;
         maxTitleResolution?: string;
-        analysisMetaInfo?: any;
+        analysispropertyType?: any;
     }
     interface IFeatureType {
         name?: string;
         style?: IFeatureTypeStyle;
-        metaInfoData?: IMetaInfo[];
+        propertyTypeData?: IPropertyType[];
         /**
-        * Optional list of MetaInfo keys, separated by semi-colons.
-        * The keys can be resolved in the project's metaInfoData dictionary, or in the local metaInfoData.
+        * Optional list of propertyType keys, separated by semi-colons.
+        * The keys can be resolved in the project's propertyTypeData dictionary, or in the local propertyTypeData.
         */
-        metaInfoKeys?: string;
+        propertyTypeKeys?: string;
     }
     interface IGeoJsonFile {
         poiTypes?: {
@@ -148,7 +148,7 @@ declare module csComp.Services {
         public value: any;
         public stringValue: string;
         public rangex: number[];
-        public meta: GeoJson.IMetaInfo;
+        public meta: GeoJson.IPropertyType;
     }
     /**
     * Styles can determine how features are shown on the map
@@ -166,7 +166,7 @@ declare module csComp.Services {
         public canSelectColor: boolean;
         public colorScales: any;
         public info: PropertyInfo;
-        public meta: GeoJson.IMetaInfo;
+        public meta: GeoJson.IPropertyType;
         constructor($translate: ng.translate.ITranslateService);
     }
 }
@@ -196,8 +196,8 @@ declare module csComp.Services {
         public featureTypes: {
             [id: string]: GeoJson.IFeatureType;
         };
-        public metaInfoData: {
-            [id: string]: GeoJson.IMetaInfo;
+        public propertyTypeData: {
+            [id: string]: GeoJson.IPropertyType;
         };
         public groups: ProjectGroup[];
         public startposition: Coordinates;
@@ -413,8 +413,8 @@ declare module csComp.Services {
         featureTypes: {
             [key: string]: GeoJson.IFeatureType;
         };
-        metaInfoData: {
-            [key: string]: GeoJson.IMetaInfo;
+        propertyTypeData: {
+            [key: string]: GeoJson.IPropertyType;
         };
     }
 }
@@ -465,8 +465,8 @@ declare module csComp.Services {
         public featureTypes: {
             [key: string]: GeoJson.IFeatureType;
         };
-        public metaInfoData: {
-            [key: string]: GeoJson.IMetaInfo;
+        public propertyTypeData: {
+            [key: string]: GeoJson.IPropertyType;
         };
         public project: Project;
         public layerGroup: L.LayerGroup<L.ILayer>;
@@ -718,7 +718,7 @@ declare module FeatureProps {
         canStyle: boolean;
         feature: csComp.GeoJson.IFeature;
         description?: string;
-        meta?: csComp.GeoJson.IMetaInfo;
+        meta?: csComp.GeoJson.IPropertyType;
         isFilter: boolean;
     }
     class CallOutProperty implements ICallOutProperty {
@@ -730,39 +730,39 @@ declare module FeatureProps {
         public feature: csComp.GeoJson.IFeature;
         public isFilter: boolean;
         public description: string;
-        public meta: csComp.GeoJson.IMetaInfo;
-        constructor(key: string, value: string, property: string, canFilter: boolean, canStyle: boolean, feature: csComp.GeoJson.IFeature, isFilter: boolean, description?: string, meta?: csComp.GeoJson.IMetaInfo);
+        public meta: csComp.GeoJson.IPropertyType;
+        constructor(key: string, value: string, property: string, canFilter: boolean, canStyle: boolean, feature: csComp.GeoJson.IFeature, isFilter: boolean, description?: string, meta?: csComp.GeoJson.IPropertyType);
     }
     interface ICallOutSection {
-        metaInfos: {
-            [label: string]: csComp.GeoJson.IMetaInfo;
+        propertyTypes: {
+            [label: string]: csComp.GeoJson.IPropertyType;
         };
         properties: ICallOutProperty[];
         sectionIcon: string;
-        addProperty(key: string, value: string, property: string, canFilter: boolean, canStyle: boolean, feature: csComp.GeoJson.IFeature, isFilter: boolean, description?: string, meta?: csComp.GeoJson.IMetaInfo): void;
+        addProperty(key: string, value: string, property: string, canFilter: boolean, canStyle: boolean, feature: csComp.GeoJson.IFeature, isFilter: boolean, description?: string, meta?: csComp.GeoJson.IPropertyType): void;
         hasProperties(): boolean;
     }
     class CallOutSection implements ICallOutSection {
-        public metaInfos: {
-            [label: string]: csComp.GeoJson.IMetaInfo;
+        public propertyTypes: {
+            [label: string]: csComp.GeoJson.IPropertyType;
         };
         public properties: ICallOutProperty[];
         public sectionIcon: string;
         constructor(sectionIcon?: string);
         public showSectionIcon(): boolean;
-        public addProperty(key: string, value: string, property: string, canFilter: boolean, canStyle: boolean, feature: csComp.GeoJson.IFeature, isFilter: boolean, description?: string, meta?: csComp.GeoJson.IMetaInfo): void;
+        public addProperty(key: string, value: string, property: string, canFilter: boolean, canStyle: boolean, feature: csComp.GeoJson.IFeature, isFilter: boolean, description?: string, meta?: csComp.GeoJson.IPropertyType): void;
         public hasProperties(): boolean;
     }
     class CallOut {
         private type;
         private feature;
-        private metaInfoData;
+        private propertyTypeData;
         public title: string;
         public sections: {
             [title: string]: ICallOutSection;
         };
-        constructor(type: csComp.GeoJson.IFeatureType, feature: csComp.GeoJson.IFeature, metaInfoData: {
-            [key: string]: csComp.GeoJson.IMetaInfo;
+        constructor(type: csComp.GeoJson.IFeatureType, feature: csComp.GeoJson.IFeature, propertyTypeData: {
+            [key: string]: csComp.GeoJson.IPropertyType;
         });
         private getOrCreateCallOutSection(sectionTitle);
         /**
@@ -798,7 +798,7 @@ declare module DataTable {
     }
     /**
     * Represents a field in the table.
-    * The value is the actual displayValue shown, the type is the metainfo type (e.g. number or text, useful when aligning the data), and the header is used for sorting.
+    * The value is the actual displayValue shown, the type is the propertyType type (e.g. number or text, useful when aligning the data), and the header is used for sorting.
     */
     class TableField {
         public displayValue: string;
@@ -820,7 +820,7 @@ declare module DataTable {
         public numberOfItems: number;
         public selectedLayerId: string;
         public layerOptions: any[];
-        public metaInfos: csComp.GeoJson.IMetaInfo[];
+        public propertyTypes: csComp.GeoJson.IPropertyType[];
         public headers: string[];
         public sortingColumn: number;
         public rows: TableField[][];
@@ -839,8 +839,8 @@ declare module DataTable {
         * Load the features as visible on the map.
         */
         private loadMapLayers();
-        private updateMetaInfo(data);
-        public toggleSelection(metaInfoTitle: string): void;
+        private updatepropertyType(data);
+        public toggleSelection(propertyTypeTitle: string): void;
         private findLayerById(id);
         /**
         * Returns the data rows that are relevant for the current selection.
