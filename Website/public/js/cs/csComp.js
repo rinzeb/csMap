@@ -12,6 +12,54 @@ var csComp;
 })(csComp || (csComp = {}));
 var csComp;
 (function (csComp) {
+    (function (GeoJson) {
+        (function (DrawingModeType) {
+            DrawingModeType[DrawingModeType["None"] = 0] = "None";
+            DrawingModeType[DrawingModeType["Image"] = 1] = "Image";
+            DrawingModeType[DrawingModeType["Point"] = 2] = "Point";
+            DrawingModeType[DrawingModeType["Square"] = 3] = "Square";
+            DrawingModeType[DrawingModeType["Rectangle"] = 4] = "Rectangle";
+            DrawingModeType[DrawingModeType["Line"] = 5] = "Line";
+            DrawingModeType[DrawingModeType["Circle"] = 6] = "Circle";
+            DrawingModeType[DrawingModeType["Freehand"] = 7] = "Freehand";
+            DrawingModeType[DrawingModeType["Polyline"] = 8] = "Polyline";
+            DrawingModeType[DrawingModeType["Polygon"] = 9] = "Polygon";
+            DrawingModeType[DrawingModeType["MultiPolygon"] = 10] = "MultiPolygon";
+        })(GeoJson.DrawingModeType || (GeoJson.DrawingModeType = {}));
+        var DrawingModeType = GeoJson.DrawingModeType;
+
+        //export enum MetaInfoType {
+        //    Text,
+        //    TextArea,
+        //    Rating,
+        //    Number,
+        //    Bbcode,
+        //    Boolean,
+        //    Bit,
+        //    Sensor,
+        //    Xml,
+        //    Options,
+        //    Unknown,
+        //    Image,
+        //    DateTime,
+        //    Mediafolder
+        //}
+        (function (featureFilterType) {
+            /** Turn filtering off */
+            featureFilterType[featureFilterType["none"] = 0] = "none";
+
+            /** Default for numbers: histogram */
+            featureFilterType[featureFilterType["bar"] = 1] = "bar";
+
+            /** Default for text */
+            featureFilterType[featureFilterType["text"] = 2] = "text";
+        })(GeoJson.featureFilterType || (GeoJson.featureFilterType = {}));
+        var featureFilterType = GeoJson.featureFilterType;
+    })(csComp.GeoJson || (csComp.GeoJson = {}));
+    var GeoJson = csComp.GeoJson;
+})(csComp || (csComp = {}));
+var csComp;
+(function (csComp) {
     (function (StringExt) {
         function isNullOrEmpty(s) {
             return !s;
@@ -263,54 +311,6 @@ var csComp;
     })(csComp.Services || (csComp.Services = {}));
     var Services = csComp.Services;
 })(csComp || (csComp = {}));
-var csComp;
-(function (csComp) {
-    (function (GeoJson) {
-        (function (DrawingModeType) {
-            DrawingModeType[DrawingModeType["None"] = 0] = "None";
-            DrawingModeType[DrawingModeType["Image"] = 1] = "Image";
-            DrawingModeType[DrawingModeType["Point"] = 2] = "Point";
-            DrawingModeType[DrawingModeType["Square"] = 3] = "Square";
-            DrawingModeType[DrawingModeType["Rectangle"] = 4] = "Rectangle";
-            DrawingModeType[DrawingModeType["Line"] = 5] = "Line";
-            DrawingModeType[DrawingModeType["Circle"] = 6] = "Circle";
-            DrawingModeType[DrawingModeType["Freehand"] = 7] = "Freehand";
-            DrawingModeType[DrawingModeType["Polyline"] = 8] = "Polyline";
-            DrawingModeType[DrawingModeType["Polygon"] = 9] = "Polygon";
-            DrawingModeType[DrawingModeType["MultiPolygon"] = 10] = "MultiPolygon";
-        })(GeoJson.DrawingModeType || (GeoJson.DrawingModeType = {}));
-        var DrawingModeType = GeoJson.DrawingModeType;
-
-        //export enum MetaInfoType {
-        //    Text,
-        //    TextArea,
-        //    Rating,
-        //    Number,
-        //    Bbcode,
-        //    Boolean,
-        //    Bit,
-        //    Sensor,
-        //    Xml,
-        //    Options,
-        //    Unknown,
-        //    Image,
-        //    DateTime,
-        //    Mediafolder
-        //}
-        (function (featureFilterType) {
-            /** Turn filtering off */
-            featureFilterType[featureFilterType["none"] = 0] = "none";
-
-            /** Default for numbers: histogram */
-            featureFilterType[featureFilterType["bar"] = 1] = "bar";
-
-            /** Default for text */
-            featureFilterType[featureFilterType["text"] = 2] = "text";
-        })(GeoJson.featureFilterType || (GeoJson.featureFilterType = {}));
-        var featureFilterType = GeoJson.featureFilterType;
-    })(csComp.GeoJson || (csComp.GeoJson = {}));
-    var GeoJson = csComp.GeoJson;
-})(csComp || (csComp = {}));
 var Helpers;
 (function (Helpers) {
     (function (Resize) {
@@ -383,162 +383,6 @@ var Helpers;
     })(Helpers.Resize || (Helpers.Resize = {}));
     var Resize = Helpers.Resize;
 })(Helpers || (Helpers = {}));
-var LegendList;
-(function (LegendList) {
-    LegendList.html = '<div style="position: relative;">    <h4 class="leftpanel-header" translate="LEGEND"></h4>        <div>        <div ng-repeat="legendItem in legendItems" class="legendItem">            <div class="legendIcon">                <img ng-src="{{legendItem.uri}}" class="legendImage" />            </div><span class="legendText">                {{legendItem.title}}            </span>        </div>    </div></div>';
-})(LegendList || (LegendList = {}));
-var LegendList;
-(function (LegendList) {
-    /**
-    * Config
-    */
-    var moduleName = 'csWeb.legendList';
-
-    /**
-    * Module
-    */
-    LegendList.myModule;
-    try  {
-        LegendList.myModule = angular.module(moduleName);
-    } catch (err) {
-        // named module does not exist, so create one
-        LegendList.myModule = angular.module(moduleName, []);
-    }
-
-    /**
-    * Directive to display the available map layers.
-    */
-    LegendList.myModule.directive('legendList', [
-        '$window', '$compile',
-        function ($window, $compile) {
-            return {
-                terminal: false,
-                restrict: 'E',
-                scope: {},
-                template: LegendList.html,
-                //compile             : el          => {    // I need to explicitly compile it in order to use interpolation like {{xxx}}
-                //    var fn                        = $compile(el);
-                //    return scope                  => {
-                //        fn(scope);
-                //    };
-                //},
-                // Directives that want to modify the DOM typically use the link option.link takes a function with the following signature, function link(scope, element, attrs) { ... } where:
-                // scope is an Angular scope object.
-                // element is the jqLite - wrapped element that this directive matches.
-                // attrs is a hash object with key - value pairs of normalized attribute names and their corresponding attribute values.
-                link: function (scope, element, attrs) {
-                    // Deal with resizing the element list
-                    scope.onResizeFunction = function () {
-                        var filterHeight = 50;
-                        var paginationCtrlHeight = 100;
-                        var itemHeight = 60;
-
-                        //scope.windowHeight          = $window.innerHeight;
-                        //scope.windowWidth           = $window.innerWidth;
-                        scope.numberOfItems = Math.floor(($window.innerHeight - filterHeight - paginationCtrlHeight) / itemHeight);
-                    };
-
-                    // Call to the function when the page is first loaded
-                    scope.onResizeFunction();
-
-                    angular.element($window).bind('resize', function () {
-                        scope.onFunction();
-                        scope.$apply();
-                    });
-                },
-                replace: true,
-                transclude: true,
-                controller: LegendList.LegendListCtrl
-            };
-        }
-    ]).directive('bsPopover', function () {
-        return function (scope, element, attrs) {
-            element.find("a[rel=popover]").popover({ placement: 'right', html: 'true' });
-        };
-    });
-})(LegendList || (LegendList = {}));
-var LegendList;
-(function (LegendList) {
-    var LegendListCtrl = (function () {
-        // dependencies are injected via AngularJS $injector
-        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
-        function LegendListCtrl($scope, $layerService, $mapService, $messageBusService) {
-            var _this = this;
-            this.$scope = $scope;
-            this.$layerService = $layerService;
-            this.$mapService = $mapService;
-            this.$messageBusService = $messageBusService;
-            $scope.vm = this;
-
-            $messageBusService.subscribe('project', function () {
-                // Update the legend when a project is loaded.
-                _this.updateLegendItems();
-            });
-
-            $messageBusService.subscribe('layer', function () {
-                // Update the legend when a layer is added or removed.
-                _this.updateLegendItems();
-            });
-
-            this.updateLegendItems();
-
-            $scope.legendItems = [];
-
-            $scope.numberOfItems = 10; // This is being reset in the directive upon receiving a resize.
-        }
-        LegendListCtrl.prototype.updateLegendItems = function () {
-            var legendItems = [];
-            var existingItems = [];
-            for (var key in this.$layerService.featureTypes) {
-                var ft = this.$layerService.featureTypes[key];
-                var uri = this.getImageUri(ft);
-                var title = this.getName(key, ft);
-                var existingItem = name + uri;
-                if (existingItems.indexOf(existingItem) < 0) {
-                    existingItems.push(existingItem);
-                    legendItems.push({ "title": title, "uri": uri });
-                }
-            }
-            legendItems.sort(function (a, b) {
-                if (a.title > b.title)
-                    return 1;
-                if (a.title < b.title)
-                    return -1;
-                return 0;
-            });
-            this.$scope.legendItems = legendItems;
-        };
-
-        LegendListCtrl.prototype.getImageUri = function (ft) {
-            if (ft.style != null && ft.style.drawingMode.toLowerCase() != "point") {
-                if (ft.style.iconUri && ft.style.iconUri.indexOf('_Media') < 0)
-                    return ft.style.iconUri;
-                else
-                    return "includes/images/polygon.png";
-            } else if (ft.style != null && ft.style.iconUri != null) {
-                return ft.style.iconUri;
-            } else {
-                return "includes/images/marker.png";
-            }
-        };
-
-        LegendListCtrl.prototype.getName = function (key, ft) {
-            if (ft.name != null) {
-                return ft.name;
-            } else {
-                return key;
-            }
-        };
-        LegendListCtrl.$inject = [
-            '$scope',
-            'layerService',
-            'mapService',
-            'messageBusService'
-        ];
-        return LegendListCtrl;
-    })();
-    LegendList.LegendListCtrl = LegendListCtrl;
-})(LegendList || (LegendList = {}));
 var FeatureList;
 (function (FeatureList) {
     FeatureList.html = '<div style="position: relative;">    <h4 class="leftpanel-header" translate="FEATURES"></h4>    <div class="has-feedback" style="padding:10px 4px 4px 4px;">        <span style="direction: ltr; position: static; display: block;">            <input id="searchbox" data-ng-model="featureFilter.properties" type="text"                   placeholder="Filter" autocomplete="off" spellcheck="false"                   style="position: relative; vertical-align: top;" class="form-control tt-input">        </span>        <span id="searchicon" class="fa form-control-feedback fa-filter" style="padding-top: 10px;"></span>    </div>    <table class="table table-striped table-condensed">        <!--vm.$layerService.features-->        <tr dir-paginate="feature in vm.$layerService.project.features | filter:featureFilter | orderBy:\'properties.Name\' | itemsPerPage: numberOfItems "            data-ng-click="vm.$mapService.zoomTo(feature);vm.$layerService.selectFeature(feature);" style="cursor: pointer; height: 50px; vertical-align: central">            <!--<td>Icon</td>-->            <td>{{ feature.properties.Name }}</td>            <td>                <i class="fa fa-chevron-right pull-right"></i>            </td>        </tr>    </table>    <dir-pagination-controls style="position: absolute; bottom: -80px;" max-size="6" boundary-links="false" direction-links="false" template-url="bower_components/angular-utils-pagination/dirPagination.tpl.html"></dir-pagination-controls></div>';
@@ -2217,6 +2061,250 @@ var csComp;
     })(csComp.Services || (csComp.Services = {}));
     var Services = csComp.Services;
 })(csComp || (csComp = {}));
+var LegendList;
+(function (LegendList) {
+    LegendList.html = '<div style="position: relative;">    <h4 class="leftpanel-header" translate="LEGEND"></h4>        <div>        <div ng-repeat="legendItem in legendItems" class="legendItem">            <div class="legendIcon">                <img ng-src="{{legendItem.uri}}" class="legendImage" />            </div><span class="legendText">                {{legendItem.title}}            </span>        </div>    </div></div>';
+})(LegendList || (LegendList = {}));
+var LegendList;
+(function (LegendList) {
+    /**
+    * Config
+    */
+    var moduleName = 'csWeb.legendList';
+
+    /**
+    * Module
+    */
+    LegendList.myModule;
+    try  {
+        LegendList.myModule = angular.module(moduleName);
+    } catch (err) {
+        // named module does not exist, so create one
+        LegendList.myModule = angular.module(moduleName, []);
+    }
+
+    /**
+    * Directive to display the available map layers.
+    */
+    LegendList.myModule.directive('legendList', [
+        '$window', '$compile',
+        function ($window, $compile) {
+            return {
+                terminal: false,
+                restrict: 'E',
+                scope: {},
+                template: LegendList.html,
+                //compile             : el          => {    // I need to explicitly compile it in order to use interpolation like {{xxx}}
+                //    var fn                        = $compile(el);
+                //    return scope                  => {
+                //        fn(scope);
+                //    };
+                //},
+                // Directives that want to modify the DOM typically use the link option.link takes a function with the following signature, function link(scope, element, attrs) { ... } where:
+                // scope is an Angular scope object.
+                // element is the jqLite - wrapped element that this directive matches.
+                // attrs is a hash object with key - value pairs of normalized attribute names and their corresponding attribute values.
+                link: function (scope, element, attrs) {
+                    // Deal with resizing the element list
+                    scope.onResizeFunction = function () {
+                        var filterHeight = 50;
+                        var paginationCtrlHeight = 100;
+                        var itemHeight = 60;
+
+                        //scope.windowHeight          = $window.innerHeight;
+                        //scope.windowWidth           = $window.innerWidth;
+                        scope.numberOfItems = Math.floor(($window.innerHeight - filterHeight - paginationCtrlHeight) / itemHeight);
+                    };
+
+                    // Call to the function when the page is first loaded
+                    scope.onResizeFunction();
+
+                    angular.element($window).bind('resize', function () {
+                        scope.onFunction();
+                        scope.$apply();
+                    });
+                },
+                replace: true,
+                transclude: true,
+                controller: LegendList.LegendListCtrl
+            };
+        }
+    ]).directive('bsPopover', function () {
+        return function (scope, element, attrs) {
+            element.find("a[rel=popover]").popover({ placement: 'right', html: 'true' });
+        };
+    });
+})(LegendList || (LegendList = {}));
+var LegendList;
+(function (LegendList) {
+    var LegendListCtrl = (function () {
+        // dependencies are injected via AngularJS $injector
+        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
+        function LegendListCtrl($scope, $layerService, $mapService, $messageBusService) {
+            var _this = this;
+            this.$scope = $scope;
+            this.$layerService = $layerService;
+            this.$mapService = $mapService;
+            this.$messageBusService = $messageBusService;
+            $scope.vm = this;
+
+            $messageBusService.subscribe('project', function () {
+                // Update the legend when a project is loaded.
+                _this.updateLegendItems();
+            });
+
+            $messageBusService.subscribe('layer', function () {
+                // Update the legend when a layer is added or removed.
+                _this.updateLegendItems();
+            });
+
+            this.updateLegendItems();
+
+            $scope.legendItems = [];
+
+            $scope.numberOfItems = 10; // This is being reset in the directive upon receiving a resize.
+        }
+        LegendListCtrl.prototype.updateLegendItems = function () {
+            var legendItems = [];
+            var existingItems = [];
+            for (var key in this.$layerService.featureTypes) {
+                var ft = this.$layerService.featureTypes[key];
+                var uri = this.getImageUri(ft);
+                var title = this.getName(key, ft);
+                var existingItem = name + uri;
+                if (existingItems.indexOf(existingItem) < 0) {
+                    existingItems.push(existingItem);
+                    legendItems.push({ "title": title, "uri": uri });
+                }
+            }
+            legendItems.sort(function (a, b) {
+                if (a.title > b.title)
+                    return 1;
+                if (a.title < b.title)
+                    return -1;
+                return 0;
+            });
+            this.$scope.legendItems = legendItems;
+        };
+
+        LegendListCtrl.prototype.getImageUri = function (ft) {
+            if (ft.style != null && ft.style.drawingMode.toLowerCase() != "point") {
+                if (ft.style.iconUri && ft.style.iconUri.indexOf('_Media') < 0)
+                    return ft.style.iconUri;
+                else
+                    return "includes/images/polygon.png";
+            } else if (ft.style != null && ft.style.iconUri != null) {
+                return ft.style.iconUri;
+            } else {
+                return "includes/images/marker.png";
+            }
+        };
+
+        LegendListCtrl.prototype.getName = function (key, ft) {
+            if (ft.name != null) {
+                return ft.name;
+            } else {
+                return key;
+            }
+        };
+        LegendListCtrl.$inject = [
+            '$scope',
+            'layerService',
+            'mapService',
+            'messageBusService'
+        ];
+        return LegendListCtrl;
+    })();
+    LegendList.LegendListCtrl = LegendListCtrl;
+})(LegendList || (LegendList = {}));
+var StyleList;
+(function (StyleList) {
+    StyleList.html = '<div>    <h4 class="leftpanel-header" translate="STYLES"></h4>    <div ng-show="vm.$layerService.noStyles" translate="STYLE_INFO"></div>    <div data-ng-repeat="group in vm.$layerService.project.groups" style="margin-left: 5px">        <div ng-show="group.styles.length">            <div style="float:left;margin-left: -10px; margin-top: 5px" data-toggle="collapse" data-target="#stylegroup_{{group.id}}"><i class="fa fa-chevron-down togglebutton toggle-arrow-down"></i><i class="fa fa-chevron-up togglebutton toggle-arrow-up"></i></div>            <div class="group-title">{{group.title}}</div>            <div id="stylegroup_{{group.id}}" class="collapse in">                <div data-ng-repeat="style in group.styles">                    <div class="checkbox checkbox-primary" style="margin-left:20px;float:left">                        <input type="checkbox" id="cbstyle{{style.id}}" ng-model="style.enabled" data-ng-change="vm.$layerService.updateStyle(style);">                        <label class="style-title" for="cbstyle{{style.id}}" style="width:175px">{{style.title}}</label>                    </div>                    <div style="float:right;margin-top:10px; width: 50px">                        <div data-ng-show="style.canSelectColor" style="float:left">                            <div class="dropdown">                                <div class="style-settings" data-toggle="dropdown">                                    <style>                                                                             </style>                                    <!--<img src="includes/images/fillcolor.png" style="width: 32px; height:32px" />-->                                    <div id="colors" style="border-radius: 50%;width: 20px;height:20px;border-style:solid;border-color: black;border-width: 1px;background: linear-gradient(to right, {{style.colors[0]}} , {{style.colors[1]}})">                                                                        </div>                                    <b class="caret"></b>                                </div>                                <!--<a class="btn btn-primary btn-sm" ng-model="style.visualAspect"  style="padding-left: 10px" href="#"> {{ style.visualAspect }} </a>-->                                <ul class="dropdown-menu" role="menu">                                    <li ng-repeat="(key,val) in style.colorScales" style="margin:3px;cursor: pointer">                                        <span ng-click="$parent.style.colors = val;vm.$layerService.updateStyle($parent.style)"> {{key}} </span>                                    </li>                                </ul>                            </div>                        </div>                        <div style="float:right">                            <div class="dropdown">                                <div class="style-settings" data-toggle="dropdown">                                    <!--<img src="includes/images/fillcolor.png" style="width: 32px; height:32px" />-->                                    <div class="style-aspect style-{{style.visualAspect}}"></div><b class="caret"></b>                                </div>                                <!--<a class="btn btn-primary btn-sm" ng-model="style.visualAspect"  style="padding-left: 10px" href="#"> {{ style.visualAspect }} </a>-->                                <ul class="dropdown-menu" role="menu">                                    <li ng-repeat="title in style.availableAspects" style="margin:3px;cursor: pointer">                                        <i class="style-aspect style-{{title}}" style="float:left" /><span ng-click="$parent.style.visualAspect = title;vm.$layerService.updateStyle($parent.style)"><img class="fa fa-search" style="margin-right: 8px" /> {{title}} </span>                                    </li>                                    <li class="divider"></li>                                    <li style="margin:3px;cursor: pointer"><i class="fa fa-remove" style="margin-right: 8px" style=" float:left" /><span ng-click="vm.$layerService.removeStyle(style)">Verwijder</span></li>                                </ul>                            </div>                        </div>                    </div>                </div>                <!--<div style="right:5px; position:absolute; margin-top: -15px"><a href="#" id="stylepop{{style.id}}" rel="popover" popover-template="template.html"><img src="includes/images/settings.png" width="20px"></a></div>-->            </div>        </div>    </div></div>';
+})(StyleList || (StyleList = {}));
+var StyleList;
+(function (StyleList) {
+    /**
+    * Config
+    */
+    var moduleName = 'csWeb.styleList';
+
+    /**
+    * Module
+    */
+    StyleList.myModule;
+    try  {
+        StyleList.myModule = angular.module(moduleName);
+    } catch (err) {
+        // named module does not exist, so create one
+        StyleList.myModule = angular.module(moduleName, []);
+    }
+
+    /**
+    * Directive to display the available map layers.
+    */
+    StyleList.myModule.directive('styleList', [
+        '$window', '$compile',
+        function ($window, $compile) {
+            return {
+                terminal: false,
+                restrict: 'E',
+                scope: {},
+                template: StyleList.html,
+                //compile             : el          => {    // I need to explicitly compile it in order to use interpolation like {{xxx}}
+                //    var fn                        = $compile(el);
+                //    return scope                  => {
+                //        fn(scope);
+                //    };
+                //},
+                link: function (scope, element, attrs) {
+                    // Deal with resizing the element list
+                    scope.onResizeFunction = function () {
+                        var filterHeight = 50;
+                        var paginationCtrlHeight = 100;
+                        var itemHeight = 60;
+
+                        //scope.windowHeight          = $window.innerHeight;
+                        //scope.windowWidth           = $window.innerWidth;
+                        scope.numberOfItems = Math.floor(($window.innerHeight - filterHeight - paginationCtrlHeight) / itemHeight);
+                    };
+
+                    // Call to the function when the page is first loaded
+                    scope.onResizeFunction();
+
+                    angular.element($window).bind('resize', function () {
+                        scope.onResizeFunction();
+                        scope.$apply();
+                    });
+                },
+                replace: true,
+                transclude: true,
+                controller: StyleList.StyleListCtrl
+            };
+        }
+    ]).directive('bsPopover', function () {
+        return function (scope, element, attrs) {
+            element.find("a[rel=popover]").popover({ placement: 'right', html: 'true' });
+        };
+    });
+})(StyleList || (StyleList = {}));
+var StyleList;
+(function (StyleList) {
+    var StyleListCtrl = (function () {
+        // dependencies are injected via AngularJS $injector
+        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
+        function StyleListCtrl($scope, $layerService) {
+            this.$scope = $scope;
+            this.$layerService = $layerService;
+            $scope.vm = this;
+        }
+        StyleListCtrl.$inject = [
+            '$scope',
+            'layerService'
+        ];
+        return StyleListCtrl;
+    })();
+    StyleList.StyleListCtrl = StyleListCtrl;
+})(StyleList || (StyleList = {}));
 var BaseMapList;
 (function (BaseMapList) {
     BaseMapList.html = '<div>    <h4 class="leftpanel-header" translate="MAP"></h4>    <div data-ng-repeat="(key, value) in vm.$mapService.baseLayers" style="clear:left;">        <div ng-click="vm.selectBaseLayer(key);" class="select-basestyle">            <img data-ng-src="{{value.options.preview}}" class="preview-base-layer" style="margin-bottom:5px" />            <div style="margin:3px;float:left">                <span style="font-size: 18px;font-weight: bold;">{{key}}</span><br />                {{value.options.subtitle}}            </div>        </div>    </div></div>';
@@ -2487,94 +2575,215 @@ var csComp;
     })(csComp.Services || (csComp.Services = {}));
     var Services = csComp.Services;
 })(csComp || (csComp = {}));
-var StyleList;
-(function (StyleList) {
-    StyleList.html = '<div>    <h4 class="leftpanel-header" translate="STYLES"></h4>    <div ng-show="vm.$layerService.noStyles" translate="STYLE_INFO"></div>    <div data-ng-repeat="group in vm.$layerService.project.groups" style="margin-left: 5px">        <div ng-show="group.styles.length">            <div style="float:left;margin-left: -10px; margin-top: 5px" data-toggle="collapse" data-target="#stylegroup_{{group.id}}"><i class="fa fa-chevron-down togglebutton toggle-arrow-down"></i><i class="fa fa-chevron-up togglebutton toggle-arrow-up"></i></div>            <div class="group-title">{{group.title}}</div>            <div id="stylegroup_{{group.id}}" class="collapse in">                <div data-ng-repeat="style in group.styles">                    <div class="checkbox checkbox-primary" style="margin-left:20px;float:left">                        <input type="checkbox" id="cbstyle{{style.id}}" ng-model="style.enabled" data-ng-change="vm.$layerService.updateStyle(style);">                        <label class="style-title" for="cbstyle{{style.id}}" style="width:175px">{{style.title}}</label>                    </div>                    <div style="float:right;margin-top:10px; width: 50px">                        <div data-ng-show="style.canSelectColor" style="float:left">                            <div class="dropdown">                                <div class="style-settings" data-toggle="dropdown">                                    <style>                                                                             </style>                                    <!--<img src="includes/images/fillcolor.png" style="width: 32px; height:32px" />-->                                    <div id="colors" style="border-radius: 50%;width: 20px;height:20px;border-style:solid;border-color: black;border-width: 1px;background: linear-gradient(to right, {{style.colors[0]}} , {{style.colors[1]}})">                                                                        </div>                                    <b class="caret"></b>                                </div>                                <!--<a class="btn btn-primary btn-sm" ng-model="style.visualAspect"  style="padding-left: 10px" href="#"> {{ style.visualAspect }} </a>-->                                <ul class="dropdown-menu" role="menu">                                    <li ng-repeat="(key,val) in style.colorScales" style="margin:3px;cursor: pointer">                                        <span ng-click="$parent.style.colors = val;vm.$layerService.updateStyle($parent.style)"> {{key}} </span>                                    </li>                                </ul>                            </div>                        </div>                        <div style="float:right">                            <div class="dropdown">                                <div class="style-settings" data-toggle="dropdown">                                    <!--<img src="includes/images/fillcolor.png" style="width: 32px; height:32px" />-->                                    <div class="style-aspect style-{{style.visualAspect}}"></div><b class="caret"></b>                                </div>                                <!--<a class="btn btn-primary btn-sm" ng-model="style.visualAspect"  style="padding-left: 10px" href="#"> {{ style.visualAspect }} </a>-->                                <ul class="dropdown-menu" role="menu">                                    <li ng-repeat="title in style.availableAspects" style="margin:3px;cursor: pointer">                                        <i class="style-aspect style-{{title}}" style="float:left" /><span ng-click="$parent.style.visualAspect = title;vm.$layerService.updateStyle($parent.style)"><img class="fa fa-search" style="margin-right: 8px" /> {{title}} </span>                                    </li>                                    <li class="divider"></li>                                    <li style="margin:3px;cursor: pointer"><i class="fa fa-remove" style="margin-right: 8px" style=" float:left" /><span ng-click="vm.$layerService.removeStyle(style)">Verwijder</span></li>                                </ul>                            </div>                        </div>                    </div>                </div>                <!--<div style="right:5px; position:absolute; margin-top: -15px"><a href="#" id="stylepop{{style.id}}" rel="popover" popover-template="template.html"><img src="includes/images/settings.png" width="20px"></a></div>-->            </div>        </div>    </div></div>';
-})(StyleList || (StyleList = {}));
-var StyleList;
-(function (StyleList) {
-    /**
-    * Config
-    */
-    var moduleName = 'csWeb.styleList';
+var csComp;
+(function (csComp) {
+    (function (Mca) {
+        var McaCtrl = (function () {
+            function McaCtrl($scope, $layerService, $messageBusService) {
+                this.$scope = $scope;
+                this.$layerService = $layerService;
+                this.$messageBusService = $messageBusService;
+                this.mca = new Mca.Models.Mca();
+                $scope.vm = this;
 
-    /**
-    * Module
-    */
-    StyleList.myModule;
-    try  {
-        StyleList.myModule = angular.module(moduleName);
-    } catch (err) {
-        // named module does not exist, so create one
-        StyleList.myModule = angular.module(moduleName, []);
-    }
+                this.mca.title = 'Rekenmandje';
+                this.mca.description = 'Analyse van de financiële toestand van een concern.';
+                this.mca.label = 'mca_rekenmandje';
+                this.mca.stringFormat = '{0:0.0%}';
+                this.mca.rankTitle = 'Rang';
+                this.mca.rankFormat = '{0} van {1}';
+                this.mca.userWeightMax = 10;
+                this.mca.layerIds = 'gemeente;';
+                var criterion = new Mca.Models.Criterion();
+                criterion.label = 'p_00_14';
+                criterion.color = 'green';
+                criterion.scores = '[0,0 0.2,1]';
+                this.mca.criteria.push(criterion);
+                criterion = new Mca.Models.Criterion();
+                criterion.label = 'p_65_eo';
+                criterion.color = 'red';
+                criterion.scores = '[0,0 0.2,1]';
+                this.mca.criteria.push(criterion);
+            }
+            McaCtrl.$inject = [
+                '$scope',
+                'layerService',
+                'messageBusService'
+            ];
+            return McaCtrl;
+        })();
+        Mca.McaCtrl = McaCtrl;
+    })(csComp.Mca || (csComp.Mca = {}));
+    var Mca = csComp.Mca;
+})(csComp || (csComp = {}));
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var csComp;
+(function (csComp) {
+    (function (_Mca) {
+        (function (Models) {
+            var Mca = (function (_super) {
+                __extends(Mca, _super);
+                function Mca() {
+                    _super.apply(this, arguments);
+                    /** Maximum number of star ratings to use to set the weight */
+                    this.userWeightMax = 5;
+                    /** Applicable feature ids as a string[]. */
+                    this.featureIds = [];
+                }
+                //public calculateWeights(criteria?: Criterion[]): void {
+                //    if (!criteria) criteria = this.criteria;
+                //    if (criteria.length === 0) return;
+                //    var totalWeight = 0;
+                //    criteria.forEach((c) => {
+                //        totalWeight += c.userWeight;
+                //    });
+                //    if (totalWeight == 0) return;
+                //    criteria.forEach((c) => {
+                //        c.weight = c.userWeight / totalWeight;
+                //    });
+                //}
+                Mca.prototype.calculateWeights = function (criteria) {
+                    if (!criteria)
+                        criteria = this.criteria;
+                    var totalWeight = 0;
+                    for (var k in criteria) {
+                        var crit = criteria[k];
+                        if (crit.criteria.length > 0)
+                            this.calculateWeights(crit.criteria);
+                        totalWeight += crit.userWeight;
+                    }
+                    if (totalWeight > 0) {
+                        for (var j in criteria) {
+                            var critj = criteria[j];
+                            critj.weight = critj.userWeight / totalWeight;
+                        }
+                    }
+                };
+                return Mca;
+            })(Criterion);
+            Models.Mca = Mca;
 
-    /**
-    * Directive to display the available map layers.
-    */
-    StyleList.myModule.directive('styleList', [
-        '$window', '$compile',
-        function ($window, $compile) {
-            return {
-                terminal: false,
-                restrict: 'E',
-                scope: {},
-                template: StyleList.html,
-                //compile             : el          => {    // I need to explicitly compile it in order to use interpolation like {{xxx}}
-                //    var fn                        = $compile(el);
-                //    return scope                  => {
-                //        fn(scope);
-                //    };
-                //},
-                link: function (scope, element, attrs) {
-                    // Deal with resizing the element list
-                    scope.onResizeFunction = function () {
-                        var filterHeight = 50;
-                        var paginationCtrlHeight = 100;
-                        var itemHeight = 60;
+            var Criterion = (function () {
+                function Criterion() {
+                    /** Specified weight by the user */
+                    this.userWeight = 1;
+                    this.criteria = [];
+                    /** Piece-wise linear approximation of the scoring function by a set of x and y points */
+                    this.x = [];
+                    this.y = [];
+                    this.isPlaUpdated = false;
+                }
+                Criterion.prototype.requiresMinimum = function () {
+                    return this.scores.indexOf('min') >= 0;
+                };
 
-                        //scope.windowHeight          = $window.innerHeight;
-                        //scope.windowWidth           = $window.innerWidth;
-                        scope.numberOfItems = Math.floor(($window.innerHeight - filterHeight - paginationCtrlHeight) / itemHeight);
-                    };
+                Criterion.prototype.requiresMaximum = function () {
+                    return this.scores.indexOf('max') >= 0;
+                };
 
-                    // Call to the function when the page is first loaded
-                    scope.onResizeFunction();
+                /**
+                * Update the piecewise linear approximation (PLA) of the scoring (a.k.a. user) function,
+                * which translates a property value to a MCA value in the range [0,1].
+                */
+                Criterion.prototype.updatePla = function (features) {
+                    var _this = this;
+                    if (this.isPlaUpdated)
+                        return;
 
-                    angular.element($window).bind('resize', function () {
-                        scope.onResizeFunction();
-                        scope.$apply();
-                    });
-                },
-                replace: true,
-                transclude: true,
-                controller: StyleList.StyleListCtrl
-            };
-        }
-    ]).directive('bsPopover', function () {
-        return function (scope, element, attrs) {
-            element.find("a[rel=popover]").popover({ placement: 'right', html: 'true' });
-        };
-    });
-})(StyleList || (StyleList = {}));
-var StyleList;
-(function (StyleList) {
-    var StyleListCtrl = (function () {
-        // dependencies are injected via AngularJS $injector
-        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
-        function StyleListCtrl($scope, $layerService) {
-            this.$scope = $scope;
-            this.$layerService = $layerService;
-            $scope.vm = this;
-        }
-        StyleListCtrl.$inject = [
-            '$scope',
-            'layerService'
-        ];
-        return StyleListCtrl;
-    })();
-    StyleList.StyleListCtrl = StyleListCtrl;
-})(StyleList || (StyleList = {}));
+                    // Replace min and max by their values:
+                    var scores = this.scores;
+                    var propValues = [];
+                    if (this.requiresMaximum() || this.requiresMinimum()) {
+                        features.forEach(function (feature) {
+                            if (_this.label in feature.properties) {
+                                // The property is available
+                                propValues.push(feature.properties[_this.label]);
+                            }
+                        });
+                    }
+                    if (this.requiresMaximum()) {
+                        scores.replace('max', Math.max.apply(null, propValues));
+                    }
+                    if (this.requiresMinimum()) {
+                        scores.replace('min', Math.min.apply(null, propValues));
+                    }
+
+                    // Regex to split the scores: [^\d\.]+
+                    var pla = scores.split('[^\d\.]+');
+
+                    // Test that we have an equal number of x and y,
+                    if (pla.length % 2 != 0)
+                        throw Error(this.label + ' does not have an even (x,y) pair in scores.');
+
+                    for (var i = 0; i < pla.length / 2;) {
+                        var x = parseFloat(pla[i++]);
+                        if (i > 0 && this.x[i - 1] > x)
+                            throw Error(this.label + ': x should increment continuously.');
+                        this.x.push(x);
+
+                        var y = parseFloat(pla[i++]);
+                        if (y < 0)
+                            y = 0;
+                        else if (y > 1)
+                            y = 1;
+                        this.y.push(y);
+                    }
+                    this.isPlaUpdated = true;
+                };
+
+                Criterion.prototype.getScores = function (features, criterion) {
+                    var _this = this;
+                    if (!criterion)
+                        criterion = this;
+                    var resultingScores = Array(features.length);
+                    if (criterion.criteria.length == 0) {
+                        this.updatePla(features);
+
+                        // End point: compute the score for each feature
+                        features.forEach(function (feature) {
+                            var y = 0;
+                            if (_this.label in feature.properties) {
+                                // The property is available
+                                var x = feature.properties[_this.label];
+                                for (var k in _this.x) {
+                                    if (x < _this.x[k]) {
+                                        // Found relative position of x in this.x
+                                        y = _this.y[Math.max(0, k - 1)];
+                                        break;
+                                    }
+                                    y = _this.y[_this.y.length - 1];
+                                }
+                            } else {
+                                y = 0;
+                            }
+                            resultingScores.push(_this.weight * y);
+                        });
+                        return resultingScores;
+                    } else {
+                        // Sum all the sub-criteria.
+                        var finalScores = Array(features.length);
+                        this.criteria.forEach(function (crit) {
+                            var weightedScores = _this.getScore(features, crit);
+                            for (var k in weightedScores) {
+                                finalScores[k] += _this.weight + weightedScores[k];
+                            }
+                        });
+                        return finalScores;
+                    }
+                };
+                return Criterion;
+            })();
+            Models.Criterion = Criterion;
+        })(_Mca.Models || (_Mca.Models = {}));
+        var Models = _Mca.Models;
+    })(csComp.Mca || (csComp.Mca = {}));
+    var Mca = csComp.Mca;
+})(csComp || (csComp = {}));
 var csComp;
 (function (csComp) {
     (function (Search) {
@@ -2986,6 +3195,55 @@ var FeatureProps;
 })(FeatureProps || (FeatureProps = {}));
 var DataTable;
 (function (DataTable) {
+    DataTable.html = '<div>    <div style="width:100%; margin: 10px auto;">        <div style="float: left; width: 15%; margin: 0; padding: 1em">            <!-- Pull down of map layers -->            <select data-ng-model="vm.selectedLayerId"                    data-ng-change="vm.loadLayer()"                    data-ng-options="layer.id as layer.title group by layer.group for layer in vm.layerOptions"                    class="form-control tt-input"></select>            <!-- List of headers -->            <ul class="form-group" style="margin-top: 1em; margin-left: -2em; overflow-y: auto; overflow-x: hidden;"                resize resize-y="150">                <li ng-repeat="mi in vm.metaInfos" class="list-unstyled" style="white-space: nowrap; text-overflow: ellipsis">                    <label>                        <input type="checkbox" name="vm.selectedTitles[]" value="{{mi.title}}"                               data-ng-checked="vm.headers.indexOf(mi.title) > -1"                               data-ng-click="vm.toggleSelection(mi.title)">&nbsp;&nbsp;{{mi.title}}                    </label>                    <!--<div class="checkbox">                        <label>                            <input type="checkbox" name="vm.selectedTitles[]" value="{{mi.title}}"                                   data-ng-checked="vm.headers.indexOf(mi.title) > -1"                                   data-ng-click="vm.toggleSelection(mi.title)">&nbsp;&nbsp;{{mi.title}}                        </label>                    </div>-->                </li>            </ul>            <!--       <pre>{{vm.headers|json}}</pre>-->        </div>        <!-- Right side of the table view -->        <div style="margin-left: 16%; border-left: 1px solid gray; padding: 1em;" ng-init="poiTypeFilter">            <!-- Filter -->            <div class="has-feedback" style="margin-bottom: 1em; float: right; width: 16%; min-width: 200px;">                <span style="direction: ltr; position: static; display: block;">                    <input id="searchbox" data-ng-model="featureFilter" type="text"                           placeholder="Filter" autocomplete="off" spellcheck="false"                           style="position: relative; vertical-align: top;" class="form-control tt-input">                </span>                <span id="searchicon" class="fa form-control-feedback fa-filter" style="padding-top: 0px;"></span>            </div>            <!--Download to CSV option-->            <a href="" data-ng-click="vm.downloadCsv()" alt="Download CSV" style="margin-top: 5px; margin-right: 1em; float: right;"><i class="fa fa-download fa-2x"></i></a>            <!-- Specify how many items to show -->            <select data-ng-model="vm.numberOfItems" style="margin-bottom: 1em; margin-right: 10px; float: left; width: 16%; min-width: 200px;" class="form-control tt-input">                <option value="5" translate="SHOW5"></option>                <option value="10" translate="SHOW10"></option>                <option value="15" translate="SHOW15"></option>                <option value="20" translate="SHOW20"></option>                <option value="25" translate="SHOW25"></option>                <option value="30" translate="SHOW30"></option>                <option value="35" translate="SHOW35"></option>                <option value="40" translate="SHOW40"></option>            </select>            <!-- Data table -->            <table class="table table-striped table-condensed">                <tr>                    <th data-ng-repeat="header in vm.headers">                        {{header}}&nbsp;                        <a data-ng-click="reverseSort = !reverseSort; vm.orderBy($index, reverseSort);"><i data-ng-class="vm.sortOrderClass($index, reverseSort)">&nbsp;&nbsp;</i></a>                    </th>                </tr>                <tr dir-paginate="row in vm.rows | filter:featureFilter | itemsPerPage: vm.numberOfItems"                    style="cursor: pointer; vertical-align: central">                    <td data-ng-class="{\'text-right\': field.type == \'number\'}" data-ng-repeat="field in row track by $index" data-ng-bind-html="vm.toTrusted(field.displayValue)"></td>                </tr>            </table>            <dir-pagination-controls style="" max-size="10" boundary-links="true" direction-links="true"                                     template-url="bower_components/angular-utils-pagination/dirPagination.tpl.html"></dir-pagination-controls>        </div>    </div>    <div style="clear: both; margin: 0; padding: .5em"></div></div>';
+})(DataTable || (DataTable = {}));
+var DataTable;
+(function (DataTable) {
+    /**
+    * Config
+    */
+    var moduleName = 'csWeb.datatable';
+
+    /**
+    * Module
+    */
+    DataTable.myModule;
+    try  {
+        DataTable.myModule = angular.module(moduleName);
+    } catch (err) {
+        // named module does not exist, so create one
+        DataTable.myModule = angular.module(moduleName, []);
+    }
+
+    /**
+    * Directive to display a feature's properties in a panel.
+    *
+    * @seealso : http://www.youtube.com/watch?v=gjJ5vLRK8R8&list=UUGD_0i6L48hucTiiyhb5QzQ
+    * @seealso : http://plnkr.co/edit/HyBP9d?p=preview
+    */
+    DataTable.myModule.directive('datatable', [
+        '$compile',
+        function ($compile) {
+            return {
+                terminal: false,
+                restrict: 'E',
+                scope: {},
+                template: DataTable.html,
+                //compile   : el => {     // I need to explicitly compile it in order to use interpolation like {{xxx}}
+                //    var fn = $compile(el);
+                //    return scope => {
+                //        fn(scope);
+                //    };
+                //},
+                replace: true,
+                transclude: true,
+                controller: DataTable.DataTableCtrl
+            };
+        }
+    ]);
+})(DataTable || (DataTable = {}));
+var DataTable;
+(function (DataTable) {
     var StringExt = csComp.StringExt;
 
     /**
@@ -3006,10 +3264,12 @@ var DataTable;
     var DataTableCtrl = (function () {
         // dependencies are injected via AngularJS $injector
         // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
-        function DataTableCtrl($scope, $http, $sce, $layerService, $localStorageService, $messageBusService) {
+        function DataTableCtrl($scope, $http, $sce, $translate, $layerService, $localStorageService, $messageBusService) {
+            var _this = this;
             this.$scope = $scope;
             this.$http = $http;
             this.$sce = $sce;
+            this.$translate = $translate;
             this.$layerService = $layerService;
             this.$localStorageService = $localStorageService;
             this.$messageBusService = $messageBusService;
@@ -3019,9 +3279,13 @@ var DataTable;
             this.metaInfos = [];
             this.headers = [];
             this.rows = [];
+            this.mapFeatureTitle = 'Map Features';
             // 'vm' stands for 'view model'. We're adding a reference to the controller to the scope
             // for its methods to be accessible from view / HTML
             $scope.vm = this;
+            $translate('MAP_FEATURES').then(function (translation) {
+                _this.mapFeatureTitle = translation;
+            });
 
             this.bindToStorage('vm.numberOfItems', 10);
             this.numberOfItems = $localStorageService.get('vm.numberOfItems');
@@ -3049,7 +3313,7 @@ var DataTable;
             this.layerOptions.push({
                 "group": '',
                 "id": this.mapLabel,
-                "title": "Kaartfeatures"
+                "title": this.mapFeatureTitle
             });
             if (this.$layerService.project == null || this.$layerService.project.groups == null)
                 return;
@@ -3316,6 +3580,7 @@ var DataTable;
             '$scope',
             '$http',
             '$sce',
+            '$translate',
             'layerService',
             'localStorageService',
             'messageBusService'
@@ -3323,53 +3588,4 @@ var DataTable;
         return DataTableCtrl;
     })();
     DataTable.DataTableCtrl = DataTableCtrl;
-})(DataTable || (DataTable = {}));
-var DataTable;
-(function (DataTable) {
-    DataTable.html = '<div>    <div style="width:100%; margin: 10px auto;">        <div style="float: left; width: 15%; margin: 0; padding: 1em">            <!-- Pull down of map layers -->            <select data-ng-model="vm.selectedLayerId"                    data-ng-change="vm.loadLayer()"                    data-ng-options="layer.id as layer.title group by layer.group for layer in vm.layerOptions"                    class="form-control tt-input"></select>            <!-- List of headers -->            <ul class="form-group" style="margin-top: 1em; margin-left: -2em; overflow-y: auto; overflow-x: hidden;"                resize resize-y="150">                <li ng-repeat="mi in vm.metaInfos" class="list-unstyled" style="white-space: nowrap; text-overflow: ellipsis">                    <label>                        <input type="checkbox" name="vm.selectedTitles[]" value="{{mi.title}}"                               data-ng-checked="vm.headers.indexOf(mi.title) > -1"                               data-ng-click="vm.toggleSelection(mi.title)">&nbsp;&nbsp;{{mi.title}}                    </label>                    <!--<div class="checkbox">                        <label>                            <input type="checkbox" name="vm.selectedTitles[]" value="{{mi.title}}"                                   data-ng-checked="vm.headers.indexOf(mi.title) > -1"                                   data-ng-click="vm.toggleSelection(mi.title)">&nbsp;&nbsp;{{mi.title}}                        </label>                    </div>-->                </li>            </ul>            <!--       <pre>{{vm.headers|json}}</pre>-->        </div>        <!-- Right side of the table view -->        <div style="margin-left: 16%; border-left: 1px solid gray; padding: 1em;" ng-init="poiTypeFilter">            <!-- Filter -->            <div class="has-feedback" style="margin-bottom: 1em; float: right; width: 16%; min-width: 200px;">                <span style="direction: ltr; position: static; display: block;">                    <input id="searchbox" data-ng-model="featureFilter" type="text"                           placeholder="Filter" autocomplete="off" spellcheck="false"                           style="position: relative; vertical-align: top;" class="form-control tt-input">                </span>                <span id="searchicon" class="fa form-control-feedback fa-filter" style="padding-top: 0px;"></span>            </div>            <!--Download to CSV option-->            <a href="" data-ng-click="vm.downloadCsv()" alt="Download CSV" style="margin-top: 5px; margin-right: 1em; float: right;"><i class="fa fa-download fa-2x"></i></a>            <!-- Specify how many items to show -->            <select data-ng-model="vm.numberOfItems" style="margin-bottom: 1em; margin-right: 10px; float: left; width: 16%; min-width: 200px;" class="form-control tt-input">                <option value="5" translate="SHOW5"></option>                <option value="10" translate="SHOW10"></option>                <option value="15" translate="SHOW15"></option>                <option value="20" translate="SHOW20"></option>                <option value="25" translate="SHOW25"></option>                <option value="30" translate="SHOW30"></option>                <option value="35" translate="SHOW35"></option>                <option value="40" translate="SHOW40"></option>            </select>            <!-- Data table -->            <table class="table table-striped table-condensed">                <tr>                    <th data-ng-repeat="header in vm.headers">                        {{header}}&nbsp;                        <a data-ng-click="reverseSort = !reverseSort; vm.orderBy($index, reverseSort);"><i data-ng-class="vm.sortOrderClass($index, reverseSort)">&nbsp;&nbsp;</i></a>                    </th>                </tr>                <tr dir-paginate="row in vm.rows | filter:featureFilter | itemsPerPage: vm.numberOfItems"                    style="cursor: pointer; vertical-align: central">                    <td data-ng-class="{\'text-right\': field.type == \'number\'}" data-ng-repeat="field in row track by $index" data-ng-bind-html="vm.toTrusted(field.displayValue)"></td>                </tr>            </table>            <dir-pagination-controls style="" max-size="10" boundary-links="true" direction-links="true"                                     template-url="bower_components/angular-utils-pagination/dirPagination.tpl.html"></dir-pagination-controls>        </div>    </div>    <div style="clear: both; margin: 0; padding: .5em"></div></div>';
-})(DataTable || (DataTable = {}));
-var DataTable;
-(function (DataTable) {
-    /**
-    * Config
-    */
-    var moduleName = 'csWeb.datatable';
-
-    /**
-    * Module
-    */
-    DataTable.myModule;
-    try  {
-        DataTable.myModule = angular.module(moduleName);
-    } catch (err) {
-        // named module does not exist, so create one
-        DataTable.myModule = angular.module(moduleName, []);
-    }
-
-    /**
-    * Directive to display a feature's properties in a panel.
-    *
-    * @seealso : http://www.youtube.com/watch?v=gjJ5vLRK8R8&list=UUGD_0i6L48hucTiiyhb5QzQ
-    * @seealso : http://plnkr.co/edit/HyBP9d?p=preview
-    */
-    DataTable.myModule.directive('datatable', [
-        '$compile',
-        function ($compile) {
-            return {
-                terminal: false,
-                restrict: 'E',
-                scope: {},
-                template: DataTable.html,
-                //compile   : el => {     // I need to explicitly compile it in order to use interpolation like {{xxx}}
-                //    var fn = $compile(el);
-                //    return scope => {
-                //        fn(scope);
-                //    };
-                //},
-                replace: true,
-                transclude: true,
-                controller: DataTable.DataTableCtrl
-            };
-        }
-    ]);
 })(DataTable || (DataTable = {}));
