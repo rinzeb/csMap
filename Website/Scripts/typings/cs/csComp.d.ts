@@ -1,5 +1,76 @@
 /// <reference path="../crossfilter/crossfilter.d.ts" />
 /// <reference path="../leaflet/leaflet.d.ts" />
+declare module csComp.StringExt {
+    function isNullOrEmpty(s: string): boolean;
+    /**
+    * String formatting
+    * 'Added {0} by {1} to your collection'.f(title, artist)
+    * 'Your balance is {0} USD'.f(77.7)
+    */
+    function format(s: string, ...args: string[]): string;
+    function isNumber(n: any): boolean;
+    function isBoolean(s: any): boolean;
+    function isBbcode(s: any): boolean;
+}
+declare module csComp.Helpers {
+    function supportsDataUri(): boolean;
+}
+declare module csComp.Services {
+    interface IMessageBusCallback {
+        (title: string, data?: any): any;
+    }
+    class MessageBusHandle {
+        constructor(topic: string, callback: IMessageBusCallback);
+        public topic: string;
+        public callback: IMessageBusCallback;
+    }
+    /**
+    * Simple message bus service, used for subscribing and unsubsubscribing to topics.
+    * @see {@link https://gist.github.com/floatingmonkey/3384419}
+    */
+    class MessageBusService {
+        private static cache;
+        constructor();
+        /**
+        * Publish a notification
+        * @title: the title of the notification
+        * @text:  the contents of the notification
+        */
+        public notify(title: string, text: string): void;
+        public notifyBottom(title: string, text: string): void;
+        /**
+        * Publish a notification
+        * @title: the title of the notification
+        * @text:  the contents of the notification
+        */
+        public notifyData(data: any): void;
+        /**
+        * Publish to a topic
+        */
+        public publish(topic: string, title: string, data?: any): void;
+        /**
+        * Subscribe to a topic
+        * @param {string} topic The desired topic of the message.
+        * @param {IMessageBusCallback} callback The callback to call.
+        */
+        public subscribe(topic: string, callback: IMessageBusCallback): MessageBusHandle;
+        /**
+        * Unsubscribe to a topic by providing its handle
+        */
+        public unsubscribe(handle: MessageBusHandle): void;
+    }
+    class EventObj {
+        public myEvents: any;
+        constructor();
+        public bind(event: any, fct: any): void;
+        public unbind(event: any, fct: any): void;
+        public unbindEvent(event: any): void;
+        public unbindAll(): void;
+        public trigger(event: any, ...args: any[]): void;
+        public registerEvent(evtname: string): void;
+        public registerEvents(evtnames: string[]): void;
+    }
+}
 declare module csComp.GeoJson {
     class Feature implements IFeature {
         public id: string;
@@ -13,8 +84,6 @@ declare module csComp.GeoJson {
         public fType: IFeatureType;
         public isInitialized: boolean;
     }
-}
-declare module csComp.GeoJson {
     interface IStringToString {
         [key: string]: string;
     }
@@ -100,79 +169,43 @@ declare module csComp.GeoJson {
         features: Feature[];
     }
 }
-declare module csComp.StringExt {
-    function isNullOrEmpty(s: string): boolean;
-    /**
-    * String formatting
-    * 'Added {0} by {1} to your collection'.f(title, artist)
-    * 'Your balance is {0} USD'.f(77.7)
-    */
-    function format(s: string, ...args: string[]): string;
-    function isNumber(n: any): boolean;
-    function isBoolean(s: any): boolean;
-    function isBbcode(s: any): boolean;
-}
-declare module csComp.Services {
-    interface IMessageBusCallback {
-        (title: string, data?: any): any;
-    }
-    class MessageBusHandle {
-        constructor(topic: string, callback: IMessageBusCallback);
-        public topic: string;
-        public callback: IMessageBusCallback;
-    }
-    /**
-    * Simple message bus service, used for subscribing and unsubsubscribing to topics.
-    * @see {@link https://gist.github.com/floatingmonkey/3384419}
-    */
-    class MessageBusService {
-        private static cache;
-        constructor();
-        /**
-        * Publish a notification
-        * @title: the title of the notification
-        * @text:  the contents of the notification
-        */
-        public notify(title: string, text: string): void;
-        public notifyBottom(title: string, text: string): void;
-        /**
-        * Publish a notification
-        * @title: the title of the notification
-        * @text:  the contents of the notification
-        */
-        public notifyData(data: any): void;
-        /**
-        * Publish to a topic
-        */
-        public publish(topic: string, title: string, data?: any): void;
-        /**
-        * Subscribe to a topic
-        * @param {string} topic The desired topic of the message.
-        * @param {IMessageBusCallback} callback The callback to call.
-        */
-        public subscribe(topic: string, callback: IMessageBusCallback): MessageBusHandle;
-        /**
-        * Unsubscribe to a topic by providing its handle
-        */
-        public unsubscribe(handle: MessageBusHandle): void;
-    }
-    class EventObj {
-        public myEvents: any;
-        constructor();
-        public bind(event: any, fct: any): void;
-        public unbind(event: any, fct: any): void;
-        public unbindEvent(event: any): void;
-        public unbindAll(): void;
-        public trigger(event: any, ...args: any[]): void;
-        public registerEvent(evtname: string): void;
-        public registerEvents(evtnames: string[]): void;
-    }
-}
 declare module Helpers.Resize {
     /**
     * Module
     */
     var myModule: any;
+}
+declare module LegendList {
+    var html: string;
+}
+declare module LegendList {
+    /**
+    * Module
+    */
+    var myModule: any;
+}
+declare module LegendList {
+    interface ILegendItem {
+        title: string;
+        uri: string;
+    }
+    interface ILegendListScope extends ng.IScope {
+        vm: LegendListCtrl;
+        numberOfItems: number;
+        legendItems: ILegendItem[];
+    }
+    class LegendListCtrl {
+        private $scope;
+        private $layerService;
+        private $mapService;
+        private $messageBusService;
+        private scope;
+        static $inject: string[];
+        constructor($scope: ILegendListScope, $layerService: csComp.Services.LayerService, $mapService: csComp.Services.MapService, $messageBusService: csComp.Services.MessageBusService);
+        private updateLegendItems();
+        private getImageUri(ft);
+        private getName(key, ft);
+    }
 }
 declare module FeatureList {
     var html: string;
@@ -227,9 +260,11 @@ declare module csComp.Services {
         title: string;
         accentColor: string;
         project: Project;
+        solution: Solution;
         maxBounds: IBoundingBox;
         findLayer(id: string): ProjectLayer;
         selectFeature(feature: GeoJson.IFeature): any;
+        openSolution(url: string, layers?: string, initialProject?: string): void;
         mb: MessageBusService;
         map: MapService;
         layerGroup: L.LayerGroup<L.ILayer>;
@@ -296,6 +331,7 @@ declare module csComp.Services {
         public projects: SolutionProject[];
     }
     class Project {
+        public viewBounds: IBoundingBox;
         public title: string;
         public description: string;
         public logo: string;
@@ -408,6 +444,7 @@ declare module csComp.Services {
             [key: string]: GeoJson.IMetaInfo;
         };
         public project: Project;
+        public solution: Solution;
         public layerGroup: L.LayerGroup<L.ILayer>;
         public dimension: any;
         public info: L.Control;
@@ -503,8 +540,9 @@ declare module csComp.Services {
         * Open solution file with references to available baselayers and projects
         * @params url: URL of the solution
         * @params layers: Optionally provide a semi-colon separated list of layer IDs that should be opened.
+        * @params initialProject: Optionally provide a project name that should be loaded, if omitted the first project in the definition will be loaded
         */
-        public openSolution(url: string, layers?: string): void;
+        public openSolution(url: string, layers?: string, initialProject?: string): void;
         /**
         * Open project
         * @params url: URL of the project
@@ -533,58 +571,6 @@ declare module csComp.Services {
         */
         private updateMapFilter(group);
         private resetMapFilter(group);
-    }
-}
-declare module LegendList {
-    var html: string;
-}
-declare module LegendList {
-    /**
-    * Module
-    */
-    var myModule: any;
-}
-declare module LegendList {
-    interface ILegendItem {
-        title: string;
-        uri: string;
-    }
-    interface ILegendListScope extends ng.IScope {
-        vm: LegendListCtrl;
-        numberOfItems: number;
-        legendItems: ILegendItem[];
-    }
-    class LegendListCtrl {
-        private $scope;
-        private $layerService;
-        private $mapService;
-        private $messageBusService;
-        static $inject: string[];
-        constructor($scope: ILegendListScope, $layerService: csComp.Services.LayerService, $mapService: csComp.Services.MapService, $messageBusService: csComp.Services.MessageBusService);
-        private updateLegendItems();
-        private getImageUri(ft);
-        private getName(key, ft);
-    }
-}
-declare module StyleList {
-    var html: string;
-}
-declare module StyleList {
-    /**
-    * Module
-    */
-    var myModule: any;
-}
-declare module StyleList {
-    interface IStyleListScope extends ng.IScope {
-        vm: StyleListCtrl;
-    }
-    class StyleListCtrl {
-        private $scope;
-        private $layerService;
-        private scope;
-        static $inject: string[];
-        constructor($scope: IStyleListScope, $layerService: csComp.Services.LayerService);
     }
 }
 declare module BaseMapList {
@@ -649,55 +635,25 @@ declare module csComp.Services {
         public getMap(): L.Map;
     }
 }
-declare module csComp.Mca {
-    interface IMcaScope extends ng.IScope {
-        vm: McaCtrl;
+declare module StyleList {
+    var html: string;
+}
+declare module StyleList {
+    /**
+    * Module
+    */
+    var myModule: any;
+}
+declare module StyleList {
+    interface IStyleListScope extends ng.IScope {
+        vm: StyleListCtrl;
     }
-    class McaCtrl {
+    class StyleListCtrl {
         private $scope;
         private $layerService;
-        private $messageBusService;
-        private mca;
+        private scope;
         static $inject: string[];
-        constructor($scope: IMcaScope, $layerService: Services.LayerService, $messageBusService: Services.MessageBusService);
-    }
-}
-declare module csComp.Mca.Models {
-    class Mca extends Criterion {
-        public title: string;
-        public description: string;
-        public stringFormat: string;
-        /** Optionally, export the result also as a rank */
-        public rankTitle: string;
-        /** Optionally, stringFormat for the ranked result */
-        public rankFormat: string;
-        /** Maximum number of star ratings to use to set the weight */
-        public userWeightMax: number;
-        /** Optional, applicable layer ids as a semi-colon separated string. */
-        public layerIds: string;
-        public calculateWeights(criteria?: Criterion[]): void;
-    }
-    class Criterion {
-        /**
-        * Top level label will be used to add a property to a feature, mca_LABELNAME, with the MCA value.
-        * Lower level children will be used to obtain the property value.
-        */
-        public label: string;
-        /** Color of the pie chart */
-        public color: string;
-        /** Specified weight by the user */
-        public userWeight: number;
-        /** Derived weight based on the fact that the sum of weights in a group of criteria needs to be 1. */
-        public weight: number;
-        /** Scoring function y = f(x), which translates a specified measurement x to a value y, where y in [0,1].
-        * Format [x1,y1 x2,y2], and may contain special characters, such as min or max to define the minimum or maximum.
-        */
-        public scores: string;
-        public criteria: Criterion[];
-        /** Piece-wise linear approximation of the scoring function by a set of x and y points */
-        private xy;
-        public validateScore(score: string): boolean;
-        public getScore(): number;
+        constructor($scope: IStyleListScope, $layerService: csComp.Services.LayerService);
     }
 }
 declare module csComp.Search {
@@ -814,15 +770,6 @@ declare module FeatureProps {
     }
 }
 declare module DataTable {
-    var html: string;
-}
-declare module DataTable {
-    /**
-    * Module
-    */
-    var myModule: any;
-}
-declare module DataTable {
     interface IDataTableViewScope extends ng.IScope {
         vm: DataTableCtrl;
     }
@@ -885,9 +832,19 @@ declare module DataTable {
         */
         public orderBy(headerIndex: number, reverseOrder: boolean): void;
         public downloadCsv(): void;
+        private saveData(csvData, filename);
         /**
         * Convert to trusted html string.
         */
         public toTrusted(html: string): string;
     }
+}
+declare module DataTable {
+    var html: string;
+}
+declare module DataTable {
+    /**
+    * Module
+    */
+    var myModule: any;
 }
