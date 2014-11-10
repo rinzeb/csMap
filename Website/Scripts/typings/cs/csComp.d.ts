@@ -13,76 +13,6 @@ declare module csComp.GeoJson {
         public fType: IFeatureType;
         public isInitialized: boolean;
     }
-}
-declare module csComp.StringExt {
-    function isNullOrEmpty(s: string): boolean;
-    /**
-    * String formatting
-    * 'Added {0} by {1} to your collection'.f(title, artist)
-    * 'Your balance is {0} USD'.f(77.7)
-    */
-    function format(s: string, ...args: string[]): string;
-    function isNumber(n: any): boolean;
-    function isBoolean(s: any): boolean;
-    function isBbcode(s: any): boolean;
-}
-declare module csComp.Services {
-    interface IMessageBusCallback {
-        (title: string, data?: any): any;
-    }
-    class MessageBusHandle {
-        constructor(topic: string, callback: IMessageBusCallback);
-        public topic: string;
-        public callback: IMessageBusCallback;
-    }
-    /**
-    * Simple message bus service, used for subscribing and unsubsubscribing to topics.
-    * @see {@link https://gist.github.com/floatingmonkey/3384419}
-    */
-    class MessageBusService {
-        private static cache;
-        constructor();
-        /**
-        * Publish a notification
-        * @title: the title of the notification
-        * @text:  the contents of the notification
-        */
-        public notify(title: string, text: string): void;
-        public notifyBottom(title: string, text: string): void;
-        /**
-        * Publish a notification
-        * @title: the title of the notification
-        * @text:  the contents of the notification
-        */
-        public notifyData(data: any): void;
-        /**
-        * Publish to a topic
-        */
-        public publish(topic: string, title: string, data?: any): void;
-        /**
-        * Subscribe to a topic
-        * @param {string} topic The desired topic of the message.
-        * @param {IMessageBusCallback} callback The callback to call.
-        */
-        public subscribe(topic: string, callback: IMessageBusCallback): MessageBusHandle;
-        /**
-        * Unsubscribe to a topic by providing its handle
-        */
-        public unsubscribe(handle: MessageBusHandle): void;
-    }
-    class EventObj {
-        public myEvents: any;
-        constructor();
-        public bind(event: any, fct: any): void;
-        public unbind(event: any, fct: any): void;
-        public unbindEvent(event: any): void;
-        public unbindAll(): void;
-        public trigger(event: any, ...args: any[]): void;
-        public registerEvent(evtname: string): void;
-        public registerEvents(evtnames: string[]): void;
-    }
-}
-declare module csComp.GeoJson {
     interface IStringToString {
         [key: string]: string;
     }
@@ -168,11 +98,272 @@ declare module csComp.GeoJson {
         features: Feature[];
     }
 }
-declare module Helpers.Resize {
+declare module BaseMapList {
+    var html: string;
+}
+declare module BaseMapList {
     /**
     * Module
     */
     var myModule: any;
+}
+declare module BaseMapList {
+    interface IBaseMapScope extends ng.IScope {
+        vm: BaseMapListCtrl;
+    }
+    class BaseMapListCtrl {
+        private $scope;
+        private $mapService;
+        private scope;
+        static $inject: string[];
+        constructor($scope: IBaseMapScope, $mapService: csComp.Services.MapService);
+        public selectBaseLayer(key: any): void;
+    }
+}
+declare module DataTable {
+    var html: string;
+}
+declare module DataTable {
+    /**
+    * Module
+    */
+    var myModule: any;
+}
+declare module DataTable {
+    interface IDataTableViewScope extends ng.IScope {
+        vm: DataTableCtrl;
+    }
+    /**
+    * Represents a field in the table.
+    * The value is the actual displayValue shown, the type is the metainfo type (e.g. number or text, useful when aligning the data), and the header is used for sorting.
+    */
+    class TableField {
+        public displayValue: string;
+        public originalValue: any;
+        public type: string;
+        public header: string;
+        constructor(displayValue: string, originalValue: any, type: string, header: string);
+    }
+    class DataTableCtrl {
+        private $scope;
+        private $http;
+        private $sce;
+        private $layerService;
+        private $localStorageService;
+        private $messageBusService;
+        public mapLabel: string;
+        public dataset: csComp.GeoJson.IGeoJsonFile;
+        public selectedType: csComp.GeoJson.IFeatureType;
+        public numberOfItems: number;
+        public selectedLayerId: string;
+        public layerOptions: any[];
+        public metaInfos: csComp.GeoJson.IMetaInfo[];
+        public headers: string[];
+        public sortingColumn: number;
+        public rows: TableField[][];
+        static $inject: string[];
+        constructor($scope: IDataTableViewScope, $http: ng.IHttpService, $sce: ng.ISCEService, $layerService: csComp.Services.LayerService, $localStorageService: ng.localStorage.ILocalStorageService, $messageBusService: csComp.Services.MessageBusService);
+        /**
+        * Add a label to local storage and bind it to the scope.
+        */
+        private bindToStorage(label, defaultValue);
+        /**
+        * Create a list of layer options and select the one used previously.
+        */
+        private updateLayerOptions();
+        private loadLayer();
+        /**
+        * Load the features as visible on the map.
+        */
+        private loadMapLayers();
+        private updateMetaInfo(data);
+        public toggleSelection(metaInfoTitle: string): void;
+        private findLayerById(id);
+        /**
+        * Returns the data rows that are relevant for the current selection.
+        */
+        public getRows(): TableField[][];
+        /**
+        * Generate a font awesome class based on the order.
+        */
+        public sortOrderClass(headerIndex: number, reverseOrder: boolean): string;
+        /**
+        * Order the rows based on the header index and the order.
+        */
+        public orderBy(headerIndex: number, reverseOrder: boolean): void;
+        public downloadCsv(): void;
+        private saveData(csvData, filename);
+        /**
+        * Convert to trusted html string.
+        */
+        public toTrusted(html: string): string;
+    }
+}
+declare module FeatureList {
+    var html: string;
+}
+declare module FeatureList {
+    /**
+    * Module
+    */
+    var myModule: any;
+}
+declare module FeatureList {
+    interface IFeatureListScope extends ng.IScope {
+        vm: FeatureListCtrl;
+        numberOfItems: number;
+    }
+    class FeatureListCtrl {
+        private $scope;
+        private $layerService;
+        private $mapService;
+        private scope;
+        static $inject: string[];
+        constructor($scope: IFeatureListScope, $layerService: csComp.Services.LayerService, $mapService: csComp.Services.MapService);
+    }
+}
+declare module FeatureProps {
+    var html: string;
+}
+declare module FeatureProps {
+    /**
+    * Module
+    */
+    var myModule: any;
+}
+declare module FeatureProps {
+    interface IFeaturePropsScope extends ng.IScope {
+        vm: FeaturePropsCtrl;
+        showMenu: boolean;
+        poi: csComp.GeoJson.IFeature;
+        callOut: CallOut;
+        featureTabActivated(sectionTitle: string, section: CallOutSection): any;
+        autocollapse(init: boolean): void;
+    }
+    interface ICallOutProperty {
+        key: string;
+        value: string;
+        property: string;
+        canFilter: boolean;
+        canStyle: boolean;
+        feature: csComp.GeoJson.IFeature;
+        description?: string;
+        meta?: csComp.GeoJson.IMetaInfo;
+        isFilter: boolean;
+    }
+    class CallOutProperty implements ICallOutProperty {
+        public key: string;
+        public value: string;
+        public property: string;
+        public canFilter: boolean;
+        public canStyle: boolean;
+        public feature: csComp.GeoJson.IFeature;
+        public isFilter: boolean;
+        public description: string;
+        public meta: csComp.GeoJson.IMetaInfo;
+        constructor(key: string, value: string, property: string, canFilter: boolean, canStyle: boolean, feature: csComp.GeoJson.IFeature, isFilter: boolean, description?: string, meta?: csComp.GeoJson.IMetaInfo);
+    }
+    interface ICallOutSection {
+        metaInfos: {
+            [label: string]: csComp.GeoJson.IMetaInfo;
+        };
+        properties: ICallOutProperty[];
+        sectionIcon: string;
+        addProperty(key: string, value: string, property: string, canFilter: boolean, canStyle: boolean, feature: csComp.GeoJson.IFeature, isFilter: boolean, description?: string, meta?: csComp.GeoJson.IMetaInfo): void;
+        hasProperties(): boolean;
+    }
+    class CallOutSection implements ICallOutSection {
+        public metaInfos: {
+            [label: string]: csComp.GeoJson.IMetaInfo;
+        };
+        public properties: ICallOutProperty[];
+        public sectionIcon: string;
+        constructor(sectionIcon?: string);
+        public showSectionIcon(): boolean;
+        public addProperty(key: string, value: string, property: string, canFilter: boolean, canStyle: boolean, feature: csComp.GeoJson.IFeature, isFilter: boolean, description?: string, meta?: csComp.GeoJson.IMetaInfo): void;
+        public hasProperties(): boolean;
+    }
+    class CallOut {
+        private type;
+        private feature;
+        private metaInfoData;
+        public title: string;
+        public sections: {
+            [title: string]: ICallOutSection;
+        };
+        constructor(type: csComp.GeoJson.IFeatureType, feature: csComp.GeoJson.IFeature, metaInfoData: {
+            [key: string]: csComp.GeoJson.IMetaInfo;
+        });
+        private getOrCreateCallOutSection(sectionTitle);
+        /**
+        * Set the title of the callout to the title of the feature.
+        */
+        private setTitle();
+    }
+    class FeaturePropsCtrl {
+        private $scope;
+        private $location;
+        private $sce;
+        private $mapService;
+        private $layerService;
+        private $messageBusService;
+        private scope;
+        static $inject: string[];
+        constructor($scope: IFeaturePropsScope, $location: ng.ILocationService, $sce: ng.ISCEService, $mapService: csComp.Services.MapService, $layerService: csComp.Services.LayerService, $messageBusService: csComp.Services.MessageBusService);
+        public toTrusted(html: string): any;
+        /**
+        * Callback function
+        * @see {http://stackoverflow.com/questions/12756423/is-there-an-alias-for-this-in-typescript}
+        * @see {http://stackoverflow.com/questions/20627138/typescript-this-scoping-issue-when-called-in-jquery-callback}
+        * @todo {notice the strange syntax using a fat arrow =>, which is to preserve the this reference in a callback!}
+        */
+        private sidebarMessageReceived;
+        private featureMessageReceived;
+        private displayFeature(feature);
+    }
+}
+declare module FilterList {
+    var html: string;
+}
+declare module FilterList {
+    /**
+    * Module
+    */
+    var myModule: any;
+}
+declare module FilterList {
+    interface IFilterListScope extends ng.IScope {
+        vm: FilterListCtrl;
+    }
+    class FilterListCtrl {
+        private $scope;
+        private $layerService;
+        private scope;
+        static $inject: string[];
+        constructor($scope: IFilterListScope, $layerService: csComp.Services.LayerService);
+    }
+}
+declare module LayersDirective {
+    var html: string;
+}
+declare module LayersDirective {
+    /**
+    * Module
+    */
+    var myModule: any;
+}
+declare module LayersDirective {
+    interface ILayersDirectiveScope extends ng.IScope {
+        vm: LayersDirectiveCtrl;
+    }
+    class LayersDirectiveCtrl {
+        private $scope;
+        private $layerService;
+        private scope;
+        static $inject: string[];
+        constructor($scope: ILayersDirectiveScope, $layerService: csComp.Services.LayerService);
+        public toggleLayer(layer: csComp.Services.ProjectLayer): void;
+    }
 }
 declare module LegendList {
     var html: string;
@@ -206,49 +397,103 @@ declare module LegendList {
         private getName(key, ft);
     }
 }
-declare module FeatureList {
+declare module StyleList {
     var html: string;
 }
-declare module FeatureList {
+declare module StyleList {
     /**
     * Module
     */
     var myModule: any;
 }
-declare module FeatureList {
-    interface IFeatureListScope extends ng.IScope {
-        vm: FeatureListCtrl;
-        numberOfItems: number;
+declare module StyleList {
+    interface IStyleListScope extends ng.IScope {
+        vm: StyleListCtrl;
     }
-    class FeatureListCtrl {
+    class StyleListCtrl {
         private $scope;
         private $layerService;
-        private $mapService;
         private scope;
         static $inject: string[];
-        constructor($scope: IFeatureListScope, $layerService: csComp.Services.LayerService, $mapService: csComp.Services.MapService);
+        constructor($scope: IStyleListScope, $layerService: csComp.Services.LayerService);
     }
 }
-declare module FilterList {
-    var html: string;
+declare module csComp.StringExt {
+    function isNullOrEmpty(s: string): boolean;
+    /**
+    * String formatting
+    * 'Added {0} by {1} to your collection'.f(title, artist)
+    * 'Your balance is {0} USD'.f(77.7)
+    */
+    function format(s: string, ...args: string[]): string;
+    function isNumber(n: any): boolean;
+    function isBoolean(s: any): boolean;
+    function isBbcode(s: any): boolean;
 }
-declare module FilterList {
+declare module csComp.Helpers {
+    function supportsDataUri(): boolean;
+}
+declare module csComp.Services {
+    interface IMessageBusCallback {
+        (title: string, data?: any): any;
+    }
+    class MessageBusHandle {
+        constructor(topic: string, callback: IMessageBusCallback);
+        public topic: string;
+        public callback: IMessageBusCallback;
+    }
+    /**
+    * Simple message bus service, used for subscribing and unsubsubscribing to topics.
+    * @see {@link https://gist.github.com/floatingmonkey/3384419}
+    */
+    class MessageBusService {
+        private static cache;
+        constructor();
+        /**
+        * Publish a notification
+        * @title: the title of the notification
+        * @text:  the contents of the notification
+        */
+        public notify(title: string, text: string): void;
+        public notifyBottom(title: string, text: string): void;
+        /**
+        * Publish a notification
+        * @title: the title of the notification
+        * @text:  the contents of the notification
+        */
+        public notifyData(data: any): void;
+        /**
+        * Publish to a topic
+        */
+        public publish(topic: string, title: string, data?: any): void;
+        /**
+        * Subscribe to a topic
+        * @param {string} topic The desired topic of the message.
+        * @param {IMessageBusCallback} callback The callback to call.
+        */
+        public subscribe(topic: string, callback: IMessageBusCallback): MessageBusHandle;
+        /**
+        * Unsubscribe to a topic by providing its handle
+        */
+        public unsubscribe(handle: MessageBusHandle): void;
+    }
+    class EventObj {
+        public myEvents: any;
+        constructor();
+        public bind(event: any, fct: any): void;
+        public unbind(event: any, fct: any): void;
+        public unbindEvent(event: any): void;
+        public unbindAll(): void;
+        public trigger(event: any, ...args: any[]): void;
+        public registerEvent(evtname: string): void;
+        public registerEvents(evtnames: string[]): void;
+    }
+}
+declare module Helpers.Resize {
     /**
     * Module
     */
     var myModule: any;
-}
-declare module FilterList {
-    interface IFilterListScope extends ng.IScope {
-        vm: FilterListCtrl;
-    }
-    class FilterListCtrl {
-        private $scope;
-        private $layerService;
-        private scope;
-        static $inject: string[];
-        constructor($scope: IFilterListScope, $layerService: csComp.Services.LayerService);
-    }
 }
 declare module csComp.Services {
     enum LayerType {
@@ -271,28 +516,6 @@ declare module csComp.Services {
         metaInfoData: {
             [key: string]: GeoJson.IMetaInfo;
         };
-    }
-}
-declare module LayersDirective {
-    var html: string;
-}
-declare module LayersDirective {
-    /**
-    * Module
-    */
-    var myModule: any;
-}
-declare module LayersDirective {
-    interface ILayersDirectiveScope extends ng.IScope {
-        vm: LayersDirectiveCtrl;
-    }
-    class LayersDirectiveCtrl {
-        private $scope;
-        private $layerService;
-        private scope;
-        static $inject: string[];
-        constructor($scope: ILayersDirectiveScope, $layerService: csComp.Services.LayerService);
-        public toggleLayer(layer: csComp.Services.ProjectLayer): void;
     }
 }
 declare module csComp.Services {
@@ -567,28 +790,6 @@ declare module csComp.Services {
         private resetMapFilter(group);
     }
 }
-declare module BaseMapList {
-    var html: string;
-}
-declare module BaseMapList {
-    /**
-    * Module
-    */
-    var myModule: any;
-}
-declare module BaseMapList {
-    interface IBaseMapScope extends ng.IScope {
-        vm: BaseMapListCtrl;
-    }
-    class BaseMapListCtrl {
-        private $scope;
-        private $mapService;
-        private scope;
-        static $inject: string[];
-        constructor($scope: IBaseMapScope, $mapService: csComp.Services.MapService);
-        public selectBaseLayer(key: any): void;
-    }
-}
 declare module csComp.Services {
     interface IMapLayersScope extends ng.IScope {
         map: L.Map;
@@ -629,27 +830,6 @@ declare module csComp.Services {
         public getMap(): L.Map;
     }
 }
-declare module StyleList {
-    var html: string;
-}
-declare module StyleList {
-    /**
-    * Module
-    */
-    var myModule: any;
-}
-declare module StyleList {
-    interface IStyleListScope extends ng.IScope {
-        vm: StyleListCtrl;
-    }
-    class StyleListCtrl {
-        private $scope;
-        private $layerService;
-        private scope;
-        static $inject: string[];
-        constructor($scope: IStyleListScope, $layerService: csComp.Services.LayerService);
-    }
-}
 declare module csComp.Search {
     interface ISearchFormScope extends ng.IScope {
         vm: SearchFormCtrl;
@@ -662,182 +842,4 @@ declare module csComp.Search {
         constructor($scope: ISearchFormScope, $mapService: Services.MapService);
         public doSearch(): void;
     }
-}
-declare module FeatureProps {
-    var html: string;
-}
-declare module FeatureProps {
-    /**
-    * Module
-    */
-    var myModule: any;
-}
-declare module FeatureProps {
-    interface IFeaturePropsScope extends ng.IScope {
-        vm: FeaturePropsCtrl;
-        showMenu: boolean;
-        poi: csComp.GeoJson.IFeature;
-        callOut: CallOut;
-        featureTabActivated(sectionTitle: string, section: CallOutSection): any;
-        autocollapse(init: boolean): void;
-    }
-    interface ICallOutProperty {
-        key: string;
-        value: string;
-        property: string;
-        canFilter: boolean;
-        canStyle: boolean;
-        feature: csComp.GeoJson.IFeature;
-        description?: string;
-        meta?: csComp.GeoJson.IMetaInfo;
-        isFilter: boolean;
-    }
-    class CallOutProperty implements ICallOutProperty {
-        public key: string;
-        public value: string;
-        public property: string;
-        public canFilter: boolean;
-        public canStyle: boolean;
-        public feature: csComp.GeoJson.IFeature;
-        public isFilter: boolean;
-        public description: string;
-        public meta: csComp.GeoJson.IMetaInfo;
-        constructor(key: string, value: string, property: string, canFilter: boolean, canStyle: boolean, feature: csComp.GeoJson.IFeature, isFilter: boolean, description?: string, meta?: csComp.GeoJson.IMetaInfo);
-    }
-    interface ICallOutSection {
-        metaInfos: {
-            [label: string]: csComp.GeoJson.IMetaInfo;
-        };
-        properties: ICallOutProperty[];
-        sectionIcon: string;
-        addProperty(key: string, value: string, property: string, canFilter: boolean, canStyle: boolean, feature: csComp.GeoJson.IFeature, isFilter: boolean, description?: string, meta?: csComp.GeoJson.IMetaInfo): void;
-        hasProperties(): boolean;
-    }
-    class CallOutSection implements ICallOutSection {
-        public metaInfos: {
-            [label: string]: csComp.GeoJson.IMetaInfo;
-        };
-        public properties: ICallOutProperty[];
-        public sectionIcon: string;
-        constructor(sectionIcon?: string);
-        public showSectionIcon(): boolean;
-        public addProperty(key: string, value: string, property: string, canFilter: boolean, canStyle: boolean, feature: csComp.GeoJson.IFeature, isFilter: boolean, description?: string, meta?: csComp.GeoJson.IMetaInfo): void;
-        public hasProperties(): boolean;
-    }
-    class CallOut {
-        private type;
-        private feature;
-        private metaInfoData;
-        public title: string;
-        public sections: {
-            [title: string]: ICallOutSection;
-        };
-        constructor(type: csComp.GeoJson.IFeatureType, feature: csComp.GeoJson.IFeature, metaInfoData: {
-            [key: string]: csComp.GeoJson.IMetaInfo;
-        });
-        private getOrCreateCallOutSection(sectionTitle);
-        /**
-        * Set the title of the callout to the title of the feature.
-        */
-        private setTitle();
-    }
-    class FeaturePropsCtrl {
-        private $scope;
-        private $location;
-        private $sce;
-        private $mapService;
-        private $layerService;
-        private $messageBusService;
-        private scope;
-        static $inject: string[];
-        constructor($scope: IFeaturePropsScope, $location: ng.ILocationService, $sce: ng.ISCEService, $mapService: csComp.Services.MapService, $layerService: csComp.Services.LayerService, $messageBusService: csComp.Services.MessageBusService);
-        public toTrusted(html: string): any;
-        /**
-        * Callback function
-        * @see {http://stackoverflow.com/questions/12756423/is-there-an-alias-for-this-in-typescript}
-        * @see {http://stackoverflow.com/questions/20627138/typescript-this-scoping-issue-when-called-in-jquery-callback}
-        * @todo {notice the strange syntax using a fat arrow =>, which is to preserve the this reference in a callback!}
-        */
-        private sidebarMessageReceived;
-        private featureMessageReceived;
-        private displayFeature(feature);
-    }
-}
-declare module DataTable {
-    interface IDataTableViewScope extends ng.IScope {
-        vm: DataTableCtrl;
-    }
-    /**
-    * Represents a field in the table.
-    * The value is the actual displayValue shown, the type is the metainfo type (e.g. number or text, useful when aligning the data), and the header is used for sorting.
-    */
-    class TableField {
-        public displayValue: string;
-        public originalValue: any;
-        public type: string;
-        public header: string;
-        constructor(displayValue: string, originalValue: any, type: string, header: string);
-    }
-    class DataTableCtrl {
-        private $scope;
-        private $http;
-        private $sce;
-        private $layerService;
-        private $localStorageService;
-        private $messageBusService;
-        public mapLabel: string;
-        public dataset: csComp.GeoJson.IGeoJsonFile;
-        public selectedType: csComp.GeoJson.IFeatureType;
-        public numberOfItems: number;
-        public selectedLayerId: string;
-        public layerOptions: any[];
-        public metaInfos: csComp.GeoJson.IMetaInfo[];
-        public headers: string[];
-        public sortingColumn: number;
-        public rows: TableField[][];
-        static $inject: string[];
-        constructor($scope: IDataTableViewScope, $http: ng.IHttpService, $sce: ng.ISCEService, $layerService: csComp.Services.LayerService, $localStorageService: ng.localStorage.ILocalStorageService, $messageBusService: csComp.Services.MessageBusService);
-        /**
-        * Add a label to local storage and bind it to the scope.
-        */
-        private bindToStorage(label, defaultValue);
-        /**
-        * Create a list of layer options and select the one used previously.
-        */
-        private updateLayerOptions();
-        private loadLayer();
-        /**
-        * Load the features as visible on the map.
-        */
-        private loadMapLayers();
-        private updateMetaInfo(data);
-        public toggleSelection(metaInfoTitle: string): void;
-        private findLayerById(id);
-        /**
-        * Returns the data rows that are relevant for the current selection.
-        */
-        public getRows(): TableField[][];
-        /**
-        * Generate a font awesome class based on the order.
-        */
-        public sortOrderClass(headerIndex: number, reverseOrder: boolean): string;
-        /**
-        * Order the rows based on the header index and the order.
-        */
-        public orderBy(headerIndex: number, reverseOrder: boolean): void;
-        public downloadCsv(): void;
-        /**
-        * Convert to trusted html string.
-        */
-        public toTrusted(html: string): string;
-    }
-}
-declare module DataTable {
-    var html: string;
-}
-declare module DataTable {
-    /**
-    * Module
-    */
-    var myModule: any;
 }
