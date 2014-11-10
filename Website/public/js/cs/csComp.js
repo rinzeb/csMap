@@ -61,6 +61,12 @@ var csComp;
 var csComp;
 (function (csComp) {
     (function (Services) {
+        (function (LayerType) {
+            LayerType[LayerType["GeoJson"] = 0] = "GeoJson";
+            LayerType[LayerType["Kml"] = 1] = "Kml";
+        })(Services.LayerType || (Services.LayerType = {}));
+        var LayerType = Services.LayerType;
+
         /** a project group contains a list of layers that can be grouped together.
         * Filters, styles can clustering is always defined on the group level.
         * If a filter is selected (e.g. show only the features within a certain property range)
@@ -176,85 +182,6 @@ var csComp;
     })(csComp.Services || (csComp.Services = {}));
     var Services = csComp.Services;
 })(csComp || (csComp = {}));
-var csComp;
-(function (csComp) {
-    (function (StringExt) {
-        function isNullOrEmpty(s) {
-            return !s;
-        }
-        StringExt.isNullOrEmpty = isNullOrEmpty;
-
-        /**
-        * String formatting
-        * 'Added {0} by {1} to your collection'.f(title, artist)
-        * 'Your balance is {0} USD'.f(77.7)
-        */
-        function format(s) {
-            var args = [];
-            for (var _i = 0; _i < (arguments.length - 1); _i++) {
-                args[_i] = arguments[_i + 1];
-            }
-            var i = args.length;
-
-            while (i--) {
-                // "gm" = RegEx options for Global search (more than one instance) and for Multiline search
-                s = s.replace(new RegExp('\\{' + i + '\\}', 'gm'), args[i]);
-            }
-            return s;
-        }
-        StringExt.format = format;
-        ;
-
-        /*
-        * Returns true if we are dealing with a number, false otherwise.
-        */
-        function isNumber(n) {
-            return !isNaN(parseFloat(n)) && isFinite(n);
-        }
-        StringExt.isNumber = isNumber;
-
-        /*
-        * Returns true if we are dealing with a boolean, false otherwise.
-        */
-        function isBoolean(s) {
-            return s === 'true' || s === 'false';
-        }
-        StringExt.isBoolean = isBoolean;
-
-        /*
-        * Returns true if we are dealing with a bbcode, false otherwise.
-        */
-        function isBbcode(s) {
-            return false;
-            if (s == null)
-                return false;
-            return s.indexOf("[b]") > 0 || s.indexOf("[i]") > 0 || s.indexOf("[url") > 0;
-        }
-        StringExt.isBbcode = isBbcode;
-    })(csComp.StringExt || (csComp.StringExt = {}));
-    var StringExt = csComp.StringExt;
-})(csComp || (csComp = {}));
-//module String {
-//    export function isNullOrEmpty(s: string): boolean {
-//        return !s;
-//    }
-//}
-////interface String {
-////    format: () => string;
-////    isNullOrEmpty: () => boolean;
-////}
-////String.prototype.format = function (...args: any[]): string {
-////    var formatted = this;
-////    for (var i = 0; i < args.length; i++) {
-////        formatted = formatted.replace(
-////            RegExp("\\{" + i + "\\}", 'g'), args[i].toString());
-////    }
-////    return formatted;
-////};
-////String.prototype.isNullOrEmpty = function (): boolean {
-////    //var s: string = this;
-////    return this.length == 0;
-//}
 var csComp;
 (function (csComp) {
     (function (Services) {
@@ -628,7 +555,7 @@ var LegendList;
         };
 
         LegendListCtrl.prototype.getImageUri = function (ft) {
-            if (ft.style != null && ft.style.drawingMode.toLowerCase() != "point") {
+            if (ft.style != null && ft.style.drawingMode != null && ft.style.drawingMode.toLowerCase() != "point") {
                 if (ft.style.iconUri && ft.style.iconUri.indexOf('_Media') < 0)
                     return ft.style.iconUri;
                 else
@@ -840,17 +767,6 @@ var FilterList;
     })();
     FilterList.FilterListCtrl = FilterListCtrl;
 })(FilterList || (FilterList = {}));
-var csComp;
-(function (csComp) {
-    (function (Services) {
-        (function (LayerType) {
-            LayerType[LayerType["GeoJson"] = 0] = "GeoJson";
-            LayerType[LayerType["Kml"] = 1] = "Kml";
-        })(Services.LayerType || (Services.LayerType = {}));
-        var LayerType = Services.LayerType;
-    })(csComp.Services || (csComp.Services = {}));
-    var Services = csComp.Services;
-})(csComp || (csComp = {}));
 var LayersDirective;
 (function (LayersDirective) {
     LayersDirective.html = '<div>    <h4 class="leftpanel-header" translate="LAYERS"></h4>    <div data-ng-repeat="group in vm.$layerService.project.groups" style="margin-left: 5px">        <div style="float: left; margin-left: -10px; margin-top: 5px" data-toggle="collapse" data-target="#layergroup_{{group.id}}"><i class="fa fa-chevron-down togglebutton toggle-arrow-down"></i><i class="fa fa-chevron-up togglebutton toggle-arrow-up"></i></div>        <div popover="{{(group.description) ? group.description : \'\'}}"             popover-placement="right"             popover-width="400"             popover-trigger="mouseenter"             class="group-title">{{group.title}}</div>        <div id="layergroup_{{group.id}}" class="collapse in">            <div popover="{{(layer.description) ? layer.description : \'\'}}"                 popover-placement="right"                 popover-trigger="mouseenter"                                  data-ng-repeat="layer in group.layers">                <!--bs-popover>-->                <div style="list-style-type: none; padding: 0;" data-ng-class="{indent: layer.isSublayer}">                    <!--<button type="button" class="btn btn-default" data-container="body" data-toggle="popover" data-placement="right" data-content="Vivamus sagittis lacus vel augue laoreet rutrum faucibus." data-original-title="" title="">Right</button>-->                    <div ng-hide="group.oneLayerActive" class="checkbox checkbox-primary" style="margin-left: 20px">                        <input type="checkbox" id="cblayer{{layer.id}}" ng-model="layer.enabled" data-ng-click="vm.toggleLayer(layer);">                        <label for="cblayer{{layer.id}}">                            {{layer.title}}                        </label>                    </div>                    <div ng-show="group.oneLayerActive" class="radio radio-primary" style="margin-left: 20px">                        <input type="radio" ng-value="true" id="rblayer{{layer.id}}" ng-model="layer.enabled" data-ng-click="vm.toggleLayer(layer);">                        <label for="rblayer{{layer.id}}">                            {{layer.title}}                        </label>                    </div>                </div>            </div>        </div>    </div></div>';
@@ -935,6 +851,65 @@ var LayersDirective;
 })(LayersDirective || (LayersDirective = {}));
 var csComp;
 (function (csComp) {
+    (function (StringExt) {
+        function isNullOrEmpty(s) {
+            return !s;
+        }
+        StringExt.isNullOrEmpty = isNullOrEmpty;
+
+        /**
+        * String formatting
+        * 'Added {0} by {1} to your collection'.f(title, artist)
+        * 'Your balance is {0} USD'.f(77.7)
+        */
+        function format(s) {
+            var args = [];
+            for (var _i = 0; _i < (arguments.length - 1); _i++) {
+                args[_i] = arguments[_i + 1];
+            }
+            var i = args.length;
+
+            while (i--) {
+                // "gm" = RegEx options for Global search (more than one instance) and for Multiline search
+                s = s.replace(new RegExp('\\{' + i + '\\}', 'gm'), args[i]);
+            }
+            return s;
+        }
+        StringExt.format = format;
+        ;
+
+        /*
+        * Returns true if we are dealing with a number, false otherwise.
+        */
+        function isNumber(n) {
+            return !isNaN(parseFloat(n)) && isFinite(n);
+        }
+        StringExt.isNumber = isNumber;
+
+        /*
+        * Returns true if we are dealing with a boolean, false otherwise.
+        */
+        function isBoolean(s) {
+            return s === 'true' || s === 'false';
+        }
+        StringExt.isBoolean = isBoolean;
+
+        /*
+        * Returns true if we are dealing with a bbcode, false otherwise.
+        */
+        function isBbcode(s) {
+            return false;
+            if (s == null)
+                return false;
+            return s.indexOf("[b]") > 0 || s.indexOf("[i]") > 0 || s.indexOf("[url") > 0;
+        }
+        StringExt.isBbcode = isBbcode;
+    })(csComp.StringExt || (csComp.StringExt = {}));
+    var StringExt = csComp.StringExt;
+})(csComp || (csComp = {}));
+
+var csComp;
+(function (csComp) {
     (function (Services) {
         var PropertyInfo = (function () {
             function PropertyInfo() {
@@ -989,9 +964,9 @@ var csComp;
                                         if (err)
                                             _this.$messageBusService.notify('ERROR loading' + layer.title, err);
                                         else {
-                                            if (dta.poiTypes)
-                                                for (var featureTypeName in dta.poiTypes) {
-                                                    var featureType = dta.poiTypes[featureTypeName];
+                                            if (dta.featureTypes)
+                                                for (var featureTypeName in dta.featureTypes) {
+                                                    var featureType = dta.featureTypes[featureTypeName];
                                                     featureTypeName = layer.id + '_' + featureTypeName;
                                                     _this.featureTypes[featureTypeName] = featureType;
                                                 }
@@ -1005,8 +980,8 @@ var csComp;
                                     if (error)
                                         _this.$messageBusService.notify('ERROR loading' + layer.title, error);
                                     else {
-                                        for (var featureTypeName in data.poiTypes) {
-                                            var featureType = data.poiTypes[featureTypeName];
+                                        for (var featureTypeName in data.featureTypes) {
+                                            var featureType = data.featureTypes[featureTypeName];
                                             featureTypeName = layer.id + '_' + featureTypeName;
                                             _this.featureTypes[featureTypeName] = featureType;
                                             var pt = "." + featureTypeName;
@@ -1631,7 +1606,7 @@ var csComp;
             * In case both fail, create a default feature type at the layer level.
             */
             LayerService.prototype.getFeatureType = function (feature) {
-                var projectFeatureTypeName = feature.properties['PoiTypeId'] || "Default";
+                var projectFeatureTypeName = feature.properties['FeatureTypeId'] || "Default";
                 var featureTypeName = feature.layerId + '_' + projectFeatureTypeName;
                 if (!(featureTypeName in this.featureTypes)) {
                     if (projectFeatureTypeName in this.featureTypes)
@@ -2773,23 +2748,23 @@ var FeatureProps;
                     var callOutSection = _this.getOrCreateCallOutSection(mi.section) || infoCallOutSection;
                     callOutSection.propertyTypes[mi.label] = mi;
                     var text = feature.properties[mi.label];
-                    if (!StringExt.isNullOrEmpty(text) && !$.isNumeric(text))
+                    if (!csComp.StringExt.isNullOrEmpty(text) && !$.isNumeric(text))
                         text = text.replace(/&amp;/g, '&');
 
                     //if (mi.stringFormat)
                     //    text = StringExt.format(mi.stringFormat, text);
-                    if (StringExt.isNullOrEmpty(text))
+                    if (csComp.StringExt.isNullOrEmpty(text))
                         return;
                     switch (mi.type) {
                         case "bbcode":
-                            if (!StringExt.isNullOrEmpty(mi.stringFormat))
+                            if (!csComp.StringExt.isNullOrEmpty(mi.stringFormat))
                                 text = String.format(mi.stringFormat, text);
                             displayValue = XBBCODE.process({ text: text }).html;
                             break;
                         case "number":
                             if (!$.isNumeric(text))
                                 displayValue = text;
-                            else if (StringExt.isNullOrEmpty(mi.stringFormat))
+                            else if (csComp.StringExt.isNullOrEmpty(mi.stringFormat))
                                 displayValue = text.toString();
                             else
                                 displayValue = String.format(mi.stringFormat, parseFloat(text));
@@ -2800,7 +2775,7 @@ var FeatureProps;
                     }
 
                     // Skip empty, non-editable values
-                    if (!mi.canEdit && StringExt.isNullOrEmpty(displayValue))
+                    if (!mi.canEdit && csComp.StringExt.isNullOrEmpty(displayValue))
                         return;
 
                     var canFilter = (mi.type == "number" || mi.type == "text");
@@ -2837,7 +2812,7 @@ var FeatureProps;
         //    }
         //}
         CallOut.prototype.getOrCreateCallOutSection = function (sectionTitle) {
-            if (StringExt.isNullOrEmpty(sectionTitle)) {
+            if (!sectionTitle) {
                 return null;
             }
             if (sectionTitle in this.sections)
@@ -2851,11 +2826,15 @@ var FeatureProps;
         */
         CallOut.prototype.setTitle = function () {
             var title;
-            if (this.type == null || this.type.style == null || StringExt.isNullOrEmpty(this.type.style.nameLabel))
-                title = this.feature.properties['Name'];
-            else
+            if (this.type != null && this.type.style != null && this.type.style.nameLabel)
                 title = this.feature.properties[this.type.style.nameLabel];
-            if (!StringExt.isNullOrEmpty(title) && !$.isNumeric(title))
+            else {
+                if (this.feature.hasOwnProperty('Name'))
+                    title = this.feature.properties['Name'];
+                if (this.feature.hasOwnProperty('name'))
+                    title = this.feature.properties['name'];
+            }
+            if (!csComp.StringExt.isNullOrEmpty(title) && !$.isNumeric(title))
                 this.title = title.replace(/&amp;/g, '&');
         };
         return CallOut;
@@ -3105,12 +3084,12 @@ var DataTable;
                 return this.loadMapLayers();
             this.$http.get(selectedLayer.url).success(function (data) {
                 _this.dataset = data;
-                if (data.poiTypes == null)
-                    data.poiTypes = {};
+                if (data.featureTypes == null)
+                    data.featureTypes = {};
                 data.features.forEach(function (f) {
-                    f.featureTypeName = f.properties['PoiTypeId'];
-                    if (!(f.featureTypeName in data.poiTypes))
-                        data.poiTypes[f.featureTypeName] = _this.$layerService.featureTypes[f.featureTypeName];
+                    f.featureTypeName = f.properties['FeatureTypeId'];
+                    if (!(f.featureTypeName in data.featureTypes))
+                        data.featureTypes[f.featureTypeName] = _this.$layerService.featureTypes[f.featureTypeName];
                 });
 
                 _this.updatepropertyType(data);
@@ -3128,7 +3107,7 @@ var DataTable;
             var data = {
                 type: '',
                 features: [],
-                poiTypes: {}
+                featureTypes: {}
             };
 
             // If we are filtering, load the filter results
@@ -3144,8 +3123,8 @@ var DataTable;
                 data.features = this.$layerService.project.features;
 
             data.features.forEach(function (f) {
-                if (!(f.featureTypeName in data.poiTypes))
-                    data.poiTypes[f.featureTypeName] = _this.$layerService.featureTypes[f.featureTypeName];
+                if (!(f.featureTypeName in data.featureTypes))
+                    data.featureTypes[f.featureTypeName] = _this.$layerService.featureTypes[f.featureTypeName];
             });
 
             this.dataset = data;
@@ -3170,8 +3149,8 @@ var DataTable;
                 isSearchable: true
             });
             var featureType;
-            for (var key in data.poiTypes) {
-                featureType = data.poiTypes[key];
+            for (var key in data.featureTypes) {
+                featureType = data.featureTypes[key];
                 if (featureType.propertyTypeKeys != null) {
                     var keys = featureType.propertyTypeKeys.split(';');
                     keys.forEach(function (k) {

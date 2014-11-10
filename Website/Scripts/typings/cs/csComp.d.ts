@@ -96,7 +96,7 @@ declare module csComp.Services {
         propertyTypeKeys?: string;
     }
     interface IGeoJsonFile {
-        poiTypes?: {
+        featureTypes?: {
             [key: string]: IFeatureType;
         };
         type: string;
@@ -104,6 +104,10 @@ declare module csComp.Services {
     }
 }
 declare module csComp.Services {
+    enum LayerType {
+        GeoJson = 0,
+        Kml = 1,
+    }
     /** a project group contains a list of layers that can be grouped together.
     * Filters, styles can clustering is always defined on the group level.
     * If a filter is selected (e.g. show only the features within a certain property range)
@@ -245,18 +249,6 @@ declare module csComp.Services {
         test: string;
     }
 }
-declare module csComp.StringExt {
-    function isNullOrEmpty(s: string): boolean;
-    /**
-    * String formatting
-    * 'Added {0} by {1} to your collection'.f(title, artist)
-    * 'Your balance is {0} USD'.f(77.7)
-    */
-    function format(s: string, ...args: string[]): string;
-    function isNumber(n: any): boolean;
-    function isBoolean(s: any): boolean;
-    function isBbcode(s: any): boolean;
-}
 declare module csComp.Services {
     interface IMessageBusCallback {
         (title: string, data?: any): any;
@@ -395,12 +387,6 @@ declare module FilterList {
         constructor($scope: IFilterListScope, $layerService: csComp.Services.LayerService);
     }
 }
-declare module csComp.Services {
-    enum LayerType {
-        GeoJson = 0,
-        Kml = 1,
-    }
-}
 declare module LayersDirective {
     var html: string;
 }
@@ -422,6 +408,18 @@ declare module LayersDirective {
         constructor($scope: ILayersDirectiveScope, $layerService: csComp.Services.LayerService);
         public toggleLayer(layer: csComp.Services.ProjectLayer): void;
     }
+}
+declare module csComp.StringExt {
+    function isNullOrEmpty(s: string): boolean;
+    /**
+    * String formatting
+    * 'Added {0} by {1} to your collection'.f(title, artist)
+    * 'Your balance is {0} USD'.f(77.7)
+    */
+    function format(s: string, ...args: string[]): string;
+    function isNumber(n: any): boolean;
+    function isBoolean(s: any): boolean;
+    function isBbcode(s: any): boolean;
 }
 declare module csComp.Services {
     interface ILayerService {
