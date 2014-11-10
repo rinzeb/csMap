@@ -89,7 +89,7 @@ gulp.task('include_images', function () {
 
 gulp.task('watch', function () {
     gulp.watch('../../../csWeb/csComp/**/*.tpl.html', ['convertTemplates2Ts']);
-    gulp.watch('../../../csWeb/csComp/dist/*.d.ts', ['addref_csComp', 'minify_csComp']);
+    gulp.watch('../../../csWeb/csComp/dist/*', ['addref_csComp', 'minify_csComp']);
     gulp.watch('../../../csWeb/csServerComp/dist/*.d.ts', ['addref_csServerComp', 'minify_csServerComp']);
     gulp.watch('../../../csWeb/csComp/includes/*.*', ['include_js','include_css']);
     gulp.watch('../../../csWeb/csComp/includes/images/*.*', ['include_images']);
