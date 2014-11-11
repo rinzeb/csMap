@@ -231,7 +231,7 @@
                 SHOW35: 'Toon 35 regels',
                 SHOW40: 'Toon 40 regels'
             });
-            $translateProvider.preferredLanguage('nl');
+            $translateProvider.preferredLanguage('en');
         })
         .controller('Ctrl', ($scope, $translate) => {
             $scope.changeLanguage = key => {
