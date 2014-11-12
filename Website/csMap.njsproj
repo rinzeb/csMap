@@ -71,11 +71,7 @@
     <Content Include="public\data\projects\vws\project.json" />
     <Content Include="public\data\projects\vws\Ziekenhuizen.json" />
     <Content Include="public\data\projects\vws_private\project.json" />
-    <Content Include="public\images\CareToolIcon.png" />
-    <Content Include="public\images\langdurigezorg.png" />
-    <Content Include="public\images\verzorgingstehuis.png" />
     <Content Include="public\images\ziekenhuis.png" />
-    <Content Include="public\images\Zorgkantoor.png" />
     <Content Include="public\includes\ROsanswebtextregular.eot" />
     <Content Include="public\includes\ROsanswebtextregular.ttf" />
     <Content Include="public\index.html" />
