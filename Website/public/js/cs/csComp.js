@@ -147,7 +147,7 @@ var BaseMapList;
 })(BaseMapList || (BaseMapList = {}));
 var DataTable;
 (function (DataTable) {
-    DataTable.html = '<div>    <div style="width:100%; margin: 10px auto;">        <div style="float: left; width: 15%; margin: 0; padding: 1em">            <!-- Pull down of map layers -->            <select data-ng-model="vm.selectedLayerId"                    data-ng-change="vm.loadLayer()"                    data-ng-options="layer.id as layer.title group by layer.group for layer in vm.layerOptions"                    class="form-control tt-input"></select>            <!-- List of headers -->            <ul class="form-group" style="margin-top: 1em; margin-left: -2em; overflow-y: auto; overflow-x: hidden;"                resize resize-y="150">                <li ng-repeat="mi in vm.metaInfos" class="list-unstyled" style="white-space: nowrap; text-overflow: ellipsis">                    <label>                        <input type="checkbox" name="vm.selectedTitles[]" value="{{mi.title}}"                               data-ng-checked="vm.headers.indexOf(mi.title) > -1"                               data-ng-click="vm.toggleSelection(mi.title)">&nbsp;&nbsp;{{mi.title}}                    </label>                    <!--<div class="checkbox">                        <label>                            <input type="checkbox" name="vm.selectedTitles[]" value="{{mi.title}}"                                   data-ng-checked="vm.headers.indexOf(mi.title) > -1"                                   data-ng-click="vm.toggleSelection(mi.title)">&nbsp;&nbsp;{{mi.title}}                        </label>                    </div>-->                </li>            </ul>            <!--       <pre>{{vm.headers|json}}</pre>-->        </div>        <!-- Right side of the table view -->        <div style="margin-left: 16%; border-left: 1px solid gray; padding: 1em;" ng-init="poiTypeFilter">            <!-- Filter -->            <div class="has-feedback" style="margin-bottom: 1em; float: right; width: 16%; min-width: 200px;">                <span style="direction: ltr; position: static; display: block;">                    <input id="searchbox" data-ng-model="featureFilter" type="text"                           placeholder="Filter" autocomplete="off" spellcheck="false"                           style="position: relative; vertical-align: top;" class="form-control tt-input">                </span>                <span id="searchicon" class="fa form-control-feedback fa-filter" style="padding-top: 0px;"></span>            </div>            <!--Download to CSV option-->            <a href="" data-ng-click="vm.downloadCsv()" alt="Download CSV" style="margin-top: 5px; margin-right: 1em; float: right;"><i class="fa fa-download fa-2x"></i></a>            <iframe id="csvDownloadFrame" style="display:none"></iframe>            <!-- Specify how many items to show -->            <select data-ng-model="vm.numberOfItems" style="margin-bottom: 1em; margin-right: 10px; float: left; width: 16%; min-width: 200px;" class="form-control tt-input">                <option value="5" translate="SHOW5"></option>                <option value="10" translate="SHOW10"></option>                <option value="15" translate="SHOW15"></option>                <option value="20" translate="SHOW20"></option>                <option value="25" translate="SHOW25"></option>                <option value="30" translate="SHOW30"></option>                <option value="35" translate="SHOW35"></option>                <option value="40" translate="SHOW40"></option>            </select>            <!-- Data table -->            <table class="table table-striped table-condensed">                <tr>                    <th data-ng-repeat="header in vm.headers">                        {{header}}&nbsp;                        <a data-ng-click="reverseSort = !reverseSort; vm.orderBy($index, reverseSort);"><i data-ng-class="vm.sortOrderClass($index, reverseSort)">&nbsp;&nbsp;</i></a>                    </th>                </tr>                <tr dir-paginate="row in vm.rows | filter:featureFilter | itemsPerPage: vm.numberOfItems"                    style="cursor: pointer; vertical-align: central">                    <td data-ng-class="{\'text-right\': field.type == \'number\'}" data-ng-repeat="field in row track by $index" data-ng-bind-html="vm.toTrusted(field.displayValue)"></td>                </tr>            </table>            <dir-pagination-controls style="" max-size="10" boundary-links="true" direction-links="true"                                     template-url="bower_components/angular-utils-pagination/dirPagination.tpl.html"></dir-pagination-controls>        </div>    </div>    <div style="clear: both; margin: 0; padding: .5em"></div></div>';
+    DataTable.html = '<div>    <div style="width:100%; margin: 10px auto;">        <div style="float: left; width: 15%; margin: 0; padding: 1em">            <!-- Pull down of map layers -->            <select data-ng-model="vm.selectedLayerId"                    data-ng-change="vm.loadLayer()"                    data-ng-options="layer.id as layer.title group by layer.group for layer in vm.layerOptions"                    class="form-control tt-input"></select>            <!-- List of headers -->            <ul class="form-group" style="margin-top: 1em; margin-left: -2em; overflow-y: auto; overflow-x: hidden;"                resize resize-y="150">                <li ng-repeat="mi in vm.metaInfos" class="list-unstyled" style="white-space: nowrap; text-overflow: ellipsis">                    <label>                        <input type="checkbox" name="vm.selectedTitles[]" value="{{mi.title}}"                               data-ng-checked="vm.headers.indexOf(mi.title) > -1"                               data-ng-click="vm.toggleSelection(mi.title)">&nbsp;&nbsp;{{mi.title}}                    </label>                    <!--<div class="checkbox">                        <label>                            <input type="checkbox" name="vm.selectedTitles[]" value="{{mi.title}}"                                   data-ng-checked="vm.headers.indexOf(mi.title) > -1"                                   data-ng-click="vm.toggleSelection(mi.title)">&nbsp;&nbsp;{{mi.title}}                        </label>                    </div>-->                </li>            </ul>            <!--       <pre>{{vm.headers|json}}</pre>-->        </div>        <!-- Right side of the table view -->        <div style="margin-left: 16%; border-left: 1px solid gray; padding: 1em;" ng-init="poiTypeFilter">            <!-- Filter -->            <div class="has-feedback" style="margin-bottom: 1em; float: right; width: 16%; min-width: 200px;">                <span style="direction: ltr; position: static; display: block;">                    <input id="searchbox" data-ng-model="featureFilter" type="text"                           placeholder="Filter" autocomplete="off" spellcheck="false"                           style="position: relative; vertical-align: top;" class="form-control tt-input">                </span>                <span id="searchicon" class="fa form-control-feedback fa-filter" style="padding-top: 0px;"></span>            </div>            <!--Download to CSV option-->            <a href="" data-ng-click="vm.downloadCsv()" alt="Download CSV" style="margin-top: 5px; margin-right: 1em; float: right;"><i class="fa fa-download fa-2x"></i></a>            <!-- Specify how many items to show -->            <select data-ng-model="vm.numberOfItems" style="margin-bottom: 1em; margin-right: 10px; float: left; width: 16%; min-width: 200px;" class="form-control tt-input">                <option value="5" translate="SHOW5"></option>                <option value="10" translate="SHOW10"></option>                <option value="15" translate="SHOW15"></option>                <option value="20" translate="SHOW20"></option>                <option value="25" translate="SHOW25"></option>                <option value="30" translate="SHOW30"></option>                <option value="35" translate="SHOW35"></option>                <option value="40" translate="SHOW40"></option>            </select>            <!-- Data table -->            <table class="table table-striped table-condensed">                <tr>                    <th data-ng-repeat="header in vm.headers track by $index">                        {{header}}&nbsp;                        <a data-ng-click="reverseSort = !reverseSort; vm.orderBy($index, reverseSort);"><i data-ng-class="vm.sortOrderClass($index, reverseSort)">&nbsp;&nbsp;</i></a>                    </th>                </tr>                <tr dir-paginate="row in vm.rows | filter:featureFilter | itemsPerPage: vm.numberOfItems"                    style="cursor: pointer; vertical-align: central">                    <td data-ng-class="{\'text-right\': field.type == \'number\'}" data-ng-repeat="field in row track by $index" data-ng-bind-html="vm.toTrusted(field.displayValue)"></td>                </tr>            </table>            <dir-pagination-controls style="" max-size="10" boundary-links="true" direction-links="true"                                     template-url="bower_components/angular-utils-pagination/dirPagination.tpl.html"></dir-pagination-controls>        </div>    </div>    <div style="clear: both; margin: 0; padding: .5em"></div></div>';
 })(DataTable || (DataTable = {}));
 var DataTable;
 (function (DataTable) {
@@ -214,10 +214,12 @@ var DataTable;
     var DataTableCtrl = (function () {
         // dependencies are injected via AngularJS $injector
         // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
-        function DataTableCtrl($scope, $http, $sce, $layerService, $localStorageService, $messageBusService) {
+        function DataTableCtrl($scope, $http, $sce, $translate, $layerService, $localStorageService, $messageBusService) {
+            var _this = this;
             this.$scope = $scope;
             this.$http = $http;
             this.$sce = $sce;
+            this.$translate = $translate;
             this.$layerService = $layerService;
             this.$localStorageService = $localStorageService;
             this.$messageBusService = $messageBusService;
@@ -230,6 +232,10 @@ var DataTable;
             // 'vm' stands for 'view model'. We're adding a reference to the controller to the scope
             // for its methods to be accessible from view / HTML
             $scope.vm = this;
+
+            $translate('MAP_FEATURES').then(function (translation) {
+                _this.layerOptions[0].title = translation;
+            });
 
             this.bindToStorage('vm.numberOfItems', 10);
             this.numberOfItems = $localStorageService.get('vm.numberOfItems');
@@ -257,7 +263,7 @@ var DataTable;
             this.layerOptions.push({
                 "group": '',
                 "id": this.mapLabel,
-                "title": "Kaartfeatures"
+                "title": this.mapFeatureTitle
             });
             if (this.$layerService.project == null || this.$layerService.project.groups == null)
                 return;
@@ -495,7 +501,7 @@ var DataTable;
                 }).join(';'));
             }
 
-            var csvString = csvRows.join("\r\n");
+            var csvString = csvRows.join('\r\n');
 
             var filename = this.mapLabel;
             if (this.selectedLayerId !== this.mapLabel) {
@@ -504,43 +510,31 @@ var DataTable;
                     filename = layer.title.replace(' ', '_');
             }
             this.saveData(csvString, filename + '.csv');
-            //if (navigator.userAgent != 'Microsoft Internet Explorer') {
-            //    var a: any = document.createElement('a');
-            //    a.href = 'data:text/csv;charset=utf-8,' + encodeURI(csvString);
-            //    //a.href = 'data:attachment/csv,' + csvString;
-            //    a.target = '_blank';
-            //    var filename = this.mapLabel;
-            //    if (this.selectedLayerId !== this.mapLabel) {
-            //        var layer = this.findLayerById(this.selectedLayerId);
-            //        if (layer) filename = layer.title.replace(' ', '_');
-            //    }
-            //    a.download = filename + '.csv';
-            //    //document.body.appendChild(a);
-            //    a.click();
-            //} else {
-            //    var popup = window.open('', 'csv', '');
-            //    popup.document.body.innerHTML = '<pre>' + csvString + '</pre>';
-            //}
         };
 
         DataTableCtrl.prototype.saveData = function (csvData, filename) {
-            if (!csComp.Helpers.supportsDataUri()) {
-                var iframe = document.getElementById('csvDownloadFrame');
-                iframe = iframe.contentWindow || iframe.contentDocument;
-
-                //csvData = 'sep=,%0A' + csvData;
-                iframe.document.open("text/html", "replace");
-                iframe.document.write(csvData);
-                iframe.document.close();
-                iframe.focus();
-                iframe.document.execCommand('SaveAs', true, filename);
+            if (navigator.msSaveBlob) {
+                // IE 10+
+                var link = document.createElement('a');
+                link.addEventListener("click", function (event) {
+                    var blob = new Blob([csvData], { "type": "text/csv;charset=utf-8;" });
+                    navigator.msSaveBlob(blob, filename);
+                }, false);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } else if (!csComp.Helpers.supportsDataUri()) {
+                // Older versions of IE: show the data in a new window
+                var popup = window.open('', 'csv', '');
+                popup.document.body.innerHTML = '<pre>' + csvData + '</pre>';
             } else {
+                // Support for browsers that support the data uri.
                 var a = document.createElement('a');
                 a.href = 'data:text/csv;charset=utf-8,' + encodeURI(csvData);
                 a.target = '_blank';
-
                 a.download = filename;
                 a.click();
+                document.body.removeChild(a);
             }
         };
 
@@ -554,6 +548,7 @@ var DataTable;
             '$scope',
             '$http',
             '$sce',
+            '$translate',
             'layerService',
             'localStorageService',
             'messageBusService'
@@ -659,7 +654,7 @@ var FeatureList;
 })(FeatureList || (FeatureList = {}));
 var FeatureProps;
 (function (FeatureProps) {
-    FeatureProps.html = '<div data-ng-cloak data-ng-show="showMenu" >    <h4 class="rightpanel-header">        &nbsp;&nbsp;{{callOut.title}}    </h4>        <div class="container-fluid rightpanel-tabs" style="position: relative">            <div class="row" style="overflow:hidden">            <!-- Nav tabs -->            <span id="leftArr" style="display:block;padding:10px;margin-top:5px;position:absolute;background-color:transparent;z-index:2">                <i class="glyphicon glyphicon-chevron-left"></i>            </span>            <span id="rightArr" style="display:block;padding:10px;margin-top:5px;position:absolute;background-color:transparent;z-index:2">                <i class="glyphicon glyphicon-chevron-right"></i>            </span>            <ul class="nav nav-tabs" id="featureTabs" style="margin-left:10px">                <li data-toggle="tab" data-ng-class="{active : $first}" data-ng-repeat="(sectionTitle, section) in callOut.sections" ng-if="section.hasProperties()">                    <a ng-href="#rp-{{$index}}" data-toggle="tab" data-ng-if="section.showSectionIcon()" ng-click="featureTabActivated(sectionTitle, section)"><i class="fa {{section.sectionIcon}}"></i></a>                    <a ng-href="#rp-{{$index}}" data-toggle="tab" data-ng-if="!section.showSectionIcon()" ng-click="featureTabActivated(sectionTitle, section)">{{sectionTitle}}</a>                </li>            </ul>        </div>    </div>    <div class="tab-content" style="top:50px; width:355px; overflow-y: auto; overflow-x: hidden" resize resize-y="150">        <div data-ng-if="!$last" class="tab-pane" data-ng-class="{active : $first}" id="rp-{{$index}}" data-ng-repeat="(sectionTitle, section) in callOut.sections">            <table class="table table-condensed">                <tr popover="{{(item.description) ? item.description : \'\'}}"                    popover-placement="left"                    popover-trigger="mouseenter"                    popover-append-to-body="true"                    data-ng-repeat="item in section.properties">                    <td><a class="fa fa-filter makeNarrow" data-ng-show="item.canFilter" data-ng-click="vm.$layerService.setFilter(item)"></a></td>                    <td><a class="fa fa-eye makeNarrow" data-ng-show="item.canStyle" data-ng-click="vm.$layerService.setStyle(item)"></a></td>                    <td>{{item.key}}</td>                    <td class="text-right" data-ng-bind-html="vm.toTrusted(item.value)"></td>                </tr>            </table>        </div>        <!-- Treat last tab (filter) differently -->        <div data-ng-if="$last" class="tab-pane" data-ng-class="{active : $first}" id="rp-{{$index}}" data-ng-repeat="(sectionTitle, section) in callOut.sections">            <!-- Add filter panel to the last rendered element -->            <div class="has-feedback" style="padding:0 4px 4px 4px;">                <span style="direction: ltr; position: static; display: block;">                    <input id="searchbox" data-ng-model="search.key" type="text"                            placeholder="Filter" autocomplete="off" spellcheck="false"                            style="position: relative; vertical-align: top;" class="form-control tt-input">                </span>                <span id="searchicon" class="fa form-control-feedback fa-filter"></span>            </div>            <!--<input style="padding:4px;" class=" form-control" data-ng-model="search" placeholder="...">-->            <table id="searchTextResults" class="table table-condensed">                <tr popover="{{(item.description) ? item.description : \'\'}}"                    popover-placement="left"                    popover-trigger="mouseenter"                    popover-append-to-body="true"                    data-ng-repeat="item in section.properties | filter:search">                    <td><a class="fa fa-filter makeNarrow" data-ng-show="item.canFilter" data-ng-click="vm.$layerService.setFilter(item)"></a></td>                    <td><a class="fa fa-eye makeNarrow" data-ng-show="item.canStyle" data-ng-click="vm.$layerService.setStyle(item)"></a></td>                    <td>{{item.key}}</td>                    <td class="text-right" data-ng-bind-html="vm.toTrusted(item.value)"></td>                </tr>            </table>        </div>    </div></div>';
+    FeatureProps.html = '<div data-ng-cloak data-ng-show="showMenu" >    <h4 class="rightpanel-header">        &nbsp;&nbsp;{{callOut.title}}    </h4>        <div class="container-fluid rightpanel-tabs" style="position: relative">            <div class="row" style="overflow:hidden">            <!-- Nav tabs -->            <span id="leftArr" style="display:block;padding:10px;margin-top:5px;position:absolute;background-color:transparent;z-index:2">                <i class="glyphicon glyphicon-chevron-left"></i>            </span>            <span id="rightArr" style="display:block;padding:10px;margin-top:5px;position:absolute;background-color:transparent;z-index:2">                <i class="glyphicon glyphicon-chevron-right"></i>            </span>            <ul class="nav nav-tabs" id="featureTabs" style="margin-left:10px">                <li data-toggle="tab" data-ng-class="{active : $first}" data-ng-repeat="(sectionTitle, section) in callOut.sections" ng-if="section.hasProperties()">                    <a ng-href="#rp-{{$index}}" data-toggle="tab" data-ng-if="section.showSectionIcon()" ng-click="featureTabActivated(sectionTitle, section)"><i class="fa {{section.sectionIcon}}"></i></a>                    <a ng-href="#rp-{{$index}}" data-toggle="tab" data-ng-if="!section.showSectionIcon()" ng-click="featureTabActivated(sectionTitle, section)">{{sectionTitle}}</a>                </li>            </ul>        </div>    </div>    <div class="tab-content" style="top:50px; width:355px; overflow-y: auto; overflow-x: hidden" resize resize-y="150">        <div data-ng-if="!$last" class="tab-pane" data-ng-class="{active : $first}" id="rp-{{$index}}" data-ng-repeat="(sectionTitle, section) in callOut.sections">            <table class="table table-condensed">                <tr popover="{{(item.description) ? item.description : \'\'}}"                    popover-placement="left"                    popover-trigger="mouseenter"                    popover-append-to-body="true"                    data-ng-repeat="item in section.properties">                    <td><a class="fa fa-filter makeNarrow" data-ng-show="item.canFilter" data-ng-click="vm.$layerService.setFilter(item)" style="cursor: pointer"></a></td>                    <td><a class="fa fa-eye makeNarrow" data-ng-show="item.canStyle" data-ng-click="vm.$layerService.setStyle(item)" style="cursor: pointer"></a></td>                    <td>{{item.key}}</td>                    <td class="text-right" data-ng-bind-html="vm.toTrusted(item.value)"></td>                </tr>            </table>        </div>        <!-- Treat last tab (filter) differently -->        <div data-ng-if="$last" class="tab-pane" data-ng-class="{active : $first}" id="rp-{{$index}}" data-ng-repeat="(sectionTitle, section) in callOut.sections">            <!-- Add filter panel to the last rendered element -->            <div class="has-feedback" style="padding:0 4px 4px 4px;">                <span style="direction: ltr; position: static; display: block;">                    <input id="searchbox" data-ng-model="search.key" type="text"                            placeholder="Filter" autocomplete="off" spellcheck="false"                            style="position: relative; vertical-align: top;" class="form-control tt-input">                </span>                <span id="searchicon" class="fa form-control-feedback fa-filter"></span>            </div>            <!--<input style="padding:4px;" class=" form-control" data-ng-model="search" placeholder="...">-->            <table id="searchTextResults" class="table table-condensed">                <tr popover="{{(item.description) ? item.description : \'\'}}"                    popover-placement="left"                    popover-trigger="mouseenter"                    popover-append-to-body="true"                    data-ng-repeat="item in section.properties | filter:search">                    <td><a class="fa fa-filter makeNarrow" data-ng-show="item.canFilter" data-ng-click="vm.$layerService.setFilter(item)"></a></td>                    <td><a class="fa fa-eye makeNarrow" data-ng-show="item.canStyle" data-ng-click="vm.$layerService.setStyle(item)"></a></td>                    <td>{{item.key}}</td>                    <td class="text-right" data-ng-bind-html="vm.toTrusted(item.value)"></td>                </tr>            </table>        </div>    </div></div>';
 })(FeatureProps || (FeatureProps = {}));
 var FeatureProps;
 (function (FeatureProps) {
@@ -708,8 +703,6 @@ var FeatureProps;
 })(FeatureProps || (FeatureProps = {}));
 var FeatureProps;
 (function (FeatureProps) {
-    var StringExt = csComp.StringExt;
-
     var FeaturePropsOptions = (function () {
         function FeaturePropsOptions(position) {
             this.position = position;
@@ -742,7 +735,7 @@ var FeatureProps;
             this.sectionIcon = sectionIcon;
         }
         CallOutSection.prototype.showSectionIcon = function () {
-            return !StringExt.isNullOrEmpty(this.sectionIcon);
+            return !csComp.StringExt.isNullOrEmpty(this.sectionIcon);
         };
 
         CallOutSection.prototype.addProperty = function (key, value, property, canFilter, canStyle, feature, isFilter, description, meta) {
@@ -795,23 +788,23 @@ var FeatureProps;
                     var callOutSection = _this.getOrCreateCallOutSection(mi.section) || infoCallOutSection;
                     callOutSection.metaInfos[mi.label] = mi;
                     var text = feature.properties[mi.label];
-                    if (!StringExt.isNullOrEmpty(text) && !$.isNumeric(text))
+                    if (!csComp.StringExt.isNullOrEmpty(text) && !$.isNumeric(text))
                         text = text.replace(/&amp;/g, '&');
 
                     //if (mi.stringFormat)
-                    //    text = StringExt.format(mi.stringFormat, text);
-                    if (StringExt.isNullOrEmpty(text))
+                    //    text = csComp.StringExt.format(mi.stringFormat, text);
+                    if (csComp.StringExt.isNullOrEmpty(text))
                         return;
                     switch (mi.type) {
                         case "bbcode":
-                            if (!StringExt.isNullOrEmpty(mi.stringFormat))
+                            if (!csComp.StringExt.isNullOrEmpty(mi.stringFormat))
                                 text = String.format(mi.stringFormat, text);
                             displayValue = XBBCODE.process({ text: text }).html;
                             break;
                         case "number":
                             if (!$.isNumeric(text))
                                 displayValue = text;
-                            else if (StringExt.isNullOrEmpty(mi.stringFormat))
+                            else if (csComp.StringExt.isNullOrEmpty(mi.stringFormat))
                                 displayValue = text.toString();
                             else
                                 displayValue = String.format(mi.stringFormat, parseFloat(text));
@@ -822,7 +815,7 @@ var FeatureProps;
                     }
 
                     // Skip empty, non-editable values
-                    if (!mi.canEdit && StringExt.isNullOrEmpty(displayValue))
+                    if (!mi.canEdit && csComp.StringExt.isNullOrEmpty(displayValue))
                         return;
 
                     var canFilter = (mi.type == "number" || mi.type == "text");
@@ -840,7 +833,7 @@ var FeatureProps;
             if (infoCallOutSection.properties.length > 0)
                 this.sections['AAA Info'] = infoCallOutSection; // The AAA is added as the sections are sorted alphabetically
             if (searchCallOutSection.properties.length > 0)
-                this.sections['ZZZ Search'] = searchCallOutSection;
+                this.sections['Zzz Search'] = searchCallOutSection;
         }
         ///**
         // * In case we are dealing with a regular JSON file without type information, create a default type.
@@ -859,7 +852,7 @@ var FeatureProps;
         //    }
         //}
         CallOut.prototype.getOrCreateCallOutSection = function (sectionTitle) {
-            if (StringExt.isNullOrEmpty(sectionTitle)) {
+            if (csComp.StringExt.isNullOrEmpty(sectionTitle)) {
                 return null;
             }
             if (sectionTitle in this.sections)
@@ -873,11 +866,11 @@ var FeatureProps;
         */
         CallOut.prototype.setTitle = function () {
             var title;
-            if (this.type == null || this.type.style == null || StringExt.isNullOrEmpty(this.type.style.nameLabel))
+            if (this.type == null || this.type.style == null || csComp.StringExt.isNullOrEmpty(this.type.style.nameLabel))
                 title = this.feature.properties['Name'];
             else
                 title = this.feature.properties[this.type.style.nameLabel];
-            if (!StringExt.isNullOrEmpty(title) && !$.isNumeric(title))
+            if (!csComp.StringExt.isNullOrEmpty(title) && !$.isNumeric(title))
                 this.title = title.replace(/&amp;/g, '&');
         };
         return CallOut;
@@ -981,19 +974,21 @@ var FeatureProps;
             };
 
             $scope.autocollapse(true); // when document first loads
+            $scope.tabs = $('#featureTabs');
+            $scope.tabScrollDelta = $scope.tabs.outerWidth();
 
             $('#leftArr').click(function () {
-                console.log('leftArr');
-                var tabs = $('#featureTabs');
-                var current = parseFloat(tabs.css('margin-left'));
+                //console.log('leftArr');
+                //var tabs = $('#featureTabs');
+                var current = parseFloat($scope.tabs.css('margin-left'));
                 var min = 20;
-                var step = 40;
+                var nextPos = $scope.tabScrollDelta;
 
-                if (current - step < min) {
-                    step = current - min;
+                if (current + nextPos > min) {
+                    nextPos = min - current;
                 }
 
-                tabs.animate({ 'margin-left': '-=' + step + 'px' }, 'slow', function () {
+                $scope.tabs.animate({ 'margin-left': '+=' + nextPos + 'px' }, 'slow', function () {
                     //                    console.log('rightarr hide');
                     $('#rightArr').show();
                     $('#leftArr').show();
@@ -1002,9 +997,13 @@ var FeatureProps;
             });
 
             $('#rightArr').click(function () {
-                var tabs = $('#featureTabs');
-                var diff = widthOfList() - tabs.outerWidth() + 30;
-                tabs.animate({ 'margin-left': '-=' + diff + 'px' }, 'slow', function () {
+                //var tabs = $('#featureTabs');
+                var max = widthOfList() - $scope.tabs.outerWidth() + 30;
+                var current = Math.abs(parseFloat($scope.tabs.css('margin-left')));
+                var nextPos = $scope.tabScrollDelta;
+                nextPos = Math.min(max, nextPos);
+
+                $scope.tabs.animate({ 'margin-left': '-=' + nextPos + 'px' }, 'slow', function () {
                     $('#leftArr').show();
                     $('#rightArr').show();
 
@@ -1788,6 +1787,216 @@ var Helpers;
     })(Helpers.Resize || (Helpers.Resize = {}));
     var Resize = Helpers.Resize;
 })(Helpers || (Helpers = {}));
+var csComp;
+(function (csComp) {
+    (function (Mca) {
+        var McaCtrl = (function () {
+            function McaCtrl($scope, $layerService, $messageBusService) {
+                this.$scope = $scope;
+                this.$layerService = $layerService;
+                this.$messageBusService = $messageBusService;
+                this.mca = new Mca.Models.Mca();
+                $scope.vm = this;
+
+                this.mca.title = 'Zelfredzaamheid';
+                this.mca.description = 'Analyse van de zelfredzaamheid van een gemeente.';
+                this.mca.label = 'mca_zelfredzaamheid';
+                this.mca.stringFormat = '{0:0.0%}';
+                this.mca.rankTitle = 'Rang';
+                this.mca.rankFormat = '{0} van {1}';
+                this.mca.userWeightMax = 10;
+                this.mca.featureIds = ['cities.default'];
+
+                var criterion = new Mca.Models.Criterion();
+                criterion.label = 'p_00_14_jr';
+                criterion.color = 'green';
+                criterion.scores = '[0,0 0.2,1]';
+                criterion.userWeight = 1;
+                this.mca.criteria.push(criterion);
+
+                criterion = new Mca.Models.Criterion();
+                criterion.label = 'p_65_eo_jr';
+                criterion.color = 'red';
+                criterion.scores = '[0,0 0.25,1]';
+                criterion.userWeight = 3;
+                this.mca.criteria.push(criterion);
+            }
+            McaCtrl.prototype.calculateMca = function () {
+                if (!(this.mca.featureIds[0] in this.$layerService.featureTypes))
+                    return;
+            };
+            McaCtrl.$inject = [
+                '$scope',
+                'layerService',
+                'messageBusService'
+            ];
+            return McaCtrl;
+        })();
+        Mca.McaCtrl = McaCtrl;
+    })(csComp.Mca || (csComp.Mca = {}));
+    var Mca = csComp.Mca;
+})(csComp || (csComp = {}));
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var csComp;
+(function (csComp) {
+    (function (_Mca) {
+        (function (Models) {
+            var Mca = (function (_super) {
+                __extends(Mca, _super);
+                function Mca() {
+                    _super.call(this);
+                    /** Maximum number of star ratings to use to set the weight */
+                    this.userWeightMax = 5;
+                    /** Applicable feature ids as a string[]. */
+                    this.featureIds = [];
+                    this.weight = 1;
+                }
+                //public calculateWeights(criteria?: Criterion[]): void {
+                //    if (!criteria) criteria = this.criteria;
+                //    if (criteria.length === 0) return;
+                //    var totalWeight = 0;
+                //    criteria.forEach((c) => {
+                //        totalWeight += c.userWeight;
+                //    });
+                //    if (totalWeight == 0) return;
+                //    criteria.forEach((c) => {
+                //        c.weight = c.userWeight / totalWeight;
+                //    });
+                //}
+                Mca.prototype.calculateWeights = function (criteria) {
+                    if (!criteria)
+                        criteria = this.criteria;
+                    var totalWeight = 0;
+                    for (var k in criteria) {
+                        var crit = criteria[k];
+                        if (crit.criteria.length > 0)
+                            this.calculateWeights(crit.criteria);
+                        totalWeight += crit.userWeight;
+                    }
+                    if (totalWeight > 0) {
+                        for (var j in criteria) {
+                            var critj = criteria[j];
+                            critj.weight = critj.userWeight / totalWeight;
+                        }
+                    }
+                };
+                return Mca;
+            })(Criterion);
+            Models.Mca = Mca;
+
+            var Criterion = (function () {
+                function Criterion() {
+                    /** Specified weight by the user */
+                    this.userWeight = 1;
+                    this.criteria = [];
+                    /** Piece-wise linear approximation of the scoring function by a set of x and y points */
+                    this.x = [];
+                    this.y = [];
+                    this.isPlaUpdated = false;
+                }
+                Criterion.prototype.requiresMinimum = function () {
+                    return this.scores.indexOf('min') >= 0;
+                };
+
+                Criterion.prototype.requiresMaximum = function () {
+                    return this.scores.indexOf('max') >= 0;
+                };
+
+                /**
+                * Update the piecewise linear approximation (PLA) of the scoring (a.k.a. user) function,
+                * which translates a property value to a MCA value in the range [0,1] using all features.
+                */
+                Criterion.prototype.updatePla = function (features) {
+                    var _this = this;
+                    if (this.isPlaUpdated)
+                        return;
+
+                    // Replace min and max by their values:
+                    var scores = this.scores;
+                    var propValues = [];
+                    if (this.requiresMaximum() || this.requiresMinimum()) {
+                        features.forEach(function (feature) {
+                            if (_this.label in feature.properties) {
+                                // The property is available
+                                propValues.push(feature.properties[_this.label]);
+                            }
+                        });
+                    }
+                    if (this.requiresMaximum()) {
+                        scores.replace('max', Math.max.apply(null, propValues));
+                    }
+                    if (this.requiresMinimum()) {
+                        scores.replace('min', Math.min.apply(null, propValues));
+                    }
+
+                    // Regex to split the scores: [^\d\.]+
+                    var pla = scores.split('[^\d\.]+');
+
+                    // Test that we have an equal number of x and y,
+                    if (pla.length % 2 != 0)
+                        throw Error(this.label + ' does not have an even (x,y) pair in scores.');
+
+                    for (var i = 0; i < pla.length / 2;) {
+                        var x = parseFloat(pla[i++]);
+                        if (i > 0 && this.x[i - 1] > x)
+                            throw Error(this.label + ': x should increment continuously.');
+                        this.x.push(x);
+
+                        var y = parseFloat(pla[i++]);
+                        if (y < 0)
+                            y = 0;
+                        else if (y > 1)
+                            y = 1;
+                        this.y.push(y);
+                    }
+                    this.isPlaUpdated = true;
+                };
+
+                Criterion.prototype.getScore = function (feature, criterion) {
+                    var _this = this;
+                    if (!this.isPlaUpdated)
+                        throw ('Error: PLA must be updated!');
+                    if (!criterion)
+                        criterion = this;
+                    if (criterion.criteria.length == 0) {
+                        // End point: compute the score for each feature
+                        var y = 0;
+                        if (this.label in feature.properties) {
+                            // The property is available
+                            var x = feature.properties[this.label];
+                            for (var k in this.x) {
+                                if (x < this.x[k]) {
+                                    // Found relative position of x in this.x
+                                    // TODO Use linear interpolation
+                                    return this.y[Math.max(0, k - 1)];
+                                }
+                                return this.y[this.y.length - 1];
+                            }
+                        } else {
+                            return 0;
+                        }
+                    } else {
+                        // Sum all the sub-criteria.
+                        var finalScore = 0;
+                        this.criteria.forEach(function (crit) {
+                            finalScore += crit.weight * _this.getScore(feature, crit);
+                        });
+                        return this.weight * finalScore;
+                    }
+                };
+                return Criterion;
+            })();
+            Models.Criterion = Criterion;
+        })(_Mca.Models || (_Mca.Models = {}));
+        var Models = _Mca.Models;
+    })(csComp.Mca || (csComp.Mca = {}));
+    var Mca = csComp.Mca;
+})(csComp || (csComp = {}));
 var csComp;
 (function (csComp) {
     (function (Services) {
@@ -2727,8 +2936,9 @@ var csComp;
             * Open solution file with references to available baselayers and projects
             * @params url: URL of the solution
             * @params layers: Optionally provide a semi-colon separated list of layer IDs that should be opened.
+            * @params initialProject: Optionally provide a project name that should be loaded, if omitted the first project in the definition will be loaded
             */
-            LayerService.prototype.openSolution = function (url, layers) {
+            LayerService.prototype.openSolution = function (url, layers, initialProject) {
                 //console.log('layers (openSolution): ' + JSON.stringify(layers));
                 var _this = this;
                 $.getJSON(url, function (solution) {
@@ -2764,8 +2974,17 @@ var csComp;
 
                     //$scope.projects = projects.projects;
                     if (solution.projects.length > 0) {
-                        _this.openProject(solution.projects[0].url, layers);
+                        var p = solution.projects.filter(function (aProject) {
+                            return aProject.title == initialProject;
+                        })[0];
+                        if (p != null) {
+                            _this.openProject(p.url, layers);
+                        } else {
+                            _this.openProject(solution.projects[0].url, layers);
+                        }
                     }
+
+                    _this.solution = solution;
                 });
             };
 
@@ -2791,6 +3010,11 @@ var csComp;
 
                 $.getJSON(url, function (data) {
                     _this.project = data;
+
+                    if (_this.project.viewBounds) {
+                        _this.$mapService.map.fitBounds(new L.LatLngBounds(_this.project.viewBounds.southWest, _this.project.viewBounds.northEast));
+                    }
+
                     if (_this.project.featureTypes) {
                         for (var typeName in _this.project.featureTypes) {
                             var featureType = _this.project.featureTypes[typeName];

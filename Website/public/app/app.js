@@ -257,7 +257,7 @@
             template: "<datatable id='datatable'></datatable>",
             sticky: true
         });
-    }).controller('appCtrl', AppCtrl).controller('mapLayersCtrl', csComp.Services.MapCtrl).controller('searchFormCtrl', csComp.Search.SearchFormCtrl).controller('mapViewCtrl', MapView.MapViewCtrl).controller('searchCtrl', Search.SearchCtrl).service('messageBusService', csComp.Services.MessageBusService).service('mapService', csComp.Services.MapService).service('layerService', csComp.Services.LayerService).filter('csmillions', [
+    }).controller('appCtrl', AppCtrl).controller('mapLayersCtrl', csComp.Services.MapCtrl).controller('searchFormCtrl', csComp.Search.SearchFormCtrl).controller('mapViewCtrl', MapView.MapViewCtrl).controller('searchCtrl', Search.SearchCtrl).controller('mcaCtrl', csComp.Mca.McaCtrl).service('messageBusService', csComp.Services.MessageBusService).service('mapService', csComp.Services.MapService).service('layerService', csComp.Services.LayerService).filter('csmillions', [
         '$filter', '$locale', function (filter, locale) {
             return function (amount, currencySymbol) {
                 if (isNaN(amount))

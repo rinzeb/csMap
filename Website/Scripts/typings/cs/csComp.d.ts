@@ -148,6 +148,7 @@ declare module DataTable {
         private $scope;
         private $http;
         private $sce;
+        private $translate;
         private $layerService;
         private $localStorageService;
         private $messageBusService;
@@ -161,8 +162,9 @@ declare module DataTable {
         public headers: string[];
         public sortingColumn: number;
         public rows: TableField[][];
+        private mapFeatureTitle;
         static $inject: string[];
-        constructor($scope: IDataTableViewScope, $http: ng.IHttpService, $sce: ng.ISCEService, $layerService: csComp.Services.LayerService, $localStorageService: ng.localStorage.ILocalStorageService, $messageBusService: csComp.Services.MessageBusService);
+        constructor($scope: IDataTableViewScope, $http: ng.IHttpService, $sce: ng.ISCEService, $translate: ng.translate.ITranslateService, $layerService: csComp.Services.LayerService, $localStorageService: ng.localStorage.ILocalStorageService, $messageBusService: csComp.Services.MessageBusService);
         /**
         * Add a label to local storage and bind it to the scope.
         */
@@ -237,6 +239,8 @@ declare module FeatureProps {
         showMenu: boolean;
         poi: csComp.GeoJson.IFeature;
         callOut: CallOut;
+        tabs: JQuery;
+        tabScrollDelta: number;
         featureTabActivated(sectionTitle: string, section: CallOutSection): any;
         autocollapse(init: boolean): void;
     }
@@ -389,7 +393,6 @@ declare module LegendList {
         private $layerService;
         private $mapService;
         private $messageBusService;
-        private scope;
         static $inject: string[];
         constructor($scope: ILegendListScope, $layerService: csComp.Services.LayerService, $mapService: csComp.Services.MapService, $messageBusService: csComp.Services.MessageBusService);
         private updateLegendItems();
@@ -495,6 +498,67 @@ declare module Helpers.Resize {
     */
     var myModule: any;
 }
+declare module csComp.Mca {
+    interface IMcaScope extends ng.IScope {
+        vm: McaCtrl;
+    }
+    class McaCtrl {
+        private $scope;
+        private $layerService;
+        private $messageBusService;
+        private mca;
+        static $inject: string[];
+        constructor($scope: IMcaScope, $layerService: Services.LayerService, $messageBusService: Services.MessageBusService);
+        public calculateMca(): void;
+    }
+}
+declare module csComp.Mca.Models {
+    class Mca extends Criterion {
+        public title: string;
+        public description: string;
+        public stringFormat: string;
+        /** Optionally, export the result also as a rank */
+        public rankTitle: string;
+        /** Optionally, stringFormat for the ranked result */
+        public rankFormat: string;
+        /** Maximum number of star ratings to use to set the weight */
+        public userWeightMax: number;
+        /** Applicable feature ids as a string[]. */
+        public featureIds: string[];
+        constructor();
+        public calculateWeights(criteria?: Criterion[]): void;
+    }
+    class Criterion {
+        /**
+        * Top level label will be used to add a property to a feature, mca_LABELNAME, with the MCA value.
+        * Lower level children will be used to obtain the property value.
+        */
+        public label: string;
+        /** Color of the pie chart */
+        public color: string;
+        /** Specified weight by the user */
+        public userWeight: number;
+        /** Derived weight based on the fact that the sum of weights in a group of criteria needs to be 1. */
+        public weight: number;
+        /** Scoring function y = f(x), which translates a specified measurement x to a value y, where y in [0,1].
+        * Format [x1,y1 x2,y2], and may contain special characters, such as min or max to define the minimum or maximum.
+        */
+        public scores: string;
+        public criteria: Criterion[];
+        /** Piece-wise linear approximation of the scoring function by a set of x and y points */
+        private x;
+        private y;
+        private isPlaUpdated;
+        private requiresMinimum();
+        private requiresMaximum();
+        /**
+        * Update the piecewise linear approximation (PLA) of the scoring (a.k.a. user) function,
+        * which translates a property value to a MCA value in the range [0,1] using all features.
+        */
+        private updatePla(features);
+        public getScore(feature: GeoJson.Feature, criterion?: Criterion): number;
+    }
+}
 declare module csComp.Services {
     enum LayerType {
         GeoJson = 0,
@@ -504,9 +568,11 @@ declare module csComp.Services {
         title: string;
         accentColor: string;
         project: Project;
+        solution: Solution;
         maxBounds: IBoundingBox;
         findLayer(id: string): ProjectLayer;
         selectFeature(feature: GeoJson.IFeature): any;
+        openSolution(url: string, layers?: string, initialProject?: string): void;
         mb: MessageBusService;
         map: MapService;
         layerGroup: L.LayerGroup<L.ILayer>;
@@ -551,6 +617,7 @@ declare module csComp.Services {
         public projects: SolutionProject[];
     }
     class Project {
+        public viewBounds: IBoundingBox;
         public title: string;
         public description: string;
         public logo: string;
@@ -663,9 +730,10 @@ declare module csComp.Services {
             [key: string]: GeoJson.IMetaInfo;
         };
         public project: Project;
+        public solution: Solution;
         public layerGroup: L.LayerGroup<L.ILayer>;
-        public dimension: any;
         public info: L.Control;
+        public dimension: any;
         public noFilters: boolean;
         public noStyles: boolean;
         public lastSelectedFeature: GeoJson.IFeature;
@@ -758,8 +826,9 @@ declare module csComp.Services {
         * Open solution file with references to available baselayers and projects
         * @params url: URL of the solution
         * @params layers: Optionally provide a semi-colon separated list of layer IDs that should be opened.
+        * @params initialProject: Optionally provide a project name that should be loaded, if omitted the first project in the definition will be loaded
         */
-        public openSolution(url: string, layers?: string): void;
+        public openSolution(url: string, layers?: string, initialProject?: string): void;
         /**
         * Open project
         * @params url: URL of the project
