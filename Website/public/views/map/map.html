@@ -94,7 +94,12 @@ $1$ Right side panel #1#
             <style-list class="tab-pane" id="styles"></style-list>
             
             <div class="tab-pane" id="mca" data-ng-controller="mcaCtrl">
-                <h4>MCA</h4>
+                <h4 class="leftpanel-header">MCA</h4>
+                <select data-ng-model="vm.mca"
+                        data-ng-options="mca.title for mca in vm.availableMca()"
+                        style="width: 100%"></select>
+                <a data-ng-if="vm.mca" href="" style="width: 100%"
+                    data-ng-click="vm.calculateMca()">Bereken de {{vm.mca.title}}</a>
             </div>
 
             <feature-list class="tab-pane" id="features"></feature-list>

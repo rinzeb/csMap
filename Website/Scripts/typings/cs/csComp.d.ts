@@ -68,6 +68,21 @@ declare module csComp.GeoJson {
         maxValue?: number;
         defaultValue?: number;
     }
+    class MetaInfo {
+        public label: string;
+        public title: string;
+        public description: string;
+        public type: string;
+        public section: string;
+        public stringFormat: string;
+        public visibleInCallOut: boolean;
+        public canEdit: boolean;
+        public filterType: string;
+        public isSearchable: boolean;
+        public minValue: number;
+        public maxValue: number;
+        public defaultValue: number;
+    }
     interface IFeatureTypeStyle {
         nameLabel?: string;
         fillColor?: string;
@@ -505,29 +520,18 @@ declare module csComp.Mca {
     class McaCtrl {
         private $scope;
         private $layerService;
-        private $messageBusService;
+        private messageBusService;
         private mca;
+        private mcas;
         static $inject: string[];
-        constructor($scope: IMcaScope, $layerService: Services.LayerService, $messageBusService: Services.MessageBusService);
+        constructor($scope: IMcaScope, $layerService: Services.LayerService, messageBusService: Services.MessageBusService);
+        /** Based on the currently loaded features, which MCA can we use */
+        public availableMca(): Models.Mca[];
         public calculateMca(): void;
+        private addPropertyInfo(featureId, mca);
     }
 }
 declare module csComp.Mca.Models {
-    class Mca extends Criterion {
-        public title: string;
-        public description: string;
-        public stringFormat: string;
-        /** Optionally, export the result also as a rank */
-        public rankTitle: string;
-        /** Optionally, stringFormat for the ranked result */
-        public rankFormat: string;
-        /** Maximum number of star ratings to use to set the weight */
-        public userWeightMax: number;
-        /** Applicable feature ids as a string[]. */
-        public featureIds: string[];
-        constructor();
-        public calculateWeights(criteria?: Criterion[]): void;
-    }
     class Criterion {
         /**
         * Top level label will be used to add a property to a feature, mca_LABELNAME, with the MCA value.
@@ -546,17 +550,35 @@ declare module csComp.Mca.Models {
         public scores: string;
         public criteria: Criterion[];
         /** Piece-wise linear approximation of the scoring function by a set of x and y points */
+        public isPlaUpdated: boolean;
         private x;
         private y;
-        private isPlaUpdated;
         private requiresMinimum();
         private requiresMaximum();
         /**
         * Update the piecewise linear approximation (PLA) of the scoring (a.k.a. user) function,
         * which translates a property value to a MCA value in the range [0,1] using all features.
         */
-        private updatePla(features);
+        public updatePla(features: GeoJson.Feature[]): void;
         public getScore(feature: GeoJson.Feature, criterion?: Criterion): number;
+    }
+    class Mca extends Criterion {
+        public title: string;
+        /** Section of the callout */
+        public section: string;
+        public description: string;
+        public stringFormat: string;
+        /** Optionally, export the result also as a rank */
+        public rankTitle: string;
+        /** Optionally, stringFormat for the ranked result */
+        public rankFormat: string;
+        /** Maximum number of star ratings to use to set the weight */
+        public userWeightMax: number;
+        /** Applicable feature ids as a string[]. */
+        public featureIds: string[];
+        constructor();
+        public updatePla(features: GeoJson.Feature[]): void;
+        public calculateWeights(criteria?: Criterion[]): void;
     }
 }
 declare module csComp.Services {

@@ -50,6 +50,16 @@ var csComp;
             featureFilterType[featureFilterType["text"] = 2] = "text";
         })(GeoJson.featureFilterType || (GeoJson.featureFilterType = {}));
         var featureFilterType = GeoJson.featureFilterType;
+
+        var MetaInfo = (function () {
+            function MetaInfo() {
+                this.visibleInCallOut = true;
+                this.canEdit = false;
+                this.isSearchable = true;
+            }
+            return MetaInfo;
+        })();
+        GeoJson.MetaInfo = MetaInfo;
     })(csComp.GeoJson || (csComp.GeoJson = {}));
     var GeoJson = csComp.GeoJson;
 })(csComp || (csComp = {}));
@@ -1791,39 +1801,93 @@ var csComp;
 (function (csComp) {
     (function (Mca) {
         var McaCtrl = (function () {
-            function McaCtrl($scope, $layerService, $messageBusService) {
+            function McaCtrl($scope, $layerService, messageBusService) {
                 this.$scope = $scope;
                 this.$layerService = $layerService;
-                this.$messageBusService = $messageBusService;
-                this.mca = new Mca.Models.Mca();
+                this.messageBusService = messageBusService;
+                this.mcas = [];
                 $scope.vm = this;
+                console.log('McaCtrl');
 
-                this.mca.title = 'Zelfredzaamheid';
-                this.mca.description = 'Analyse van de zelfredzaamheid van een gemeente.';
-                this.mca.label = 'mca_zelfredzaamheid';
-                this.mca.stringFormat = '{0:0.0%}';
-                this.mca.rankTitle = 'Rang';
-                this.mca.rankFormat = '{0} van {1}';
-                this.mca.userWeightMax = 10;
-                this.mca.featureIds = ['cities.default'];
+                var mca = new Mca.Models.Mca();
+                mca.title = 'Zelfredzaamheid';
+                mca.description = 'Analyse van de zelfredzaamheid van een gemeente.';
+                mca.label = 'mca_zelfredzaamheid';
+                mca.stringFormat = '{0:0.0}';
+                mca.rankTitle = 'Rang';
+                mca.rankFormat = '{0} van {1}';
+                mca.userWeightMax = 10;
+                mca.featureIds = ['cities_Default'];
 
                 var criterion = new Mca.Models.Criterion();
                 criterion.label = 'p_00_14_jr';
                 criterion.color = 'green';
-                criterion.scores = '[0,0 0.2,1]';
+                criterion.scores = '[0,0 20,1]';
                 criterion.userWeight = 1;
-                this.mca.criteria.push(criterion);
+                mca.criteria.push(criterion);
 
                 criterion = new Mca.Models.Criterion();
                 criterion.label = 'p_65_eo_jr';
                 criterion.color = 'red';
-                criterion.scores = '[0,0 0.25,1]';
+                criterion.scores = '[0,0 25,1]';
                 criterion.userWeight = 3;
-                this.mca.criteria.push(criterion);
+                mca.criteria.push(criterion);
+                this.mcas.push(mca);
             }
+            /** Based on the currently loaded features, which MCA can we use */
+            McaCtrl.prototype.availableMca = function () {
+                var _this = this;
+                this.mca = null;
+                var availableMcas = [];
+                this.mcas.forEach(function (m) {
+                    m.featureIds.forEach(function (featureId) {
+                        if (featureId in _this.$layerService.featureTypes)
+                            availableMcas.push(m);
+                    });
+                });
+                if (availableMcas.length > 0)
+                    this.mca = availableMcas[0];
+                return availableMcas;
+            };
+
             McaCtrl.prototype.calculateMca = function () {
-                if (!(this.mca.featureIds[0] in this.$layerService.featureTypes))
+                var _this = this;
+                if (!this.mca)
                     return;
+                var mca = this.mca;
+                mca.featureIds.forEach(function (featureId) {
+                    if (!(featureId in _this.$layerService.featureTypes))
+                        return;
+                    _this.addPropertyInfo(featureId, mca);
+                    var features = [];
+                    _this.$layerService.project.features.forEach(function (feature) {
+                        features.push(feature);
+                    });
+                    mca.updatePla(features);
+                    mca.calculateWeights();
+                    _this.$layerService.project.features.forEach(function (feature) {
+                        var score = mca.getScore(feature);
+                        feature.properties[mca.label] = score;
+                    });
+                });
+            };
+
+            McaCtrl.prototype.addPropertyInfo = function (featureId, mca) {
+                var featureType = this.$layerService.featureTypes[featureId];
+                if (featureType.metaInfoData.reduce(function (prevValue, curItem) {
+                    return prevValue || (curItem.label === mca.label);
+                }, false))
+                    return;
+                var mi = new csComp.GeoJson.MetaInfo();
+                mi.title = mca.title;
+                mi.label = mca.label;
+                mi.type = 'number';
+                mi.maxValue = 1;
+                mi.minValue = 0;
+                mi.description = mca.description;
+                mi.stringFormat = mca.stringFormat;
+                mi.section = mca.section || 'Info';
+                featureType.metaInfoData.push(mi);
             };
             McaCtrl.$inject = [
                 '$scope',
@@ -1846,6 +1910,135 @@ var csComp;
 (function (csComp) {
     (function (_Mca) {
         (function (Models) {
+            var Criterion = (function () {
+                function Criterion() {
+                    /** Specified weight by the user */
+                    this.userWeight = 1;
+                    this.criteria = [];
+                    /** Piece-wise linear approximation of the scoring function by a set of x and y points */
+                    this.isPlaUpdated = false;
+                    this.x = [];
+                    this.y = [];
+                }
+                Criterion.prototype.requiresMinimum = function () {
+                    return this.scores && this.scores.indexOf('min') >= 0;
+                };
+
+                Criterion.prototype.requiresMaximum = function () {
+                    return this.scores && this.scores.indexOf('max') >= 0;
+                };
+
+                /**
+                * Update the piecewise linear approximation (PLA) of the scoring (a.k.a. user) function,
+                * which translates a property value to a MCA value in the range [0,1] using all features.
+                */
+                Criterion.prototype.updatePla = function (features) {
+                    var _this = this;
+                    if (this.isPlaUpdated)
+                        return;
+
+                    // Replace min and max by their values:
+                    var scores = this.scores;
+                    if (!scores) {
+                        if (this.criteria.length > 0) {
+                            this.criteria.forEach(function (criterion) {
+                                criterion.updatePla(features);
+                            });
+                        }
+                        return;
+                    }
+                    var propValues = [];
+                    if (this.requiresMaximum() || this.requiresMinimum()) {
+                        features.forEach(function (feature) {
+                            if (_this.label in feature.properties) {
+                                // The property is available
+                                propValues.push(feature.properties[_this.label]);
+                            }
+                        });
+                    }
+                    if (this.requiresMaximum()) {
+                        scores.replace('max', Math.max.apply(null, propValues));
+                    }
+                    if (this.requiresMinimum()) {
+                        scores.replace('min', Math.min.apply(null, propValues));
+                    }
+
+                    // Regex to split the scores: [^\d\.]+ and remove empty entries
+                    var pla = scores.split(/[^\d\.]+/).filter(function (item) {
+                        return item.length > 0;
+                    });
+
+                    // Test that we have an equal number of x and y,
+                    if (pla.length % 2 != 0)
+                        throw Error(this.label + ' does not have an even (x,y) pair in scores.');
+
+                    for (var i = 0; i < pla.length / 2; i++) {
+                        var x = parseFloat(pla[2 * i]);
+                        if (i > 0 && this.x[i - 1] > x)
+                            throw Error(this.label + ': x should increment continuously.');
+                        this.x.push(x);
+
+                        var y = parseFloat(pla[2 * i + 1]);
+                        if (y < 0)
+                            y = 0;
+                        else if (y > 1)
+                            y = 1;
+                        this.y.push(y);
+                    }
+                    this.isPlaUpdated = true;
+                };
+
+                Criterion.prototype.getScore = function (feature, criterion) {
+                    var _this = this;
+                    if (!this.isPlaUpdated)
+                        throw ('Error: PLA must be updated!');
+                    if (!criterion)
+                        criterion = this;
+                    if (criterion.criteria.length == 0) {
+                        // End point: compute the score for each feature
+                        var y = 0;
+                        if (criterion.label in feature.properties) {
+                            // The property is available
+                            var x = feature.properties[criterion.label];
+                            if (x < criterion.x[0])
+                                return criterion.y[0];
+                            var last = criterion.x.length - 1;
+                            if (x > criterion.x[last])
+                                return criterion.y[last];
+                            for (var k in criterion.x) {
+                                if (x < criterion.x[k]) {
+                                    // Found relative position of x in criterion.x
+                                    // TODO Use linear interpolation
+                                    var x0 = criterion.x[k - 1];
+                                    var x1 = criterion.x[k];
+                                    var y0 = criterion.y[k - 1];
+                                    var y1 = criterion.y[k];
+
+                                    //var x0 = criterion.x[Math.max(0, k - 1)];
+                                    //var x1 = criterion.x[Math.min(last, k)];
+                                    //var y0 = criterion.y[Math.max(0, k - 1)];
+                                    //var y1 = criterion.y[Math.min(last, k)];
+                                    return (y1 - y0) * (x - x0) / (x1 - x0);
+                                }
+                            }
+                        } else {
+                            return 0;
+                        }
+                    } else {
+                        // Sum all the sub-criteria.
+                        var finalScore = 0;
+                        this.criteria.forEach(function (crit) {
+                            finalScore += crit.weight * _this.getScore(feature, crit);
+                        });
+                        return this.weight * finalScore;
+                    }
+                    return 0;
+                };
+                return Criterion;
+            })();
+            Models.Criterion = Criterion;
+
+            // NOTE: When extending a base class, make sure that the base class has been defined already.
             var Mca = (function (_super) {
                 __extends(Mca, _super);
                 function Mca() {
@@ -1855,7 +2048,14 @@ var csComp;
                     /** Applicable feature ids as a string[]. */
                     this.featureIds = [];
                     this.weight = 1;
+                    this.isPlaUpdated = true;
                 }
+                Mca.prototype.updatePla = function (features) {
+                    this.criteria.forEach(function (criterion) {
+                        criterion.updatePla(features);
+                    });
+                };
+
                 //public calculateWeights(criteria?: Criterion[]): void {
                 //    if (!criteria) criteria = this.criteria;
                 //    if (criteria.length === 0) return;
@@ -1888,110 +2088,6 @@ var csComp;
                 return Mca;
             })(Criterion);
             Models.Mca = Mca;
-
-            var Criterion = (function () {
-                function Criterion() {
-                    /** Specified weight by the user */
-                    this.userWeight = 1;
-                    this.criteria = [];
-                    /** Piece-wise linear approximation of the scoring function by a set of x and y points */
-                    this.x = [];
-                    this.y = [];
-                    this.isPlaUpdated = false;
-                }
-                Criterion.prototype.requiresMinimum = function () {
-                    return this.scores.indexOf('min') >= 0;
-                };
-
-                Criterion.prototype.requiresMaximum = function () {
-                    return this.scores.indexOf('max') >= 0;
-                };
-
-                /**
-                * Update the piecewise linear approximation (PLA) of the scoring (a.k.a. user) function,
-                * which translates a property value to a MCA value in the range [0,1] using all features.
-                */
-                Criterion.prototype.updatePla = function (features) {
-                    var _this = this;
-                    if (this.isPlaUpdated)
-                        return;
-
-                    // Replace min and max by their values:
-                    var scores = this.scores;
-                    var propValues = [];
-                    if (this.requiresMaximum() || this.requiresMinimum()) {
-                        features.forEach(function (feature) {
-                            if (_this.label in feature.properties) {
-                                // The property is available
-                                propValues.push(feature.properties[_this.label]);
-                            }
-                        });
-                    }
-                    if (this.requiresMaximum()) {
-                        scores.replace('max', Math.max.apply(null, propValues));
-                    }
-                    if (this.requiresMinimum()) {
-                        scores.replace('min', Math.min.apply(null, propValues));
-                    }
-
-                    // Regex to split the scores: [^\d\.]+
-                    var pla = scores.split('[^\d\.]+');
-
-                    // Test that we have an equal number of x and y,
-                    if (pla.length % 2 != 0)
-                        throw Error(this.label + ' does not have an even (x,y) pair in scores.');
-
-                    for (var i = 0; i < pla.length / 2;) {
-                        var x = parseFloat(pla[i++]);
-                        if (i > 0 && this.x[i - 1] > x)
-                            throw Error(this.label + ': x should increment continuously.');
-                        this.x.push(x);
-
-                        var y = parseFloat(pla[i++]);
-                        if (y < 0)
-                            y = 0;
-                        else if (y > 1)
-                            y = 1;
-                        this.y.push(y);
-                    }
-                    this.isPlaUpdated = true;
-                };
-
-                Criterion.prototype.getScore = function (feature, criterion) {
-                    var _this = this;
-                    if (!this.isPlaUpdated)
-                        throw ('Error: PLA must be updated!');
-                    if (!criterion)
-                        criterion = this;
-                    if (criterion.criteria.length == 0) {
-                        // End point: compute the score for each feature
-                        var y = 0;
-                        if (this.label in feature.properties) {
-                            // The property is available
-                            var x = feature.properties[this.label];
-                            for (var k in this.x) {
-                                if (x < this.x[k]) {
-                                    // Found relative position of x in this.x
-                                    // TODO Use linear interpolation
-                                    return this.y[Math.max(0, k - 1)];
-                                }
-                                return this.y[this.y.length - 1];
-                            }
-                        } else {
-                            return 0;
-                        }
-                    } else {
-                        // Sum all the sub-criteria.
-                        var finalScore = 0;
-                        this.criteria.forEach(function (crit) {
-                            finalScore += crit.weight * _this.getScore(feature, crit);
-                        });
-                        return this.weight * finalScore;
-                    }
-                };
-                return Criterion;
-            })();
-            Models.Criterion = Criterion;
         })(_Mca.Models || (_Mca.Models = {}));
         var Models = _Mca.Models;
     })(csComp.Mca || (csComp.Mca = {}));
