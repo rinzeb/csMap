@@ -68,6 +68,21 @@ declare module csComp.GeoJson {
         maxValue?: number;
         defaultValue?: number;
     }
+    class MetaInfo {
+        public label: string;
+        public title: string;
+        public description: string;
+        public type: string;
+        public section: string;
+        public stringFormat: string;
+        public visibleInCallOut: boolean;
+        public canEdit: boolean;
+        public filterType: string;
+        public isSearchable: boolean;
+        public minValue: number;
+        public maxValue: number;
+        public defaultValue: number;
+    }
     interface IFeatureTypeStyle {
         nameLabel?: string;
         fillColor?: string;
@@ -239,6 +254,8 @@ declare module FeatureProps {
         showMenu: boolean;
         poi: csComp.GeoJson.IFeature;
         callOut: CallOut;
+        tabs: JQuery;
+        tabScrollDelta: number;
         featureTabActivated(sectionTitle: string, section: CallOutSection): any;
         autocollapse(init: boolean): void;
     }
@@ -391,7 +408,6 @@ declare module LegendList {
         private $layerService;
         private $mapService;
         private $messageBusService;
-        private scope;
         static $inject: string[];
         constructor($scope: ILegendListScope, $layerService: csComp.Services.LayerService, $mapService: csComp.Services.MapService, $messageBusService: csComp.Services.MessageBusService);
         private updateLegendItems();
@@ -496,6 +512,77 @@ declare module Helpers.Resize {
     * Module
     */
     var myModule: any;
+}
+declare module csComp.Mca {
+    interface IMcaScope extends ng.IScope {
+        vm: McaCtrl;
+    }
+    class McaCtrl {
+        private $scope;
+        private $layerService;
+        private messageBusService;
+        private mca;
+        private mcas;
+        static $inject: string[];
+        constructor($scope: IMcaScope, $layerService: Services.LayerService, messageBusService: Services.MessageBusService);
+        /** Based on the currently loaded features, which MCA can we use */
+        public availableMca(): Models.Mca[];
+        public calculateMca(): void;
+        private applyPropertyInfoToCriteria(mca, featureType);
+        private addPropertyInfo(featureId, mca);
+    }
+}
+declare module csComp.Mca.Models {
+    class Criterion {
+        public title: string;
+        public description: string;
+        /**
+        * Top level label will be used to add a property to a feature, mca_LABELNAME, with the MCA value.
+        * Lower level children will be used to obtain the property value.
+        */
+        public label: string;
+        /** Color of the pie chart */
+        public color: string;
+        /** Specified weight by the user */
+        public userWeight: number;
+        /** Derived weight based on the fact that the sum of weights in a group of criteria needs to be 1. */
+        public weight: number;
+        /** Scoring function y = f(x), which translates a specified measurement x to a value y, where y in [0,1].
+        * Format [x1,y1 x2,y2], and may contain special characters, such as min or max to define the minimum or maximum.
+        */
+        public scores: string;
+        public criteria: Criterion[];
+        /** Piece-wise linear approximation of the scoring function by a set of x and y points */
+        public isPlaUpdated: boolean;
+        private x;
+        private y;
+        private requiresMinimum();
+        private requiresMaximum();
+        public getTitle(): string;
+        /**
+        * Update the piecewise linear approximation (PLA) of the scoring (a.k.a. user) function,
+        * which translates a property value to a MCA value in the range [0,1] using all features.
+        */
+        public updatePla(features: GeoJson.Feature[]): void;
+        public getScore(feature: GeoJson.Feature, criterion?: Criterion): number;
+    }
+    class Mca extends Criterion {
+        /** Section of the callout */
+        public section: string;
+        public description: string;
+        public stringFormat: string;
+        /** Optionally, export the result also as a rank */
+        public rankTitle: string;
+        /** Optionally, stringFormat for the ranked result */
+        public rankFormat: string;
+        /** Maximum number of star ratings to use to set the weight */
+        public userWeightMax: number;
+        /** Applicable feature ids as a string[]. */
+        public featureIds: string[];
+        constructor();
+        public updatePla(features: GeoJson.Feature[]): void;
+        public calculateWeights(criteria?: Criterion[]): void;
+    }
 }
 declare module csComp.Services {
     enum LayerType {
@@ -670,8 +757,8 @@ declare module csComp.Services {
         public project: Project;
         public solution: Solution;
         public layerGroup: L.LayerGroup<L.ILayer>;
-        public dimension: any;
         public info: L.Control;
+        public dimension: any;
         public noFilters: boolean;
         public noStyles: boolean;
         public lastSelectedFeature: GeoJson.IFeature;

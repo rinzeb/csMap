@@ -50,6 +50,16 @@ var csComp;
             featureFilterType[featureFilterType["text"] = 2] = "text";
         })(GeoJson.featureFilterType || (GeoJson.featureFilterType = {}));
         var featureFilterType = GeoJson.featureFilterType;
+
+        var MetaInfo = (function () {
+            function MetaInfo() {
+                this.visibleInCallOut = true;
+                this.canEdit = false;
+                this.isSearchable = true;
+            }
+            return MetaInfo;
+        })();
+        GeoJson.MetaInfo = MetaInfo;
     })(csComp.GeoJson || (csComp.GeoJson = {}));
     var GeoJson = csComp.GeoJson;
 })(csComp || (csComp = {}));
@@ -232,6 +242,7 @@ var DataTable;
             // 'vm' stands for 'view model'. We're adding a reference to the controller to the scope
             // for its methods to be accessible from view / HTML
             $scope.vm = this;
+
             $translate('MAP_FEATURES').then(function (translation) {
                 _this.layerOptions[0].title = translation;
             });
@@ -653,7 +664,7 @@ var FeatureList;
 })(FeatureList || (FeatureList = {}));
 var FeatureProps;
 (function (FeatureProps) {
-    FeatureProps.html = '<div data-ng-cloak data-ng-show="showMenu" >    <h4 class="rightpanel-header">        &nbsp;&nbsp;{{callOut.title}}    </h4>        <div class="container-fluid rightpanel-tabs" style="position: relative">            <div class="row" style="overflow:hidden">            <!-- Nav tabs -->            <span id="leftArr" style="display:block;padding:10px;margin-top:5px;position:absolute;background-color:transparent;z-index:2">                <i class="glyphicon glyphicon-chevron-left"></i>            </span>            <span id="rightArr" style="display:block;padding:10px;margin-top:5px;position:absolute;background-color:transparent;z-index:2">                <i class="glyphicon glyphicon-chevron-right"></i>            </span>            <ul class="nav nav-tabs" id="featureTabs" style="margin-left:10px">                <li data-toggle="tab" data-ng-class="{active : $first}" data-ng-repeat="(sectionTitle, section) in callOut.sections" ng-if="section.hasProperties()">                    <a ng-href="#rp-{{$index}}" data-toggle="tab" data-ng-if="section.showSectionIcon()" ng-click="featureTabActivated(sectionTitle, section)"><i class="fa {{section.sectionIcon}}"></i></a>                    <a ng-href="#rp-{{$index}}" data-toggle="tab" data-ng-if="!section.showSectionIcon()" ng-click="featureTabActivated(sectionTitle, section)">{{sectionTitle}}</a>                </li>            </ul>        </div>    </div>    <div class="tab-content" style="top:50px; width:355px; overflow-y: auto; overflow-x: hidden" resize resize-y="150">        <div data-ng-if="!$last" class="tab-pane" data-ng-class="{active : $first}" id="rp-{{$index}}" data-ng-repeat="(sectionTitle, section) in callOut.sections">            <table class="table table-condensed">                <tr popover="{{(item.description) ? item.description : \'\'}}"                    popover-placement="left"                    popover-trigger="mouseenter"                    popover-append-to-body="true"                    data-ng-repeat="item in section.properties">                    <td><a class="fa fa-filter makeNarrow" data-ng-show="item.canFilter" data-ng-click="vm.$layerService.setFilter(item)"></a></td>                    <td><a class="fa fa-eye makeNarrow" data-ng-show="item.canStyle" data-ng-click="vm.$layerService.setStyle(item)"></a></td>                    <td>{{item.key}}</td>                    <td class="text-right" data-ng-bind-html="vm.toTrusted(item.value)"></td>                </tr>            </table>        </div>        <!-- Treat last tab (filter) differently -->        <div data-ng-if="$last" class="tab-pane" data-ng-class="{active : $first}" id="rp-{{$index}}" data-ng-repeat="(sectionTitle, section) in callOut.sections">            <!-- Add filter panel to the last rendered element -->            <div class="has-feedback" style="padding:0 4px 4px 4px;">                <span style="direction: ltr; position: static; display: block;">                    <input id="searchbox" data-ng-model="search.key" type="text"                            placeholder="Filter" autocomplete="off" spellcheck="false"                            style="position: relative; vertical-align: top;" class="form-control tt-input">                </span>                <span id="searchicon" class="fa form-control-feedback fa-filter"></span>            </div>            <!--<input style="padding:4px;" class=" form-control" data-ng-model="search" placeholder="...">-->            <table id="searchTextResults" class="table table-condensed">                <tr popover="{{(item.description) ? item.description : \'\'}}"                    popover-placement="left"                    popover-trigger="mouseenter"                    popover-append-to-body="true"                    data-ng-repeat="item in section.properties | filter:search">                    <td><a class="fa fa-filter makeNarrow" data-ng-show="item.canFilter" data-ng-click="vm.$layerService.setFilter(item)"></a></td>                    <td><a class="fa fa-eye makeNarrow" data-ng-show="item.canStyle" data-ng-click="vm.$layerService.setStyle(item)"></a></td>                    <td>{{item.key}}</td>                    <td class="text-right" data-ng-bind-html="vm.toTrusted(item.value)"></td>                </tr>            </table>        </div>    </div></div>';
+    FeatureProps.html = '<div data-ng-cloak data-ng-show="showMenu" >    <h4 class="rightpanel-header">        &nbsp;&nbsp;{{callOut.title}}    </h4>        <div class="container-fluid rightpanel-tabs" style="position: relative">            <div class="row" style="overflow:hidden">            <!-- Nav tabs -->            <span id="leftArr" style="display:block;padding:10px;margin-top:5px;position:absolute;background-color:transparent;z-index:2">                <i class="glyphicon glyphicon-chevron-left"></i>            </span>            <span id="rightArr" style="display:block;padding:10px;margin-top:5px;position:absolute;background-color:transparent;z-index:2">                <i class="glyphicon glyphicon-chevron-right"></i>            </span>            <ul class="nav nav-tabs" id="featureTabs" style="margin-left:10px">                <li data-toggle="tab" data-ng-class="{active : $first}" data-ng-repeat="(sectionTitle, section) in callOut.sections" ng-if="section.hasProperties()">                    <a ng-href="#rp-{{$index}}" data-toggle="tab" data-ng-if="section.showSectionIcon()" ng-click="featureTabActivated(sectionTitle, section)"><i class="fa {{section.sectionIcon}}"></i></a>                    <a ng-href="#rp-{{$index}}" data-toggle="tab" data-ng-if="!section.showSectionIcon()" ng-click="featureTabActivated(sectionTitle, section)">{{sectionTitle}}</a>                </li>            </ul>        </div>    </div>    <div class="tab-content" style="top:50px; width:355px; overflow-y: auto; overflow-x: hidden" resize resize-y="150">        <div data-ng-if="!$last" class="tab-pane" data-ng-class="{active : $first}" id="rp-{{$index}}" data-ng-repeat="(sectionTitle, section) in callOut.sections">            <table class="table table-condensed">                <tr popover="{{(item.description) ? item.description : \'\'}}"                    popover-placement="left"                    popover-trigger="mouseenter"                    popover-append-to-body="true"                    data-ng-repeat="item in section.properties">                    <td><a class="fa fa-filter makeNarrow" data-ng-show="item.canFilter" data-ng-click="vm.$layerService.setFilter(item)" style="cursor: pointer"></a></td>                    <td><a class="fa fa-eye makeNarrow" data-ng-show="item.canStyle" data-ng-click="vm.$layerService.setStyle(item)" style="cursor: pointer"></a></td>                    <td>{{item.key}}</td>                    <td class="text-right" data-ng-bind-html="vm.toTrusted(item.value)"></td>                </tr>            </table>        </div>        <!-- Treat last tab (filter) differently -->        <div data-ng-if="$last" class="tab-pane" data-ng-class="{active : $first}" id="rp-{{$index}}" data-ng-repeat="(sectionTitle, section) in callOut.sections">            <!-- Add filter panel to the last rendered element -->            <div class="has-feedback" style="padding:0 4px 4px 4px;">                <span style="direction: ltr; position: static; display: block;">                    <input id="searchbox" data-ng-model="search.key" type="text"                            placeholder="Filter" autocomplete="off" spellcheck="false"                            style="position: relative; vertical-align: top;" class="form-control tt-input">                </span>                <span id="searchicon" class="fa form-control-feedback fa-filter"></span>            </div>            <!--<input style="padding:4px;" class=" form-control" data-ng-model="search" placeholder="...">-->            <table id="searchTextResults" class="table table-condensed">                <tr popover="{{(item.description) ? item.description : \'\'}}"                    popover-placement="left"                    popover-trigger="mouseenter"                    popover-append-to-body="true"                    data-ng-repeat="item in section.properties | filter:search">                    <td><a class="fa fa-filter makeNarrow" data-ng-show="item.canFilter" data-ng-click="vm.$layerService.setFilter(item)"></a></td>                    <td><a class="fa fa-eye makeNarrow" data-ng-show="item.canStyle" data-ng-click="vm.$layerService.setStyle(item)"></a></td>                    <td>{{item.key}}</td>                    <td class="text-right" data-ng-bind-html="vm.toTrusted(item.value)"></td>                </tr>            </table>        </div>    </div></div>';
 })(FeatureProps || (FeatureProps = {}));
 var FeatureProps;
 (function (FeatureProps) {
@@ -702,8 +713,6 @@ var FeatureProps;
 })(FeatureProps || (FeatureProps = {}));
 var FeatureProps;
 (function (FeatureProps) {
-    var StringExt = csComp.StringExt;
-
     var FeaturePropsOptions = (function () {
         function FeaturePropsOptions(position) {
             this.position = position;
@@ -736,7 +745,7 @@ var FeatureProps;
             this.sectionIcon = sectionIcon;
         }
         CallOutSection.prototype.showSectionIcon = function () {
-            return !StringExt.isNullOrEmpty(this.sectionIcon);
+            return !csComp.StringExt.isNullOrEmpty(this.sectionIcon);
         };
 
         CallOutSection.prototype.addProperty = function (key, value, property, canFilter, canStyle, feature, isFilter, description, meta) {
@@ -789,23 +798,23 @@ var FeatureProps;
                     var callOutSection = _this.getOrCreateCallOutSection(mi.section) || infoCallOutSection;
                     callOutSection.metaInfos[mi.label] = mi;
                     var text = feature.properties[mi.label];
-                    if (!StringExt.isNullOrEmpty(text) && !$.isNumeric(text))
+                    if (!csComp.StringExt.isNullOrEmpty(text) && !$.isNumeric(text))
                         text = text.replace(/&amp;/g, '&');
 
                     //if (mi.stringFormat)
-                    //    text = StringExt.format(mi.stringFormat, text);
-                    if (StringExt.isNullOrEmpty(text))
+                    //    text = csComp.StringExt.format(mi.stringFormat, text);
+                    if (csComp.StringExt.isNullOrEmpty(text))
                         return;
                     switch (mi.type) {
                         case "bbcode":
-                            if (!StringExt.isNullOrEmpty(mi.stringFormat))
+                            if (!csComp.StringExt.isNullOrEmpty(mi.stringFormat))
                                 text = String.format(mi.stringFormat, text);
                             displayValue = XBBCODE.process({ text: text }).html;
                             break;
                         case "number":
                             if (!$.isNumeric(text))
                                 displayValue = text;
-                            else if (StringExt.isNullOrEmpty(mi.stringFormat))
+                            else if (csComp.StringExt.isNullOrEmpty(mi.stringFormat))
                                 displayValue = text.toString();
                             else
                                 displayValue = String.format(mi.stringFormat, parseFloat(text));
@@ -816,7 +825,7 @@ var FeatureProps;
                     }
 
                     // Skip empty, non-editable values
-                    if (!mi.canEdit && StringExt.isNullOrEmpty(displayValue))
+                    if (!mi.canEdit && csComp.StringExt.isNullOrEmpty(displayValue))
                         return;
 
                     var canFilter = (mi.type == "number" || mi.type == "text");
@@ -853,7 +862,7 @@ var FeatureProps;
         //    }
         //}
         CallOut.prototype.getOrCreateCallOutSection = function (sectionTitle) {
-            if (StringExt.isNullOrEmpty(sectionTitle)) {
+            if (csComp.StringExt.isNullOrEmpty(sectionTitle)) {
                 return null;
             }
             if (sectionTitle in this.sections)
@@ -867,11 +876,11 @@ var FeatureProps;
         */
         CallOut.prototype.setTitle = function () {
             var title;
-            if (this.type == null || this.type.style == null || StringExt.isNullOrEmpty(this.type.style.nameLabel))
+            if (this.type == null || this.type.style == null || csComp.StringExt.isNullOrEmpty(this.type.style.nameLabel))
                 title = this.feature.properties['Name'];
             else
                 title = this.feature.properties[this.type.style.nameLabel];
-            if (!StringExt.isNullOrEmpty(title) && !$.isNumeric(title))
+            if (!csComp.StringExt.isNullOrEmpty(title) && !$.isNumeric(title))
                 this.title = title.replace(/&amp;/g, '&');
         };
         return CallOut;
@@ -975,19 +984,21 @@ var FeatureProps;
             };
 
             $scope.autocollapse(true); // when document first loads
+            $scope.tabs = $('#featureTabs');
+            $scope.tabScrollDelta = $scope.tabs.outerWidth();
 
             $('#leftArr').click(function () {
-                console.log('leftArr');
-                var tabs = $('#featureTabs');
-                var current = parseFloat(tabs.css('margin-left'));
+                //console.log('leftArr');
+                //var tabs = $('#featureTabs');
+                var current = parseFloat($scope.tabs.css('margin-left'));
                 var min = 20;
-                var step = 40;
+                var nextPos = $scope.tabScrollDelta;
 
-                if (current - step < min) {
-                    step = current - min;
+                if (current + nextPos > min) {
+                    nextPos = min - current;
                 }
 
-                tabs.animate({ 'margin-left': '-=' + step + 'px' }, 'slow', function () {
+                $scope.tabs.animate({ 'margin-left': '+=' + nextPos + 'px' }, 'slow', function () {
                     //                    console.log('rightarr hide');
                     $('#rightArr').show();
                     $('#leftArr').show();
@@ -996,9 +1007,13 @@ var FeatureProps;
             });
 
             $('#rightArr').click(function () {
-                var tabs = $('#featureTabs');
-                var diff = widthOfList() - tabs.outerWidth() + 30;
-                tabs.animate({ 'margin-left': '-=' + diff + 'px' }, 'slow', function () {
+                //var tabs = $('#featureTabs');
+                var max = widthOfList() - $scope.tabs.outerWidth() + 30;
+                var current = Math.abs(parseFloat($scope.tabs.css('margin-left')));
+                var nextPos = $scope.tabScrollDelta;
+                nextPos = Math.min(max, nextPos);
+
+                $scope.tabs.animate({ 'margin-left': '-=' + nextPos + 'px' }, 'slow', function () {
                     $('#leftArr').show();
                     $('#rightArr').show();
 
@@ -1782,6 +1797,322 @@ var Helpers;
     })(Helpers.Resize || (Helpers.Resize = {}));
     var Resize = Helpers.Resize;
 })(Helpers || (Helpers = {}));
+var csComp;
+(function (csComp) {
+    (function (Mca) {
+        var McaCtrl = (function () {
+            function McaCtrl($scope, $layerService, messageBusService) {
+                this.$scope = $scope;
+                this.$layerService = $layerService;
+                this.messageBusService = messageBusService;
+                this.mcas = [];
+                $scope.vm = this;
+
+                var mca = new Mca.Models.Mca();
+                mca.title = 'Zelfredzaamheid';
+                mca.description = 'Analyse van de zelfredzaamheid van een gemeente.';
+                mca.label = 'mca_zelfredzaamheid';
+                mca.stringFormat = '{0:0.0}';
+                mca.rankTitle = 'Rang';
+                mca.rankFormat = '{0} van {1}';
+                mca.userWeightMax = 10;
+                mca.featureIds = ['cities_Default'];
+
+                var criterion = new Mca.Models.Criterion();
+                criterion.label = 'p_00_14_jr';
+                criterion.color = 'green';
+                criterion.scores = '[0,0 20,1]';
+                criterion.userWeight = 1;
+                mca.criteria.push(criterion);
+
+                criterion = new Mca.Models.Criterion();
+                criterion.label = 'p_65_eo_jr';
+                criterion.color = 'red';
+                criterion.scores = '[0,0 25,1]';
+                criterion.userWeight = 3;
+                mca.criteria.push(criterion);
+                this.mcas.push(mca);
+            }
+            /** Based on the currently loaded features, which MCA can we use */
+            McaCtrl.prototype.availableMca = function () {
+                var _this = this;
+                this.mca = null;
+                var availableMcas = [];
+                this.mcas.forEach(function (m) {
+                    m.featureIds.forEach(function (featureId) {
+                        if (availableMcas.indexOf(m) < 0 && featureId in _this.$layerService.featureTypes) {
+                            availableMcas.push(m);
+                            var featureType = _this.$layerService.featureTypes[featureId];
+                            _this.applyPropertyInfoToCriteria(m, featureType);
+                        }
+                    });
+                });
+                if (availableMcas.length > 0)
+                    this.mca = availableMcas[0];
+                return availableMcas;
+            };
+
+            McaCtrl.prototype.calculateMca = function () {
+                var _this = this;
+                if (!this.mca)
+                    return;
+                var mca = this.mca;
+                mca.featureIds.forEach(function (featureId) {
+                    if (!(featureId in _this.$layerService.featureTypes))
+                        return;
+                    _this.addPropertyInfo(featureId, mca);
+                    var features = [];
+                    _this.$layerService.project.features.forEach(function (feature) {
+                        features.push(feature);
+                    });
+                    mca.updatePla(features);
+                    mca.calculateWeights();
+                    _this.$layerService.project.features.forEach(function (feature) {
+                        var score = mca.getScore(feature);
+                        feature.properties[mca.label] = score;
+                    });
+                });
+            };
+
+            McaCtrl.prototype.applyPropertyInfoToCriteria = function (mca, featureType) {
+                mca.criteria.forEach(function (criterion) {
+                    var label = criterion.label;
+                    featureType.metaInfoData.forEach(function (propInfo) {
+                        if (propInfo.label === label) {
+                            criterion.title = propInfo.title;
+                            criterion.description = propInfo.description;
+                        }
+                    });
+                });
+            };
+
+            McaCtrl.prototype.addPropertyInfo = function (featureId, mca) {
+                var featureType = this.$layerService.featureTypes[featureId];
+                if (featureType.metaInfoData.reduce(function (prevValue, curItem) {
+                    return prevValue || (curItem.label === mca.label);
+                }, false))
+                    return;
+                var mi = new csComp.GeoJson.MetaInfo();
+                mi.title = mca.title;
+                mi.label = mca.label;
+                mi.type = 'number';
+                mi.maxValue = 1;
+                mi.minValue = 0;
+                mi.description = mca.description;
+                mi.stringFormat = mca.stringFormat;
+                mi.section = mca.section || 'Info';
+                featureType.metaInfoData.push(mi);
+            };
+            McaCtrl.$inject = [
+                '$scope',
+                'layerService',
+                'messageBusService'
+            ];
+            return McaCtrl;
+        })();
+        Mca.McaCtrl = McaCtrl;
+    })(csComp.Mca || (csComp.Mca = {}));
+    var Mca = csComp.Mca;
+})(csComp || (csComp = {}));
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var csComp;
+(function (csComp) {
+    (function (_Mca) {
+        (function (Models) {
+            var Criterion = (function () {
+                function Criterion() {
+                    /** Specified weight by the user */
+                    this.userWeight = 1;
+                    this.criteria = [];
+                    /** Piece-wise linear approximation of the scoring function by a set of x and y points */
+                    this.isPlaUpdated = false;
+                    this.x = [];
+                    this.y = [];
+                }
+                Criterion.prototype.requiresMinimum = function () {
+                    return this.scores && this.scores.indexOf('min') >= 0;
+                };
+
+                Criterion.prototype.requiresMaximum = function () {
+                    return this.scores && this.scores.indexOf('max') >= 0;
+                };
+
+                Criterion.prototype.getTitle = function () {
+                    if (this.title)
+                        return this.title;
+                    return this.label;
+                };
+
+                /**
+                * Update the piecewise linear approximation (PLA) of the scoring (a.k.a. user) function,
+                * which translates a property value to a MCA value in the range [0,1] using all features.
+                */
+                Criterion.prototype.updatePla = function (features) {
+                    var _this = this;
+                    if (this.isPlaUpdated)
+                        return;
+
+                    // Replace min and max by their values:
+                    var scores = this.scores;
+                    if (!scores) {
+                        if (this.criteria.length > 0) {
+                            this.criteria.forEach(function (criterion) {
+                                criterion.updatePla(features);
+                            });
+                        }
+                        return;
+                    }
+                    var propValues = [];
+                    if (this.requiresMaximum() || this.requiresMinimum()) {
+                        features.forEach(function (feature) {
+                            if (_this.label in feature.properties) {
+                                // The property is available
+                                propValues.push(feature.properties[_this.label]);
+                            }
+                        });
+                    }
+                    if (this.requiresMaximum()) {
+                        scores.replace('max', Math.max.apply(null, propValues));
+                    }
+                    if (this.requiresMinimum()) {
+                        scores.replace('min', Math.min.apply(null, propValues));
+                    }
+
+                    // Regex to split the scores: [^\d\.]+ and remove empty entries
+                    var pla = scores.split(/[^\d\.]+/).filter(function (item) {
+                        return item.length > 0;
+                    });
+
+                    // Test that we have an equal number of x and y,
+                    if (pla.length % 2 != 0)
+                        throw Error(this.label + ' does not have an even (x,y) pair in scores.');
+
+                    for (var i = 0; i < pla.length / 2; i++) {
+                        var x = parseFloat(pla[2 * i]);
+                        if (i > 0 && this.x[i - 1] > x)
+                            throw Error(this.label + ': x should increment continuously.');
+                        this.x.push(x);
+
+                        var y = parseFloat(pla[2 * i + 1]);
+                        if (y < 0)
+                            y = 0;
+                        else if (y > 1)
+                            y = 1;
+                        this.y.push(y);
+                    }
+                    this.isPlaUpdated = true;
+                };
+
+                Criterion.prototype.getScore = function (feature, criterion) {
+                    var _this = this;
+                    if (!this.isPlaUpdated)
+                        throw ('Error: PLA must be updated!');
+                    if (!criterion)
+                        criterion = this;
+                    if (criterion.criteria.length == 0) {
+                        // End point: compute the score for each feature
+                        var y = 0;
+                        if (criterion.label in feature.properties) {
+                            // The property is available
+                            var x = feature.properties[criterion.label];
+                            if (x < criterion.x[0])
+                                return criterion.y[0];
+                            var last = criterion.x.length - 1;
+                            if (x > criterion.x[last])
+                                return criterion.y[last];
+                            for (var k in criterion.x) {
+                                if (x < criterion.x[k]) {
+                                    // Found relative position of x in criterion.x
+                                    // TODO Use linear interpolation
+                                    var x0 = criterion.x[k - 1];
+                                    var x1 = criterion.x[k];
+                                    var y0 = criterion.y[k - 1];
+                                    var y1 = criterion.y[k];
+
+                                    //var x0 = criterion.x[Math.max(0, k - 1)];
+                                    //var x1 = criterion.x[Math.min(last, k)];
+                                    //var y0 = criterion.y[Math.max(0, k - 1)];
+                                    //var y1 = criterion.y[Math.min(last, k)];
+                                    return (y1 - y0) * (x - x0) / (x1 - x0);
+                                }
+                            }
+                        } else {
+                            return 0;
+                        }
+                    } else {
+                        // Sum all the sub-criteria.
+                        var finalScore = 0;
+                        this.criteria.forEach(function (crit) {
+                            finalScore += crit.weight * _this.getScore(feature, crit);
+                        });
+                        return this.weight * finalScore;
+                    }
+                    return 0;
+                };
+                return Criterion;
+            })();
+            Models.Criterion = Criterion;
+
+            // NOTE: When extending a base class, make sure that the base class has been defined already.
+            var Mca = (function (_super) {
+                __extends(Mca, _super);
+                function Mca() {
+                    _super.call(this);
+                    /** Maximum number of star ratings to use to set the weight */
+                    this.userWeightMax = 5;
+                    /** Applicable feature ids as a string[]. */
+                    this.featureIds = [];
+                    this.weight = 1;
+                    this.isPlaUpdated = true;
+                }
+                Mca.prototype.updatePla = function (features) {
+                    this.criteria.forEach(function (criterion) {
+                        criterion.updatePla(features);
+                    });
+                };
+
+                //public calculateWeights(criteria?: Criterion[]): void {
+                //    if (!criteria) criteria = this.criteria;
+                //    if (criteria.length === 0) return;
+                //    var totalWeight = 0;
+                //    criteria.forEach((c) => {
+                //        totalWeight += c.userWeight;
+                //    });
+                //    if (totalWeight == 0) return;
+                //    criteria.forEach((c) => {
+                //        c.weight = c.userWeight / totalWeight;
+                //    });
+                //}
+                Mca.prototype.calculateWeights = function (criteria) {
+                    if (!criteria)
+                        criteria = this.criteria;
+                    var totalWeight = 0;
+                    for (var k in criteria) {
+                        var crit = criteria[k];
+                        if (crit.criteria.length > 0)
+                            this.calculateWeights(crit.criteria);
+                        totalWeight += crit.userWeight;
+                    }
+                    if (totalWeight > 0) {
+                        for (var j in criteria) {
+                            var critj = criteria[j];
+                            critj.weight = critj.userWeight / totalWeight;
+                        }
+                    }
+                };
+                return Mca;
+            })(Criterion);
+            Models.Mca = Mca;
+        })(_Mca.Models || (_Mca.Models = {}));
+        var Models = _Mca.Models;
+    })(csComp.Mca || (csComp.Mca = {}));
+    var Mca = csComp.Mca;
+})(csComp || (csComp = {}));
 var csComp;
 (function (csComp) {
     (function (Services) {
