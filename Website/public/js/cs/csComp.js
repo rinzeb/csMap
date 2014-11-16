@@ -1725,6 +1725,84 @@ var csComp;
     })(csComp.Services || (csComp.Services = {}));
     var Services = csComp.Services;
 })(csComp || (csComp = {}));
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var csComp;
+(function (csComp) {
+    (function (Helpers) {
+        var PieData = (function () {
+            function PieData() {
+            }
+            return PieData;
+        })();
+        Helpers.PieData = PieData;
+
+        var AstorPieData = (function (_super) {
+            __extends(AstorPieData, _super);
+            function AstorPieData() {
+                _super.apply(this, arguments);
+            }
+            return AstorPieData;
+        })(PieData);
+        Helpers.AstorPieData = AstorPieData;
+
+        var Plot = (function () {
+            function Plot() {
+            }
+            Plot.drawPie = function (pieRadius, data, colorScale, parentId, svgId) {
+                if (typeof colorScale === "undefined") { colorScale = 'Reds'; }
+                if (typeof parentId === "undefined") { parentId = 'mcaPieChart'; }
+                if (typeof svgId === "undefined") { svgId = 'the_SVG_ID'; }
+                Plot.clearSvg(svgId);
+
+                if (!data)
+                    return;
+
+                var width = pieRadius, height = pieRadius, radius = Math.min(width, height) / 2, innerRadius = 0;
+
+                var pie = d3.layout.pie().sort(null).value(function (d) {
+                    return d.weight;
+                });
+
+                var tip = d3.tip().attr('class', 'd3-tip').offset([0, 0]).html(function (d) {
+                    return '<strong>' + d.data.label + ": </strong><span style='color:orangered'>" + Math.round(d.data.weight * 100) + "%</span>";
+                });
+
+                var arc = d3.svg.arc().innerRadius(innerRadius).outerRadius(radius);
+
+                var outlineArc = d3.svg.arc().innerRadius(innerRadius).outerRadius(radius);
+
+                var svg = d3.select('#' + parentId).append("svg").attr("id", svgId).attr("width", width).attr("height", height).append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+                svg.call(tip);
+
+                var colors = chroma.scale(colorScale).domain([0, data.length - 1], data.length);
+                var path = svg.selectAll(".solidArc").data(pie(data)).enter().append("path").attr("fill", function (d, i) {
+                    return d.data.color || colors(i).hex();
+                }).attr("class", "solidArc").attr("stroke", "gray").attr("d", arc).on('mouseover', function (d, i) {
+                    tip.show(d, i);
+                    console.log(i);
+                }).on('mouseout', tip.hide);
+
+                var outerPath = svg.selectAll(".outlineArc").data(pie(data)).enter().append("path").attr("fill", "none").attr("stroke", "gray").attr("class", "outlineArc").attr("d", outlineArc);
+            };
+
+            Plot.clearSvg = function (svgId) {
+                var svgElement = d3.select('#' + svgId);
+                if (svgElement)
+                    svgElement.remove();
+            };
+            Plot.pieColors = ["#fff7ec", "#fee8c8", "#fdd49e", "#fdbb84", "#fc8d59", "#ef6548", "#d7301f", "#b30000", "#7f0000"];
+            return Plot;
+        })();
+        Helpers.Plot = Plot;
+    })(csComp.Helpers || (csComp.Helpers = {}));
+    var Helpers = csComp.Helpers;
+})(csComp || (csComp = {}));
 var Helpers;
 (function (Helpers) {
     (function (Resize) {
@@ -1800,13 +1878,23 @@ var Helpers;
 var csComp;
 (function (csComp) {
     (function (Mca) {
+        var Plot = csComp.Helpers.Plot;
+
         var McaCtrl = (function () {
             function McaCtrl($scope, $layerService, messageBusService) {
+                var _this = this;
                 this.$scope = $scope;
                 this.$layerService = $layerService;
                 this.messageBusService = messageBusService;
                 this.mcas = [];
+                this.availableMcas = [];
                 $scope.vm = this;
+
+                messageBusService.subscribe('layer', function (title, layer) {
+                    console.log(title);
+                    console.log(layer.title);
+                    _this.availableMca();
+                });
 
                 var mca = new Mca.Models.Mca();
                 mca.title = 'Zelfredzaamheid';
@@ -1815,7 +1903,7 @@ var csComp;
                 mca.stringFormat = '{0:0.0}';
                 mca.rankTitle = 'Rang';
                 mca.rankFormat = '{0} van {1}';
-                mca.userWeightMax = 10;
+                mca.userWeightMax = 5;
                 mca.featureIds = ['cities_Default'];
 
                 var criterion = new Mca.Models.Criterion();
@@ -1832,24 +1920,78 @@ var csComp;
                 criterion.userWeight = 3;
                 mca.criteria.push(criterion);
                 this.mcas.push(mca);
+
+                mca = new Mca.Models.Mca();
+                mca.title = 'test';
+                mca.label = 'mca_test';
+                mca.stringFormat = '{0:0.0}';
+                mca.rankTitle = 'Rang';
+                mca.rankFormat = '{0} van {1}';
+                mca.userWeightMax = 3;
+                mca.featureIds = ['cities_Default'];
+
+                criterion = new Mca.Models.Criterion();
+                criterion.label = 'p_15_24_jr';
+                criterion.color = 'green';
+                criterion.scores = '[0,0 20,1]';
+                criterion.userWeight = 1;
+                mca.criteria.push(criterion);
+
+                criterion = new Mca.Models.Criterion();
+                criterion.label = 'p_65_eo_jr';
+                criterion.color = 'red';
+                criterion.scores = '[0,0 25,1]';
+                criterion.userWeight = 3;
+                mca.criteria.push(criterion);
+                this.mcas.push(mca);
+
+                $scope.$watch('vm.mca', function (d) {
+                    if (_this.mca)
+                        _this.drawPieChart();
+                    // console.log(JSON.stringify(d));
+                }, true);
             }
+            McaCtrl.prototype.drawPieChart = function (criterion) {
+                var currentLevel;
+                this.mca.update();
+                if (typeof criterion === 'undefined' || this.mca.criteria.indexOf(criterion) >= 0) {
+                    currentLevel = this.mca.criteria;
+                } else {
+                    this.mca.criteria.forEach(function (c) {
+                        if (c.criteria.indexOf(criterion) >= 0)
+                            currentLevel = c.criteria;
+                    });
+                }
+                if (!currentLevel)
+                    return;
+                var data = [];
+                var i = 0;
+                currentLevel.forEach(function (c) {
+                    var pieData = new csComp.Helpers.PieData();
+                    pieData.id = i++;
+                    pieData.label = c.getTitle();
+                    pieData.weight = c.weight;
+                    data.push(pieData);
+                });
+                Plot.drawPie(100, data, 'Reds', 'mcaPieChart');
+            };
+
             /** Based on the currently loaded features, which MCA can we use */
             McaCtrl.prototype.availableMca = function () {
                 var _this = this;
                 this.mca = null;
-                var availableMcas = [];
+                this.availableMcas = [];
                 this.mcas.forEach(function (m) {
                     m.featureIds.forEach(function (featureId) {
-                        if (availableMcas.indexOf(m) < 0 && featureId in _this.$layerService.featureTypes) {
-                            availableMcas.push(m);
+                        if (_this.availableMcas.indexOf(m) < 0 && featureId in _this.$layerService.featureTypes) {
+                            _this.availableMcas.push(m);
                             var featureType = _this.$layerService.featureTypes[featureId];
                             _this.applyPropertyInfoToCriteria(m, featureType);
                         }
                     });
                 });
-                if (availableMcas.length > 0)
-                    this.mca = availableMcas[0];
-                return availableMcas;
+                if (this.availableMcas.length > 0)
+                    this.mca = this.availableMcas[0];
             };
 
             McaCtrl.prototype.calculateMca = function () {
@@ -1866,7 +2008,7 @@ var csComp;
                         features.push(feature);
                     });
                     mca.updatePla(features);
-                    mca.calculateWeights();
+                    mca.update();
                     _this.$layerService.project.features.forEach(function (feature) {
                         var score = mca.getScore(feature);
                         feature.properties[mca.label] = score;
@@ -1884,6 +2026,9 @@ var csComp;
                         }
                     });
                 });
+            };
+
+            McaCtrl.prototype.createMca = function () {
             };
 
             McaCtrl.prototype.addPropertyInfo = function (featureId, mca) {
@@ -1914,12 +2059,6 @@ var csComp;
     })(csComp.Mca || (csComp.Mca = {}));
     var Mca = csComp.Mca;
 })(csComp || (csComp = {}));
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
 var csComp;
 (function (csComp) {
     (function (_Mca) {
@@ -2088,6 +2227,11 @@ var csComp;
                 //        c.weight = c.userWeight / totalWeight;
                 //    });
                 //}
+                Mca.prototype.update = function () {
+                    this.calculateWeights();
+                    this.setColors();
+                };
+
                 Mca.prototype.calculateWeights = function (criteria) {
                     if (!criteria)
                         criteria = this.criteria;
@@ -2104,6 +2248,24 @@ var csComp;
                             critj.weight = critj.userWeight / totalWeight;
                         }
                     }
+                };
+
+                /** Set the colors of all criteria and sub-criteria */
+                Mca.prototype.setColors = function () {
+                    var redColors = chroma.scale('Reds').domain([0, this.criteria.length - 1], this.criteria.length);
+                    var totalSubcrit = 0;
+                    var i = 0;
+                    this.criteria.forEach(function (c) {
+                        totalSubcrit += c.criteria.length;
+                        c.color = redColors(i++).hex();
+                    });
+                    var blueColors = chroma.scale('Blues').domain([0, totalSubcrit - 1], totalSubcrit);
+                    i = 0;
+                    this.criteria.forEach(function (c) {
+                        c.criteria.forEach(function (crit) {
+                            crit.color = blueColors(i++).hex();
+                        });
+                    });
                 };
                 return Mca;
             })(Criterion);

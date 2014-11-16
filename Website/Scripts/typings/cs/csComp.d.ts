@@ -507,6 +507,22 @@ declare module csComp.Services {
         public registerEvents(evtnames: string[]): void;
     }
 }
+declare module csComp.Helpers {
+    class PieData {
+        public id: number;
+        public label: string;
+        public color: string;
+        public weight: number;
+    }
+    class AstorPieData extends PieData {
+        public score: number;
+    }
+    class Plot {
+        static pieColors: string[];
+        static drawPie(pieRadius: number, data?: any, colorScale?: string, parentId?: string, svgId?: string): void;
+        static clearSvg(svgId: string): void;
+    }
+}
 declare module Helpers.Resize {
     /**
     * Module
@@ -521,14 +537,17 @@ declare module csComp.Mca {
         private $scope;
         private $layerService;
         private messageBusService;
-        private mca;
-        private mcas;
+        public mca: Models.Mca;
+        public mcas: Models.Mca[];
+        public availableMcas: Models.Mca[];
         static $inject: string[];
         constructor($scope: IMcaScope, $layerService: Services.LayerService, messageBusService: Services.MessageBusService);
+        public drawPieChart(criterion?: Models.Criterion): void;
         /** Based on the currently loaded features, which MCA can we use */
-        public availableMca(): Models.Mca[];
+        public availableMca(): void;
         public calculateMca(): void;
         private applyPropertyInfoToCriteria(mca, featureType);
+        public createMca(): void;
         private addPropertyInfo(featureId, mca);
     }
 }
@@ -581,7 +600,10 @@ declare module csComp.Mca.Models {
         public featureIds: string[];
         constructor();
         public updatePla(features: GeoJson.Feature[]): void;
-        public calculateWeights(criteria?: Criterion[]): void;
+        public update(): void;
+        private calculateWeights(criteria?);
+        /** Set the colors of all criteria and sub-criteria */
+        private setColors();
     }
 }
 declare module csComp.Services {

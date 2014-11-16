@@ -63,14 +63,9 @@
     <Content Include="public\css\pnotify.custom.min.css" />
     <Content Include="public\css\style.css" />
     <Content Include="public\css\xbbcode.css" />
-    <Content Include="public\data\projects\ais\layer1.json" />
-    <Content Include="public\data\projects\ais\project.json" />
     <Content Include="public\data\projects\projects.json">
       <Publish>True</Publish>
     </Content>
-    <Content Include="public\data\projects\vws\project.json" />
-    <Content Include="public\data\projects\vws\Ziekenhuizen.json" />
-    <Content Include="public\data\projects\vws_private\project.json" />
     <Content Include="public\images\ziekenhuis.png" />
     <Content Include="public\includes\ROsanswebtextregular.eot" />
     <Content Include="public\includes\ROsanswebtextregular.ttf" />
@@ -87,9 +82,6 @@
     <Folder Include="public\app\" />
     <Folder Include="public\data\" />
     <Folder Include="public\data\projects\" />
-    <Folder Include="public\data\projects\ais\" />
-    <Folder Include="public\data\projects\vws_private\" />
-    <Folder Include="public\data\projects\vws\" />
     <Folder Include="public\images\" />
     <Folder Include="public\includes\" />
     <Folder Include="public\js\" />
