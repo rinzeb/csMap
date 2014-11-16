@@ -798,31 +798,7 @@ var FeatureProps;
                     var callOutSection = _this.getOrCreateCallOutSection(mi.section) || infoCallOutSection;
                     callOutSection.metaInfos[mi.label] = mi;
                     var text = feature.properties[mi.label];
-                    if (!csComp.StringExt.isNullOrEmpty(text) && !$.isNumeric(text))
-                        text = text.replace(/&amp;/g, '&');
-
-                    //if (mi.stringFormat)
-                    //    text = csComp.StringExt.format(mi.stringFormat, text);
-                    if (csComp.StringExt.isNullOrEmpty(text))
-                        return;
-                    switch (mi.type) {
-                        case "bbcode":
-                            if (!csComp.StringExt.isNullOrEmpty(mi.stringFormat))
-                                text = String.format(mi.stringFormat, text);
-                            displayValue = XBBCODE.process({ text: text }).html;
-                            break;
-                        case "number":
-                            if (!$.isNumeric(text))
-                                displayValue = text;
-                            else if (csComp.StringExt.isNullOrEmpty(mi.stringFormat))
-                                displayValue = text.toString();
-                            else
-                                displayValue = String.format(mi.stringFormat, parseFloat(text));
-                            break;
-                        default:
-                            displayValue = text;
-                            break;
-                    }
+                    displayValue = CallOut.convertPropertyInfo(mi, text);
 
                     // Skip empty, non-editable values
                     if (!mi.canEdit && csComp.StringExt.isNullOrEmpty(displayValue))
@@ -832,9 +808,7 @@ var FeatureProps;
                     var canStyle = (mi.type == "number");
                     if (mi.filterType != null)
                         canFilter = mi.filterType.toLowerCase() != "none";
-
                     var isFilter = false;
-
                     if (mi.visibleInCallOut)
                         callOutSection.addProperty(mi.title, displayValue, mi.label, canFilter, canStyle, feature, isFilter, mi.description, mi);
                     searchCallOutSection.addProperty(mi.title, displayValue, mi.label, canFilter, canStyle, feature, isFilter, mi.description);
@@ -845,6 +819,33 @@ var FeatureProps;
             if (searchCallOutSection.properties.length > 0)
                 this.sections['Zzz Search'] = searchCallOutSection;
         }
+        CallOut.convertPropertyInfo = function (mi, text) {
+            var displayValue;
+            if (!csComp.StringExt.isNullOrEmpty(text) && !$.isNumeric(text))
+                text = text.replace(/&amp;/g, '&');
+            if (csComp.StringExt.isNullOrEmpty(text))
+                return '';
+            switch (mi.type) {
+                case "bbcode":
+                    if (!csComp.StringExt.isNullOrEmpty(mi.stringFormat))
+                        text = String.format(mi.stringFormat, text);
+                    displayValue = XBBCODE.process({ text: text }).html;
+                    break;
+                case "number":
+                    if (!$.isNumeric(text))
+                        displayValue = text;
+                    else if (csComp.StringExt.isNullOrEmpty(mi.stringFormat))
+                        displayValue = text.toString();
+                    else
+                        displayValue = String.format(mi.stringFormat, parseFloat(text));
+                    break;
+                default:
+                    displayValue = text;
+                    break;
+            }
+            return displayValue;
+        };
+
         ///**
         // * In case we are dealing with a regular JSON file without type information, create a default type.
         // */
@@ -875,13 +876,25 @@ var FeatureProps;
         * Set the title of the callout to the title of the feature.
         */
         CallOut.prototype.setTitle = function () {
+            this.title = CallOut.title(this.type, this.feature);
+            //var title: string;
+            //if (this.type == null || this.type.style == null || csComp.StringExt.isNullOrEmpty(this.type.style.nameLabel))
+            //    title = this.feature.properties['Name'];
+            //else
+            //    title = this.feature.properties[this.type.style.nameLabel];
+            //if (!csComp.StringExt.isNullOrEmpty(title) && !$.isNumeric(title))
+            //    this.title = title.replace(/&amp;/g, '&');
+        };
+
+        CallOut.title = function (type, feature) {
             var title;
-            if (this.type == null || this.type.style == null || csComp.StringExt.isNullOrEmpty(this.type.style.nameLabel))
-                title = this.feature.properties['Name'];
+            if (type == null || type.style == null || csComp.StringExt.isNullOrEmpty(type.style.nameLabel))
+                title = feature.properties['Name'];
             else
-                title = this.feature.properties[this.type.style.nameLabel];
+                title = feature.properties[type.style.nameLabel];
             if (!csComp.StringExt.isNullOrEmpty(title) && !$.isNumeric(title))
-                this.title = title.replace(/&amp;/g, '&');
+                title = title.replace(/&amp;/g, '&');
+            return title;
         };
         return CallOut;
     })();
@@ -1785,7 +1798,6 @@ var csComp;
                     return d.data.color || colors(i).hex();
                 }).attr("class", "solidArc").attr("stroke", "gray").attr("d", arc).on('mouseover', function (d, i) {
                     tip.show(d, i);
-                    console.log(i);
                 }).on('mouseout', tip.hide);
 
                 var outerPath = svg.selectAll(".outlineArc").data(pie(data)).enter().append("path").attr("fill", "none").attr("stroke", "gray").attr("class", "outlineArc").attr("d", outlineArc);
@@ -1888,13 +1900,29 @@ var csComp;
                 this.messageBusService = messageBusService;
                 this.mcas = [];
                 this.availableMcas = [];
+                this.featureMessageReceived = function (title, feature) {
+                    switch (title) {
+                        case "onFeatureSelect":
+                            _this.updateSelectedFeature(feature);
+                            break;
+                        case "onFeatureDeselect":
+                            _this.selectedFeature = null;
+                            break;
+                        default:
+                            console.log(title);
+                            break;
+                    }
+                    if (_this.$scope.$root.$$phase != '$apply' && _this.$scope.$root.$$phase != '$digest') {
+                        _this.$scope.$apply();
+                    }
+                };
                 $scope.vm = this;
 
                 messageBusService.subscribe('layer', function (title, layer) {
-                    console.log(title);
-                    console.log(layer.title);
                     _this.availableMca();
                 });
+
+                messageBusService.subscribe("feature", this.featureMessageReceived);
 
                 var mca = new Mca.Models.Mca();
                 mca.title = 'Zelfredzaamheid';
@@ -1951,6 +1979,24 @@ var csComp;
                     // console.log(JSON.stringify(d));
                 }, true);
             }
+            McaCtrl.prototype.updateSelectedFeature = function (feature) {
+                if (typeof feature === 'undefined' || feature == null)
+                    return;
+                this.selectedFeature = feature;
+                if (this.mca.label in feature.properties) {
+                    var mi = new csComp.GeoJson.MetaInfo();
+                    mi.label = this.mca.label;
+                    mi.title = this.mca.title;
+                    mi.type = 'number';
+                    mi.stringFormat = this.mca.stringFormat;
+                    mi.description = this.mca.description;
+                    var displayValue = FeatureProps.CallOut.convertPropertyInfo(mi, feature.properties[mi.label]);
+                    this.selectedProperty = new FeatureProps.CallOutProperty(mi.title, displayValue, mi.label, true, true, feature, false, mi.description);
+                    //console.log(feature);
+                    //this.displayFeature(feature);
+                }
+            };
+
             McaCtrl.prototype.drawPieChart = function (criterion) {
                 var currentLevel;
                 this.mca.update();
@@ -2011,9 +2057,10 @@ var csComp;
                     mca.update();
                     _this.$layerService.project.features.forEach(function (feature) {
                         var score = mca.getScore(feature);
-                        feature.properties[mca.label] = score;
+                        feature.properties[mca.label] = score * 100;
                     });
                 });
+                this.updateSelectedFeature(this.selectedFeature);
             };
 
             McaCtrl.prototype.applyPropertyInfoToCriteria = function (mca, featureType) {

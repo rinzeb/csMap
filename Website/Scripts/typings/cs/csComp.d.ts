@@ -313,11 +313,13 @@ declare module FeatureProps {
         constructor(type: csComp.GeoJson.IFeatureType, feature: csComp.GeoJson.IFeature, metaInfoData: {
             [key: string]: csComp.GeoJson.IMetaInfo;
         });
+        static convertPropertyInfo(mi: csComp.GeoJson.IMetaInfo, text: string): string;
         private getOrCreateCallOutSection(sectionTitle);
         /**
         * Set the title of the callout to the title of the feature.
         */
         private setTitle();
+        static title(type: csComp.GeoJson.IFeatureType, feature: csComp.GeoJson.IFeature): string;
     }
     class FeaturePropsCtrl {
         private $scope;
@@ -537,11 +539,15 @@ declare module csComp.Mca {
         private $scope;
         private $layerService;
         private messageBusService;
+        public selectedFeature: GeoJson.IFeature;
+        public selectedProperty: FeatureProps.CallOutProperty;
         public mca: Models.Mca;
         public mcas: Models.Mca[];
         public availableMcas: Models.Mca[];
         static $inject: string[];
         constructor($scope: IMcaScope, $layerService: Services.LayerService, messageBusService: Services.MessageBusService);
+        private featureMessageReceived;
+        private updateSelectedFeature(feature);
         public drawPieChart(criterion?: Models.Criterion): void;
         /** Based on the currently loaded features, which MCA can we use */
         public availableMca(): void;
