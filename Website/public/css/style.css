@@ -40,20 +40,6 @@ html, body, #container {
 	width: 100%;
 }
 
-.sidebar-wrapper {
-	height: 100%;
-	position: relative;
-	width: 100%;
-}
-
-.sidebar-table {
-	bottom: 0;
-	overflow: auto;
-	position: absolute;
-	top: 124px;
-	width: 100%;
-}
-
 #sidebar {
 	-moz-transition: all 0.25s ease-out;
 	-webkit-transition: all 0.25s ease-out;
@@ -87,13 +73,13 @@ input[type="checkbox"] { margin: 0; }
 }
 
 .sidebar-table {
-	bottom: 0px;
-	left: 0px;
+	bottom: 0;
 	overflow: auto;
 	position: absolute;
-	right: 0px;
-	top: 150px;
 	width: 100%;
+	left: 0;
+	right: 0;
+	top: 150px;
 }
 
 .leaflet-sidebar { z-index: 1020; }
@@ -244,8 +230,6 @@ input[type="checkbox"] { margin: 0; }
 	width: 70px;
 }
 
-		  
-
 .menutoggle-right {
 	-moz-transition: all 0.2s ease-out 0s;
 	-webkit-transition: all 0.2s ease-out 0s;
@@ -269,9 +253,7 @@ input[type="checkbox"] { margin: 0; }
 	position: absolute;
 	top: 50px;
 	z-index: 100;
-}
-
-		 
+}		 
 
 .rightpanel {
     pointer-events:none;
@@ -339,13 +321,11 @@ input[type="checkbox"] { margin: 0; }
     height:35px; 
     padding-top: 5px; 
     margin-top: 1px; 
-    width: 100%; 
     white-space: nowrap; 
     overflow: hidden; 
     text-overflow: ellipsis;
     color: black;
     font-weight: bold;
-    padding-top: 5px;
     font-size: 22px;
 }
 

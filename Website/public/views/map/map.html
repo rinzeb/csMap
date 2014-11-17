@@ -103,7 +103,7 @@ $1$ Right side panel #1#
                 </div>
                 <div data-ng-if="vm.mca">
                     <ul class="list-unstyled">
-                        <li data-ng-click="vm.drawPieChart(criterion)" data-ng-repeat="criterion in vm.mca.criteria">
+                        <li data-ng-click="vm.drawChart(criterion)" data-ng-repeat="criterion in vm.mca.criteria">
                             <div data-ng-style="{'display': 'inline-block', 'width':'10px', 'height':'10px', 'border':'solid 1px black', 'background-color': criterion.color}">
                             </div> 
                             <div style="display: inline-block;">{{criterion.getTitle()}}</div>
