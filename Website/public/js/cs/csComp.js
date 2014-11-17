@@ -839,6 +839,15 @@ var FeatureProps;
                     else
                         displayValue = String.format(mi.stringFormat, parseFloat(text));
                     break;
+                case "rank":
+                    var rank = text.split(',');
+                    if (rank.length != 2)
+                        return text;
+                    if (mi.stringFormat)
+                        displayValue = String.format(mi.stringFormat, rank[0], rank[1]);
+                    else
+                        displayValue = String.format("{0) / {1}", rank[0], rank[1]);
+                    break;
                 default:
                     displayValue = text;
                     break;
@@ -877,13 +886,6 @@ var FeatureProps;
         */
         CallOut.prototype.setTitle = function () {
             this.title = CallOut.title(this.type, this.feature);
-            //var title: string;
-            //if (this.type == null || this.type.style == null || csComp.StringExt.isNullOrEmpty(this.type.style.nameLabel))
-            //    title = this.feature.properties['Name'];
-            //else
-            //    title = this.feature.properties[this.type.style.nameLabel];
-            //if (!csComp.StringExt.isNullOrEmpty(title) && !$.isNumeric(title))
-            //    this.title = title.replace(/&amp;/g, '&');
         };
 
         CallOut.title = function (type, feature) {
@@ -1994,21 +1996,26 @@ var csComp;
                 mca.description = 'Analyse van de zelfredzaamheid van een gemeente.';
                 mca.label = 'mca_zelfredzaamheid';
                 mca.stringFormat = '{0:0.0}';
-                mca.rankTitle = 'Rang';
+                mca.rankTitle = 'Positie';
+                mca.rankDescription = 'Relatieve positie in de lijst.';
                 mca.rankFormat = '{0} van {1}';
                 mca.userWeightMax = 5;
                 mca.featureIds = ['cities_Default'];
 
                 var criterion = new Mca.Models.Criterion();
                 criterion.label = 'p_00_14_jr';
-                criterion.color = 'green';
+                criterion.scores = '[0,0 20,1]';
+                criterion.userWeight = 1;
+                mca.criteria.push(criterion);
+
+                criterion = new Mca.Models.Criterion();
+                criterion.label = 'p_15_24_jr';
                 criterion.scores = '[0,0 20,1]';
                 criterion.userWeight = 1;
                 mca.criteria.push(criterion);
 
                 criterion = new Mca.Models.Criterion();
                 criterion.label = 'p_65_eo_jr';
-                criterion.color = 'red';
                 criterion.scores = '[0,0 25,1]';
                 criterion.userWeight = 3;
                 mca.criteria.push(criterion);
@@ -2025,14 +2032,12 @@ var csComp;
 
                 criterion = new Mca.Models.Criterion();
                 criterion.label = 'p_15_24_jr';
-                criterion.color = 'green';
                 criterion.scores = '[0,0 20,1]';
                 criterion.userWeight = 1;
                 mca.criteria.push(criterion);
 
                 criterion = new Mca.Models.Criterion();
                 criterion.label = 'p_65_eo_jr';
-                criterion.color = 'red';
                 criterion.scores = '[0,0 25,1]';
                 criterion.userWeight = 3;
                 mca.criteria.push(criterion);
@@ -2052,17 +2057,16 @@ var csComp;
                 this.selectedFeature = feature;
                 if (this.mca.label in feature.properties) {
                     this.showFeature = true;
-                    var mi = new csComp.GeoJson.MetaInfo();
-                    mi.label = this.mca.label;
-                    mi.title = this.mca.title;
-                    mi.type = 'number';
-                    mi.stringFormat = this.mca.stringFormat;
-                    mi.description = this.mca.description;
+                    this.properties = [];
+                    var mi = McaCtrl.createMetaInfo(this.mca);
                     var displayValue = FeatureProps.CallOut.convertPropertyInfo(mi, feature.properties[mi.label]);
-                    this.selectedProperty = new FeatureProps.CallOutProperty(mi.title, displayValue, mi.label, true, true, feature, false, mi.description);
+                    this.properties.push(new FeatureProps.CallOutProperty(mi.title, displayValue, mi.label, true, true, feature, false, mi.description));
+                    if (this.mca.rankTitle) {
+                        mi = McaCtrl.createMetaInfoRank(this.mca);
+                        displayValue = FeatureProps.CallOut.convertPropertyInfo(mi, feature.properties[mi.label]);
+                        this.properties.push(new FeatureProps.CallOutProperty(mi.title, displayValue, mi.label, false, false, feature, false, mi.description));
+                    }
                     this.drawChart();
-                    //console.log(feature);
-                    //this.displayFeature(feature);
                 }
             };
 
@@ -2160,10 +2164,34 @@ var csComp;
                     });
                     mca.updatePla(features);
                     mca.update();
+                    var tempScores = [];
+                    var index = 0;
                     _this.$layerService.project.features.forEach(function (feature) {
                         var score = mca.getScore(feature);
+                        if (mca.rankTitle) {
+                            var item = { score: score, index: index++ };
+                            tempScores.push(item);
+                        }
                         feature.properties[mca.label] = score * 100;
                     });
+                    if (mca.rankTitle) {
+                        // Add rank information
+                        tempScores.sort(function (a, b) {
+                            return b.score - a.score;
+                        });
+                        var length = _this.$layerService.project.features.length;
+                        var prevScore = -1;
+                        var rank = 1;
+                        for (var i = 0; i < length; i++) {
+                            var item = tempScores[i];
+
+                            // Assign items with the same value the same rank.
+                            if (item.score != prevScore)
+                                rank = i + 1;
+                            prevScore = item.score;
+                            _this.$layerService.project.features[item.index].properties[mca.label + '#'] = rank + ',' + length;
+                        }
+                    }
                 });
                 this.updateSelectedFeature(this.selectedFeature);
             };
@@ -2189,6 +2217,17 @@ var csComp;
                     return prevValue || (curItem.label === mca.label);
                 }, false))
                     return;
+
+                var mi = McaCtrl.createMetaInfo(mca);
+                featureType.metaInfoData.push(mi);
+
+                if (!mca.rankTitle)
+                    return;
+                mi = McaCtrl.createMetaInfoRank(mca);
+                featureType.metaInfoData.push(mi);
+            };
+
+            McaCtrl.createMetaInfo = function (mca) {
                 var mi = new csComp.GeoJson.MetaInfo();
                 mi.title = mca.title;
                 mi.label = mca.label;
@@ -2198,7 +2237,18 @@ var csComp;
                 mi.description = mca.description;
                 mi.stringFormat = mca.stringFormat;
                 mi.section = mca.section || 'Info';
-                featureType.metaInfoData.push(mi);
+                return mi;
+            };
+
+            McaCtrl.createMetaInfoRank = function (mca) {
+                var mi = new csComp.GeoJson.MetaInfo();
+                mi.title = mca.rankTitle;
+                mi.label = mca.label + '#';
+                mi.type = 'rank';
+                mi.description = mca.rankDescription;
+                mi.stringFormat = mca.rankFormat;
+                mi.section = mca.section || 'Info';
+                return mi;
             };
             McaCtrl.$inject = [
                 '$scope',
@@ -2367,18 +2417,9 @@ var csComp;
                     });
                 };
 
-                //public calculateWeights(criteria?: Criterion[]): void {
-                //    if (!criteria) criteria = this.criteria;
-                //    if (criteria.length === 0) return;
-                //    var totalWeight = 0;
-                //    criteria.forEach((c) => {
-                //        totalWeight += c.userWeight;
-                //    });
-                //    if (totalWeight == 0) return;
-                //    criteria.forEach((c) => {
-                //        c.weight = c.userWeight / totalWeight;
-                //    });
-                //}
+                /**
+                * Update the MCA by calculating the weights and setting the colors.
+                */
                 Mca.prototype.update = function () {
                     this.calculateWeights();
                     this.setColors();

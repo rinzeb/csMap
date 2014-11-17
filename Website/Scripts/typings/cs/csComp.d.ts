@@ -548,7 +548,7 @@ declare module csComp.Mca {
         private $layerService;
         private messageBusService;
         public selectedFeature: GeoJson.IFeature;
-        public selectedProperty: FeatureProps.CallOutProperty;
+        public properties: FeatureProps.CallOutProperty[];
         public showFeature: boolean;
         public mca: Models.Mca;
         public mcas: Models.Mca[];
@@ -567,6 +567,8 @@ declare module csComp.Mca {
         private applyPropertyInfoToCriteria(mca, featureType);
         public createMca(): void;
         private addPropertyInfo(featureId, mca);
+        private static createMetaInfo(mca);
+        private static createMetaInfoRank(mca);
     }
 }
 declare module csComp.Mca.Models {
@@ -610,6 +612,7 @@ declare module csComp.Mca.Models {
         public stringFormat: string;
         /** Optionally, export the result also as a rank */
         public rankTitle: string;
+        public rankDescription: string;
         /** Optionally, stringFormat for the ranked result */
         public rankFormat: string;
         /** Maximum number of star ratings to use to set the weight */
@@ -618,6 +621,9 @@ declare module csComp.Mca.Models {
         public featureIds: string[];
         constructor();
         public updatePla(features: GeoJson.Feature[]): void;
+        /**
+        * Update the MCA by calculating the weights and setting the colors.
+        */
         public update(): void;
         private calculateWeights(criteria?);
         /** Set the colors of all criteria and sub-criteria */
