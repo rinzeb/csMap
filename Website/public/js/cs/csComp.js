@@ -1754,21 +1754,24 @@ var csComp;
         })();
         Helpers.PieData = PieData;
 
-        var AstorPieData = (function (_super) {
-            __extends(AstorPieData, _super);
-            function AstorPieData() {
+        var AsterPieData = (function (_super) {
+            __extends(AsterPieData, _super);
+            function AsterPieData() {
                 _super.apply(this, arguments);
             }
-            return AstorPieData;
+            return AsterPieData;
         })(PieData);
-        Helpers.AstorPieData = AstorPieData;
+        Helpers.AsterPieData = AsterPieData;
 
         var Plot = (function () {
             function Plot() {
             }
-            Plot.drawPie = function (pieRadius, data, colorScale, parentId, svgId) {
-                if (typeof colorScale === "undefined") { colorScale = 'Reds'; }
+            /**
+            * Draw a Pie chart.
+            */
+            Plot.drawPie = function (pieRadius, data, parentId, colorScale, svgId) {
                 if (typeof parentId === "undefined") { parentId = 'mcaPieChart'; }
+                if (typeof colorScale === "undefined") { colorScale = 'Reds'; }
                 if (typeof svgId === "undefined") { svgId = 'the_SVG_ID'; }
                 Plot.clearSvg(svgId);
 
@@ -1801,6 +1804,64 @@ var csComp;
                 }).on('mouseout', tip.hide);
 
                 var outerPath = svg.selectAll(".outlineArc").data(pie(data)).enter().append("path").attr("fill", "none").attr("stroke", "gray").attr("class", "outlineArc").attr("d", outlineArc);
+            };
+
+            /**
+            * Draw an Aster Pie chart, i.e. a pie chart with varying radius depending on the score, where the maximum score of 100 equals the pie radius.
+            * See http://bl.ocks.org/bbest/2de0e25d4840c68f2db1
+            */
+            Plot.drawAsterPlot = function (pieRadius, data, parentId, colorScale, svgId) {
+                if (typeof parentId === "undefined") { parentId = 'mcaPieChart'; }
+                if (typeof colorScale === "undefined") { colorScale = 'Reds'; }
+                if (typeof svgId === "undefined") { svgId = 'the_SVG_ID'; }
+                Plot.clearSvg(svgId);
+
+                if (!data)
+                    return;
+
+                var width = pieRadius, height = pieRadius, radius = Math.min(width, height) / 2, innerRadius = 0.3 * radius;
+
+                var pie = d3.layout.pie().sort(null).value(function (d) {
+                    return d.weight;
+                });
+
+                var tip = d3.tip().attr('class', 'd3-tip').offset([0, 0]).html(function (d) {
+                    return '<strong>' + d.data.label + ": </strong> <span style='color:orangered'>" + Math.round(d.data.weight * 100) + "% x " + Math.round(d.data.score) + ",&nbsp; = " + Math.round(d.data.weight * d.data.score) + "</span>";
+                });
+
+                var arc = d3.svg.arc().innerRadius(innerRadius).outerRadius(function (d) {
+                    return (radius - innerRadius) * (d.data.score / 100.0) + innerRadius;
+                });
+
+                var outlineArc = d3.svg.arc().innerRadius(innerRadius).outerRadius(radius);
+
+                var svg = d3.select('#' + parentId).append("svg").attr("id", svgId).attr("width", width).attr("height", height).append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+                try  {
+                    svg.call(tip);
+                } catch (err) {
+                    console.log("Error: " + err.message);
+                }
+
+                var colors = chroma.scale(colorScale).domain([0, data.length - 1], data.length);
+                var path = svg.selectAll(".solidArc").data(pie(data)).enter().append("path").attr("fill", function (d, i) {
+                    return d.data.color || colors(i).hex();
+                }).attr("class", "solidArc").attr("stroke", "gray").attr("d", arc).on('mouseover', function (d, i) {
+                    tip.show(d, i);
+                    //$rootScope.$broadcast('tooltipShown', { id: d.data.id });
+                }).on('mouseout', tip.hide);
+
+                var outerPath = svg.selectAll(".outlineArc").data(pie(data)).enter().append("path").attr("fill", "none").attr("stroke", "gray").attr("class", "outlineArc").attr("d", outlineArc);
+
+                // calculate the weighted mean score
+                var totalWeight = 0;
+                var totalScore = 0;
+                data.forEach(function (p) {
+                    totalWeight += p.weight;
+                    totalScore += p.weight * p.score;
+                });
+
+                svg.append("svg:text").attr("class", "aster-score").attr("dy", ".35em").attr("text-anchor", "middle").text(Math.round(totalScore / totalWeight));
             };
 
             Plot.clearSvg = function (svgId) {
@@ -1906,6 +1967,7 @@ var csComp;
                             _this.updateSelectedFeature(feature);
                             break;
                         case "onFeatureDeselect":
+                            _this.showFeature = false;
                             _this.selectedFeature = null;
                             break;
                         default:
@@ -1920,6 +1982,8 @@ var csComp;
 
                 messageBusService.subscribe('layer', function (title, layer) {
                     _this.availableMca();
+                    _this.calculateMca();
+                    _this.calculateMca();
                 });
 
                 messageBusService.subscribe("feature", this.featureMessageReceived);
@@ -1974,8 +2038,9 @@ var csComp;
                 this.mcas.push(mca);
 
                 $scope.$watch('vm.mca', function (d) {
-                    if (_this.mca)
-                        _this.drawPieChart();
+                    if (!_this.mca)
+                        return;
+                    _this.drawChart();
                     // console.log(JSON.stringify(d));
                 }, true);
             }
@@ -1984,6 +2049,7 @@ var csComp;
                     return;
                 this.selectedFeature = feature;
                 if (this.mca.label in feature.properties) {
+                    this.showFeature = true;
                     var mi = new csComp.GeoJson.MetaInfo();
                     mi.label = this.mca.label;
                     mi.title = this.mca.title;
@@ -1992,23 +2058,59 @@ var csComp;
                     mi.description = this.mca.description;
                     var displayValue = FeatureProps.CallOut.convertPropertyInfo(mi, feature.properties[mi.label]);
                     this.selectedProperty = new FeatureProps.CallOutProperty(mi.title, displayValue, mi.label, true, true, feature, false, mi.description);
+                    this.drawChart();
                     //console.log(feature);
                     //this.displayFeature(feature);
                 }
             };
 
-            McaCtrl.prototype.drawPieChart = function (criterion) {
-                var currentLevel;
+            McaCtrl.prototype.drawChart = function (criterion) {
+                if (this.showFeature)
+                    this.drawAsterPlot(criterion);
+                else
+                    this.drawPieChart(criterion);
+            };
+
+            McaCtrl.prototype.getParentOfSelectedCriterion = function (criterion) {
+                var parent;
                 this.mca.update();
                 if (typeof criterion === 'undefined' || this.mca.criteria.indexOf(criterion) >= 0) {
-                    currentLevel = this.mca.criteria;
+                    parent = this.mca.criteria;
                 } else {
                     this.mca.criteria.forEach(function (c) {
                         if (c.criteria.indexOf(criterion) >= 0)
-                            currentLevel = c.criteria;
+                            parent = c.criteria;
                     });
                 }
-                if (!currentLevel)
+                return parent;
+            };
+
+            McaCtrl.prototype.drawAsterPlot = function (criterion) {
+                var _this = this;
+                if (!this.mca || !this.selectedFeature)
+                    return;
+                var currentLevel = this.getParentOfSelectedCriterion(criterion);
+                if (typeof currentLevel === 'undefined' || currentLevel == null)
+                    return;
+                var data = [];
+                var i = 0;
+                currentLevel.forEach(function (c) {
+                    var pieData = new csComp.Helpers.AsterPieData();
+                    pieData.id = i++;
+                    pieData.label = c.getTitle();
+                    pieData.weight = c.weight;
+                    pieData.color = c.color;
+                    pieData.score = c.getScore(_this.selectedFeature, c) * 100;
+                    data.push(pieData);
+                });
+                Plot.drawAsterPlot(100, data, 'mcaPieChart');
+            };
+
+            McaCtrl.prototype.drawPieChart = function (criterion) {
+                if (!this.mca)
+                    return;
+                var currentLevel = this.getParentOfSelectedCriterion(criterion);
+                if (typeof currentLevel === 'undefined' || currentLevel == null)
                     return;
                 var data = [];
                 var i = 0;
@@ -2017,9 +2119,10 @@ var csComp;
                     pieData.id = i++;
                     pieData.label = c.getTitle();
                     pieData.weight = c.weight;
+                    pieData.color = c.color;
                     data.push(pieData);
                 });
-                Plot.drawPie(100, data, 'Reds', 'mcaPieChart');
+                Plot.drawPie(100, data, 'mcaPieChart');
             };
 
             /** Based on the currently loaded features, which MCA can we use */

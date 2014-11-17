@@ -103,7 +103,7 @@ $1$ Right side panel #1#
                 </div>
                 <div data-ng-if="vm.mca">
                     <ul class="list-unstyled">
-                        <li data-ng-click="vm.drawPieChart(criterion)" data-ng-repeat="criterion in vm.mca.criteria">
+                        <li data-ng-repeat="criterion in vm.mca.criteria">
                             <div data-ng-style="{'display': 'inline-block', 'width':'10px', 'height':'10px', 'border':'solid 1px black', 'background-color': criterion.color}">
                             </div> 
                             <div style="display: inline-block;">{{criterion.getTitle()}}</div>
@@ -116,12 +116,12 @@ $1$ Right side panel #1#
                         </li>
                     </ul>
 
-                    <a href="" style="display: inline-block; width: 100%"
-                       data-ng-click="vm.calculateMca()">Bereken de <div style="display: inline-block; text-transform: uppercase">{{vm.mca.title}}</div>.</a>
+                    <a href="" style="display: inline-block; width: 100%; text-transform: uppercase"
+                       data-ng-click="vm.calculateMca()" translate="MCA_COMPUTE_MGS" translate-values="{ mcaTitle: vm.mca.title }"></a>
 
-                    <div style="margin-top: 5px; margin-left: 60px;" id="mcaPieChart"></div>
+                    <div style="margin-top: 5px; margin-left: 70px;" id="mcaPieChart"></div>
                     
-                    <div data-ng-if="vm.selectedFeature">
+                    <div data-ng-if="vm.showFeature">
                         <h4>{{vm.selectedFeature.properties['Name']}}</h4>
                         <table class="table table-condensed">
                             <tr popover="{{vm.selectedProperty.description}}"
@@ -135,6 +135,7 @@ $1$ Right side panel #1#
                             </tr>
                         </table>
                     </div>
+                    <i data-ng-if="!vm.showFeature"><div translate="SHOW_FEATURE_MSG"></div></i>
                 </div>
             </div>
             <feature-list class="tab-pane" id="features"></feature-list>

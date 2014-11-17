@@ -516,12 +516,20 @@ declare module csComp.Helpers {
         public color: string;
         public weight: number;
     }
-    class AstorPieData extends PieData {
+    class AsterPieData extends PieData {
         public score: number;
     }
     class Plot {
         static pieColors: string[];
-        static drawPie(pieRadius: number, data?: any, colorScale?: string, parentId?: string, svgId?: string): void;
+        /**
+        * Draw a Pie chart.
+        */
+        static drawPie(pieRadius: number, data?: PieData[], parentId?: string, colorScale?: string, svgId?: string): void;
+        /**
+        * Draw an Aster Pie chart, i.e. a pie chart with varying radius depending on the score, where the maximum score of 100 equals the pie radius.
+        * See http://bl.ocks.org/bbest/2de0e25d4840c68f2db1
+        */
+        static drawAsterPlot(pieRadius: number, data?: AsterPieData[], parentId?: string, colorScale?: string, svgId?: string): void;
         static clearSvg(svgId: string): void;
     }
 }
@@ -541,6 +549,7 @@ declare module csComp.Mca {
         private messageBusService;
         public selectedFeature: GeoJson.IFeature;
         public selectedProperty: FeatureProps.CallOutProperty;
+        public showFeature: boolean;
         public mca: Models.Mca;
         public mcas: Models.Mca[];
         public availableMcas: Models.Mca[];
@@ -548,7 +557,10 @@ declare module csComp.Mca {
         constructor($scope: IMcaScope, $layerService: Services.LayerService, messageBusService: Services.MessageBusService);
         private featureMessageReceived;
         private updateSelectedFeature(feature);
-        public drawPieChart(criterion?: Models.Criterion): void;
+        public drawChart(criterion?: Models.Criterion): void;
+        private getParentOfSelectedCriterion(criterion?);
+        private drawAsterPlot(criterion?);
+        private drawPieChart(criterion?);
         /** Based on the currently loaded features, which MCA can we use */
         public availableMca(): void;
         public calculateMca(): void;
