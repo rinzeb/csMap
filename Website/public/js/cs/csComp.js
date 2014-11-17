@@ -2194,6 +2194,8 @@ var csComp;
                     }
                 });
                 this.updateSelectedFeature(this.selectedFeature);
+                if (this.groupStyle)
+                    this.$layerService.updateStyle(this.groupStyle);
             };
 
             McaCtrl.prototype.applyPropertyInfoToCriteria = function (mca, featureType) {
@@ -2206,9 +2208,6 @@ var csComp;
                         }
                     });
                 });
-            };
-
-            McaCtrl.prototype.createMca = function () {
             };
 
             McaCtrl.prototype.addPropertyInfo = function (featureId, mca) {
@@ -2227,6 +2226,13 @@ var csComp;
                 featureType.metaInfoData.push(mi);
             };
 
+            McaCtrl.prototype.setStyle = function (item) {
+                if (this.groupStyle)
+                    this.$layerService.updateStyle(this.groupStyle);
+                else
+                    this.groupStyle = this.$layerService.setStyle(item);
+            };
+
             McaCtrl.createMetaInfo = function (mca) {
                 var mi = new csComp.GeoJson.MetaInfo();
                 mi.title = mca.title;
@@ -2236,7 +2242,7 @@ var csComp;
                 mi.minValue = 0;
                 mi.description = mca.description;
                 mi.stringFormat = mca.stringFormat;
-                mi.section = mca.section || 'Info';
+                mi.section = mca.section || 'MCA';
                 return mi;
             };
 
@@ -2247,7 +2253,7 @@ var csComp;
                 mi.type = 'rank';
                 mi.description = mca.rankDescription;
                 mi.stringFormat = mca.rankFormat;
-                mi.section = mca.section || 'Info';
+                mi.section = mca.section || 'MCA';
                 return mi;
             };
             McaCtrl.$inject = [
@@ -3124,8 +3130,9 @@ var csComp;
                 return r;
             };
 
-            LayerService.prototype.setStyle = function (property) {
+            LayerService.prototype.setStyle = function (property, openStyleTab) {
                 var _this = this;
+                if (typeof openStyleTab === "undefined") { openStyleTab = true; }
                 var f = property.feature;
                 if (f != null) {
                     this.noStyles = false;
@@ -3159,7 +3166,8 @@ var csComp;
                     } else {
                         this.updateStyle(gs);
                     }
-                    $('#leftPanelTab a[href="#styles"]').tab('show'); // Select tab by name
+                    if (openStyleTab)
+                        $('#leftPanelTab a[href="#styles"]').tab('show'); // Select tab by name
                     return gs;
                 }
             };

@@ -553,6 +553,7 @@ declare module csComp.Mca {
         public mca: Models.Mca;
         public mcas: Models.Mca[];
         public availableMcas: Models.Mca[];
+        private groupStyle;
         static $inject: string[];
         constructor($scope: IMcaScope, $layerService: Services.LayerService, messageBusService: Services.MessageBusService);
         private featureMessageReceived;
@@ -565,8 +566,8 @@ declare module csComp.Mca {
         public availableMca(): void;
         public calculateMca(): void;
         private applyPropertyInfoToCriteria(mca, featureType);
-        public createMca(): void;
         private addPropertyInfo(featureId, mca);
+        public setStyle(item: FeatureProps.CallOutProperty): void;
         private static createMetaInfo(mca);
         private static createMetaInfoRank(mca);
     }
@@ -867,7 +868,7 @@ declare module csComp.Services {
         * find a layer with a specific id
         */
         public findLayer(id: string): ProjectLayer;
-        public setStyle(property: any): GroupStyle;
+        public setStyle(property: any, openStyleTab?: boolean): GroupStyle;
         private saveStyle(group, style);
         public addFilter(group: ProjectGroup, prop: string): void;
         /**
