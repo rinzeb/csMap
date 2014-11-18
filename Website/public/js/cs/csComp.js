@@ -1,1480 +1,5 @@
 var csComp;
 (function (csComp) {
-    (function (GeoJson) {
-        var Feature = (function () {
-            function Feature() {
-            }
-            return Feature;
-        })();
-        GeoJson.Feature = Feature;
-
-        (function (DrawingModeType) {
-            DrawingModeType[DrawingModeType["None"] = 0] = "None";
-            DrawingModeType[DrawingModeType["Image"] = 1] = "Image";
-            DrawingModeType[DrawingModeType["Point"] = 2] = "Point";
-            DrawingModeType[DrawingModeType["Square"] = 3] = "Square";
-            DrawingModeType[DrawingModeType["Rectangle"] = 4] = "Rectangle";
-            DrawingModeType[DrawingModeType["Line"] = 5] = "Line";
-            DrawingModeType[DrawingModeType["Circle"] = 6] = "Circle";
-            DrawingModeType[DrawingModeType["Freehand"] = 7] = "Freehand";
-            DrawingModeType[DrawingModeType["Polyline"] = 8] = "Polyline";
-            DrawingModeType[DrawingModeType["Polygon"] = 9] = "Polygon";
-            DrawingModeType[DrawingModeType["MultiPolygon"] = 10] = "MultiPolygon";
-        })(GeoJson.DrawingModeType || (GeoJson.DrawingModeType = {}));
-        var DrawingModeType = GeoJson.DrawingModeType;
-
-        //export enum MetaInfoType {
-        //    Text,
-        //    TextArea,
-        //    Rating,
-        //    Number,
-        //    Bbcode,
-        //    Boolean,
-        //    Bit,
-        //    Sensor,
-        //    Xml,
-        //    Options,
-        //    Unknown,
-        //    Image,
-        //    DateTime,
-        //    Mediafolder
-        //}
-        (function (featureFilterType) {
-            /** Turn filtering off */
-            featureFilterType[featureFilterType["none"] = 0] = "none";
-
-            /** Default for numbers: histogram */
-            featureFilterType[featureFilterType["bar"] = 1] = "bar";
-
-            /** Default for text */
-            featureFilterType[featureFilterType["text"] = 2] = "text";
-        })(GeoJson.featureFilterType || (GeoJson.featureFilterType = {}));
-        var featureFilterType = GeoJson.featureFilterType;
-
-        var MetaInfo = (function () {
-            function MetaInfo() {
-                this.visibleInCallOut = true;
-                this.canEdit = false;
-                this.isSearchable = true;
-            }
-            return MetaInfo;
-        })();
-        GeoJson.MetaInfo = MetaInfo;
-    })(csComp.GeoJson || (csComp.GeoJson = {}));
-    var GeoJson = csComp.GeoJson;
-})(csComp || (csComp = {}));
-var BaseMapList;
-(function (BaseMapList) {
-    BaseMapList.html = '<div>    <h4 class="leftpanel-header" translate="MAP"></h4>    <div data-ng-repeat="(key, value) in vm.$mapService.baseLayers" style="clear:left;">        <div ng-click="vm.selectBaseLayer(key);" class="select-basestyle">            <img data-ng-src="{{value.options.preview}}" class="preview-base-layer" style="margin-bottom:5px" />            <div style="margin:3px;float:left">                <span style="font-size: 18px;font-weight: bold;">{{key}}</span><br />                {{value.options.subtitle}}            </div>        </div>    </div></div>';
-})(BaseMapList || (BaseMapList = {}));
-var BaseMapList;
-(function (BaseMapList) {
-    /**
-    * Config
-    */
-    var moduleName = 'csWeb.baseMapList';
-
-    /**
-    * Module
-    */
-    BaseMapList.myModule;
-    try  {
-        BaseMapList.myModule = angular.module(moduleName);
-    } catch (err) {
-        // named module does not exist, so create one
-        BaseMapList.myModule = angular.module(moduleName, []);
-    }
-
-    /**
-    * Directive to display the available map layers.
-    */
-    BaseMapList.myModule.directive('baseMapList', [
-        '$window', '$compile',
-        function ($window, $compile) {
-            return {
-                terminal: false,
-                restrict: 'E',
-                scope: {},
-                template: BaseMapList.html,
-                //compile : el          => {    // I need to explicitly compile it in order to use interpolation like {{xxx}}
-                //    var fn                        = $compile(el);
-                //    return scope                  => {
-                //        fn(scope);
-                //    };
-                //},
-                link: function (scope, element, attrs) {
-                    // Deal with resizing the element list
-                    scope.onResizeFunction = function () {
-                        var filterHeight = 50;
-                        var paginationCtrlHeight = 100;
-                        var itemHeight = 60;
-
-                        //scope.windowHeight          = $window.innerHeight;
-                        //scope.windowWidth           = $window.innerWidth;
-                        scope.numberOfItems = Math.floor(($window.innerHeight - filterHeight - paginationCtrlHeight) / itemHeight);
-                    };
-
-                    // Call to the function when the page is first loaded
-                    scope.onResizeFunction();
-
-                    angular.element($window).bind('resize', function () {
-                        scope.onResizeFunction();
-                        scope.$apply();
-                    });
-                },
-                replace: true,
-                transclude: true,
-                controller: BaseMapList.BaseMapListCtrl
-            };
-        }
-    ]).directive('bsPopover', function () {
-        return function (scope, element, attrs) {
-            element.find("a[rel=popover]").popover({ placement: 'right', html: 'true' });
-        };
-    });
-})(BaseMapList || (BaseMapList = {}));
-var BaseMapList;
-(function (BaseMapList) {
-    var BaseMapListCtrl = (function () {
-        // dependencies are injected via AngularJS $injector
-        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
-        function BaseMapListCtrl($scope, $mapService) {
-            this.$scope = $scope;
-            this.$mapService = $mapService;
-            $scope.vm = this;
-        }
-        BaseMapListCtrl.prototype.selectBaseLayer = function (key) {
-            var bl = this.$mapService.baseLayers[key];
-            this.$mapService.changeBaseLayer(bl);
-        };
-        BaseMapListCtrl.$inject = [
-            '$scope',
-            'mapService'
-        ];
-        return BaseMapListCtrl;
-    })();
-    BaseMapList.BaseMapListCtrl = BaseMapListCtrl;
-})(BaseMapList || (BaseMapList = {}));
-var DataTable;
-(function (DataTable) {
-    DataTable.html = '<div>    <div style="width:100%; margin: 10px auto;">        <div style="float: left; width: 15%; margin: 0; padding: 1em">            <!-- Pull down of map layers -->            <select data-ng-model="vm.selectedLayerId"                    data-ng-change="vm.loadLayer()"                    data-ng-options="layer.id as layer.title group by layer.group for layer in vm.layerOptions"                    class="form-control tt-input"></select>            <!-- List of headers -->            <ul class="form-group" style="margin-top: 1em; margin-left: -2em; overflow-y: auto; overflow-x: hidden;"                resize resize-y="150">                <li ng-repeat="mi in vm.metaInfos" class="list-unstyled" style="white-space: nowrap; text-overflow: ellipsis">                    <label>                        <input type="checkbox" name="vm.selectedTitles[]" value="{{mi.title}}"                               data-ng-checked="vm.headers.indexOf(mi.title) > -1"                               data-ng-click="vm.toggleSelection(mi.title)">&nbsp;&nbsp;{{mi.title}}                    </label>                    <!--<div class="checkbox">                        <label>                            <input type="checkbox" name="vm.selectedTitles[]" value="{{mi.title}}"                                   data-ng-checked="vm.headers.indexOf(mi.title) > -1"                                   data-ng-click="vm.toggleSelection(mi.title)">&nbsp;&nbsp;{{mi.title}}                        </label>                    </div>-->                </li>            </ul>            <!--       <pre>{{vm.headers|json}}</pre>-->        </div>        <!-- Right side of the table view -->        <div style="margin-left: 16%; border-left: 1px solid gray; padding: 1em;" ng-init="poiTypeFilter">            <!-- Filter -->            <div class="has-feedback" style="margin-bottom: 1em; float: right; width: 16%; min-width: 200px;">                <span style="direction: ltr; position: static; display: block;">                    <input id="searchbox" data-ng-model="featureFilter" type="text"                           placeholder="Filter" autocomplete="off" spellcheck="false"                           style="position: relative; vertical-align: top;" class="form-control tt-input">                </span>                <span id="searchicon" class="fa form-control-feedback fa-filter" style="padding-top: 0px;"></span>            </div>            <!--Download to CSV option-->            <a href="" data-ng-click="vm.downloadCsv()" alt="Download CSV" style="margin-top: 5px; margin-right: 1em; float: right;"><i class="fa fa-download fa-2x"></i></a>            <!-- Specify how many items to show -->            <select data-ng-model="vm.numberOfItems" style="margin-bottom: 1em; margin-right: 10px; float: left; width: 16%; min-width: 200px;" class="form-control tt-input">                <option value="5" translate="SHOW5"></option>                <option value="10" translate="SHOW10"></option>                <option value="15" translate="SHOW15"></option>                <option value="20" translate="SHOW20"></option>                <option value="25" translate="SHOW25"></option>                <option value="30" translate="SHOW30"></option>                <option value="35" translate="SHOW35"></option>                <option value="40" translate="SHOW40"></option>            </select>            <!-- Data table -->            <table class="table table-striped table-condensed">                <tr>                    <th data-ng-repeat="header in vm.headers track by $index">                        {{header}}&nbsp;                        <a data-ng-click="reverseSort = !reverseSort; vm.orderBy($index, reverseSort);"><i data-ng-class="vm.sortOrderClass($index, reverseSort)">&nbsp;&nbsp;</i></a>                    </th>                </tr>                <tr dir-paginate="row in vm.rows | filter:featureFilter | itemsPerPage: vm.numberOfItems"                    style="cursor: pointer; vertical-align: central">                    <td data-ng-class="{\'text-right\': field.type == \'number\'}" data-ng-repeat="field in row track by $index" data-ng-bind-html="vm.toTrusted(field.displayValue)"></td>                </tr>            </table>            <dir-pagination-controls style="" max-size="10" boundary-links="true" direction-links="true"                                     template-url="bower_components/angular-utils-pagination/dirPagination.tpl.html"></dir-pagination-controls>        </div>    </div>    <div style="clear: both; margin: 0; padding: .5em"></div></div>';
-})(DataTable || (DataTable = {}));
-var DataTable;
-(function (DataTable) {
-    /**
-    * Config
-    */
-    var moduleName = 'csWeb.datatable';
-
-    /**
-    * Module
-    */
-    DataTable.myModule;
-    try  {
-        DataTable.myModule = angular.module(moduleName);
-    } catch (err) {
-        // named module does not exist, so create one
-        DataTable.myModule = angular.module(moduleName, []);
-    }
-
-    /**
-    * Directive to display a feature's properties in a panel.
-    *
-    * @seealso : http://www.youtube.com/watch?v=gjJ5vLRK8R8&list=UUGD_0i6L48hucTiiyhb5QzQ
-    * @seealso : http://plnkr.co/edit/HyBP9d?p=preview
-    */
-    DataTable.myModule.directive('datatable', [
-        '$compile',
-        function ($compile) {
-            return {
-                terminal: false,
-                restrict: 'E',
-                scope: {},
-                template: DataTable.html,
-                //compile   : el => {     // I need to explicitly compile it in order to use interpolation like {{xxx}}
-                //    var fn = $compile(el);
-                //    return scope => {
-                //        fn(scope);
-                //    };
-                //},
-                replace: true,
-                transclude: true,
-                controller: DataTable.DataTableCtrl
-            };
-        }
-    ]);
-})(DataTable || (DataTable = {}));
-var DataTable;
-(function (DataTable) {
-    /**
-    * Represents a field in the table.
-    * The value is the actual displayValue shown, the type is the metainfo type (e.g. number or text, useful when aligning the data), and the header is used for sorting.
-    */
-    var TableField = (function () {
-        function TableField(displayValue, originalValue, type, header) {
-            this.displayValue = displayValue;
-            this.originalValue = originalValue;
-            this.type = type;
-            this.header = header;
-        }
-        return TableField;
-    })();
-    DataTable.TableField = TableField;
-
-    var DataTableCtrl = (function () {
-        // dependencies are injected via AngularJS $injector
-        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
-        function DataTableCtrl($scope, $http, $sce, $translate, $layerService, $localStorageService, $messageBusService) {
-            var _this = this;
-            this.$scope = $scope;
-            this.$http = $http;
-            this.$sce = $sce;
-            this.$translate = $translate;
-            this.$layerService = $layerService;
-            this.$localStorageService = $localStorageService;
-            this.$messageBusService = $messageBusService;
-            this.mapLabel = "map";
-            this.numberOfItems = 10;
-            this.layerOptions = [];
-            this.metaInfos = [];
-            this.headers = [];
-            this.rows = [];
-            // 'vm' stands for 'view model'. We're adding a reference to the controller to the scope
-            // for its methods to be accessible from view / HTML
-            $scope.vm = this;
-
-            $translate('MAP_FEATURES').then(function (translation) {
-                _this.layerOptions[0].title = translation;
-            });
-
-            this.bindToStorage('vm.numberOfItems', 10);
-            this.numberOfItems = $localStorageService.get('vm.numberOfItems');
-            this.bindToStorage('vm.selectedLayerId', this.mapLabel);
-
-            if (this.$layerService.project == null || this.$layerService.project.groups == null)
-                return;
-            this.updateLayerOptions();
-            this.loadLayer();
-        }
-        /**
-        * Add a label to local storage and bind it to the scope.
-        */
-        DataTableCtrl.prototype.bindToStorage = function (label, defaultValue) {
-            if (this.$localStorageService.get(label) === null)
-                this.$localStorageService.set(label, defaultValue); // You first need to set the key
-            this.$localStorageService.bind(this.$scope, label);
-        };
-
-        /**
-        * Create a list of layer options and select the one used previously.
-        */
-        DataTableCtrl.prototype.updateLayerOptions = function () {
-            var _this = this;
-            this.layerOptions.push({
-                "group": '',
-                "id": this.mapLabel,
-                "title": this.mapFeatureTitle
-            });
-            if (this.$layerService.project == null || this.$layerService.project.groups == null)
-                return;
-            this.$layerService.project.groups.forEach(function (group) {
-                group.layers.forEach(function (layer) {
-                    _this.layerOptions.push({
-                        "group": group.title,
-                        "id": layer.id,
-                        "title": layer.title
-                    });
-                });
-            });
-            this.selectedLayerId = this.$localStorageService.get('vm.selectedLayerId');
-        };
-
-        DataTableCtrl.prototype.loadLayer = function () {
-            var _this = this;
-            if (!this.selectedLayerId || this.selectedLayerId === this.mapLabel)
-                return this.loadMapLayers();
-            var selectedLayer = this.findLayerById(this.selectedLayerId);
-            if (selectedLayer == null)
-                return this.loadMapLayers();
-            this.$http.get(selectedLayer.url).success(function (data) {
-                _this.dataset = data;
-                if (data.poiTypes == null)
-                    data.poiTypes = {};
-                data.features.forEach(function (f) {
-                    f.featureTypeName = f.properties['PoiTypeId'];
-                    if (!(f.featureTypeName in data.poiTypes))
-                        data.poiTypes[f.featureTypeName] = _this.$layerService.featureTypes[f.featureTypeName];
-                });
-
-                _this.updateMetaInfo(data);
-            }).error(function (data, status, headers, config) {
-                _this.$messageBusService.notify("ERROR opening " + selectedLayer.title, "Could not get the data.");
-            });
-        };
-
-        /**
-        * Load the features as visible on the map.
-        */
-        DataTableCtrl.prototype.loadMapLayers = function () {
-            var _this = this;
-            this.selectedLayerId = this.mapLabel;
-            var data = {
-                type: '',
-                features: [],
-                poiTypes: {}
-            };
-
-            // If we are filtering, load the filter results
-            this.$layerService.project.groups.forEach(function (group) {
-                if (group.filterResult != null)
-                    group.filterResult.forEach(function (f) {
-                        return data.features.push(f);
-                    });
-            });
-
-            // Otherwise, take all loaded features
-            if (data.features.length === 0)
-                data.features = this.$layerService.project.features;
-
-            data.features.forEach(function (f) {
-                if (!(f.featureTypeName in data.poiTypes))
-                    data.poiTypes[f.featureTypeName] = _this.$layerService.featureTypes[f.featureTypeName];
-            });
-
-            this.dataset = data;
-            this.updateMetaInfo(data);
-        };
-
-        DataTableCtrl.prototype.updateMetaInfo = function (data) {
-            var _this = this;
-            this.metaInfos = [];
-            this.headers = [];
-            this.rows = [];
-            var titles = [];
-            var mis = [];
-
-            // Push the Name, so it always appears on top.
-            mis.push({
-                label: "Name",
-                visibleInCallOut: true,
-                title: "Naam",
-                type: "text",
-                filterType: "text",
-                isSearchable: true
-            });
-            var featureType;
-            for (var key in data.poiTypes) {
-                featureType = data.poiTypes[key];
-                if (featureType.metaInfoKeys != null) {
-                    var keys = featureType.metaInfoKeys.split(';');
-                    keys.forEach(function (k) {
-                        if (k in _this.$layerService.metaInfoData)
-                            mis.push(_this.$layerService.metaInfoData[k]);
-                        else if (featureType.metaInfoData != null) {
-                            var result = $.grep(featureType.metaInfoData, function (e) {
-                                return e.label === k;
-                            });
-                            if (result.length >= 1)
-                                mis.push(result);
-                        }
-                    });
-                } else if (featureType.metaInfoData != null) {
-                    featureType.metaInfoData.forEach(function (mi) {
-                        return mis.push(mi);
-                    });
-                }
-                mis.forEach(function (mi) {
-                    if ((mi.visibleInCallOut || mi.label === "Name") && titles.indexOf(mi.title) < 0) {
-                        titles.push(mi.title);
-                        _this.metaInfos.push(mi);
-                    }
-                });
-            }
-
-            // Select the first couple of headers
-            var nmbrOfDefaultSelectedHeaders = 3;
-            for (var i = 0; i < nmbrOfDefaultSelectedHeaders; i++) {
-                this.headers.push(titles[i]);
-            }
-            this.rows = this.getRows();
-        };
-
-        DataTableCtrl.prototype.toggleSelection = function (metaInfoTitle) {
-            var idx = this.headers.indexOf(metaInfoTitle);
-
-            // is currently selected
-            if (idx > -1) {
-                this.headers.splice(idx, 1);
-            } else {
-                this.headers.push(metaInfoTitle);
-            }
-            this.rows = this.getRows();
-        };
-
-        DataTableCtrl.prototype.findLayerById = function (id) {
-            for (var i = 0; i < this.$layerService.project.groups.length; i++) {
-                var group = this.$layerService.project.groups[i];
-                for (var j = 0; j < group.layers.length; j++) {
-                    var layer = group.layers[j];
-                    if (layer.id != id)
-                        continue;
-                    return layer;
-                }
-            }
-            return null;
-        };
-
-        /**
-        * Returns the data rows that are relevant for the current selection.
-        */
-        DataTableCtrl.prototype.getRows = function () {
-            var _this = this;
-            var meta = [this.headers.length];
-            this.metaInfos.forEach(function (mi) {
-                // Keep headers and mi in the right order
-                var index = _this.headers.indexOf(mi.title);
-                if (index >= 0)
-                    meta[index] = mi;
-            });
-            var props = [];
-            var displayValue;
-            this.dataset.features.forEach(function (f) {
-                var row = [];
-                meta.forEach(function (mi) {
-                    var text = f.properties[mi.label];
-                    if (!text)
-                        text = ' ';
-                    else if (!$.isNumeric(text))
-                        text = text.replace(/&amp;/g, '&');
-                    switch (mi.type) {
-                        case "bbcode":
-                            displayValue = XBBCODE.process({ text: text }).html;
-                            break;
-                        case "number":
-                            if (!$.isNumeric(text))
-                                displayValue = '??';
-                            else if (!mi.stringFormat)
-                                displayValue = text.toString();
-                            else
-                                displayValue = String.format(mi.stringFormat, parseFloat(text));
-                            break;
-                        default:
-                            displayValue = text;
-                            break;
-                    }
-                    row.push(new TableField(displayValue, text, mi.type, mi.title));
-                });
-                props.push(row);
-            });
-            return props;
-        };
-
-        /**
-        * Generate a font awesome class based on the order.
-        */
-        DataTableCtrl.prototype.sortOrderClass = function (headerIndex, reverseOrder) {
-            var t;
-            if (reverseOrder != null && headerIndex == this.sortingColumn) {
-                t = ('fa fa-sort-' + ((reverseOrder) ? 'desc' : 'asc'));
-            } else {
-                t = 'fa fa-sort';
-            }
-            return t;
-        };
-
-        /**
-        * Order the rows based on the header index and the order.
-        */
-        DataTableCtrl.prototype.orderBy = function (headerIndex, reverseOrder) {
-            this.sortingColumn = headerIndex;
-            this.rows = this.rows.sort(function (a, b) {
-                var order;
-                if (a[headerIndex].type == 'number')
-                    order = a[headerIndex].originalValue > b[headerIndex].originalValue;
-                else
-                    order = a[headerIndex].originalValue.toLowerCase() > b[headerIndex].originalValue.toLowerCase();
-                if (order == reverseOrder)
-                    return 1;
-                else
-                    return -1;
-            });
-        };
-
-        DataTableCtrl.prototype.downloadCsv = function () {
-            var csvRows = [];
-
-            csvRows.push(this.headers.join(';'));
-
-            for (var i = 0; i < this.rows.length; i++) {
-                csvRows.push(this.rows[i].map(function (f) {
-                    return f.originalValue;
-                }).join(';'));
-            }
-
-            var csvString = csvRows.join('\r\n');
-
-            var filename = this.mapLabel;
-            if (this.selectedLayerId !== this.mapLabel) {
-                var layer = this.findLayerById(this.selectedLayerId);
-                if (layer)
-                    filename = layer.title.replace(' ', '_');
-            }
-            this.saveData(csvString, filename + '.csv');
-        };
-
-        DataTableCtrl.prototype.saveData = function (csvData, filename) {
-            if (navigator.msSaveBlob) {
-                // IE 10+
-                var link = document.createElement('a');
-                link.addEventListener("click", function (event) {
-                    var blob = new Blob([csvData], { "type": "text/csv;charset=utf-8;" });
-                    navigator.msSaveBlob(blob, filename);
-                }, false);
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            } else if (!csComp.Helpers.supportsDataUri()) {
-                // Older versions of IE: show the data in a new window
-                var popup = window.open('', 'csv', '');
-                popup.document.body.innerHTML = '<pre>' + csvData + '</pre>';
-            } else {
-                // Support for browsers that support the data uri.
-                var a = document.createElement('a');
-                a.href = 'data:text/csv;charset=utf-8,' + encodeURI(csvData);
-                a.target = '_blank';
-                a.download = filename;
-                a.click();
-                document.body.removeChild(a);
-            }
-        };
-
-        /**
-        * Convert to trusted html string.
-        */
-        DataTableCtrl.prototype.toTrusted = function (html) {
-            return this.$sce.trustAsHtml(html);
-        };
-        DataTableCtrl.$inject = [
-            '$scope',
-            '$http',
-            '$sce',
-            '$translate',
-            'layerService',
-            'localStorageService',
-            'messageBusService'
-        ];
-        return DataTableCtrl;
-    })();
-    DataTable.DataTableCtrl = DataTableCtrl;
-})(DataTable || (DataTable = {}));
-var FeatureList;
-(function (FeatureList) {
-    FeatureList.html = '<div style="position: relative;">    <h4 class="leftpanel-header" translate="FEATURES"></h4>    <div class="has-feedback" style="padding:10px 4px 4px 4px;">        <span style="direction: ltr; position: static; display: block;">            <input id="searchbox" data-ng-model="featureFilter.properties" type="text"                   placeholder="Filter" autocomplete="off" spellcheck="false"                   style="position: relative; vertical-align: top;" class="form-control tt-input">        </span>        <span id="searchicon" class="fa form-control-feedback fa-filter" style="padding-top: 10px;"></span>    </div>    <table class="table table-striped table-condensed">        <!--vm.$layerService.features-->        <tr dir-paginate="feature in vm.$layerService.project.features | filter:featureFilter | orderBy:\'properties.Name\' | itemsPerPage: numberOfItems "            data-ng-click="vm.$mapService.zoomTo(feature);vm.$layerService.selectFeature(feature);" style="cursor: pointer; height: 50px; vertical-align: central">            <!--<td>Icon</td>-->            <td>{{ feature.properties.Name }}</td>            <td>                <i class="fa fa-chevron-right pull-right"></i>            </td>        </tr>    </table>    <dir-pagination-controls style="position: absolute; bottom: -80px;" max-size="6" boundary-links="false" direction-links="false" template-url="bower_components/angular-utils-pagination/dirPagination.tpl.html"></dir-pagination-controls></div>';
-})(FeatureList || (FeatureList = {}));
-var FeatureList;
-(function (FeatureList) {
-    /**
-    * Config
-    */
-    var moduleName = 'csWeb.featureList';
-
-    /**
-    * Module
-    */
-    FeatureList.myModule;
-    try  {
-        FeatureList.myModule = angular.module(moduleName);
-    } catch (err) {
-        // named module does not exist, so create one
-        FeatureList.myModule = angular.module(moduleName, []);
-    }
-
-    /**
-    * Directive to display the available map layers.
-    */
-    FeatureList.myModule.directive('featureList', [
-        '$window', '$compile',
-        function ($window, $compile) {
-            return {
-                terminal: false,
-                restrict: 'E',
-                scope: {},
-                template: FeatureList.html,
-                //compile             : el          => {    // I need to explicitly compile it in order to use interpolation like {{xxx}}
-                //    var fn                        = $compile(el);
-                //    return scope                  => {
-                //        fn(scope);
-                //    };
-                //},
-                // Directives that want to modify the DOM typically use the link option.link takes a function with the following signature, function link(scope, element, attrs) { ... } where:
-                // scope is an Angular scope object.
-                // element is the jqLite - wrapped element that this directive matches.
-                // attrs is a hash object with key - value pairs of normalized attribute names and their corresponding attribute values.
-                link: function (scope, element, attrs) {
-                    // Deal with resizing the element list
-                    scope.onResizeFunction = function () {
-                        var filterHeight = 50;
-                        var paginationCtrlHeight = 100;
-                        var itemHeight = 60;
-
-                        //scope.windowHeight          = $window.innerHeight;
-                        //scope.windowWidth           = $window.innerWidth;
-                        scope.numberOfItems = Math.floor(($window.innerHeight - filterHeight - paginationCtrlHeight) / itemHeight);
-                    };
-
-                    // Call to the function when the page is first loaded
-                    scope.onResizeFunction();
-
-                    angular.element($window).bind('resize', function () {
-                        scope.onResizeFunction();
-                        scope.$apply();
-                    });
-                },
-                replace: true,
-                transclude: true,
-                controller: FeatureList.FeatureListCtrl
-            };
-        }
-    ]).directive('bsPopover', function () {
-        return function (scope, element, attrs) {
-            element.find("a[rel=popover]").popover({ placement: 'right', html: 'true' });
-        };
-    });
-})(FeatureList || (FeatureList = {}));
-var FeatureList;
-(function (FeatureList) {
-    var FeatureListCtrl = (function () {
-        // dependencies are injected via AngularJS $injector
-        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
-        function FeatureListCtrl($scope, $layerService, $mapService) {
-            this.$scope = $scope;
-            this.$layerService = $layerService;
-            this.$mapService = $mapService;
-            $scope.vm = this;
-            $scope.numberOfItems = 10; // This is being reset in the directive upon receiving a resize.
-        }
-        FeatureListCtrl.$inject = [
-            '$scope',
-            'layerService',
-            'mapService'
-        ];
-        return FeatureListCtrl;
-    })();
-    FeatureList.FeatureListCtrl = FeatureListCtrl;
-})(FeatureList || (FeatureList = {}));
-var FeatureProps;
-(function (FeatureProps) {
-    FeatureProps.html = '<div data-ng-cloak data-ng-show="showMenu" >    <h4 class="rightpanel-header">        &nbsp;&nbsp;{{callOut.title}}    </h4>        <div class="container-fluid rightpanel-tabs" style="position: relative">            <div class="row" style="overflow:hidden">            <!-- Nav tabs -->            <span id="leftArr" style="display:block;padding:10px;margin-top:5px;position:absolute;background-color:transparent;z-index:2">                <i class="glyphicon glyphicon-chevron-left"></i>            </span>            <span id="rightArr" style="display:block;padding:10px;margin-top:5px;position:absolute;background-color:transparent;z-index:2">                <i class="glyphicon glyphicon-chevron-right"></i>            </span>            <ul class="nav nav-tabs" id="featureTabs" style="margin-left:10px">                <li data-toggle="tab" data-ng-class="{active : $first}" data-ng-repeat="(sectionTitle, section) in callOut.sections" ng-if="section.hasProperties()">                    <a ng-href="#rp-{{$index}}" data-toggle="tab" data-ng-if="section.showSectionIcon()" ng-click="featureTabActivated(sectionTitle, section)"><i class="fa {{section.sectionIcon}}"></i></a>                    <a ng-href="#rp-{{$index}}" data-toggle="tab" data-ng-if="!section.showSectionIcon()" ng-click="featureTabActivated(sectionTitle, section)">{{sectionTitle}}</a>                </li>            </ul>        </div>    </div>    <div class="tab-content" style="top:50px; width:355px; overflow-y: auto; overflow-x: hidden" resize resize-y="150">        <div data-ng-if="!$last" class="tab-pane" data-ng-class="{active : $first}" id="rp-{{$index}}" data-ng-repeat="(sectionTitle, section) in callOut.sections">            <table class="table table-condensed">                <tr popover="{{(item.description) ? item.description : \'\'}}"                    popover-placement="left"                    popover-trigger="mouseenter"                    popover-append-to-body="true"                    data-ng-repeat="item in section.properties">                    <td><a class="fa fa-filter makeNarrow" data-ng-show="item.canFilter" data-ng-click="vm.$layerService.setFilter(item)" style="cursor: pointer"></a></td>                    <td><a class="fa fa-eye makeNarrow" data-ng-show="item.canStyle" data-ng-click="vm.$layerService.setStyle(item)" style="cursor: pointer"></a></td>                    <td>{{item.key}}</td>                    <td class="text-right" data-ng-bind-html="vm.toTrusted(item.value)"></td>                </tr>            </table>        </div>        <!-- Treat last tab (filter) differently -->        <div data-ng-if="$last" class="tab-pane" data-ng-class="{active : $first}" id="rp-{{$index}}" data-ng-repeat="(sectionTitle, section) in callOut.sections">            <!-- Add filter panel to the last rendered element -->            <div class="has-feedback" style="padding:0 4px 4px 4px;">                <span style="direction: ltr; position: static; display: block;">                    <input id="searchbox" data-ng-model="search.key" type="text"                            placeholder="Filter" autocomplete="off" spellcheck="false"                            style="position: relative; vertical-align: top;" class="form-control tt-input">                </span>                <span id="searchicon" class="fa form-control-feedback fa-filter"></span>            </div>            <!--<input style="padding:4px;" class=" form-control" data-ng-model="search" placeholder="...">-->            <table id="searchTextResults" class="table table-condensed">                <tr popover="{{(item.description) ? item.description : \'\'}}"                    popover-placement="left"                    popover-trigger="mouseenter"                    popover-append-to-body="true"                    data-ng-repeat="item in section.properties | filter:search">                    <td><a class="fa fa-filter makeNarrow" data-ng-show="item.canFilter" data-ng-click="vm.$layerService.setFilter(item)"></a></td>                    <td><a class="fa fa-eye makeNarrow" data-ng-show="item.canStyle" data-ng-click="vm.$layerService.setStyle(item)"></a></td>                    <td>{{item.key}}</td>                    <td class="text-right" data-ng-bind-html="vm.toTrusted(item.value)"></td>                </tr>            </table>        </div>    </div></div>';
-})(FeatureProps || (FeatureProps = {}));
-var FeatureProps;
-(function (FeatureProps) {
-    /**
-    * Config
-    */
-    var moduleName = 'csWeb.featureprops';
-
-    /**
-    * Module
-    */
-    FeatureProps.myModule;
-    try  {
-        FeatureProps.myModule = angular.module(moduleName);
-    } catch (err) {
-        // named module does not exist, so create one
-        FeatureProps.myModule = angular.module(moduleName, []);
-    }
-
-    /**
-    * Directive to display a feature's properties in a panel.
-    *
-    * @seealso          : http://www.youtube.com/watch?v=gjJ5vLRK8R8&list=UUGD_0i6L48hucTiiyhb5QzQ
-    * @seealso          : http://plnkr.co/edit/HyBP9d?p=preview
-    */
-    FeatureProps.myModule.directive('featureprops', [
-        '$compile',
-        function ($compile) {
-            return {
-                terminal: true,
-                restrict: 'E',
-                scope: {},
-                template: FeatureProps.html,
-                compile: function (el) {
-                    var fn = $compile(el);
-                    return function (scope) {
-                        fn(scope);
-                    };
-                },
-                replace: true,
-                transclude: true,
-                controller: FeatureProps.FeaturePropsCtrl
-            };
-        }
-    ]);
-})(FeatureProps || (FeatureProps = {}));
-var FeatureProps;
-(function (FeatureProps) {
-    var FeaturePropsOptions = (function () {
-        function FeaturePropsOptions(position) {
-            this.position = position;
-            this.closeButton = true;
-            this.autoPan = true;
-        }
-        return FeaturePropsOptions;
-    })();
-
-    var CallOutProperty = (function () {
-        function CallOutProperty(key, value, property, canFilter, canStyle, feature, isFilter, description, meta) {
-            this.key = key;
-            this.value = value;
-            this.property = property;
-            this.canFilter = canFilter;
-            this.canStyle = canStyle;
-            this.feature = feature;
-            this.isFilter = isFilter;
-            this.description = description;
-            this.meta = meta;
-        }
-        return CallOutProperty;
-    })();
-    FeatureProps.CallOutProperty = CallOutProperty;
-
-    var CallOutSection = (function () {
-        function CallOutSection(sectionIcon) {
-            this.metaInfos = {};
-            this.properties = [];
-            this.sectionIcon = sectionIcon;
-        }
-        CallOutSection.prototype.showSectionIcon = function () {
-            return !csComp.StringExt.isNullOrEmpty(this.sectionIcon);
-        };
-
-        CallOutSection.prototype.addProperty = function (key, value, property, canFilter, canStyle, feature, isFilter, description, meta) {
-            if (description)
-                this.properties.push(new CallOutProperty(key, value, property, canFilter, canStyle, feature, isFilter, description, meta));
-            else
-                this.properties.push(new CallOutProperty(key, value, property, canFilter, canStyle, feature, isFilter, null, meta));
-        };
-
-        CallOutSection.prototype.hasProperties = function () {
-            return this.properties != null && this.properties.length > 0;
-        };
-        return CallOutSection;
-    })();
-    FeatureProps.CallOutSection = CallOutSection;
-
-    var CallOut = (function () {
-        function CallOut(type, feature, metaInfoData) {
-            var _this = this;
-            this.type = type;
-            this.feature = feature;
-            this.metaInfoData = metaInfoData;
-            this.sections = {};
-
-            //if (type == null) this.createDefaultType();
-            this.setTitle();
-
-            var infoCallOutSection = new CallOutSection('fa-info');
-            var searchCallOutSection = new CallOutSection('fa-filter');
-            var displayValue;
-            if (type != null) {
-                var metaInfos = [];
-                if (type.metaInfoKeys != null) {
-                    var keys = type.metaInfoKeys.split(';');
-                    keys.forEach(function (key) {
-                        if (key in metaInfoData)
-                            metaInfos.push(metaInfoData[key]);
-                        else if (type.metaInfoData != null) {
-                            var result = $.grep(type.metaInfoData, function (e) {
-                                return e.label === key;
-                            });
-                            if (result.length >= 1)
-                                metaInfos.push(result);
-                        }
-                    });
-                } else if (type.metaInfoData != null) {
-                    metaInfos = type.metaInfoData;
-                }
-                metaInfos.forEach(function (mi) {
-                    var callOutSection = _this.getOrCreateCallOutSection(mi.section) || infoCallOutSection;
-                    callOutSection.metaInfos[mi.label] = mi;
-                    var text = feature.properties[mi.label];
-                    displayValue = CallOut.convertPropertyInfo(mi, text);
-
-                    // Skip empty, non-editable values
-                    if (!mi.canEdit && csComp.StringExt.isNullOrEmpty(displayValue))
-                        return;
-
-                    var canFilter = (mi.type == "number" || mi.type == "text");
-                    var canStyle = (mi.type == "number");
-                    if (mi.filterType != null)
-                        canFilter = mi.filterType.toLowerCase() != "none";
-                    var isFilter = false;
-                    if (mi.visibleInCallOut)
-                        callOutSection.addProperty(mi.title, displayValue, mi.label, canFilter, canStyle, feature, isFilter, mi.description, mi);
-                    searchCallOutSection.addProperty(mi.title, displayValue, mi.label, canFilter, canStyle, feature, isFilter, mi.description);
-                });
-            }
-            if (infoCallOutSection.properties.length > 0)
-                this.sections['AAA Info'] = infoCallOutSection; // The AAA is added as the sections are sorted alphabetically
-            if (searchCallOutSection.properties.length > 0)
-                this.sections['Zzz Search'] = searchCallOutSection;
-        }
-        CallOut.convertPropertyInfo = function (mi, text) {
-            var displayValue;
-            if (!csComp.StringExt.isNullOrEmpty(text) && !$.isNumeric(text))
-                text = text.replace(/&amp;/g, '&');
-            if (csComp.StringExt.isNullOrEmpty(text))
-                return '';
-            switch (mi.type) {
-                case "bbcode":
-                    if (!csComp.StringExt.isNullOrEmpty(mi.stringFormat))
-                        text = String.format(mi.stringFormat, text);
-                    displayValue = XBBCODE.process({ text: text }).html;
-                    break;
-                case "number":
-                    if (!$.isNumeric(text))
-                        displayValue = text;
-                    else if (csComp.StringExt.isNullOrEmpty(mi.stringFormat))
-                        displayValue = text.toString();
-                    else
-                        displayValue = String.format(mi.stringFormat, parseFloat(text));
-                    break;
-                default:
-                    displayValue = text;
-                    break;
-            }
-            return displayValue;
-        };
-
-        ///**
-        // * In case we are dealing with a regular JSON file without type information, create a default type.
-        // */
-        //private createDefaultType(): void {
-        //    this.type              = [];
-        //    this.type.style        = { nameLabel: "Name", iconHeight: 30, iconWidth: 30 };
-        //    this.type.metaInfoData = [];
-        //    for (var kvp in this.feature.properties) {
-        //        var metaInfo: IMetaInfo = [];
-        //        metaInfo.label          = kvp.key;
-        //        metaInfo.title          = kvp.key.replace("_", " ");
-        //        metaInfo.isSearchable   = true;
-        //        metaInfo.type           = MetaInfoType.Text;
-        //        this.type.metaInfoData.push(metaInfo);
-        //    }
-        //}
-        CallOut.prototype.getOrCreateCallOutSection = function (sectionTitle) {
-            if (csComp.StringExt.isNullOrEmpty(sectionTitle)) {
-                return null;
-            }
-            if (sectionTitle in this.sections)
-                return this.sections[sectionTitle];
-            this.sections[sectionTitle] = new CallOutSection();
-            return this.sections[sectionTitle];
-        };
-
-        /**
-        * Set the title of the callout to the title of the feature.
-        */
-        CallOut.prototype.setTitle = function () {
-            this.title = CallOut.title(this.type, this.feature);
-            //var title: string;
-            //if (this.type == null || this.type.style == null || csComp.StringExt.isNullOrEmpty(this.type.style.nameLabel))
-            //    title = this.feature.properties['Name'];
-            //else
-            //    title = this.feature.properties[this.type.style.nameLabel];
-            //if (!csComp.StringExt.isNullOrEmpty(title) && !$.isNumeric(title))
-            //    this.title = title.replace(/&amp;/g, '&');
-        };
-
-        CallOut.title = function (type, feature) {
-            var title;
-            if (type == null || type.style == null || csComp.StringExt.isNullOrEmpty(type.style.nameLabel))
-                title = feature.properties['Name'];
-            else
-                title = feature.properties[type.style.nameLabel];
-            if (!csComp.StringExt.isNullOrEmpty(title) && !$.isNumeric(title))
-                title = title.replace(/&amp;/g, '&');
-            return title;
-        };
-        return CallOut;
-    })();
-    FeatureProps.CallOut = CallOut;
-
-    var FeaturePropsCtrl = (function () {
-        // dependencies are injected via AngularJS $injector
-        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
-        function FeaturePropsCtrl($scope, $location, $sce, $mapService, $layerService, $messageBusService) {
-            var _this = this;
-            this.$scope = $scope;
-            this.$location = $location;
-            this.$sce = $sce;
-            this.$mapService = $mapService;
-            this.$layerService = $layerService;
-            this.$messageBusService = $messageBusService;
-            /**
-            * Callback function
-            * @see {http://stackoverflow.com/questions/12756423/is-there-an-alias-for-this-in-typescript}
-            * @see {http://stackoverflow.com/questions/20627138/typescript-this-scoping-issue-when-called-in-jquery-callback}
-            * @todo {notice the strange syntax using a fat arrow =>, which is to preserve the this reference in a callback!}
-            */
-            this.sidebarMessageReceived = function (title) {
-                switch (title) {
-                    case "toggle":
-                        _this.$scope.showMenu = !_this.$scope.showMenu;
-                        break;
-                    case "show":
-                        _this.$scope.showMenu = true;
-                        break;
-                    case "hide":
-                        _this.$scope.showMenu = false;
-                        break;
-                    default:
-                }
-
-                // NOTE EV: You need to call apply only when an event is received outside the angular scope.
-                // However, make sure you are not calling this inside an angular apply cycle, as it will generate an error.
-                if (_this.$scope.$root.$$phase != '$apply' && _this.$scope.$root.$$phase != '$digest') {
-                    _this.$scope.$apply();
-                }
-            };
-            this.featureMessageReceived = function (title, feature) {
-                switch (title) {
-                    case "onFeatureSelect":
-                        //console.log(feature);
-                        _this.displayFeature(feature);
-                        _this.$scope.poi = feature;
-                        _this.$scope.autocollapse(true);
-                        break;
-                    default:
-                }
-                if (_this.$scope.$root.$$phase != '$apply' && _this.$scope.$root.$$phase != '$digest') {
-                    _this.$scope.$apply();
-                }
-            };
-            this.scope = $scope;
-            $scope.vm = this;
-            $scope.showMenu = false;
-
-            $scope.featureTabActivated = function (sectionTitle, section) {
-                $messageBusService.publish('FeatureTab', 'activated', { sectionTitle: sectionTitle, section: section });
-            };
-
-            //console.log('SidebarCtrl: constructed');
-            this.$messageBusService.subscribe("sidebar", this.sidebarMessageReceived);
-            this.$messageBusService.subscribe("feature", this.featureMessageReceived);
-
-            var widthOfList = function () {
-                var itemsWidth = 0;
-                $('#featureTabs>li').each(function () {
-                    var itemWidth = $(this).outerWidth();
-
-                    itemsWidth += itemWidth;
-                });
-                return itemsWidth;
-            };
-
-            $scope.autocollapse = function (initializeTabPosition) {
-                if (typeof initializeTabPosition === "undefined") { initializeTabPosition = false; }
-                //                console.log('autocollapse');
-                var tabs = $('#featureTabs');
-
-                //                console.log('#ft.ow(): ' + tabs.outerWidth());
-                //                console.log('wol: ' + widthOfList());
-                //                console.log('ml: ' + tabs.css('margin-left'));
-                if (tabs.outerWidth() < widthOfList() || parseFloat(tabs.css('margin-left')) < 0) {
-                    $('#leftArr').show();
-                    $('#rightArr').show();
-                    if (initializeTabPosition) {
-                        tabs.animate({ 'margin-left': '20px' }, 'slow');
-                    }
-                } else {
-                    $('#leftArr').hide();
-                    $('#rightArr').hide();
-                    if (initializeTabPosition) {
-                        tabs.animate({ 'margin-left': '0px' }, 'slow');
-                    }
-                }
-            };
-
-            $scope.autocollapse(true); // when document first loads
-            $scope.tabs = $('#featureTabs');
-            $scope.tabScrollDelta = $scope.tabs.outerWidth();
-
-            $('#leftArr').click(function () {
-                //console.log('leftArr');
-                //var tabs = $('#featureTabs');
-                var current = parseFloat($scope.tabs.css('margin-left'));
-                var min = 20;
-                var nextPos = $scope.tabScrollDelta;
-
-                if (current + nextPos > min) {
-                    nextPos = min - current;
-                }
-
-                $scope.tabs.animate({ 'margin-left': '+=' + nextPos + 'px' }, 'slow', function () {
-                    //                    console.log('rightarr hide');
-                    $('#rightArr').show();
-                    $('#leftArr').show();
-                    $scope.autocollapse(false);
-                });
-            });
-
-            $('#rightArr').click(function () {
-                //var tabs = $('#featureTabs');
-                var max = widthOfList() - $scope.tabs.outerWidth() + 30;
-                var current = Math.abs(parseFloat($scope.tabs.css('margin-left')));
-                var nextPos = $scope.tabScrollDelta;
-                nextPos = Math.min(max, nextPos);
-
-                $scope.tabs.animate({ 'margin-left': '-=' + nextPos + 'px' }, 'slow', function () {
-                    $('#leftArr').show();
-                    $('#rightArr').show();
-
-                    $scope.autocollapse(false);
-                });
-            });
-        }
-        FeaturePropsCtrl.prototype.toTrusted = function (html) {
-            return this.$sce.trustAsHtml(html);
-        };
-
-        FeaturePropsCtrl.prototype.displayFeature = function (feature) {
-            var featureType = this.$layerService.featureTypes[feature.featureTypeName];
-            this.$scope.callOut = new CallOut(featureType, feature, this.$layerService.metaInfoData);
-
-            // Probably not needed
-            if (this.$scope.$root.$$phase != '$apply' && this.$scope.$root.$$phase != '$digest') {
-                this.$scope.$apply();
-            }
-        };
-        FeaturePropsCtrl.$inject = [
-            '$scope',
-            '$location',
-            '$sce',
-            'mapService',
-            'layerService',
-            'messageBusService'
-        ];
-        return FeaturePropsCtrl;
-    })();
-    FeatureProps.FeaturePropsCtrl = FeaturePropsCtrl;
-})(FeatureProps || (FeatureProps = {}));
-var FilterList;
-(function (FilterList) {
-    FilterList.html = '<div>    <h4 class="leftpanel-header" translate="FILTERS"></h4>    <div ng-show="vm.$layerService.noFilters" translate="FILTER_INFO"></div>    <a ng-hide="vm.$layerService.noFilters" ng-click="vm.$layerService.resetFilters()"><span class="fa fa-refresh"></span> reset</a>    <div id="filterChart"></div></div>';
-})(FilterList || (FilterList = {}));
-var FilterList;
-(function (FilterList) {
-    /**
-    * Config
-    */
-    var moduleName = 'csWeb.filterList';
-
-    /**
-    * Module
-    */
-    FilterList.myModule;
-    try  {
-        FilterList.myModule = angular.module(moduleName);
-    } catch (err) {
-        // named module does not exist, so create one
-        FilterList.myModule = angular.module(moduleName, []);
-    }
-
-    /**
-    * Directive to display the available map layers.
-    */
-    FilterList.myModule.directive('filterList', [
-        '$window', '$compile',
-        function ($window, $compile) {
-            return {
-                terminal: false,
-                restrict: 'E',
-                scope: {},
-                template: FilterList.html,
-                //compile             : el          => {    // I need to explicitly compile it in order to use interpolation like {{xxx}}
-                //    var fn                        = $compile(el);
-                //    return scope                  => {
-                //        fn(scope);
-                //    };
-                //},
-                link: function (scope, element, attrs) {
-                    // Deal with resizing the element list
-                    scope.onResizeFunction = function () {
-                        var filterHeight = 50;
-                        var paginationCtrlHeight = 100;
-                        var itemHeight = 60;
-
-                        //scope.windowHeight          = $window.innerHeight;
-                        //scope.windowWidth           = $window.innerWidth;
-                        scope.numberOfItems = Math.floor(($window.innerHeight - filterHeight - paginationCtrlHeight) / itemHeight);
-                    };
-
-                    // Call to the function when the page is first loaded
-                    scope.onResizeFunction();
-
-                    angular.element($window).bind('resize', function () {
-                        scope.onResizeFunction();
-                        scope.$apply();
-                    });
-                },
-                replace: true,
-                transclude: true,
-                controller: FilterList.FilterListCtrl
-            };
-        }
-    ]).directive('bsPopover', function () {
-        return function (scope, element, attrs) {
-            element.find("a[rel=popover]").popover({ placement: 'right', html: 'true' });
-        };
-    });
-})(FilterList || (FilterList = {}));
-var FilterList;
-(function (FilterList) {
-    var FilterListCtrl = (function () {
-        // dependencies are injected via AngularJS $injector
-        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
-        function FilterListCtrl($scope, $layerService) {
-            this.$scope = $scope;
-            this.$layerService = $layerService;
-            $scope.vm = this;
-        }
-        FilterListCtrl.$inject = [
-            '$scope',
-            'layerService'
-        ];
-        return FilterListCtrl;
-    })();
-    FilterList.FilterListCtrl = FilterListCtrl;
-})(FilterList || (FilterList = {}));
-var LayersDirective;
-(function (LayersDirective) {
-    LayersDirective.html = '<div>    <h4 class="leftpanel-header" translate="LAYERS"></h4>    <div data-ng-repeat="group in vm.$layerService.project.groups" style="margin-left: 5px">        <div style="float: left; margin-left: -10px; margin-top: 5px" data-toggle="collapse" data-target="#layergroup_{{group.id}}"><i class="fa fa-chevron-down togglebutton toggle-arrow-down"></i><i class="fa fa-chevron-up togglebutton toggle-arrow-up"></i></div>        <div popover="{{(group.description) ? group.description : \'\'}}"             popover-placement="right"             popover-width="400"             popover-trigger="mouseenter"             class="group-title">{{group.title}}</div>        <div id="layergroup_{{group.id}}" class="collapse in">            <div popover="{{(layer.description) ? layer.description : \'\'}}"                 popover-placement="right"                 popover-trigger="mouseenter"                                  data-ng-repeat="layer in group.layers">                <!--bs-popover>-->                <div style="list-style-type: none; padding: 0;" data-ng-class="{indent: layer.isSublayer}">                    <!--<button type="button" class="btn btn-default" data-container="body" data-toggle="popover" data-placement="right" data-content="Vivamus sagittis lacus vel augue laoreet rutrum faucibus." data-original-title="" title="">Right</button>-->                    <div ng-hide="group.oneLayerActive" class="checkbox checkbox-primary" style="margin-left: 20px">                        <input type="checkbox" id="cblayer{{layer.id}}" ng-model="layer.enabled" data-ng-click="vm.toggleLayer(layer);">                        <label for="cblayer{{layer.id}}">                            {{layer.title}}                        </label>                    </div>                    <div ng-show="group.oneLayerActive" class="radio radio-primary" style="margin-left: 20px">                        <input type="radio" ng-value="true" id="rblayer{{layer.id}}" ng-model="layer.enabled" data-ng-click="vm.toggleLayer(layer);">                        <label for="rblayer{{layer.id}}">                            {{layer.title}}                        </label>                    </div>                </div>            </div>        </div>    </div></div>';
-})(LayersDirective || (LayersDirective = {}));
-var LayersDirective;
-(function (LayersDirective) {
-    /**
-    * Config
-    */
-    var moduleName = 'csWeb.layersDirective';
-
-    /**
-    * Module
-    */
-    LayersDirective.myModule;
-    try  {
-        LayersDirective.myModule = angular.module(moduleName);
-    } catch (err) {
-        // named module does not exist, so create one
-        LayersDirective.myModule = angular.module(moduleName, []);
-    }
-
-    /**
-    * Directive to display the available map layers.
-    */
-    LayersDirective.myModule.directive('layersDirective', [
-        '$compile',
-        function ($compile) {
-            return {
-                terminal: true,
-                restrict: 'E',
-                scope: {},
-                template: LayersDirective.html,
-                compile: function (el) {
-                    var fn = $compile(el);
-                    return function (scope) {
-                        fn(scope);
-                    };
-                },
-                replace: true,
-                transclude: true,
-                controller: LayersDirective.LayersDirectiveCtrl
-            };
-        }
-    ]).directive('bsPopover', function () {
-        return function (scope, element, attrs) {
-            element.find("a[rel=popover]").popover({ placement: 'right', html: 'true' });
-        };
-    });
-})(LayersDirective || (LayersDirective = {}));
-var LayersDirective;
-(function (LayersDirective) {
-    var LayersDirectiveCtrl = (function () {
-        // dependencies are injected via AngularJS $injector
-        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
-        function LayersDirectiveCtrl($scope, $layerService) {
-            this.$scope = $scope;
-            this.$layerService = $layerService;
-            $scope.vm = this;
-        }
-        LayersDirectiveCtrl.prototype.toggleLayer = function (layer) {
-            layer.enabled = !layer.enabled;
-            if (layer.enabled) {
-                this.$layerService.addLayer(layer);
-            } else {
-                this.$layerService.removeLayer(layer);
-            }
-
-            // NOTE EV: You need to call apply only when an event is received outside the angular scope.
-            // However, make sure you are not calling this inside an angular apply cycle, as it will generate an error.
-            if (this.$scope.$root.$$phase != '$apply' && this.$scope.$root.$$phase != '$digest') {
-                this.$scope.$apply();
-            }
-        };
-        LayersDirectiveCtrl.$inject = [
-            '$scope',
-            'layerService'
-        ];
-        return LayersDirectiveCtrl;
-    })();
-    LayersDirective.LayersDirectiveCtrl = LayersDirectiveCtrl;
-})(LayersDirective || (LayersDirective = {}));
-var LegendList;
-(function (LegendList) {
-    LegendList.html = '<div style="position: relative;">    <h4 class="leftpanel-header" translate="LEGEND"></h4>        <div>        <div ng-repeat="legendItem in legendItems" class="legendItem">            <div class="legendIcon">                <img ng-src="{{legendItem.uri}}" class="legendImage" />            </div><span class="legendText">                {{legendItem.title}}            </span>        </div>    </div></div>';
-})(LegendList || (LegendList = {}));
-var LegendList;
-(function (LegendList) {
-    /**
-    * Config
-    */
-    var moduleName = 'csWeb.legendList';
-
-    /**
-    * Module
-    */
-    LegendList.myModule;
-    try  {
-        LegendList.myModule = angular.module(moduleName);
-    } catch (err) {
-        // named module does not exist, so create one
-        LegendList.myModule = angular.module(moduleName, []);
-    }
-
-    /**
-    * Directive to display the available map layers.
-    */
-    LegendList.myModule.directive('legendList', [
-        '$window', '$compile',
-        function ($window, $compile) {
-            return {
-                terminal: false,
-                restrict: 'E',
-                scope: {},
-                template: LegendList.html,
-                //compile             : el          => {    // I need to explicitly compile it in order to use interpolation like {{xxx}}
-                //    var fn                        = $compile(el);
-                //    return scope                  => {
-                //        fn(scope);
-                //    };
-                //},
-                // Directives that want to modify the DOM typically use the link option.link takes a function with the following signature, function link(scope, element, attrs) { ... } where:
-                // scope is an Angular scope object.
-                // element is the jqLite - wrapped element that this directive matches.
-                // attrs is a hash object with key - value pairs of normalized attribute names and their corresponding attribute values.
-                link: function (scope, element, attrs) {
-                    // Deal with resizing the element list
-                    scope.onResizeFunction = function () {
-                        var filterHeight = 50;
-                        var paginationCtrlHeight = 100;
-                        var itemHeight = 60;
-
-                        //scope.windowHeight          = $window.innerHeight;
-                        //scope.windowWidth           = $window.innerWidth;
-                        scope.numberOfItems = Math.floor(($window.innerHeight - filterHeight - paginationCtrlHeight) / itemHeight);
-                    };
-
-                    // Call to the function when the page is first loaded
-                    scope.onResizeFunction();
-
-                    angular.element($window).bind('resize', function () {
-                        scope.onResizeFunction();
-                        scope.$apply();
-                    });
-                },
-                replace: true,
-                transclude: true,
-                controller: LegendList.LegendListCtrl
-            };
-        }
-    ]).directive('bsPopover', function () {
-        return function (scope, element, attrs) {
-            element.find("a[rel=popover]").popover({ placement: 'right', html: 'true' });
-        };
-    });
-})(LegendList || (LegendList = {}));
-var LegendList;
-(function (LegendList) {
-    var LegendListCtrl = (function () {
-        // dependencies are injected via AngularJS $injector
-        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
-        function LegendListCtrl($scope, $layerService, $mapService, $messageBusService) {
-            var _this = this;
-            this.$scope = $scope;
-            this.$layerService = $layerService;
-            this.$mapService = $mapService;
-            this.$messageBusService = $messageBusService;
-            $scope.vm = this;
-
-            $messageBusService.subscribe('project', function () {
-                // Update the legend when a project is loaded.
-                _this.updateLegendItems();
-            });
-
-            $messageBusService.subscribe('layer', function () {
-                // Update the legend when a layer is added or removed.
-                _this.updateLegendItems();
-            });
-
-            this.updateLegendItems();
-
-            $scope.legendItems = [];
-
-            $scope.numberOfItems = 10; // This is being reset in the directive upon receiving a resize.
-        }
-        LegendListCtrl.prototype.updateLegendItems = function () {
-            var legendItems = [];
-            var existingItems = [];
-            for (var key in this.$layerService.featureTypes) {
-                var ft = this.$layerService.featureTypes[key];
-                var uri = this.getImageUri(ft);
-                var title = this.getName(key, ft);
-                var existingItem = name + uri;
-                if (existingItems.indexOf(existingItem) < 0) {
-                    existingItems.push(existingItem);
-                    legendItems.push({ "title": title, "uri": uri });
-                }
-            }
-            legendItems.sort(function (a, b) {
-                if (a.title > b.title)
-                    return 1;
-                if (a.title < b.title)
-                    return -1;
-                return 0;
-            });
-            this.$scope.legendItems = legendItems;
-        };
-
-        LegendListCtrl.prototype.getImageUri = function (ft) {
-            if (ft.style != null && ft.style.drawingMode.toLowerCase() != "point") {
-                if (ft.style.iconUri && ft.style.iconUri.indexOf('_Media') < 0)
-                    return ft.style.iconUri;
-                else
-                    return "includes/images/polygon.png";
-            } else if (ft.style != null && ft.style.iconUri != null) {
-                return ft.style.iconUri;
-            } else {
-                return "includes/images/marker.png";
-            }
-        };
-
-        LegendListCtrl.prototype.getName = function (key, ft) {
-            if (ft.name != null) {
-                return ft.name;
-            } else {
-                return key;
-            }
-        };
-        LegendListCtrl.$inject = [
-            '$scope',
-            'layerService',
-            'mapService',
-            'messageBusService'
-        ];
-        return LegendListCtrl;
-    })();
-    LegendList.LegendListCtrl = LegendListCtrl;
-})(LegendList || (LegendList = {}));
-var StyleList;
-(function (StyleList) {
-    StyleList.html = '<div>    <h4 class="leftpanel-header" translate="STYLES"></h4>    <div ng-show="vm.$layerService.noStyles" translate="STYLE_INFO"></div>    <div data-ng-repeat="group in vm.$layerService.project.groups" style="margin-left: 5px">        <div ng-show="group.styles.length">            <div style="float:left;margin-left: -10px; margin-top: 5px" data-toggle="collapse" data-target="#stylegroup_{{group.id}}"><i class="fa fa-chevron-down togglebutton toggle-arrow-down"></i><i class="fa fa-chevron-up togglebutton toggle-arrow-up"></i></div>            <div class="group-title">{{group.title}}</div>            <div id="stylegroup_{{group.id}}" class="collapse in">                <div data-ng-repeat="style in group.styles">                    <div class="checkbox checkbox-primary" style="margin-left:20px;float:left">                        <input type="checkbox" id="cbstyle{{style.id}}" ng-model="style.enabled" data-ng-change="vm.$layerService.updateStyle(style);">                        <label class="style-title" for="cbstyle{{style.id}}" style="width:175px">{{style.title}}</label>                    </div>                    <div style="float:right;margin-top:10px; width: 50px">                        <div data-ng-show="style.canSelectColor" style="float:left">                            <div class="dropdown">                                <div class="style-settings" data-toggle="dropdown">                                    <style>                                                                             </style>                                    <!--<img src="includes/images/fillcolor.png" style="width: 32px; height:32px" />-->                                    <div id="colors" style="border-radius: 50%;width: 20px;height:20px;border-style:solid;border-color: black;border-width: 1px;background: linear-gradient(to right, {{style.colors[0]}} , {{style.colors[1]}})">                                                                        </div>                                    <b class="caret"></b>                                </div>                                <!--<a class="btn btn-primary btn-sm" ng-model="style.visualAspect"  style="padding-left: 10px" href="#"> {{ style.visualAspect }} </a>-->                                <ul class="dropdown-menu" role="menu">                                    <li ng-repeat="(key,val) in style.colorScales" style="margin:3px;cursor: pointer">                                        <span ng-click="$parent.style.colors = val;vm.$layerService.updateStyle($parent.style)"> {{key}} </span>                                    </li>                                </ul>                            </div>                        </div>                        <div style="float:right">                            <div class="dropdown">                                <div class="style-settings" data-toggle="dropdown">                                    <!--<img src="includes/images/fillcolor.png" style="width: 32px; height:32px" />-->                                    <div class="style-aspect style-{{style.visualAspect}}"></div><b class="caret"></b>                                </div>                                <!--<a class="btn btn-primary btn-sm" ng-model="style.visualAspect"  style="padding-left: 10px" href="#"> {{ style.visualAspect }} </a>-->                                <ul class="dropdown-menu" role="menu">                                    <li ng-repeat="title in style.availableAspects" style="margin:3px;cursor: pointer">                                        <i class="style-aspect style-{{title}}" style="float:left" /><span ng-click="$parent.style.visualAspect = title;vm.$layerService.updateStyle($parent.style)"><img class="fa fa-search" style="margin-right: 8px" /> {{title}} </span>                                    </li>                                    <li class="divider"></li>                                    <li style="margin:3px;cursor: pointer"><i class="fa fa-remove" style="margin-right: 8px" style=" float:left" /><span ng-click="vm.$layerService.removeStyle(style)">Verwijder</span></li>                                </ul>                            </div>                        </div>                    </div>                </div>                <!--<div style="right:5px; position:absolute; margin-top: -15px"><a href="#" id="stylepop{{style.id}}" rel="popover" popover-template="template.html"><img src="includes/images/settings.png" width="20px"></a></div>-->            </div>        </div>    </div></div>';
-})(StyleList || (StyleList = {}));
-var StyleList;
-(function (StyleList) {
-    /**
-    * Config
-    */
-    var moduleName = 'csWeb.styleList';
-
-    /**
-    * Module
-    */
-    StyleList.myModule;
-    try  {
-        StyleList.myModule = angular.module(moduleName);
-    } catch (err) {
-        // named module does not exist, so create one
-        StyleList.myModule = angular.module(moduleName, []);
-    }
-
-    /**
-    * Directive to display the available map layers.
-    */
-    StyleList.myModule.directive('styleList', [
-        '$window', '$compile',
-        function ($window, $compile) {
-            return {
-                terminal: false,
-                restrict: 'E',
-                scope: {},
-                template: StyleList.html,
-                //compile             : el          => {    // I need to explicitly compile it in order to use interpolation like {{xxx}}
-                //    var fn                        = $compile(el);
-                //    return scope                  => {
-                //        fn(scope);
-                //    };
-                //},
-                link: function (scope, element, attrs) {
-                    // Deal with resizing the element list
-                    scope.onResizeFunction = function () {
-                        var filterHeight = 50;
-                        var paginationCtrlHeight = 100;
-                        var itemHeight = 60;
-
-                        //scope.windowHeight          = $window.innerHeight;
-                        //scope.windowWidth           = $window.innerWidth;
-                        scope.numberOfItems = Math.floor(($window.innerHeight - filterHeight - paginationCtrlHeight) / itemHeight);
-                    };
-
-                    // Call to the function when the page is first loaded
-                    scope.onResizeFunction();
-
-                    angular.element($window).bind('resize', function () {
-                        scope.onResizeFunction();
-                        scope.$apply();
-                    });
-                },
-                replace: true,
-                transclude: true,
-                controller: StyleList.StyleListCtrl
-            };
-        }
-    ]).directive('bsPopover', function () {
-        return function (scope, element, attrs) {
-            element.find("a[rel=popover]").popover({ placement: 'right', html: 'true' });
-        };
-    });
-})(StyleList || (StyleList = {}));
-var StyleList;
-(function (StyleList) {
-    var StyleListCtrl = (function () {
-        // dependencies are injected via AngularJS $injector
-        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
-        function StyleListCtrl($scope, $layerService) {
-            this.$scope = $scope;
-            this.$layerService = $layerService;
-            $scope.vm = this;
-        }
-        StyleListCtrl.$inject = [
-            '$scope',
-            'layerService'
-        ];
-        return StyleListCtrl;
-    })();
-    StyleList.StyleListCtrl = StyleListCtrl;
-})(StyleList || (StyleList = {}));
-var csComp;
-(function (csComp) {
     (function (StringExt) {
         function isNullOrEmpty(s) {
             return !s;
@@ -1738,6 +263,71 @@ var csComp;
     })(csComp.Services || (csComp.Services = {}));
     var Services = csComp.Services;
 })(csComp || (csComp = {}));
+var csComp;
+(function (csComp) {
+    (function (GeoJson) {
+        var Feature = (function () {
+            function Feature() {
+            }
+            return Feature;
+        })();
+        GeoJson.Feature = Feature;
+
+        (function (DrawingModeType) {
+            DrawingModeType[DrawingModeType["None"] = 0] = "None";
+            DrawingModeType[DrawingModeType["Image"] = 1] = "Image";
+            DrawingModeType[DrawingModeType["Point"] = 2] = "Point";
+            DrawingModeType[DrawingModeType["Square"] = 3] = "Square";
+            DrawingModeType[DrawingModeType["Rectangle"] = 4] = "Rectangle";
+            DrawingModeType[DrawingModeType["Line"] = 5] = "Line";
+            DrawingModeType[DrawingModeType["Circle"] = 6] = "Circle";
+            DrawingModeType[DrawingModeType["Freehand"] = 7] = "Freehand";
+            DrawingModeType[DrawingModeType["Polyline"] = 8] = "Polyline";
+            DrawingModeType[DrawingModeType["Polygon"] = 9] = "Polygon";
+            DrawingModeType[DrawingModeType["MultiPolygon"] = 10] = "MultiPolygon";
+        })(GeoJson.DrawingModeType || (GeoJson.DrawingModeType = {}));
+        var DrawingModeType = GeoJson.DrawingModeType;
+
+        //export enum MetaInfoType {
+        //    Text,
+        //    TextArea,
+        //    Rating,
+        //    Number,
+        //    Bbcode,
+        //    Boolean,
+        //    Bit,
+        //    Sensor,
+        //    Xml,
+        //    Options,
+        //    Unknown,
+        //    Image,
+        //    DateTime,
+        //    Mediafolder
+        //}
+        (function (featureFilterType) {
+            /** Turn filtering off */
+            featureFilterType[featureFilterType["none"] = 0] = "none";
+
+            /** Default for numbers: histogram */
+            featureFilterType[featureFilterType["bar"] = 1] = "bar";
+
+            /** Default for text */
+            featureFilterType[featureFilterType["text"] = 2] = "text";
+        })(GeoJson.featureFilterType || (GeoJson.featureFilterType = {}));
+        var featureFilterType = GeoJson.featureFilterType;
+
+        var MetaInfo = (function () {
+            function MetaInfo() {
+                this.visibleInCallOut = true;
+                this.canEdit = false;
+                this.isSearchable = true;
+            }
+            return MetaInfo;
+        })();
+        GeoJson.MetaInfo = MetaInfo;
+    })(csComp.GeoJson || (csComp.GeoJson = {}));
+    var GeoJson = csComp.GeoJson;
+})(csComp || (csComp = {}));
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -1826,7 +416,7 @@ var csComp;
                 });
 
                 var tip = d3.tip().attr('class', 'd3-tip').offset([0, 0]).html(function (d) {
-                    return '<strong>' + d.data.label + ": </strong> <span style='color:orangered'>" + Math.round(d.data.weight * 100) + "% x " + Math.round(d.data.score) + ",&nbsp; = " + Math.round(d.data.weight * d.data.score) + "</span>";
+                    return '<strong>' + d.data.label + ": </strong> <span style='color:orangered'>" + Math.round(d.data.weight * 100) + "% x " + Math.round(d.data.score) + "&nbsp; = " + Math.round(d.data.weight * d.data.score) + "</span>";
                 });
 
                 var arc = d3.svg.arc().innerRadius(innerRadius).outerRadius(function (d) {
@@ -1948,6 +538,345 @@ var Helpers;
     })(Helpers.Resize || (Helpers.Resize = {}));
     var Resize = Helpers.Resize;
 })(Helpers || (Helpers = {}));
+var LegendList;
+(function (LegendList) {
+    LegendList.html = '<div style="position: relative;">    <h4 class="leftpanel-header" translate="LEGEND"></h4>        <div>        <div ng-repeat="legendItem in legendItems" class="legendItem">            <div class="legendIcon">                <img ng-src="{{legendItem.uri}}" class="legendImage" />            </div><span class="legendText">                {{legendItem.title}}            </span>        </div>    </div></div>';
+})(LegendList || (LegendList = {}));
+var LegendList;
+(function (LegendList) {
+    /**
+    * Config
+    */
+    var moduleName = 'csWeb.legendList';
+
+    /**
+    * Module
+    */
+    LegendList.myModule;
+    try  {
+        LegendList.myModule = angular.module(moduleName);
+    } catch (err) {
+        // named module does not exist, so create one
+        LegendList.myModule = angular.module(moduleName, []);
+    }
+
+    /**
+    * Directive to display the available map layers.
+    */
+    LegendList.myModule.directive('legendList', [
+        '$window', '$compile',
+        function ($window, $compile) {
+            return {
+                terminal: false,
+                restrict: 'E',
+                scope: {},
+                template: LegendList.html,
+                //compile             : el          => {    // I need to explicitly compile it in order to use interpolation like {{xxx}}
+                //    var fn                        = $compile(el);
+                //    return scope                  => {
+                //        fn(scope);
+                //    };
+                //},
+                // Directives that want to modify the DOM typically use the link option.link takes a function with the following signature, function link(scope, element, attrs) { ... } where:
+                // scope is an Angular scope object.
+                // element is the jqLite - wrapped element that this directive matches.
+                // attrs is a hash object with key - value pairs of normalized attribute names and their corresponding attribute values.
+                link: function (scope, element, attrs) {
+                    // Deal with resizing the element list
+                    scope.onResizeFunction = function () {
+                        var filterHeight = 50;
+                        var paginationCtrlHeight = 100;
+                        var itemHeight = 60;
+
+                        //scope.windowHeight          = $window.innerHeight;
+                        //scope.windowWidth           = $window.innerWidth;
+                        scope.numberOfItems = Math.floor(($window.innerHeight - filterHeight - paginationCtrlHeight) / itemHeight);
+                    };
+
+                    // Call to the function when the page is first loaded
+                    scope.onResizeFunction();
+
+                    angular.element($window).bind('resize', function () {
+                        scope.onResizeFunction();
+                        scope.$apply();
+                    });
+                },
+                replace: true,
+                transclude: true,
+                controller: LegendList.LegendListCtrl
+            };
+        }
+    ]).directive('bsPopover', function () {
+        return function (scope, element, attrs) {
+            element.find("a[rel=popover]").popover({ placement: 'right', html: 'true' });
+        };
+    });
+})(LegendList || (LegendList = {}));
+var LegendList;
+(function (LegendList) {
+    var LegendListCtrl = (function () {
+        // dependencies are injected via AngularJS $injector
+        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
+        function LegendListCtrl($scope, $layerService, $mapService, $messageBusService) {
+            var _this = this;
+            this.$scope = $scope;
+            this.$layerService = $layerService;
+            this.$mapService = $mapService;
+            this.$messageBusService = $messageBusService;
+            $scope.vm = this;
+
+            $messageBusService.subscribe('project', function () {
+                // Update the legend when a project is loaded.
+                _this.updateLegendItems();
+            });
+
+            $messageBusService.subscribe('layer', function () {
+                // Update the legend when a layer is added or removed.
+                _this.updateLegendItems();
+            });
+
+            this.updateLegendItems();
+
+            $scope.legendItems = [];
+
+            $scope.numberOfItems = 10; // This is being reset in the directive upon receiving a resize.
+        }
+        LegendListCtrl.prototype.updateLegendItems = function () {
+            var legendItems = [];
+            var existingItems = [];
+            for (var key in this.$layerService.featureTypes) {
+                var ft = this.$layerService.featureTypes[key];
+                var uri = this.getImageUri(ft);
+                var title = this.getName(key, ft);
+                var existingItem = name + uri;
+                if (existingItems.indexOf(existingItem) < 0) {
+                    existingItems.push(existingItem);
+                    legendItems.push({ "title": title, "uri": uri });
+                }
+            }
+            legendItems.sort(function (a, b) {
+                if (a.title > b.title)
+                    return 1;
+                if (a.title < b.title)
+                    return -1;
+                return 0;
+            });
+            this.$scope.legendItems = legendItems;
+        };
+
+        LegendListCtrl.prototype.getImageUri = function (ft) {
+            if (ft.style != null && ft.style.drawingMode.toLowerCase() != "point") {
+                if (ft.style.iconUri && ft.style.iconUri.indexOf('_Media') < 0)
+                    return ft.style.iconUri;
+                else
+                    return "includes/images/polygon.png";
+            } else if (ft.style != null && ft.style.iconUri != null) {
+                return ft.style.iconUri;
+            } else {
+                return "includes/images/marker.png";
+            }
+        };
+
+        LegendListCtrl.prototype.getName = function (key, ft) {
+            if (ft.name != null) {
+                return ft.name;
+            } else {
+                return key;
+            }
+        };
+        LegendListCtrl.$inject = [
+            '$scope',
+            'layerService',
+            'mapService',
+            'messageBusService'
+        ];
+        return LegendListCtrl;
+    })();
+    LegendList.LegendListCtrl = LegendListCtrl;
+})(LegendList || (LegendList = {}));
+var FeatureList;
+(function (FeatureList) {
+    FeatureList.html = '<div style="position: relative;">    <h4 class="leftpanel-header" translate="FEATURES"></h4>    <div class="has-feedback" style="padding:10px 4px 4px 4px;">        <span style="direction: ltr; position: static; display: block;">            <input id="searchbox" data-ng-model="featureFilter.properties" type="text"                   placeholder="Filter" autocomplete="off" spellcheck="false"                   style="position: relative; vertical-align: top;" class="form-control tt-input">        </span>        <span id="searchicon" class="fa form-control-feedback fa-filter" style="padding-top: 10px;"></span>    </div>    <table class="table table-striped table-condensed">        <!--vm.$layerService.features-->        <tr dir-paginate="feature in vm.$layerService.project.features | filter:featureFilter | orderBy:\'properties.Name\' | itemsPerPage: numberOfItems "            data-ng-click="vm.$mapService.zoomTo(feature);vm.$layerService.selectFeature(feature);" style="cursor: pointer; height: 50px; vertical-align: central">            <!--<td>Icon</td>-->            <td>{{ feature.properties.Name }}</td>            <td>                <i class="fa fa-chevron-right pull-right"></i>            </td>        </tr>    </table>    <dir-pagination-controls style="position: absolute; bottom: -80px;" max-size="6" boundary-links="false" direction-links="false" template-url="bower_components/angular-utils-pagination/dirPagination.tpl.html"></dir-pagination-controls></div>';
+})(FeatureList || (FeatureList = {}));
+var FeatureList;
+(function (FeatureList) {
+    /**
+    * Config
+    */
+    var moduleName = 'csWeb.featureList';
+
+    /**
+    * Module
+    */
+    FeatureList.myModule;
+    try  {
+        FeatureList.myModule = angular.module(moduleName);
+    } catch (err) {
+        // named module does not exist, so create one
+        FeatureList.myModule = angular.module(moduleName, []);
+    }
+
+    /**
+    * Directive to display the available map layers.
+    */
+    FeatureList.myModule.directive('featureList', [
+        '$window', '$compile',
+        function ($window, $compile) {
+            return {
+                terminal: false,
+                restrict: 'E',
+                scope: {},
+                template: FeatureList.html,
+                //compile             : el          => {    // I need to explicitly compile it in order to use interpolation like {{xxx}}
+                //    var fn                        = $compile(el);
+                //    return scope                  => {
+                //        fn(scope);
+                //    };
+                //},
+                // Directives that want to modify the DOM typically use the link option.link takes a function with the following signature, function link(scope, element, attrs) { ... } where:
+                // scope is an Angular scope object.
+                // element is the jqLite - wrapped element that this directive matches.
+                // attrs is a hash object with key - value pairs of normalized attribute names and their corresponding attribute values.
+                link: function (scope, element, attrs) {
+                    // Deal with resizing the element list
+                    scope.onResizeFunction = function () {
+                        var filterHeight = 50;
+                        var paginationCtrlHeight = 100;
+                        var itemHeight = 60;
+
+                        //scope.windowHeight          = $window.innerHeight;
+                        //scope.windowWidth           = $window.innerWidth;
+                        scope.numberOfItems = Math.floor(($window.innerHeight - filterHeight - paginationCtrlHeight) / itemHeight);
+                    };
+
+                    // Call to the function when the page is first loaded
+                    scope.onResizeFunction();
+
+                    angular.element($window).bind('resize', function () {
+                        scope.onResizeFunction();
+                        scope.$apply();
+                    });
+                },
+                replace: true,
+                transclude: true,
+                controller: FeatureList.FeatureListCtrl
+            };
+        }
+    ]).directive('bsPopover', function () {
+        return function (scope, element, attrs) {
+            element.find("a[rel=popover]").popover({ placement: 'right', html: 'true' });
+        };
+    });
+})(FeatureList || (FeatureList = {}));
+var FeatureList;
+(function (FeatureList) {
+    var FeatureListCtrl = (function () {
+        // dependencies are injected via AngularJS $injector
+        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
+        function FeatureListCtrl($scope, $layerService, $mapService) {
+            this.$scope = $scope;
+            this.$layerService = $layerService;
+            this.$mapService = $mapService;
+            $scope.vm = this;
+            $scope.numberOfItems = 10; // This is being reset in the directive upon receiving a resize.
+        }
+        FeatureListCtrl.$inject = [
+            '$scope',
+            'layerService',
+            'mapService'
+        ];
+        return FeatureListCtrl;
+    })();
+    FeatureList.FeatureListCtrl = FeatureListCtrl;
+})(FeatureList || (FeatureList = {}));
+var FilterList;
+(function (FilterList) {
+    FilterList.html = '<div>    <h4 class="leftpanel-header" translate="FILTERS"></h4>    <div ng-show="vm.$layerService.noFilters" translate="FILTER_INFO"></div>    <a ng-hide="vm.$layerService.noFilters" ng-click="vm.$layerService.resetFilters()"><span class="fa fa-refresh"></span> reset</a>    <div id="filterChart"></div></div>';
+})(FilterList || (FilterList = {}));
+var FilterList;
+(function (FilterList) {
+    /**
+    * Config
+    */
+    var moduleName = 'csWeb.filterList';
+
+    /**
+    * Module
+    */
+    FilterList.myModule;
+    try  {
+        FilterList.myModule = angular.module(moduleName);
+    } catch (err) {
+        // named module does not exist, so create one
+        FilterList.myModule = angular.module(moduleName, []);
+    }
+
+    /**
+    * Directive to display the available map layers.
+    */
+    FilterList.myModule.directive('filterList', [
+        '$window', '$compile',
+        function ($window, $compile) {
+            return {
+                terminal: false,
+                restrict: 'E',
+                scope: {},
+                template: FilterList.html,
+                //compile             : el          => {    // I need to explicitly compile it in order to use interpolation like {{xxx}}
+                //    var fn                        = $compile(el);
+                //    return scope                  => {
+                //        fn(scope);
+                //    };
+                //},
+                link: function (scope, element, attrs) {
+                    // Deal with resizing the element list
+                    scope.onResizeFunction = function () {
+                        var filterHeight = 50;
+                        var paginationCtrlHeight = 100;
+                        var itemHeight = 60;
+
+                        //scope.windowHeight          = $window.innerHeight;
+                        //scope.windowWidth           = $window.innerWidth;
+                        scope.numberOfItems = Math.floor(($window.innerHeight - filterHeight - paginationCtrlHeight) / itemHeight);
+                    };
+
+                    // Call to the function when the page is first loaded
+                    scope.onResizeFunction();
+
+                    angular.element($window).bind('resize', function () {
+                        scope.onResizeFunction();
+                        scope.$apply();
+                    });
+                },
+                replace: true,
+                transclude: true,
+                controller: FilterList.FilterListCtrl
+            };
+        }
+    ]).directive('bsPopover', function () {
+        return function (scope, element, attrs) {
+            element.find("a[rel=popover]").popover({ placement: 'right', html: 'true' });
+        };
+    });
+})(FilterList || (FilterList = {}));
+var FilterList;
+(function (FilterList) {
+    var FilterListCtrl = (function () {
+        // dependencies are injected via AngularJS $injector
+        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
+        function FilterListCtrl($scope, $layerService) {
+            this.$scope = $scope;
+            this.$layerService = $layerService;
+            $scope.vm = this;
+        }
+        FilterListCtrl.$inject = [
+            '$scope',
+            'layerService'
+        ];
+        return FilterListCtrl;
+    })();
+    FilterList.FilterListCtrl = FilterListCtrl;
+})(FilterList || (FilterList = {}));
 var csComp;
 (function (csComp) {
     (function (Mca) {
@@ -1969,6 +898,7 @@ var csComp;
                         case "onFeatureDeselect":
                             _this.showFeature = false;
                             _this.selectedFeature = null;
+                            _this.drawChart();
                             break;
                         default:
                             console.log(title);
@@ -1993,21 +923,26 @@ var csComp;
                 mca.description = 'Analyse van de zelfredzaamheid van een gemeente.';
                 mca.label = 'mca_zelfredzaamheid';
                 mca.stringFormat = '{0:0.0}';
-                mca.rankTitle = 'Rang';
+                mca.rankTitle = 'Positie';
+                mca.rankDescription = 'Relatieve positie in de lijst.';
                 mca.rankFormat = '{0} van {1}';
                 mca.userWeightMax = 5;
                 mca.featureIds = ['cities_Default'];
 
                 var criterion = new Mca.Models.Criterion();
                 criterion.label = 'p_00_14_jr';
-                criterion.color = 'green';
+                criterion.scores = '[0,0 20,1]';
+                criterion.userWeight = 1;
+                mca.criteria.push(criterion);
+
+                criterion = new Mca.Models.Criterion();
+                criterion.label = 'p_15_24_jr';
                 criterion.scores = '[0,0 20,1]';
                 criterion.userWeight = 1;
                 mca.criteria.push(criterion);
 
                 criterion = new Mca.Models.Criterion();
                 criterion.label = 'p_65_eo_jr';
-                criterion.color = 'red';
                 criterion.scores = '[0,0 25,1]';
                 criterion.userWeight = 3;
                 mca.criteria.push(criterion);
@@ -2024,14 +959,12 @@ var csComp;
 
                 criterion = new Mca.Models.Criterion();
                 criterion.label = 'p_15_24_jr';
-                criterion.color = 'green';
                 criterion.scores = '[0,0 20,1]';
                 criterion.userWeight = 1;
                 mca.criteria.push(criterion);
 
                 criterion = new Mca.Models.Criterion();
                 criterion.label = 'p_65_eo_jr';
-                criterion.color = 'red';
                 criterion.scores = '[0,0 25,1]';
                 criterion.userWeight = 3;
                 mca.criteria.push(criterion);
@@ -2040,6 +973,7 @@ var csComp;
                 $scope.$watch('vm.mca', function (d) {
                     if (!_this.mca)
                         return;
+                    _this.calculateMca();
                     _this.drawChart();
                     // console.log(JSON.stringify(d));
                 }, true);
@@ -2050,17 +984,16 @@ var csComp;
                 this.selectedFeature = feature;
                 if (this.mca.label in feature.properties) {
                     this.showFeature = true;
-                    var mi = new csComp.GeoJson.MetaInfo();
-                    mi.label = this.mca.label;
-                    mi.title = this.mca.title;
-                    mi.type = 'number';
-                    mi.stringFormat = this.mca.stringFormat;
-                    mi.description = this.mca.description;
+                    this.properties = [];
+                    var mi = McaCtrl.createMetaInfo(this.mca);
                     var displayValue = FeatureProps.CallOut.convertPropertyInfo(mi, feature.properties[mi.label]);
-                    this.selectedProperty = new FeatureProps.CallOutProperty(mi.title, displayValue, mi.label, true, true, feature, false, mi.description);
+                    this.properties.push(new FeatureProps.CallOutProperty(mi.title, displayValue, mi.label, true, true, feature, false, mi.description));
+                    if (this.mca.rankTitle) {
+                        mi = McaCtrl.createMetaInfoRank(this.mca);
+                        displayValue = FeatureProps.CallOut.convertPropertyInfo(mi, feature.properties[mi.label]);
+                        this.properties.push(new FeatureProps.CallOutProperty(mi.title, displayValue, mi.label, false, false, feature, false, mi.description));
+                    }
                     this.drawChart();
-                    //console.log(feature);
-                    //this.displayFeature(feature);
                 }
             };
 
@@ -2158,12 +1091,39 @@ var csComp;
                     });
                     mca.updatePla(features);
                     mca.update();
+                    var tempScores = [];
+                    var index = 0;
                     _this.$layerService.project.features.forEach(function (feature) {
                         var score = mca.getScore(feature);
+                        if (mca.rankTitle) {
+                            var item = { score: score, index: index++ };
+                            tempScores.push(item);
+                        }
                         feature.properties[mca.label] = score * 100;
+                        _this.$layerService.updateFeature(feature);
                     });
+                    if (mca.rankTitle) {
+                        // Add rank information
+                        tempScores.sort(function (a, b) {
+                            return b.score - a.score;
+                        });
+                        var length = _this.$layerService.project.features.length;
+                        var prevScore = -1;
+                        var rank = 1;
+                        for (var i = 0; i < length; i++) {
+                            var item = tempScores[i];
+
+                            // Assign items with the same value the same rank.
+                            if (item.score != prevScore)
+                                rank = i + 1;
+                            prevScore = item.score;
+                            _this.$layerService.project.features[item.index].properties[mca.label + '#'] = rank + ',' + length;
+                        }
+                    }
                 });
                 this.updateSelectedFeature(this.selectedFeature);
+                if (this.groupStyle)
+                    this.$layerService.updateStyle(this.groupStyle);
             };
 
             McaCtrl.prototype.applyPropertyInfoToCriteria = function (mca, featureType) {
@@ -2178,15 +1138,33 @@ var csComp;
                 });
             };
 
-            McaCtrl.prototype.createMca = function () {
-            };
-
             McaCtrl.prototype.addPropertyInfo = function (featureId, mca) {
                 var featureType = this.$layerService.featureTypes[featureId];
                 if (featureType.metaInfoData.reduce(function (prevValue, curItem) {
                     return prevValue || (curItem.label === mca.label);
                 }, false))
                     return;
+
+                var mi = McaCtrl.createMetaInfo(mca);
+                featureType.metaInfoData.push(mi);
+
+                if (!mca.rankTitle)
+                    return;
+                mi = McaCtrl.createMetaInfoRank(mca);
+                featureType.metaInfoData.push(mi);
+            };
+
+            McaCtrl.prototype.setStyle = function (item) {
+                if (this.groupStyle)
+                    this.$layerService.updateStyle(this.groupStyle);
+                else {
+                    this.groupStyle = this.$layerService.setStyle(item, false);
+                    this.groupStyle.colors = ['red', 'green'];
+                    this.$layerService.updateStyle(this.groupStyle);
+                }
+            };
+
+            McaCtrl.createMetaInfo = function (mca) {
                 var mi = new csComp.GeoJson.MetaInfo();
                 mi.title = mca.title;
                 mi.label = mca.label;
@@ -2195,8 +1173,19 @@ var csComp;
                 mi.minValue = 0;
                 mi.description = mca.description;
                 mi.stringFormat = mca.stringFormat;
-                mi.section = mca.section || 'Info';
-                featureType.metaInfoData.push(mi);
+                mi.section = mca.section || 'MCA';
+                return mi;
+            };
+
+            McaCtrl.createMetaInfoRank = function (mca) {
+                var mi = new csComp.GeoJson.MetaInfo();
+                mi.title = mca.rankTitle;
+                mi.label = mca.label + '#';
+                mi.type = 'rank';
+                mi.description = mca.rankDescription;
+                mi.stringFormat = mca.rankFormat;
+                mi.section = mca.section || 'MCA';
+                return mi;
             };
             McaCtrl.$inject = [
                 '$scope',
@@ -2365,18 +1354,9 @@ var csComp;
                     });
                 };
 
-                //public calculateWeights(criteria?: Criterion[]): void {
-                //    if (!criteria) criteria = this.criteria;
-                //    if (criteria.length === 0) return;
-                //    var totalWeight = 0;
-                //    criteria.forEach((c) => {
-                //        totalWeight += c.userWeight;
-                //    });
-                //    if (totalWeight == 0) return;
-                //    criteria.forEach((c) => {
-                //        c.weight = c.userWeight / totalWeight;
-                //    });
-                //}
+                /**
+                * Update the MCA by calculating the weights and setting the colors.
+                */
                 Mca.prototype.update = function () {
                     this.calculateWeights();
                     this.setColors();
@@ -2402,14 +1382,14 @@ var csComp;
 
                 /** Set the colors of all criteria and sub-criteria */
                 Mca.prototype.setColors = function () {
-                    var redColors = chroma.scale('Reds').domain([0, this.criteria.length - 1], this.criteria.length);
+                    var redColors = chroma.scale('RdYlBu').domain([0, this.criteria.length - 1], this.criteria.length);
                     var totalSubcrit = 0;
                     var i = 0;
                     this.criteria.forEach(function (c) {
                         totalSubcrit += c.criteria.length;
                         c.color = redColors(i++).hex();
                     });
-                    var blueColors = chroma.scale('Blues').domain([0, totalSubcrit - 1], totalSubcrit);
+                    var blueColors = chroma.scale('PRGn').domain([0, totalSubcrit - 1], totalSubcrit);
                     i = 0;
                     this.criteria.forEach(function (c) {
                         c.criteria.forEach(function (crit) {
@@ -2436,6 +1416,88 @@ var csComp;
     })(csComp.Services || (csComp.Services = {}));
     var Services = csComp.Services;
 })(csComp || (csComp = {}));
+var LayersDirective;
+(function (LayersDirective) {
+    LayersDirective.html = '<div>    <h4 class="leftpanel-header" translate="LAYERS"></h4>    <div data-ng-repeat="group in vm.$layerService.project.groups" style="margin-left: 5px">        <div style="float: left; margin-left: -10px; margin-top: 5px" data-toggle="collapse" data-target="#layergroup_{{group.id}}"><i class="fa fa-chevron-down togglebutton toggle-arrow-down"></i><i class="fa fa-chevron-up togglebutton toggle-arrow-up"></i></div>        <div popover="{{(group.description) ? group.description : \'\'}}"             popover-placement="right"             popover-width="400"             popover-trigger="mouseenter"             class="group-title">{{group.title}}</div>        <div id="layergroup_{{group.id}}" class="collapse in">            <div popover="{{(layer.description) ? layer.description : \'\'}}"                 popover-placement="right"                 popover-trigger="mouseenter"                                  data-ng-repeat="layer in group.layers">                <!--bs-popover>-->                <div style="list-style-type: none; padding: 0;" data-ng-class="{indent: layer.isSublayer}">                    <!--<button type="button" class="btn btn-default" data-container="body" data-toggle="popover" data-placement="right" data-content="Vivamus sagittis lacus vel augue laoreet rutrum faucibus." data-original-title="" title="">Right</button>-->                    <div ng-hide="group.oneLayerActive" class="checkbox checkbox-primary" style="margin-left: 20px">                        <input type="checkbox" id="cblayer{{layer.id}}" ng-model="layer.enabled" data-ng-click="vm.toggleLayer(layer);">                        <label for="cblayer{{layer.id}}">                            {{layer.title}}                        </label>                    </div>                    <div ng-show="group.oneLayerActive" class="radio radio-primary" style="margin-left: 20px">                        <input type="radio" ng-value="true" id="rblayer{{layer.id}}" ng-model="layer.enabled" data-ng-click="vm.toggleLayer(layer);">                        <label for="rblayer{{layer.id}}">                            {{layer.title}}                        </label>                    </div>                </div>            </div>        </div>    </div></div>';
+})(LayersDirective || (LayersDirective = {}));
+var LayersDirective;
+(function (LayersDirective) {
+    /**
+    * Config
+    */
+    var moduleName = 'csWeb.layersDirective';
+
+    /**
+    * Module
+    */
+    LayersDirective.myModule;
+    try  {
+        LayersDirective.myModule = angular.module(moduleName);
+    } catch (err) {
+        // named module does not exist, so create one
+        LayersDirective.myModule = angular.module(moduleName, []);
+    }
+
+    /**
+    * Directive to display the available map layers.
+    */
+    LayersDirective.myModule.directive('layersDirective', [
+        '$compile',
+        function ($compile) {
+            return {
+                terminal: true,
+                restrict: 'E',
+                scope: {},
+                template: LayersDirective.html,
+                compile: function (el) {
+                    var fn = $compile(el);
+                    return function (scope) {
+                        fn(scope);
+                    };
+                },
+                replace: true,
+                transclude: true,
+                controller: LayersDirective.LayersDirectiveCtrl
+            };
+        }
+    ]).directive('bsPopover', function () {
+        return function (scope, element, attrs) {
+            element.find("a[rel=popover]").popover({ placement: 'right', html: 'true' });
+        };
+    });
+})(LayersDirective || (LayersDirective = {}));
+var LayersDirective;
+(function (LayersDirective) {
+    var LayersDirectiveCtrl = (function () {
+        // dependencies are injected via AngularJS $injector
+        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
+        function LayersDirectiveCtrl($scope, $layerService) {
+            this.$scope = $scope;
+            this.$layerService = $layerService;
+            $scope.vm = this;
+        }
+        LayersDirectiveCtrl.prototype.toggleLayer = function (layer) {
+            layer.enabled = !layer.enabled;
+            if (layer.enabled) {
+                this.$layerService.addLayer(layer);
+            } else {
+                this.$layerService.removeLayer(layer);
+            }
+
+            // NOTE EV: You need to call apply only when an event is received outside the angular scope.
+            // However, make sure you are not calling this inside an angular apply cycle, as it will generate an error.
+            if (this.$scope.$root.$$phase != '$apply' && this.$scope.$root.$$phase != '$digest') {
+                this.$scope.$apply();
+            }
+        };
+        LayersDirectiveCtrl.$inject = [
+            '$scope',
+            'layerService'
+        ];
+        return LayersDirectiveCtrl;
+    })();
+    LayersDirective.LayersDirectiveCtrl = LayersDirectiveCtrl;
+})(LayersDirective || (LayersDirective = {}));
 var csComp;
 (function (csComp) {
     (function (Services) {
@@ -2721,7 +1783,7 @@ var csComp;
                             if (f.meta != null && !csComp.StringExt.isNullOrEmpty(f.meta.stringFormat)) {
                                 value = String.format(f.meta.stringFormat, parseFloat(value));
                             }
-                            content += "<br><img src='includes/images/filter-black.png' style='width:12px; height:12px; margin-top:4px;float:left; margin-right:4px'/>" + f.title + ":<b>" + value + "</b>";
+                            content += "<br><kimg src='includes/images/filter-black.png' style='width:12px; height:12px; margin-top:4px;float:left; margin-right:4px'/>" + f.title + ":<b>" + value + "</b>";
                         }
                     });
                 }
@@ -3081,8 +2143,9 @@ var csComp;
                 return r;
             };
 
-            LayerService.prototype.setStyle = function (property) {
+            LayerService.prototype.setStyle = function (property, openStyleTab) {
                 var _this = this;
+                if (typeof openStyleTab === "undefined") { openStyleTab = true; }
                 var f = property.feature;
                 if (f != null) {
                     this.noStyles = false;
@@ -3116,7 +2179,8 @@ var csComp;
                     } else {
                         this.updateStyle(gs);
                     }
-                    $('#leftPanelTab a[href="#styles"]').tab('show'); // Select tab by name
+                    if (openStyleTab)
+                        $('#leftPanelTab a[href="#styles"]').tab('show'); // Select tab by name
                     return gs;
                 }
             };
@@ -3853,6 +2917,98 @@ var csComp;
     })(csComp.Services || (csComp.Services = {}));
     var Services = csComp.Services;
 })(csComp || (csComp = {}));
+var BaseMapList;
+(function (BaseMapList) {
+    BaseMapList.html = '<div>    <h4 class="leftpanel-header" translate="MAP"></h4>    <div data-ng-repeat="(key, value) in vm.$mapService.baseLayers" style="clear:left;">        <div ng-click="vm.selectBaseLayer(key);" class="select-basestyle">            <img data-ng-src="{{value.options.preview}}" class="preview-base-layer" style="margin-bottom:5px" />            <div style="margin:3px;float:left">                <span style="font-size: 18px;font-weight: bold;">{{key}}</span><br />                {{value.options.subtitle}}            </div>        </div>    </div></div>';
+})(BaseMapList || (BaseMapList = {}));
+var BaseMapList;
+(function (BaseMapList) {
+    /**
+    * Config
+    */
+    var moduleName = 'csWeb.baseMapList';
+
+    /**
+    * Module
+    */
+    BaseMapList.myModule;
+    try  {
+        BaseMapList.myModule = angular.module(moduleName);
+    } catch (err) {
+        // named module does not exist, so create one
+        BaseMapList.myModule = angular.module(moduleName, []);
+    }
+
+    /**
+    * Directive to display the available map layers.
+    */
+    BaseMapList.myModule.directive('baseMapList', [
+        '$window', '$compile',
+        function ($window, $compile) {
+            return {
+                terminal: false,
+                restrict: 'E',
+                scope: {},
+                template: BaseMapList.html,
+                //compile : el          => {    // I need to explicitly compile it in order to use interpolation like {{xxx}}
+                //    var fn                        = $compile(el);
+                //    return scope                  => {
+                //        fn(scope);
+                //    };
+                //},
+                link: function (scope, element, attrs) {
+                    // Deal with resizing the element list
+                    scope.onResizeFunction = function () {
+                        var filterHeight = 50;
+                        var paginationCtrlHeight = 100;
+                        var itemHeight = 60;
+
+                        //scope.windowHeight          = $window.innerHeight;
+                        //scope.windowWidth           = $window.innerWidth;
+                        scope.numberOfItems = Math.floor(($window.innerHeight - filterHeight - paginationCtrlHeight) / itemHeight);
+                    };
+
+                    // Call to the function when the page is first loaded
+                    scope.onResizeFunction();
+
+                    angular.element($window).bind('resize', function () {
+                        scope.onResizeFunction();
+                        scope.$apply();
+                    });
+                },
+                replace: true,
+                transclude: true,
+                controller: BaseMapList.BaseMapListCtrl
+            };
+        }
+    ]).directive('bsPopover', function () {
+        return function (scope, element, attrs) {
+            element.find("a[rel=popover]").popover({ placement: 'right', html: 'true' });
+        };
+    });
+})(BaseMapList || (BaseMapList = {}));
+var BaseMapList;
+(function (BaseMapList) {
+    var BaseMapListCtrl = (function () {
+        // dependencies are injected via AngularJS $injector
+        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
+        function BaseMapListCtrl($scope, $mapService) {
+            this.$scope = $scope;
+            this.$mapService = $mapService;
+            $scope.vm = this;
+        }
+        BaseMapListCtrl.prototype.selectBaseLayer = function (key) {
+            var bl = this.$mapService.baseLayers[key];
+            this.$mapService.changeBaseLayer(bl);
+        };
+        BaseMapListCtrl.$inject = [
+            '$scope',
+            'mapService'
+        ];
+        return BaseMapListCtrl;
+    })();
+    BaseMapList.BaseMapListCtrl = BaseMapListCtrl;
+})(BaseMapList || (BaseMapList = {}));
 var csComp;
 (function (csComp) {
     (function (Services) {
@@ -4031,6 +3187,94 @@ var csComp;
     })(csComp.Services || (csComp.Services = {}));
     var Services = csComp.Services;
 })(csComp || (csComp = {}));
+var StyleList;
+(function (StyleList) {
+    StyleList.html = '<div>    <h4 class="leftpanel-header" translate="STYLES"></h4>    <div ng-show="vm.$layerService.noStyles" translate="STYLE_INFO"></div>    <div data-ng-repeat="group in vm.$layerService.project.groups" style="margin-left: 5px">        <div ng-show="group.styles.length">            <div style="float:left;margin-left: -10px; margin-top: 5px" data-toggle="collapse" data-target="#stylegroup_{{group.id}}"><i class="fa fa-chevron-down togglebutton toggle-arrow-down"></i><i class="fa fa-chevron-up togglebutton toggle-arrow-up"></i></div>            <div class="group-title">{{group.title}}</div>            <div id="stylegroup_{{group.id}}" class="collapse in">                <div data-ng-repeat="style in group.styles">                    <div class="checkbox checkbox-primary" style="margin-left:20px;float:left">                        <input type="checkbox" id="cbstyle{{style.id}}" ng-model="style.enabled" data-ng-change="vm.$layerService.updateStyle(style);">                        <label class="style-title" for="cbstyle{{style.id}}" style="width:175px">{{style.title}}</label>                    </div>                    <div style="float:right;margin-top:10px; width: 50px">                        <div data-ng-show="style.canSelectColor" style="float:left">                            <div class="dropdown">                                <div class="style-settings" data-toggle="dropdown">                                    <style>                                                                             </style>                                    <!--<img src="includes/images/fillcolor.png" style="width: 32px; height:32px" />-->                                    <div id="colors" style="border-radius: 50%;width: 20px;height:20px;border-style:solid;border-color: black;border-width: 1px;background: linear-gradient(to right, {{style.colors[0]}} , {{style.colors[1]}})">                                                                        </div>                                    <b class="caret"></b>                                </div>                                <!--<a class="btn btn-primary btn-sm" ng-model="style.visualAspect"  style="padding-left: 10px" href="#"> {{ style.visualAspect }} </a>-->                                <ul class="dropdown-menu" role="menu">                                    <li ng-repeat="(key,val) in style.colorScales" style="margin:3px;cursor: pointer">                                        <span ng-click="$parent.style.colors = val;vm.$layerService.updateStyle($parent.style)"> {{key}} </span>                                    </li>                                </ul>                            </div>                        </div>                        <div style="float:right">                            <div class="dropdown">                                <div class="style-settings" data-toggle="dropdown">                                    <!--<img src="includes/images/fillcolor.png" style="width: 32px; height:32px" />-->                                    <div class="style-aspect style-{{style.visualAspect}}"></div><b class="caret"></b>                                </div>                                <!--<a class="btn btn-primary btn-sm" ng-model="style.visualAspect"  style="padding-left: 10px" href="#"> {{ style.visualAspect }} </a>-->                                <ul class="dropdown-menu" role="menu">                                    <li ng-repeat="title in style.availableAspects" style="margin:3px;cursor: pointer">                                        <i class="style-aspect style-{{title}}" style="float:left" /><span ng-click="$parent.style.visualAspect = title;vm.$layerService.updateStyle($parent.style)"><img class="fa fa-search" style="margin-right: 8px" /> {{title}} </span>                                    </li>                                    <li class="divider"></li>                                    <li style="margin:3px;cursor: pointer"><i class="fa fa-remove" style="margin-right: 8px" style=" float:left" /><span ng-click="vm.$layerService.removeStyle(style)">Verwijder</span></li>                                </ul>                            </div>                        </div>                    </div>                </div>                <!--<div style="right:5px; position:absolute; margin-top: -15px"><a href="#" id="stylepop{{style.id}}" rel="popover" popover-template="template.html"><img src="includes/images/settings.png" width="20px"></a></div>-->            </div>        </div>    </div></div>';
+})(StyleList || (StyleList = {}));
+var StyleList;
+(function (StyleList) {
+    /**
+    * Config
+    */
+    var moduleName = 'csWeb.styleList';
+
+    /**
+    * Module
+    */
+    StyleList.myModule;
+    try  {
+        StyleList.myModule = angular.module(moduleName);
+    } catch (err) {
+        // named module does not exist, so create one
+        StyleList.myModule = angular.module(moduleName, []);
+    }
+
+    /**
+    * Directive to display the available map layers.
+    */
+    StyleList.myModule.directive('styleList', [
+        '$window', '$compile',
+        function ($window, $compile) {
+            return {
+                terminal: false,
+                restrict: 'E',
+                scope: {},
+                template: StyleList.html,
+                //compile             : el          => {    // I need to explicitly compile it in order to use interpolation like {{xxx}}
+                //    var fn                        = $compile(el);
+                //    return scope                  => {
+                //        fn(scope);
+                //    };
+                //},
+                link: function (scope, element, attrs) {
+                    // Deal with resizing the element list
+                    scope.onResizeFunction = function () {
+                        var filterHeight = 50;
+                        var paginationCtrlHeight = 100;
+                        var itemHeight = 60;
+
+                        //scope.windowHeight          = $window.innerHeight;
+                        //scope.windowWidth           = $window.innerWidth;
+                        scope.numberOfItems = Math.floor(($window.innerHeight - filterHeight - paginationCtrlHeight) / itemHeight);
+                    };
+
+                    // Call to the function when the page is first loaded
+                    scope.onResizeFunction();
+
+                    angular.element($window).bind('resize', function () {
+                        scope.onResizeFunction();
+                        scope.$apply();
+                    });
+                },
+                replace: true,
+                transclude: true,
+                controller: StyleList.StyleListCtrl
+            };
+        }
+    ]).directive('bsPopover', function () {
+        return function (scope, element, attrs) {
+            element.find("a[rel=popover]").popover({ placement: 'right', html: 'true' });
+        };
+    });
+})(StyleList || (StyleList = {}));
+var StyleList;
+(function (StyleList) {
+    var StyleListCtrl = (function () {
+        // dependencies are injected via AngularJS $injector
+        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
+        function StyleListCtrl($scope, $layerService) {
+            this.$scope = $scope;
+            this.$layerService = $layerService;
+            $scope.vm = this;
+        }
+        StyleListCtrl.$inject = [
+            '$scope',
+            'layerService'
+        ];
+        return StyleListCtrl;
+    })();
+    StyleList.StyleListCtrl = StyleListCtrl;
+})(StyleList || (StyleList = {}));
 var csComp;
 (function (csComp) {
     (function (Search) {
@@ -4060,3 +3304,814 @@ var csComp;
     })(csComp.Search || (csComp.Search = {}));
     var Search = csComp.Search;
 })(csComp || (csComp = {}));
+var FeatureProps;
+(function (FeatureProps) {
+    FeatureProps.html = '<div data-ng-cloak data-ng-show="showMenu" >    <h4 class="rightpanel-header">        &nbsp;&nbsp;{{callOut.title}}    </h4>        <div class="container-fluid rightpanel-tabs" style="position: relative">            <div class="row" style="overflow:hidden">            <!-- Nav tabs -->            <span id="leftArr" style="display:block;padding:10px;margin-top:5px;position:absolute;background-color:transparent;z-index:2">                <i class="glyphicon glyphicon-chevron-left"></i>            </span>            <span id="rightArr" style="display:block;padding:10px;margin-top:5px;position:absolute;background-color:transparent;z-index:2">                <i class="glyphicon glyphicon-chevron-right"></i>            </span>            <ul class="nav nav-tabs" id="featureTabs" style="margin-left:10px">                <li data-toggle="tab" data-ng-class="{active : $first}" data-ng-repeat="(sectionTitle, section) in callOut.sections" ng-if="section.hasProperties()">                    <a ng-href="#rp-{{$index}}" data-toggle="tab" data-ng-if="section.showSectionIcon()" ng-click="featureTabActivated(sectionTitle, section)"><i class="fa {{section.sectionIcon}}"></i></a>                    <a ng-href="#rp-{{$index}}" data-toggle="tab" data-ng-if="!section.showSectionIcon()" ng-click="featureTabActivated(sectionTitle, section)">{{sectionTitle}}</a>                </li>            </ul>        </div>    </div>    <div class="tab-content" style="top:50px; width:355px; overflow-y: auto; overflow-x: hidden" resize resize-y="150">        <div data-ng-if="!$last" class="tab-pane" data-ng-class="{active : $first}" id="rp-{{$index}}" data-ng-repeat="(sectionTitle, section) in callOut.sections">            <table class="table table-condensed">                <tr popover="{{(item.description) ? item.description : \'\'}}"                    popover-placement="left"                    popover-trigger="mouseenter"                    popover-append-to-body="true"                    data-ng-repeat="item in section.properties">                    <td><a class="fa fa-filter makeNarrow" data-ng-show="item.canFilter" data-ng-click="vm.$layerService.setFilter(item)" style="cursor: pointer"></a></td>                    <td><a class="fa fa-eye makeNarrow" data-ng-show="item.canStyle" data-ng-click="vm.$layerService.setStyle(item)" style="cursor: pointer"></a></td>                    <td>{{item.key}}</td>                    <td class="text-right" data-ng-bind-html="vm.toTrusted(item.value)"></td>                </tr>            </table>        </div>        <!-- Treat last tab (filter) differently -->        <div data-ng-if="$last" class="tab-pane" data-ng-class="{active : $first}" id="rp-{{$index}}" data-ng-repeat="(sectionTitle, section) in callOut.sections">            <!-- Add filter panel to the last rendered element -->            <div class="has-feedback" style="padding:0 4px 4px 4px;">                <span style="direction: ltr; position: static; display: block;">                    <input id="searchbox" data-ng-model="search.key" type="text"                            placeholder="Filter" autocomplete="off" spellcheck="false"                            style="position: relative; vertical-align: top;" class="form-control tt-input">                </span>                <span id="searchicon" class="fa form-control-feedback fa-filter"></span>            </div>            <!--<input style="padding:4px;" class=" form-control" data-ng-model="search" placeholder="...">-->            <table id="searchTextResults" class="table table-condensed">                <tr popover="{{(item.description) ? item.description : \'\'}}"                    popover-placement="left"                    popover-trigger="mouseenter"                    popover-append-to-body="true"                    data-ng-repeat="item in section.properties | filter:search">                    <td><a class="fa fa-filter makeNarrow" data-ng-show="item.canFilter" data-ng-click="vm.$layerService.setFilter(item)"></a></td>                    <td><a class="fa fa-eye makeNarrow" data-ng-show="item.canStyle" data-ng-click="vm.$layerService.setStyle(item)"></a></td>                    <td>{{item.key}}</td>                    <td class="text-right" data-ng-bind-html="vm.toTrusted(item.value)"></td>                </tr>            </table>        </div>    </div></div>';
+})(FeatureProps || (FeatureProps = {}));
+var FeatureProps;
+(function (FeatureProps) {
+    /**
+    * Config
+    */
+    var moduleName = 'csWeb.featureprops';
+
+    /**
+    * Module
+    */
+    FeatureProps.myModule;
+    try  {
+        FeatureProps.myModule = angular.module(moduleName);
+    } catch (err) {
+        // named module does not exist, so create one
+        FeatureProps.myModule = angular.module(moduleName, []);
+    }
+
+    /**
+    * Directive to display a feature's properties in a panel.
+    *
+    * @seealso          : http://www.youtube.com/watch?v=gjJ5vLRK8R8&list=UUGD_0i6L48hucTiiyhb5QzQ
+    * @seealso          : http://plnkr.co/edit/HyBP9d?p=preview
+    */
+    FeatureProps.myModule.directive('featureprops', [
+        '$compile',
+        function ($compile) {
+            return {
+                terminal: true,
+                restrict: 'E',
+                scope: {},
+                template: FeatureProps.html,
+                compile: function (el) {
+                    var fn = $compile(el);
+                    return function (scope) {
+                        fn(scope);
+                    };
+                },
+                replace: true,
+                transclude: true,
+                controller: FeatureProps.FeaturePropsCtrl
+            };
+        }
+    ]);
+})(FeatureProps || (FeatureProps = {}));
+var FeatureProps;
+(function (FeatureProps) {
+    var FeaturePropsOptions = (function () {
+        function FeaturePropsOptions(position) {
+            this.position = position;
+            this.closeButton = true;
+            this.autoPan = true;
+        }
+        return FeaturePropsOptions;
+    })();
+
+    var CallOutProperty = (function () {
+        function CallOutProperty(key, value, property, canFilter, canStyle, feature, isFilter, description, meta) {
+            this.key = key;
+            this.value = value;
+            this.property = property;
+            this.canFilter = canFilter;
+            this.canStyle = canStyle;
+            this.feature = feature;
+            this.isFilter = isFilter;
+            this.description = description;
+            this.meta = meta;
+        }
+        return CallOutProperty;
+    })();
+    FeatureProps.CallOutProperty = CallOutProperty;
+
+    var CallOutSection = (function () {
+        function CallOutSection(sectionIcon) {
+            this.metaInfos = {};
+            this.properties = [];
+            this.sectionIcon = sectionIcon;
+        }
+        CallOutSection.prototype.showSectionIcon = function () {
+            return !csComp.StringExt.isNullOrEmpty(this.sectionIcon);
+        };
+
+        CallOutSection.prototype.addProperty = function (key, value, property, canFilter, canStyle, feature, isFilter, description, meta) {
+            if (description)
+                this.properties.push(new CallOutProperty(key, value, property, canFilter, canStyle, feature, isFilter, description, meta));
+            else
+                this.properties.push(new CallOutProperty(key, value, property, canFilter, canStyle, feature, isFilter, null, meta));
+        };
+
+        CallOutSection.prototype.hasProperties = function () {
+            return this.properties != null && this.properties.length > 0;
+        };
+        return CallOutSection;
+    })();
+    FeatureProps.CallOutSection = CallOutSection;
+
+    var CallOut = (function () {
+        function CallOut(type, feature, metaInfoData) {
+            var _this = this;
+            this.type = type;
+            this.feature = feature;
+            this.metaInfoData = metaInfoData;
+            this.sections = {};
+
+            //if (type == null) this.createDefaultType();
+            this.setTitle();
+
+            var infoCallOutSection = new CallOutSection('fa-info');
+            var searchCallOutSection = new CallOutSection('fa-filter');
+            var displayValue;
+            if (type != null) {
+                var metaInfos = [];
+                if (type.metaInfoKeys != null) {
+                    var keys = type.metaInfoKeys.split(';');
+                    keys.forEach(function (key) {
+                        if (key in metaInfoData)
+                            metaInfos.push(metaInfoData[key]);
+                        else if (type.metaInfoData != null) {
+                            var result = $.grep(type.metaInfoData, function (e) {
+                                return e.label === key;
+                            });
+                            if (result.length >= 1)
+                                metaInfos.push(result);
+                        }
+                    });
+                } else if (type.metaInfoData != null) {
+                    metaInfos = type.metaInfoData;
+                }
+                metaInfos.forEach(function (mi) {
+                    var callOutSection = _this.getOrCreateCallOutSection(mi.section) || infoCallOutSection;
+                    callOutSection.metaInfos[mi.label] = mi;
+                    var text = feature.properties[mi.label];
+                    displayValue = CallOut.convertPropertyInfo(mi, text);
+
+                    // Skip empty, non-editable values
+                    if (!mi.canEdit && csComp.StringExt.isNullOrEmpty(displayValue))
+                        return;
+
+                    var canFilter = (mi.type == "number" || mi.type == "text");
+                    var canStyle = (mi.type == "number");
+                    if (mi.filterType != null)
+                        canFilter = mi.filterType.toLowerCase() != "none";
+                    var isFilter = false;
+                    if (mi.visibleInCallOut)
+                        callOutSection.addProperty(mi.title, displayValue, mi.label, canFilter, canStyle, feature, isFilter, mi.description, mi);
+                    searchCallOutSection.addProperty(mi.title, displayValue, mi.label, canFilter, canStyle, feature, isFilter, mi.description);
+                });
+            }
+            if (infoCallOutSection.properties.length > 0)
+                this.sections['AAA Info'] = infoCallOutSection; // The AAA is added as the sections are sorted alphabetically
+            if (searchCallOutSection.properties.length > 0)
+                this.sections['Zzz Search'] = searchCallOutSection;
+        }
+        CallOut.convertPropertyInfo = function (mi, text) {
+            var displayValue;
+            if (!csComp.StringExt.isNullOrEmpty(text) && !$.isNumeric(text))
+                text = text.replace(/&amp;/g, '&');
+            if (csComp.StringExt.isNullOrEmpty(text))
+                return '';
+            switch (mi.type) {
+                case "bbcode":
+                    if (!csComp.StringExt.isNullOrEmpty(mi.stringFormat))
+                        text = String.format(mi.stringFormat, text);
+                    displayValue = XBBCODE.process({ text: text }).html;
+                    break;
+                case "number":
+                    if (!$.isNumeric(text))
+                        displayValue = text;
+                    else if (csComp.StringExt.isNullOrEmpty(mi.stringFormat))
+                        displayValue = text.toString();
+                    else
+                        displayValue = String.format(mi.stringFormat, parseFloat(text));
+                    break;
+                case "rank":
+                    var rank = text.split(',');
+                    if (rank.length != 2)
+                        return text;
+                    if (mi.stringFormat)
+                        displayValue = String.format(mi.stringFormat, rank[0], rank[1]);
+                    else
+                        displayValue = String.format("{0) / {1}", rank[0], rank[1]);
+                    break;
+                default:
+                    displayValue = text;
+                    break;
+            }
+            return displayValue;
+        };
+
+        ///**
+        // * In case we are dealing with a regular JSON file without type information, create a default type.
+        // */
+        //private createDefaultType(): void {
+        //    this.type              = [];
+        //    this.type.style        = { nameLabel: "Name", iconHeight: 30, iconWidth: 30 };
+        //    this.type.metaInfoData = [];
+        //    for (var kvp in this.feature.properties) {
+        //        var metaInfo: IMetaInfo = [];
+        //        metaInfo.label          = kvp.key;
+        //        metaInfo.title          = kvp.key.replace("_", " ");
+        //        metaInfo.isSearchable   = true;
+        //        metaInfo.type           = MetaInfoType.Text;
+        //        this.type.metaInfoData.push(metaInfo);
+        //    }
+        //}
+        CallOut.prototype.getOrCreateCallOutSection = function (sectionTitle) {
+            if (csComp.StringExt.isNullOrEmpty(sectionTitle)) {
+                return null;
+            }
+            if (sectionTitle in this.sections)
+                return this.sections[sectionTitle];
+            this.sections[sectionTitle] = new CallOutSection();
+            return this.sections[sectionTitle];
+        };
+
+        /**
+        * Set the title of the callout to the title of the feature.
+        */
+        CallOut.prototype.setTitle = function () {
+            this.title = CallOut.title(this.type, this.feature);
+        };
+
+        CallOut.title = function (type, feature) {
+            var title;
+            if (type == null || type.style == null || csComp.StringExt.isNullOrEmpty(type.style.nameLabel))
+                title = feature.properties['Name'];
+            else
+                title = feature.properties[type.style.nameLabel];
+            if (!csComp.StringExt.isNullOrEmpty(title) && !$.isNumeric(title))
+                title = title.replace(/&amp;/g, '&');
+            return title;
+        };
+        return CallOut;
+    })();
+    FeatureProps.CallOut = CallOut;
+
+    var FeaturePropsCtrl = (function () {
+        // dependencies are injected via AngularJS $injector
+        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
+        function FeaturePropsCtrl($scope, $location, $sce, $mapService, $layerService, $messageBusService) {
+            var _this = this;
+            this.$scope = $scope;
+            this.$location = $location;
+            this.$sce = $sce;
+            this.$mapService = $mapService;
+            this.$layerService = $layerService;
+            this.$messageBusService = $messageBusService;
+            /**
+            * Callback function
+            * @see {http://stackoverflow.com/questions/12756423/is-there-an-alias-for-this-in-typescript}
+            * @see {http://stackoverflow.com/questions/20627138/typescript-this-scoping-issue-when-called-in-jquery-callback}
+            * @todo {notice the strange syntax using a fat arrow =>, which is to preserve the this reference in a callback!}
+            */
+            this.sidebarMessageReceived = function (title) {
+                switch (title) {
+                    case "toggle":
+                        _this.$scope.showMenu = !_this.$scope.showMenu;
+                        break;
+                    case "show":
+                        _this.$scope.showMenu = true;
+                        break;
+                    case "hide":
+                        _this.$scope.showMenu = false;
+                        break;
+                    default:
+                }
+
+                // NOTE EV: You need to call apply only when an event is received outside the angular scope.
+                // However, make sure you are not calling this inside an angular apply cycle, as it will generate an error.
+                if (_this.$scope.$root.$$phase != '$apply' && _this.$scope.$root.$$phase != '$digest') {
+                    _this.$scope.$apply();
+                }
+            };
+            this.featureMessageReceived = function (title, feature) {
+                switch (title) {
+                    case "onFeatureSelect":
+                        //console.log(feature);
+                        _this.displayFeature(feature);
+                        _this.$scope.poi = feature;
+                        _this.$scope.autocollapse(true);
+                        break;
+                    default:
+                }
+                if (_this.$scope.$root.$$phase != '$apply' && _this.$scope.$root.$$phase != '$digest') {
+                    _this.$scope.$apply();
+                }
+            };
+            this.scope = $scope;
+            $scope.vm = this;
+            $scope.showMenu = false;
+
+            $scope.featureTabActivated = function (sectionTitle, section) {
+                $messageBusService.publish('FeatureTab', 'activated', { sectionTitle: sectionTitle, section: section });
+            };
+
+            //console.log('SidebarCtrl: constructed');
+            this.$messageBusService.subscribe("sidebar", this.sidebarMessageReceived);
+            this.$messageBusService.subscribe("feature", this.featureMessageReceived);
+
+            var widthOfList = function () {
+                var itemsWidth = 0;
+                $('#featureTabs>li').each(function () {
+                    var itemWidth = $(this).outerWidth();
+
+                    itemsWidth += itemWidth;
+                });
+                return itemsWidth;
+            };
+
+            $scope.autocollapse = function (initializeTabPosition) {
+                if (typeof initializeTabPosition === "undefined") { initializeTabPosition = false; }
+                //                console.log('autocollapse');
+                var tabs = $('#featureTabs');
+
+                //                console.log('#ft.ow(): ' + tabs.outerWidth());
+                //                console.log('wol: ' + widthOfList());
+                //                console.log('ml: ' + tabs.css('margin-left'));
+                if (tabs.outerWidth() < widthOfList() || parseFloat(tabs.css('margin-left')) < 0) {
+                    $('#leftArr').show();
+                    $('#rightArr').show();
+                    if (initializeTabPosition) {
+                        tabs.animate({ 'margin-left': '20px' }, 'slow');
+                    }
+                } else {
+                    $('#leftArr').hide();
+                    $('#rightArr').hide();
+                    if (initializeTabPosition) {
+                        tabs.animate({ 'margin-left': '0px' }, 'slow');
+                    }
+                }
+            };
+
+            $scope.autocollapse(true); // when document first loads
+            $scope.tabs = $('#featureTabs');
+            $scope.tabScrollDelta = $scope.tabs.outerWidth();
+
+            $('#leftArr').click(function () {
+                //console.log('leftArr');
+                //var tabs = $('#featureTabs');
+                var current = parseFloat($scope.tabs.css('margin-left'));
+                var min = 20;
+                var nextPos = $scope.tabScrollDelta;
+
+                if (current + nextPos > min) {
+                    nextPos = min - current;
+                }
+
+                $scope.tabs.animate({ 'margin-left': '+=' + nextPos + 'px' }, 'slow', function () {
+                    //                    console.log('rightarr hide');
+                    $('#rightArr').show();
+                    $('#leftArr').show();
+                    $scope.autocollapse(false);
+                });
+            });
+
+            $('#rightArr').click(function () {
+                //var tabs = $('#featureTabs');
+                var max = widthOfList() - $scope.tabs.outerWidth() + 30;
+                var current = Math.abs(parseFloat($scope.tabs.css('margin-left')));
+                var nextPos = $scope.tabScrollDelta;
+                nextPos = Math.min(max, nextPos);
+
+                $scope.tabs.animate({ 'margin-left': '-=' + nextPos + 'px' }, 'slow', function () {
+                    $('#leftArr').show();
+                    $('#rightArr').show();
+
+                    $scope.autocollapse(false);
+                });
+            });
+        }
+        FeaturePropsCtrl.prototype.toTrusted = function (html) {
+            return this.$sce.trustAsHtml(html);
+        };
+
+        FeaturePropsCtrl.prototype.displayFeature = function (feature) {
+            var featureType = this.$layerService.featureTypes[feature.featureTypeName];
+            this.$scope.callOut = new CallOut(featureType, feature, this.$layerService.metaInfoData);
+
+            // Probably not needed
+            if (this.$scope.$root.$$phase != '$apply' && this.$scope.$root.$$phase != '$digest') {
+                this.$scope.$apply();
+            }
+        };
+        FeaturePropsCtrl.$inject = [
+            '$scope',
+            '$location',
+            '$sce',
+            'mapService',
+            'layerService',
+            'messageBusService'
+        ];
+        return FeaturePropsCtrl;
+    })();
+    FeatureProps.FeaturePropsCtrl = FeaturePropsCtrl;
+})(FeatureProps || (FeatureProps = {}));
+var DataTable;
+(function (DataTable) {
+    /**
+    * Represents a field in the table.
+    * The value is the actual displayValue shown, the type is the metainfo type (e.g. number or text, useful when aligning the data), and the header is used for sorting.
+    */
+    var TableField = (function () {
+        function TableField(displayValue, originalValue, type, header) {
+            this.displayValue = displayValue;
+            this.originalValue = originalValue;
+            this.type = type;
+            this.header = header;
+        }
+        return TableField;
+    })();
+    DataTable.TableField = TableField;
+
+    var DataTableCtrl = (function () {
+        // dependencies are injected via AngularJS $injector
+        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
+        function DataTableCtrl($scope, $http, $sce, $translate, $layerService, $localStorageService, $messageBusService) {
+            var _this = this;
+            this.$scope = $scope;
+            this.$http = $http;
+            this.$sce = $sce;
+            this.$translate = $translate;
+            this.$layerService = $layerService;
+            this.$localStorageService = $localStorageService;
+            this.$messageBusService = $messageBusService;
+            this.mapLabel = "map";
+            this.numberOfItems = 10;
+            this.layerOptions = [];
+            this.metaInfos = [];
+            this.headers = [];
+            this.rows = [];
+            // 'vm' stands for 'view model'. We're adding a reference to the controller to the scope
+            // for its methods to be accessible from view / HTML
+            $scope.vm = this;
+
+            $translate('MAP_FEATURES').then(function (translation) {
+                _this.layerOptions[0].title = translation;
+            });
+
+            this.bindToStorage('vm.numberOfItems', 10);
+            this.numberOfItems = $localStorageService.get('vm.numberOfItems');
+            this.bindToStorage('vm.selectedLayerId', this.mapLabel);
+
+            if (this.$layerService.project == null || this.$layerService.project.groups == null)
+                return;
+            this.updateLayerOptions();
+            this.loadLayer();
+        }
+        /**
+        * Add a label to local storage and bind it to the scope.
+        */
+        DataTableCtrl.prototype.bindToStorage = function (label, defaultValue) {
+            if (this.$localStorageService.get(label) === null)
+                this.$localStorageService.set(label, defaultValue); // You first need to set the key
+            this.$localStorageService.bind(this.$scope, label);
+        };
+
+        /**
+        * Create a list of layer options and select the one used previously.
+        */
+        DataTableCtrl.prototype.updateLayerOptions = function () {
+            var _this = this;
+            this.layerOptions.push({
+                "group": '',
+                "id": this.mapLabel,
+                "title": this.mapFeatureTitle
+            });
+            if (this.$layerService.project == null || this.$layerService.project.groups == null)
+                return;
+            this.$layerService.project.groups.forEach(function (group) {
+                group.layers.forEach(function (layer) {
+                    _this.layerOptions.push({
+                        "group": group.title,
+                        "id": layer.id,
+                        "title": layer.title
+                    });
+                });
+            });
+            this.selectedLayerId = this.$localStorageService.get('vm.selectedLayerId');
+        };
+
+        DataTableCtrl.prototype.loadLayer = function () {
+            var _this = this;
+            if (!this.selectedLayerId || this.selectedLayerId === this.mapLabel)
+                return this.loadMapLayers();
+            var selectedLayer = this.findLayerById(this.selectedLayerId);
+            if (selectedLayer == null)
+                return this.loadMapLayers();
+            this.$http.get(selectedLayer.url).success(function (data) {
+                _this.dataset = data;
+                if (data.poiTypes == null)
+                    data.poiTypes = {};
+                data.features.forEach(function (f) {
+                    f.featureTypeName = f.properties['PoiTypeId'];
+                    if (!(f.featureTypeName in data.poiTypes))
+                        data.poiTypes[f.featureTypeName] = _this.$layerService.featureTypes[f.featureTypeName];
+                });
+
+                _this.updateMetaInfo(data);
+            }).error(function (data, status, headers, config) {
+                _this.$messageBusService.notify("ERROR opening " + selectedLayer.title, "Could not get the data.");
+            });
+        };
+
+        /**
+        * Load the features as visible on the map.
+        */
+        DataTableCtrl.prototype.loadMapLayers = function () {
+            var _this = this;
+            this.selectedLayerId = this.mapLabel;
+            var data = {
+                type: '',
+                features: [],
+                poiTypes: {}
+            };
+
+            // If we are filtering, load the filter results
+            this.$layerService.project.groups.forEach(function (group) {
+                if (group.filterResult != null)
+                    group.filterResult.forEach(function (f) {
+                        return data.features.push(f);
+                    });
+            });
+
+            // Otherwise, take all loaded features
+            if (data.features.length === 0)
+                data.features = this.$layerService.project.features;
+
+            data.features.forEach(function (f) {
+                if (!(f.featureTypeName in data.poiTypes))
+                    data.poiTypes[f.featureTypeName] = _this.$layerService.featureTypes[f.featureTypeName];
+            });
+
+            this.dataset = data;
+            this.updateMetaInfo(data);
+        };
+
+        DataTableCtrl.prototype.updateMetaInfo = function (data) {
+            var _this = this;
+            this.metaInfos = [];
+            this.headers = [];
+            this.rows = [];
+            var titles = [];
+            var mis = [];
+
+            // Push the Name, so it always appears on top.
+            mis.push({
+                label: "Name",
+                visibleInCallOut: true,
+                title: "Naam",
+                type: "text",
+                filterType: "text",
+                isSearchable: true
+            });
+            var featureType;
+            for (var key in data.poiTypes) {
+                featureType = data.poiTypes[key];
+                if (featureType.metaInfoKeys != null) {
+                    var keys = featureType.metaInfoKeys.split(';');
+                    keys.forEach(function (k) {
+                        if (k in _this.$layerService.metaInfoData)
+                            mis.push(_this.$layerService.metaInfoData[k]);
+                        else if (featureType.metaInfoData != null) {
+                            var result = $.grep(featureType.metaInfoData, function (e) {
+                                return e.label === k;
+                            });
+                            if (result.length >= 1)
+                                mis.push(result);
+                        }
+                    });
+                } else if (featureType.metaInfoData != null) {
+                    featureType.metaInfoData.forEach(function (mi) {
+                        return mis.push(mi);
+                    });
+                }
+                mis.forEach(function (mi) {
+                    if ((mi.visibleInCallOut || mi.label === "Name") && titles.indexOf(mi.title) < 0) {
+                        titles.push(mi.title);
+                        _this.metaInfos.push(mi);
+                    }
+                });
+            }
+
+            // Select the first couple of headers
+            var nmbrOfDefaultSelectedHeaders = 3;
+            for (var i = 0; i < nmbrOfDefaultSelectedHeaders; i++) {
+                this.headers.push(titles[i]);
+            }
+            this.rows = this.getRows();
+        };
+
+        DataTableCtrl.prototype.toggleSelection = function (metaInfoTitle) {
+            var idx = this.headers.indexOf(metaInfoTitle);
+
+            // is currently selected
+            if (idx > -1) {
+                this.headers.splice(idx, 1);
+            } else {
+                this.headers.push(metaInfoTitle);
+            }
+            this.rows = this.getRows();
+        };
+
+        DataTableCtrl.prototype.findLayerById = function (id) {
+            for (var i = 0; i < this.$layerService.project.groups.length; i++) {
+                var group = this.$layerService.project.groups[i];
+                for (var j = 0; j < group.layers.length; j++) {
+                    var layer = group.layers[j];
+                    if (layer.id != id)
+                        continue;
+                    return layer;
+                }
+            }
+            return null;
+        };
+
+        /**
+        * Returns the data rows that are relevant for the current selection.
+        */
+        DataTableCtrl.prototype.getRows = function () {
+            var _this = this;
+            var meta = [this.headers.length];
+            this.metaInfos.forEach(function (mi) {
+                // Keep headers and mi in the right order
+                var index = _this.headers.indexOf(mi.title);
+                if (index >= 0)
+                    meta[index] = mi;
+            });
+            var props = [];
+            var displayValue;
+            this.dataset.features.forEach(function (f) {
+                var row = [];
+                meta.forEach(function (mi) {
+                    var text = f.properties[mi.label];
+                    if (!text)
+                        text = ' ';
+                    else if (!$.isNumeric(text))
+                        text = text.replace(/&amp;/g, '&');
+                    switch (mi.type) {
+                        case "bbcode":
+                            displayValue = XBBCODE.process({ text: text }).html;
+                            break;
+                        case "number":
+                            if (!$.isNumeric(text))
+                                displayValue = '??';
+                            else if (!mi.stringFormat)
+                                displayValue = text.toString();
+                            else
+                                displayValue = String.format(mi.stringFormat, parseFloat(text));
+                            break;
+                        default:
+                            displayValue = text;
+                            break;
+                    }
+                    row.push(new TableField(displayValue, text, mi.type, mi.title));
+                });
+                props.push(row);
+            });
+            return props;
+        };
+
+        /**
+        * Generate a font awesome class based on the order.
+        */
+        DataTableCtrl.prototype.sortOrderClass = function (headerIndex, reverseOrder) {
+            var t;
+            if (reverseOrder != null && headerIndex == this.sortingColumn) {
+                t = ('fa fa-sort-' + ((reverseOrder) ? 'desc' : 'asc'));
+            } else {
+                t = 'fa fa-sort';
+            }
+            return t;
+        };
+
+        /**
+        * Order the rows based on the header index and the order.
+        */
+        DataTableCtrl.prototype.orderBy = function (headerIndex, reverseOrder) {
+            this.sortingColumn = headerIndex;
+            this.rows = this.rows.sort(function (a, b) {
+                var order;
+                if (a[headerIndex].type == 'number')
+                    order = a[headerIndex].originalValue > b[headerIndex].originalValue;
+                else
+                    order = a[headerIndex].originalValue.toLowerCase() > b[headerIndex].originalValue.toLowerCase();
+                if (order == reverseOrder)
+                    return 1;
+                else
+                    return -1;
+            });
+        };
+
+        DataTableCtrl.prototype.downloadCsv = function () {
+            var csvRows = [];
+
+            csvRows.push(this.headers.join(';'));
+
+            for (var i = 0; i < this.rows.length; i++) {
+                csvRows.push(this.rows[i].map(function (f) {
+                    return f.originalValue;
+                }).join(';'));
+            }
+
+            var csvString = csvRows.join('\r\n');
+
+            var filename = this.mapLabel;
+            if (this.selectedLayerId !== this.mapLabel) {
+                var layer = this.findLayerById(this.selectedLayerId);
+                if (layer)
+                    filename = layer.title.replace(' ', '_');
+            }
+            this.saveData(csvString, filename + '.csv');
+        };
+
+        DataTableCtrl.prototype.saveData = function (csvData, filename) {
+            if (navigator.msSaveBlob) {
+                // IE 10+
+                var link = document.createElement('a');
+                link.addEventListener("click", function (event) {
+                    var blob = new Blob([csvData], { "type": "text/csv;charset=utf-8;" });
+                    navigator.msSaveBlob(blob, filename);
+                }, false);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } else if (!csComp.Helpers.supportsDataUri()) {
+                // Older versions of IE: show the data in a new window
+                var popup = window.open('', 'csv', '');
+                popup.document.body.innerHTML = '<pre>' + csvData + '</pre>';
+            } else {
+                // Support for browsers that support the data uri.
+                var a = document.createElement('a');
+                a.href = 'data:text/csv;charset=utf-8,' + encodeURI(csvData);
+                a.target = '_blank';
+                a.download = filename;
+                a.click();
+                document.body.removeChild(a);
+            }
+        };
+
+        /**
+        * Convert to trusted html string.
+        */
+        DataTableCtrl.prototype.toTrusted = function (html) {
+            return this.$sce.trustAsHtml(html);
+        };
+        DataTableCtrl.$inject = [
+            '$scope',
+            '$http',
+            '$sce',
+            '$translate',
+            'layerService',
+            'localStorageService',
+            'messageBusService'
+        ];
+        return DataTableCtrl;
+    })();
+    DataTable.DataTableCtrl = DataTableCtrl;
+})(DataTable || (DataTable = {}));
+var DataTable;
+(function (DataTable) {
+    DataTable.html = '<div>    <div style="width:100%; margin: 10px auto;">        <div style="float: left; width: 15%; margin: 0; padding: 1em">            <!-- Pull down of map layers -->            <select data-ng-model="vm.selectedLayerId"                    data-ng-change="vm.loadLayer()"                    data-ng-options="layer.id as layer.title group by layer.group for layer in vm.layerOptions"                    class="form-control tt-input"></select>            <!-- List of headers -->            <ul class="form-group" style="margin-top: 1em; margin-left: -2em; overflow-y: auto; overflow-x: hidden;"                resize resize-y="150">                <li ng-repeat="mi in vm.metaInfos" class="list-unstyled" style="white-space: nowrap; text-overflow: ellipsis">                    <label>                        <input type="checkbox" name="vm.selectedTitles[]" value="{{mi.title}}"                               data-ng-checked="vm.headers.indexOf(mi.title) > -1"                               data-ng-click="vm.toggleSelection(mi.title)">&nbsp;&nbsp;{{mi.title}}                    </label>                    <!--<div class="checkbox">                        <label>                            <input type="checkbox" name="vm.selectedTitles[]" value="{{mi.title}}"                                   data-ng-checked="vm.headers.indexOf(mi.title) > -1"                                   data-ng-click="vm.toggleSelection(mi.title)">&nbsp;&nbsp;{{mi.title}}                        </label>                    </div>-->                </li>            </ul>            <!--       <pre>{{vm.headers|json}}</pre>-->        </div>        <!-- Right side of the table view -->        <div style="margin-left: 16%; border-left: 1px solid gray; padding: 1em;" ng-init="poiTypeFilter">            <!-- Filter -->            <div class="has-feedback" style="margin-bottom: 1em; float: right; width: 16%; min-width: 200px;">                <span style="direction: ltr; position: static; display: block;">                    <input id="searchbox" data-ng-model="featureFilter" type="text"                           placeholder="Filter" autocomplete="off" spellcheck="false"                           style="position: relative; vertical-align: top;" class="form-control tt-input">                </span>                <span id="searchicon" class="fa form-control-feedback fa-filter" style="padding-top: 0px;"></span>            </div>            <!--Download to CSV option-->            <a href="" data-ng-click="vm.downloadCsv()" alt="Download CSV" style="margin-top: 5px; margin-right: 1em; float: right;"><i class="fa fa-download fa-2x"></i></a>            <!-- Specify how many items to show -->            <select data-ng-model="vm.numberOfItems" style="margin-bottom: 1em; margin-right: 10px; float: left; width: 16%; min-width: 200px;" class="form-control tt-input">                <option value="5" translate="SHOW5"></option>                <option value="10" translate="SHOW10"></option>                <option value="15" translate="SHOW15"></option>                <option value="20" translate="SHOW20"></option>                <option value="25" translate="SHOW25"></option>                <option value="30" translate="SHOW30"></option>                <option value="35" translate="SHOW35"></option>                <option value="40" translate="SHOW40"></option>            </select>            <!-- Data table -->            <table class="table table-striped table-condensed">                <tr>                    <th data-ng-repeat="header in vm.headers track by $index">                        {{header}}&nbsp;                        <a data-ng-click="reverseSort = !reverseSort; vm.orderBy($index, reverseSort);"><i data-ng-class="vm.sortOrderClass($index, reverseSort)">&nbsp;&nbsp;</i></a>                    </th>                </tr>                <tr dir-paginate="row in vm.rows | filter:featureFilter | itemsPerPage: vm.numberOfItems"                    style="cursor: pointer; vertical-align: central">                    <td data-ng-class="{\'text-right\': field.type == \'number\'}" data-ng-repeat="field in row track by $index" data-ng-bind-html="vm.toTrusted(field.displayValue)"></td>                </tr>            </table>            <dir-pagination-controls style="" max-size="10" boundary-links="true" direction-links="true"                                     template-url="bower_components/angular-utils-pagination/dirPagination.tpl.html"></dir-pagination-controls>        </div>    </div>    <div style="clear: both; margin: 0; padding: .5em"></div></div>';
+})(DataTable || (DataTable = {}));
+var DataTable;
+(function (DataTable) {
+    /**
+    * Config
+    */
+    var moduleName = 'csWeb.datatable';
+
+    /**
+    * Module
+    */
+    DataTable.myModule;
+    try  {
+        DataTable.myModule = angular.module(moduleName);
+    } catch (err) {
+        // named module does not exist, so create one
+        DataTable.myModule = angular.module(moduleName, []);
+    }
+
+    /**
+    * Directive to display a feature's properties in a panel.
+    *
+    * @seealso : http://www.youtube.com/watch?v=gjJ5vLRK8R8&list=UUGD_0i6L48hucTiiyhb5QzQ
+    * @seealso : http://plnkr.co/edit/HyBP9d?p=preview
+    */
+    DataTable.myModule.directive('datatable', [
+        '$compile',
+        function ($compile) {
+            return {
+                terminal: false,
+                restrict: 'E',
+                scope: {},
+                template: DataTable.html,
+                //compile   : el => {     // I need to explicitly compile it in order to use interpolation like {{xxx}}
+                //    var fn = $compile(el);
+                //    return scope => {
+                //        fn(scope);
+                //    };
+                //},
+                replace: true,
+                transclude: true,
+                controller: DataTable.DataTableCtrl
+            };
+        }
+    ]);
+})(DataTable || (DataTable = {}));
