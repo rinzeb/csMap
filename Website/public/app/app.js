@@ -139,6 +139,7 @@
         'csWeb.styleList',
         'csWeb.legendList',
         'csWeb.resize',
+        'csWeb.mca',
         'csWeb.datatable',
         'ngCookies'
     ]).config(function (localStorageServiceProvider) {
@@ -166,7 +167,7 @@
             WHITE_ORANGE: 'white - orange',
             ORANGE_WHITE: 'orange - white',
             SHOW_FEATURE_MSG: 'Select a feature on the map to see the effects of the Multi-Criteria Analysis (MCA).',
-            MCA_COMPUTE_MGS: "Compute the '{{mcaTitle}}'.",
+            //MCA_COMPUTE_MGS: "Compute the '{{mcaTitle}}'.",
             SHOW5: 'Show 5 items',
             SHOW10: 'Show 10 items',
             SHOW15: 'Show 15 items',
@@ -198,7 +199,7 @@
             WHITE_ORANGE: 'wit - oranje',
             ORANGE_WHITE: 'oranje - wit',
             SHOW_FEATURE_MSG: 'Selecteer een feature op de kaart om de Multi-Criteria Analyse (MCA) resultaten in detail te bekijken.',
-            MCA_COMPUTE_MGS: "Bereken de '{{mcaTitle}}'.",
+            //MCA_COMPUTE_MGS: "Bereken de '{{mcaTitle}}'.",
             SHOW5: 'Toon 5 regels',
             SHOW10: 'Toon 10 regels',
             SHOW15: 'Toon 15 regels',
