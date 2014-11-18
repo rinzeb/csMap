@@ -309,7 +309,6 @@
         .controller('mapLayersCtrl', csComp.Services.MapCtrl)
         .controller('mapViewCtrl', MapView.MapViewCtrl)
         .controller('searchCtrl', Search.SearchCtrl)
-        .controller('mcaCtrl', csComp.Mca.McaCtrl)
         .filter('csmillions', [
             '$filter', '$locale', function(filter, locale) {
                 return function(amount, currencySymbol) {
