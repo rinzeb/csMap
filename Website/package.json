@@ -1,7 +1,7 @@
 {
-  "name": "ZorgOpDeKaart",
+  "name": "csMap",
   "version": "0.0.0",
-  "description": "ZorgOpDeKaart",
+  "description": "CommonSense map application",
   "main": "app.js",
   "author": {
     "name": "Erik Vullings",
@@ -17,6 +17,7 @@
     "gulp-cssmin": "^0.1.6",
     "gulp-htmlmin": "^0.2.0",
     "gulp-insert": "~0.4.0",
+    "gulp-plumber": "^0.6.6",
     "gulp-rename": "~1.2.0",
     "gulp-tap": "^0.1.1",
     "gulp-uglify": "^1.0.1",

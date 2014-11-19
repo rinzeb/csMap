@@ -8,6 +8,7 @@ var gulp      = require('gulp'),
     rename    = require('gulp-rename'),
     cache     = require('gulp-cached'),
     concat    = require('gulp-concat'),
+    plumber   = require('gulp-plumber'),    
     watch     = require('gulp-watch');
 
 // gulp.task('minify', function () {
@@ -40,16 +41,19 @@ gulp.task('convertTemplates2Ts', function() {
 });
 
 gulp.task('minify_csComp', function () {
-   gulp.src('../../../csWeb/csComp/dist/csComp.js')
+    gulp.src('../../../csWeb/csComp/dist/csComp.js')
+      .pipe(plumber())
       .pipe(uglify())
       .pipe(rename({suffix: '.min'}))
       .pipe(gulp.dest('public/js/cs'));
    gulp.src('../../../csWeb/csComp/dist/csComp.js')
+      .pipe(plumber())
       .pipe(gulp.dest('public/js/cs'));
 });
 
 gulp.task('minify_csServerComp', function () {
    gulp.src('../../../csWeb/csServerComp/dist/csServerComp.js')
+      .pipe(plumber())
       .pipe(uglify())
       .pipe(rename({suffix: '.min'}))
       .pipe(gulp.dest('public/js/cs'))
@@ -57,13 +61,15 @@ gulp.task('minify_csServerComp', function () {
 
 gulp.task('addref_csComp', function () {
    gulp.src('../../../csWeb/csComp/dist/csComp.d.ts')
-    .pipe(insert.prepend('/// <reference path="../leaflet/leaflet.d.ts" />\r\n'))
-    .pipe(insert.prepend('/// <reference path="../crossfilter/crossfilter.d.ts" />\r\n'))
-    .pipe(gulp.dest('Scripts/typings/cs'));
+      .pipe(plumber())
+      .pipe(insert.prepend('/// <reference path="../leaflet/leaflet.d.ts" />\r\n'))
+      .pipe(insert.prepend('/// <reference path="../crossfilter/crossfilter.d.ts" />\r\n'))
+      .pipe(gulp.dest('Scripts/typings/cs'));
 });
 
 gulp.task('addref_csServerComp', function () {
    gulp.src('../../../csWeb/csServerComp/dist/csServerComp.d.ts')
+    .pipe(plumber())
     .pipe(insert.prepend('/// <reference path="../leaflet/leaflet.d.ts" />\r\n'))
     .pipe(gulp.dest('Scripts/typings/cs'));
 });
@@ -71,6 +77,7 @@ gulp.task('addref_csServerComp', function () {
 gulp.task('include_js', function() {
   gulp.src('../../../csWeb/csComp/includes/*.js')
     //.pipe(concat('includes.js'))
+    .pipe(plumber())
     .pipe(uglify())
     .pipe(rename({suffix: '.min'}))
     .pipe(gulp.dest('./public/js/cs'));
@@ -78,12 +85,14 @@ gulp.task('include_js', function() {
 
 gulp.task('include_css', function () {
     gulp.src('../../../csWeb/csComp/includes/*.css')
-    //.pipe(concat('includes.js'))    
-    .pipe(gulp.dest('./public/css'));
+        .pipe(plumber())
+        //.pipe(concat('includes.js'))    
+        .pipe(gulp.dest('./public/css'));
 });
 
 gulp.task('include_images', function () {
     gulp.src('../../../csWeb/csComp/includes/images/*.*')    
+    .pipe(plumber())
     .pipe(gulp.dest('./public/includes/images/'));
 });
 
