@@ -139,6 +139,7 @@
         'csWeb.styleList',
         'csWeb.legendList',
         'csWeb.resize',
+        'csWeb.showModal',
         'csWeb.mca',
         'csWeb.datatable',
         'ngCookies'
