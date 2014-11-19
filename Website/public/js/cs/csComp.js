@@ -442,26 +442,27 @@ var DataTable;
                 var row = [];
                 meta.forEach(function (mi) {
                     var text = f.properties[mi.label];
-                    if (!text)
-                        text = ' ';
-                    else if (!$.isNumeric(text))
-                        text = text.replace(/&amp;/g, '&');
-                    switch (mi.type) {
-                        case "bbcode":
-                            displayValue = XBBCODE.process({ text: text }).html;
-                            break;
-                        case "number":
-                            if (!$.isNumeric(text))
-                                displayValue = '??';
-                            else if (!mi.stringFormat)
-                                displayValue = text.toString();
-                            else
-                                displayValue = String.format(mi.stringFormat, parseFloat(text));
-                            break;
-                        default:
-                            displayValue = text;
-                            break;
-                    }
+                    displayValue = FeatureProps.CallOut.convertPropertyInfo(mi, text);
+
+                    //if (!text)
+                    //    text = ' ';
+                    //else if (!$.isNumeric(text))
+                    //    text = text.replace(/&amp;/g, '&');
+                    //switch (mi.type) {
+                    //    case "bbcode":
+                    //        displayValue = XBBCODE.process({ text: text }).html;
+                    //        break;
+                    //    case "number":
+                    //        if (!$.isNumeric(text)) displayValue ='??';
+                    //        else if (!mi.stringFormat)
+                    //            displayValue = text.toString();
+                    //        else
+                    //            displayValue = String.format(mi.stringFormat, parseFloat(text));
+                    //        break;
+                    //    default:
+                    //        displayValue = text;
+                    //        break;
+                    //}
                     row.push(new TableField(displayValue, text, mi.type, mi.title));
                 });
                 props.push(row);
@@ -1391,7 +1392,7 @@ var LegendList;
 })(LegendList || (LegendList = {}));
 var Mca;
 (function (Mca) {
-    Mca.html = '<div>    <h4 class="leftpanel-header">MCA</h4>    <div>        <select data-ng-model="vm.mca"                data-ng-options="mca.title for mca in vm.availableMcas"                style="width: 85%; margin-bottom:10px;"></select>        <a href="" data-ng-click="vm.createMca()" class="pull-right" style="margin:0 10px;"><i class="fa fa-plus"></i></a>    </div>    <div data-ng-if="vm.mca">        <ul class="list-unstyled">            <li data-ng-repeat="criterion in vm.mca.criteria">                <div data-ng-style="{\'display\': \'inline-block\', \'width\':\'10px\', \'height\':\'10px\', \'border\':\'solid 1px black\', \'background-color\': criterion.color}">                </div>                <div style="display: inline-block;">{{criterion.getTitle()}}</div>                <rating class="pull-right" style="margin:0 10px;" ng-model="criterion.userWeight" max="{{vm.mca.userWeightMax}}" readonly="isReadonly"                        state-on="\'fa fa-circle\'" state-off="\'fa fa-circle-o\'"                        on-hover="hoveringOver(value)" on-leave="overStar = null"></rating>                <ul data-ng-if="criterion.criteria.length > 0">                    <li data-ng-repeat="crit in criterion.criteria">{{crit.label}}</li>                </ul>            </li>        </ul>        <!--<a href="" style="display: inline-block; width: 100%; text-transform: uppercase"           data-ng-click="vm.calculateMca()" translate="MCA_COMPUTE_MGS" translate-values="{ mcaTitle: vm.mca.title }"></a>-->        <div style="margin-top: 5px; margin-left: 70px;" id="mcaPieChart"></div>        <div data-ng-if="vm.showFeature">            <h4>{{vm.selectedFeature.properties[\'Name\']}}</h4>            <table class="table table-condensed">                <tr data-ng-repeat="item in vm.properties"                    popover="{{item.description}}"                    popover-placement="right"                    popover-trigger="mouseenter"                    popover-append-to-body="true">                    <td><a class="fa fa-filter makeNarrow" data-ng-if="item.canFilter" data-ng-click="vm.$layerService.setFilter(item)" style="cursor: pointer"></a></td>                    <td><a class="fa fa-eye makeNarrow" data-ng-if="item.canStyle" data-ng-click="vm.setStyle(item)" style="cursor: pointer"></a></td>                    <td>{{item.key}}</td>                    <td class="text-right">{{item.value}}</td>                </tr>            </table>        </div>        <i data-ng-if="!vm.showFeature"><div translate="SHOW_FEATURE_MSG"></div></i>    </div></div>';
+    Mca.html = '<div>    <h4 class="leftpanel-header">MCA</h4>    <div>        <select data-ng-model="vm.mca"                data-ng-options="mca.title for mca in vm.availableMcas"                style="width: 85%; margin-bottom:10px;"></select>        <a href="" data-ng-click="showDialog=!showDialog" class="pull-right" style="margin:0 10px;"><i class="fa fa-plus"></i></a>    </div>        <div>        <!--<input type="checkbox" ng-model="showDialog"> Show-->        <div show-modal="showDialog" class="modal fade">            <div class="modal-dialog" data-ng-controller="mcaEditorCtrl">                <div class="modal-content">                    <div class="modal-header">                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>                        <h4 class="modal-title">MCA Editor</h4>                    </div>                    <div class="modal-body">                        <ul>                            <li data-ng-repeat="item in vm.metaInfos">{{item.title}}</li>                        </ul>                        <button type="button" class="btn btn-default" data-ng-click="vm.sayHi()">Say hi</button>                    </div>                    <div class="modal-footer">                        <button class="btn btn-primary" ng-click="ok()">OK</button>                        <button class="btn btn-warning" ng-click="cancel()">Cancel</button>                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>                    </div>                </div><!-- /.modal-content -->            </div><!-- /.modal-dialog -->        </div>    </div>    <div data-ng-if="vm.mca">        <ul class="list-unstyled">            <li data-ng-repeat="criterion in vm.mca.criteria">                <div data-ng-style="{\'display\': \'inline-block\', \'width\':\'10px\', \'height\':\'10px\', \'border\':\'solid 1px black\', \'background-color\': criterion.color}">                </div>                <div style="display: inline-block;">{{criterion.getTitle()}}</div>                <rating class="pull-right" style="margin:0 10px;" ng-model="criterion.userWeight" max="{{vm.mca.userWeightMax}}" readonly="isReadonly"                        state-on="\'fa fa-circle\'" state-off="\'fa fa-circle-o\'"                        on-hover="hoveringOver(value)" on-leave="overStar = null"></rating>                <ul data-ng-if="criterion.criteria.length > 0">                    <li data-ng-repeat="crit in criterion.criteria">{{crit.label}}</li>                </ul>            </li>        </ul>        <!--<a href="" style="display: inline-block; width: 100%; text-transform: uppercase"           data-ng-click="vm.calculateMca()" translate="MCA_COMPUTE_MGS" translate-values="{ mcaTitle: vm.mca.title }"></a>-->        <div style="margin-top: 5px; margin-left: 70px;" id="mcaPieChart"></div>        <div data-ng-if="vm.showFeature">            <h4>{{vm.selectedFeature.properties[\'Name\']}}</h4>            <table class="table table-condensed">                <tr data-ng-repeat="item in vm.properties"                    popover="{{item.description}}"                    popover-placement="right"                    popover-trigger="mouseenter"                    popover-append-to-body="true">                    <td><a class="fa fa-filter makeNarrow" data-ng-if="item.canFilter" data-ng-click="vm.$layerService.setFilter(item)" style="cursor: pointer"></a></td>                    <td><a class="fa fa-eye makeNarrow" data-ng-if="item.canStyle" data-ng-click="vm.setStyle(item)" style="cursor: pointer"></a></td>                    <td>{{item.key}}</td>                    <td class="text-right">{{item.value}}</td>                </tr>            </table>        </div>        <i data-ng-if="!vm.showFeature"><div translate="SHOW_FEATURE_MSG"></div></i>    </div></div>';
 })(Mca || (Mca = {}));
 var Mca;
 (function (Mca) {
@@ -1441,10 +1442,15 @@ var Mca;
 })(Mca || (Mca = {}));
 var Mca;
 (function (Mca) {
+    // TODO MCA Editor
+    // TODO Saving and uploading MCA definitions
+    // TODO Adding MCA definitions to the project file
+    // TODO Optimize me button.
     var McaCtrl = (function () {
-        function McaCtrl($scope, $layerService, messageBusService) {
+        function McaCtrl($scope, $modal, $layerService, messageBusService) {
             var _this = this;
             this.$scope = $scope;
+            this.$modal = $modal;
             this.$layerService = $layerService;
             this.messageBusService = messageBusService;
             this.mcas = [];
@@ -1470,9 +1476,14 @@ var Mca;
             $scope.vm = this;
 
             messageBusService.subscribe('layer', function (title, layer) {
-                _this.availableMca();
-                _this.calculateMca();
-                _this.calculateMca();
+                switch (title) {
+                    case 'activated':
+                    case 'deactivate':
+                        _this.availableMca();
+                        _this.calculateMca();
+                        _this.calculateMca();
+                        break;
+                }
             });
 
             messageBusService.subscribe("feature", this.featureMessageReceived);
@@ -1681,6 +1692,8 @@ var Mca;
                 }
             });
             this.updateSelectedFeature(this.selectedFeature);
+            if (this.selectedFeature)
+                this.messageBusService.publish('feature', 'onFeatureSelect', this.selectedFeature);
             if (this.groupStyle)
                 this.$layerService.updateStyle(this.groupStyle);
         };
@@ -1748,12 +1761,133 @@ var Mca;
         };
         McaCtrl.$inject = [
             '$scope',
+            '$modal',
             'layerService',
             'messageBusService'
         ];
         return McaCtrl;
     })();
     Mca.McaCtrl = McaCtrl;
+})(Mca || (Mca = {}));
+var Mca;
+(function (Mca) {
+    var McaEditorCtrl = (function () {
+        function McaEditorCtrl($scope, $modal, $layerService, messageBusService) {
+            var _this = this;
+            this.$scope = $scope;
+            this.$modal = $modal;
+            this.$layerService = $layerService;
+            this.messageBusService = messageBusService;
+            this.metaInfos = [];
+            this.headers = [];
+            $scope.vm = this;
+            console.log("McaEditorCtlr");
+            messageBusService.subscribe('layer', function (title, layer) {
+                switch (title) {
+                    case 'activated':
+                    case 'deactivate':
+                        _this.loadMapLayers();
+                        break;
+                }
+            });
+        }
+        McaEditorCtrl.prototype.sayHi = function () {
+            alert('Hello ' + this.$scope.$parent);
+        };
+
+        /**
+        * Load the features as visible on the map.
+        */
+        McaEditorCtrl.prototype.loadMapLayers = function () {
+            var _this = this;
+            var data = {
+                type: '',
+                features: [],
+                poiTypes: {}
+            };
+
+            // If we are filtering, load the filter results
+            this.$layerService.project.groups.forEach(function (group) {
+                if (group.filterResult != null)
+                    group.filterResult.forEach(function (f) {
+                        return data.features.push(f);
+                    });
+            });
+
+            // Otherwise, take all loaded features
+            if (data.features.length === 0)
+                data.features = this.$layerService.project.features;
+
+            data.features.forEach(function (f) {
+                if (!(f.featureTypeName in data.poiTypes))
+                    data.poiTypes[f.featureTypeName] = _this.$layerService.featureTypes[f.featureTypeName];
+            });
+
+            this.dataset = data;
+            this.updateMetaInfo(data);
+        };
+
+        McaEditorCtrl.prototype.updateMetaInfo = function (data) {
+            var _this = this;
+            this.metaInfos = [];
+            this.headers = [];
+            var titles = [];
+            var mis = [];
+
+            // Push the Name, so it always appears on top.
+            mis.push({
+                label: "Name",
+                visibleInCallOut: true,
+                title: "Naam",
+                type: "text",
+                filterType: "text",
+                isSearchable: true
+            });
+            var featureType;
+            for (var key in data.poiTypes) {
+                featureType = data.poiTypes[key];
+                if (featureType.metaInfoKeys != null) {
+                    var keys = featureType.metaInfoKeys.split(';');
+                    keys.forEach(function (k) {
+                        if (k in _this.$layerService.metaInfoData)
+                            mis.push(_this.$layerService.metaInfoData[k]);
+                        else if (featureType.metaInfoData != null) {
+                            var result = $.grep(featureType.metaInfoData, function (e) {
+                                return e.label === k;
+                            });
+                            if (result.length >= 1)
+                                mis.push(result);
+                        }
+                    });
+                } else if (featureType.metaInfoData != null) {
+                    featureType.metaInfoData.forEach(function (mi) {
+                        return mis.push(mi);
+                    });
+                }
+                mis.forEach(function (mi) {
+                    if ((mi.visibleInCallOut || mi.label === "Name") && titles.indexOf(mi.title) < 0) {
+                        titles.push(mi.title);
+                        _this.metaInfos.push(mi);
+                    }
+                });
+            }
+
+            // Select the first couple of headers
+            var nmbrOfDefaultSelectedHeaders = 3;
+            for (var i = 0; i < nmbrOfDefaultSelectedHeaders; i++) {
+                this.headers.push(titles[i]);
+            }
+            //this.rows = this.getRows();
+        };
+        McaEditorCtrl.$inject = [
+            '$scope',
+            '$modal',
+            'layerService',
+            'messageBusService'
+        ];
+        return McaEditorCtrl;
+    })();
+    Mca.McaEditorCtrl = McaEditorCtrl;
 })(Mca || (Mca = {}));
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -1965,6 +2099,136 @@ var Mca;
     })(_Mca.Models || (_Mca.Models = {}));
     var Models = _Mca.Models;
 })(Mca || (Mca = {}));
+var Helpers;
+(function (Helpers) {
+    (function (Resize) {
+        /**
+        * Config
+        */
+        var moduleName = 'csWeb.resize';
+
+        /**
+        * Module
+        */
+        Resize.myModule;
+
+        try  {
+            Resize.myModule = angular.module(moduleName);
+        } catch (err) {
+            // named module does not exist, so create one
+            Resize.myModule = angular.module(moduleName, []);
+        }
+
+        /**
+        * Directive to resize an element by settings its width or height,
+        * for example to make sure that the scrollbar appears.
+        * Typical usage:
+        * <div style="overflow-y: auto; overflow-x: hidden" resize resize-x="20" resize-y="250">...</div>
+        * Load the directive in your module, e.g.
+        * angular.module('myWebApp', ['csWeb.resize'])
+        */
+        Resize.myModule.directive('resize', [
+            '$window',
+            function ($window) {
+                return {
+                    terminal: false,
+                    // E = elements, A=attributes and C=css classes. Can be compined, e.g. EAC
+                    restrict: 'A',
+                    // Name if optional. Text Binding (Prefix: @), One-way Binding (Prefix: &), Two-way Binding (Prefix: =)
+                    scope: {
+                        resizeX: '@',
+                        resizeY: '@'
+                    },
+                    // Directives that want to modify the DOM typically use the link option.link takes a function with the following signature, function link(scope, element, attrs) { ... } where:
+                    // * scope is an Angular scope object.
+                    // * element is the jqLite wrapped element that this directive matches.
+                    // * attrs is a hash object with key-value pairs of normalized attribute names and their corresponding attribute values.
+                    link: function (scope, element, attrs) {
+                        scope.onResizeFunction = function () {
+                            // console.log(scope.resizeX + "-" + scope.resizeY);
+                            if (scope.resizeX) {
+                                var windowWidth = $window.innerWidth;
+                                element.width((windowWidth - scope.resizeX) + 'px');
+                            }
+                            if (scope.resizeY) {
+                                var windowHeight = $window.innerHeight;
+                                element.height((windowHeight - scope.resizeY) + 'px');
+                            }
+                        };
+
+                        // Call to the function when the page is first loaded
+                        scope.onResizeFunction();
+
+                        // Listen to the resize event.
+                        angular.element($window).bind('resize', function () {
+                            scope.onResizeFunction();
+                            scope.$apply();
+                        });
+                    }
+                };
+            }
+        ]);
+    })(Helpers.Resize || (Helpers.Resize = {}));
+    var Resize = Helpers.Resize;
+})(Helpers || (Helpers = {}));
+var ShowModal;
+(function (ShowModal) {
+    /**
+    * Config
+    */
+    var moduleName = 'csWeb.showModal';
+
+    /**
+    * Module
+    */
+    ShowModal.myModule;
+
+    try  {
+        ShowModal.myModule = angular.module(moduleName);
+    } catch (err) {
+        // named module does not exist, so create one
+        ShowModal.myModule = angular.module(moduleName, []);
+    }
+
+    /**
+    * Directive to show a modal dialog, whose html is specified inside the main HTML code.
+    * Typical usage: http://plnkr.co/edit/WJBp7A6M3RB1MLERDXSS?p=info
+    * angular.module('myWebApp', ['csWeb.showModal'])
+    */
+    ShowModal.myModule.directive('showModal', [
+        '$parse',
+        function ($parse) {
+            return {
+                restrict: "A",
+                link: function (scope, element, attrs) {
+                    //Hide or show the modal
+                    scope.showModalDialog = function (visible, elem) {
+                        if (!elem)
+                            elem = element;
+                        var myElem = $(elem);
+
+                        if (visible)
+                            myElem.appendTo('body').modal("show");
+                        else
+                            myElem.modal("hide");
+                    };
+
+                    //Watch for changes to the modal-visible attribute
+                    scope.$watch(attrs.showModal, function (newValue, oldValue) {
+                        scope.showModalDialog(newValue, attrs.$$element);
+                    });
+
+                    //Update the visible value when the dialog is closed through UI actions (Ok, cancel, etc.)
+                    $(element).bind("hide.bs.modal", function () {
+                        $parse(attrs.showModal).assign(scope, false);
+                        if (!scope.$$phase && !scope.$root.$$phase)
+                            scope.$apply();
+                    });
+                }
+            };
+        }
+    ]);
+})(ShowModal || (ShowModal = {}));
 var StyleList;
 (function (StyleList) {
     StyleList.html = '<div>    <h4 class="leftpanel-header" translate="STYLES"></h4>    <div ng-show="vm.$layerService.noStyles" translate="STYLE_INFO"></div>    <div data-ng-repeat="group in vm.$layerService.project.groups" style="margin-left: 5px">        <div ng-show="group.styles.length">            <div style="float:left;margin-left: -10px; margin-top: 5px" data-toggle="collapse" data-target="#stylegroup_{{group.id}}"><i class="fa fa-chevron-down togglebutton toggle-arrow-down"></i><i class="fa fa-chevron-up togglebutton toggle-arrow-up"></i></div>            <div class="group-title">{{group.title}}</div>            <div id="stylegroup_{{group.id}}" class="collapse in">                <div data-ng-repeat="style in group.styles">                    <div class="checkbox checkbox-primary" style="margin-left:20px;float:left">                        <input type="checkbox" id="cbstyle{{style.id}}" ng-model="style.enabled" data-ng-change="vm.$layerService.updateStyle(style);">                        <label class="style-title" for="cbstyle{{style.id}}" style="width:175px">{{style.title}}</label>                    </div>                    <div style="float:right;margin-top:10px; width: 50px">                        <div data-ng-show="style.canSelectColor" style="float:left">                            <div class="dropdown">                                <div class="style-settings" data-toggle="dropdown">                                    <style>                                                                             </style>                                    <!--<img src="includes/images/fillcolor.png" style="width: 32px; height:32px" />-->                                    <div id="colors" style="border-radius: 50%;width: 20px;height:20px;border-style:solid;border-color: black;border-width: 1px;background: linear-gradient(to right, {{style.colors[0]}} , {{style.colors[1]}})">                                                                        </div>                                    <b class="caret"></b>                                </div>                                <!--<a class="btn btn-primary btn-sm" ng-model="style.visualAspect"  style="padding-left: 10px" href="#"> {{ style.visualAspect }} </a>-->                                <ul class="dropdown-menu" role="menu">                                    <li ng-repeat="(key,val) in style.colorScales" style="margin:3px;cursor: pointer">                                        <span ng-click="$parent.style.colors = val;vm.$layerService.updateStyle($parent.style)"> {{key}} </span>                                    </li>                                </ul>                            </div>                        </div>                        <div style="float:right">                            <div class="dropdown">                                <div class="style-settings" data-toggle="dropdown">                                    <!--<img src="includes/images/fillcolor.png" style="width: 32px; height:32px" />-->                                    <div class="style-aspect style-{{style.visualAspect}}"></div><b class="caret"></b>                                </div>                                <!--<a class="btn btn-primary btn-sm" ng-model="style.visualAspect"  style="padding-left: 10px" href="#"> {{ style.visualAspect }} </a>-->                                <ul class="dropdown-menu" role="menu">                                    <li ng-repeat="title in style.availableAspects" style="margin:3px;cursor: pointer">                                        <i class="style-aspect style-{{title}}" style="float:left" /><span ng-click="$parent.style.visualAspect = title;vm.$layerService.updateStyle($parent.style)"><img class="fa fa-search" style="margin-right: 8px" /> {{title}} </span>                                    </li>                                    <li class="divider"></li>                                    <li style="margin:3px;cursor: pointer"><i class="fa fa-remove" style="margin-right: 8px" style=" float:left" /><span ng-click="vm.$layerService.removeStyle(style)">Verwijder</span></li>                                </ul>                            </div>                        </div>                    </div>                </div>                <!--<div style="right:5px; position:absolute; margin-top: -15px"><a href="#" id="stylepop{{style.id}}" rel="popover" popover-template="template.html"><img src="includes/images/settings.png" width="20px"></a></div>-->            </div>        </div>    </div></div>';
@@ -2450,78 +2714,6 @@ var csComp;
     })(csComp.Helpers || (csComp.Helpers = {}));
     var Helpers = csComp.Helpers;
 })(csComp || (csComp = {}));
-var Helpers;
-(function (Helpers) {
-    (function (Resize) {
-        /**
-        * Config
-        */
-        var moduleName = 'csWeb.resize';
-
-        /**
-        * Module
-        */
-        Resize.myModule;
-
-        try  {
-            Resize.myModule = angular.module(moduleName);
-        } catch (err) {
-            // named module does not exist, so create one
-            Resize.myModule = angular.module(moduleName, []);
-        }
-
-        /**
-        * Directive to resize an element by settings its width or height,
-        * for example to make sure that the scrollbar appears.
-        * Typical usage:
-        * <div style="overflow-y: auto; overflow-x: hidden" resize resize-x="20" resize-y="250">...</div>
-        * Load the directive in your module, e.g.
-        * angular.module('myWebApp', ['csWeb.resize'])
-        */
-        Resize.myModule.directive('resize', [
-            '$window',
-            function ($window) {
-                return {
-                    terminal: false,
-                    // E = elements, A=attributes and C=css classes. Can be compined, e.g. EAC
-                    restrict: 'A',
-                    // Name if optional. Text Binding (Prefix: @), One-way Binding (Prefix: &), Two-way Binding (Prefix: =)
-                    scope: {
-                        resizeX: '@',
-                        resizeY: '@'
-                    },
-                    // Directives that want to modify the DOM typically use the link option.link takes a function with the following signature, function link(scope, element, attrs) { ... } where:
-                    // * scope is an Angular scope object.
-                    // * element is the jqLite wrapped element that this directive matches.
-                    // * attrs is a hash object with key-value pairs of normalized attribute names and their corresponding attribute values.
-                    link: function (scope, element, attrs) {
-                        scope.onResizeFunction = function () {
-                            // console.log(scope.resizeX + "-" + scope.resizeY);
-                            if (scope.resizeX) {
-                                var windowWidth = $window.innerWidth;
-                                element.width((windowWidth - scope.resizeX) + 'px');
-                            }
-                            if (scope.resizeY) {
-                                var windowHeight = $window.innerHeight;
-                                element.height((windowHeight - scope.resizeY) + 'px');
-                            }
-                        };
-
-                        // Call to the function when the page is first loaded
-                        scope.onResizeFunction();
-
-                        // Listen to the resize event.
-                        angular.element($window).bind('resize', function () {
-                            scope.onResizeFunction();
-                            scope.$apply();
-                        });
-                    }
-                };
-            }
-        ]);
-    })(Helpers.Resize || (Helpers.Resize = {}));
-    var Resize = Helpers.Resize;
-})(Helpers || (Helpers = {}));
 var csComp;
 (function (csComp) {
     (function (Services) {
@@ -3398,7 +3590,7 @@ var csComp;
             * deactivate layer
             */
             LayerService.prototype.removeLayer = function (layer) {
-                this.$messageBusService.publish("layer", "deactivate", layer);
+                this.$messageBusService.publish("layer", "deactivating", layer);
 
                 var m;
                 var g = layer.group;
@@ -3448,6 +3640,7 @@ var csComp;
                 }
 
                 this.rebuildFilters(g);
+                this.$messageBusService.publish("layer", "deactivate", layer);
             };
 
             LayerService.prototype.S4 = function () {

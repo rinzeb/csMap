@@ -164,6 +164,7 @@
             'csWeb.styleList',
             'csWeb.legendList',
             'csWeb.resize',
+            'csWeb.showModal',
             'csWeb.mca',
             'csWeb.datatable',
             'ngCookies'
@@ -309,6 +310,7 @@
         .controller('mapLayersCtrl', csComp.Services.MapCtrl)
         .controller('mapViewCtrl', MapView.MapViewCtrl)
         .controller('searchCtrl', Search.SearchCtrl)
+        .controller('mcaEditorCtrl', Mca.McaEditorCtrl)
         .filter('csmillions', [
             '$filter', '$locale', function(filter, locale) {
                 return function(amount, currencySymbol) {

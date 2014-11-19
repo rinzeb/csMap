@@ -435,6 +435,7 @@ declare module Mca {
     }
     class McaCtrl {
         private $scope;
+        private $modal;
         private $layerService;
         private messageBusService;
         public selectedFeature: csComp.GeoJson.IFeature;
@@ -445,7 +446,7 @@ declare module Mca {
         public availableMcas: Models.Mca[];
         private groupStyle;
         static $inject: string[];
-        constructor($scope: IMcaScope, $layerService: csComp.Services.LayerService, messageBusService: csComp.Services.MessageBusService);
+        constructor($scope: IMcaScope, $modal: any, $layerService: csComp.Services.LayerService, messageBusService: csComp.Services.MessageBusService);
         private featureMessageReceived;
         private updateSelectedFeature(feature);
         public drawChart(criterion?: Models.Criterion): void;
@@ -460,6 +461,28 @@ declare module Mca {
         public setStyle(item: FeatureProps.CallOutProperty): void;
         private static createMetaInfo(mca);
         private static createMetaInfoRank(mca);
+    }
+}
+declare module Mca {
+    interface IMcaEditorScope extends ng.IScope {
+        vm: McaEditorCtrl;
+    }
+    class McaEditorCtrl {
+        private $scope;
+        private $modal;
+        private $layerService;
+        private messageBusService;
+        public dataset: csComp.GeoJson.IGeoJsonFile;
+        public metaInfos: csComp.GeoJson.IMetaInfo[];
+        public headers: string[];
+        static $inject: string[];
+        constructor($scope: IMcaEditorScope, $modal: any, $layerService: csComp.Services.LayerService, messageBusService: csComp.Services.MessageBusService);
+        public sayHi(): void;
+        /**
+        * Load the features as visible on the map.
+        */
+        private loadMapLayers();
+        private updateMetaInfo(data);
     }
 }
 declare module Mca.Models {
@@ -520,6 +543,18 @@ declare module Mca.Models {
         /** Set the colors of all criteria and sub-criteria */
         private setColors();
     }
+}
+declare module Helpers.Resize {
+    /**
+    * Module
+    */
+    var myModule: any;
+}
+declare module ShowModal {
+    /**
+    * Module
+    */
+    var myModule: any;
 }
 declare module StyleList {
     var html: string;
@@ -636,12 +671,6 @@ declare module csComp.Helpers {
         static drawAsterPlot(pieRadius: number, data?: AsterPieData[], parentId?: string, colorScale?: string, svgId?: string): void;
         static clearSvg(svgId: string): void;
     }
-}
-declare module Helpers.Resize {
-    /**
-    * Module
-    */
-    var myModule: any;
 }
 declare module csComp.Services {
     enum LayerType {
