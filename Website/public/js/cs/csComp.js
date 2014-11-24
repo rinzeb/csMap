@@ -4796,3 +4796,95 @@ var csComp;
     })(csComp.Search || (csComp.Search = {}));
     var Search = csComp.Search;
 })(csComp || (csComp = {}));
+var Translations;
+(function (Translations) {
+    var English = (function () {
+        function English() {
+        }
+        English.locale = {
+            MAP: 'Maps',
+            MAP_LABEL: 'Map',
+            TABLE_LABEL: 'Table',
+            LAYERS: 'Layers',
+            FILTERS: 'Filters',
+            FILTER_INFO: 'At the moment, no filters have been selected. In order to add a filter, click on an icon or area on the map, and click on the filter icon (<span class="fa fa-filter"></span>) in the right menu. This will create a filter for the selected property.',
+            STYLES: 'Styles',
+            STYLE_INFO: 'At the moment, no style has been selected. In order to add a style, click on an icon or area on the map, and click on the style icon (<span class="fa fa-eye"></span>) in the right menu. This will create a filter for the selected property.',
+            FEATURES: 'Features',
+            LEGEND: 'Legend',
+            SEARCH: 'Search',
+            MAP_FEATURES: 'Map features',
+            WHITE_RED: 'white - red',
+            RED_WHITE: 'red - white',
+            GREEN_RED: 'green - red',
+            RED_GREEN: 'red - green',
+            WHITE_BLUE: 'white - blue',
+            BLUE_WHITE: 'blue - white',
+            WHITE_GREEN: 'white - green',
+            GREEN_WHITE: 'green - white',
+            WHITE_ORANGE: 'white - orange',
+            ORANGE_WHITE: 'orange - white',
+            SHOW_FEATURE_MSG: 'Select a feature on the map to see the effects of the Multi-Criteria Analysis (MCA).',
+            MCA_TOTAL_RESULT: 'Combined result',
+            MCA_DELETE_MSG: 'Delete "{0}"',
+            MCA_DELETE_MSG2: 'Are you sure?',
+            //MCA_COMPUTE_MGS: "Compute the '{{mcaTitle}}'.",
+            SHOW5: 'Show 5 items',
+            SHOW10: 'Show 10 items',
+            SHOW15: 'Show 15 items',
+            SHOW20: 'Show 20 items',
+            SHOW25: 'Show 25 items',
+            SHOW30: 'Show 30 items',
+            SHOW35: 'Show 35 items',
+            SHOW40: 'Show 40 items'
+        };
+        return English;
+    })();
+    Translations.English = English;
+})(Translations || (Translations = {}));
+var Translations;
+(function (Translations) {
+    var Dutch = (function () {
+        function Dutch() {
+        }
+        Dutch.locale = {
+            MAP: 'Kaarten',
+            MAP_LABEL: 'Kaart',
+            TABLE_LABEL: 'Tabel',
+            LAYERS: 'Kaartlagen',
+            FILTERS: 'Filters',
+            FILTER_INFO: 'Momenteel zijn er geen filters geselecteerd. Klik op een icoon of gebied op de kaart, en klik op het filter icoontje (<span class="fa fa-filter"></span>) in het rechter menu om een filter toe te voegen. Dan wordt er een filter aangemaakt voor de geselecteerde eigenschap.',
+            STYLES: 'Stijlen',
+            STYLE_INFO: 'Momenteel zijn er geen stijlen geselecteerd. Klik op een icoon of gebied op de kaart, en klik op het stijl icoontje (<span class="fa fa-eye"></span>) in het rechter menu om een stijl toe te voegen. Dan wordt er een stijl aangemaakt voor de geselecteerde eigenschap.',
+            FEATURES: 'Features',
+            LEGEND: 'Legenda',
+            SEARCH: 'Zoeken',
+            MAP_FEATURES: 'Kaartfeatures',
+            WHITE_RED: 'wit - rood',
+            RED_WHITE: 'rood - wit',
+            GREEN_RED: 'groen - rood',
+            RED_GREEN: 'rood - groen',
+            WHITE_BLUE: 'wit - blauw',
+            BLUE_WHITE: 'wit - groen',
+            WHITE_GREEN: 'wit - groen',
+            GREEN_WHITE: 'groen - wit',
+            WHITE_ORANGE: 'wit - oranje',
+            ORANGE_WHITE: 'oranje - wit',
+            SHOW_FEATURE_MSG: 'Selecteer een feature op de kaart om de Multi-Criteria Analyse (MCA) resultaten in detail te bekijken.',
+            MCA_TOTAL_RESULT: 'Gecombineerd resultaat',
+            MCA_DELETE_MSG: 'Verwijder "{0}"',
+            MCA_DELETE_MSG2: 'Weet u het zeker?',
+            //MCA_COMPUTE_MGS: "Bereken de '{{mcaTitle}}'.",
+            SHOW5: 'Toon 5 regels',
+            SHOW10: 'Toon 10 regels',
+            SHOW15: 'Toon 15 regels',
+            SHOW20: 'Toon 20 regels',
+            SHOW25: 'Toon 25 regels',
+            SHOW30: 'Toon 30 regels',
+            SHOW35: 'Toon 35 regels',
+            SHOW40: 'Toon 40 regels'
+        };
+        return Dutch;
+    })();
+    Translations.Dutch = Dutch;
+})(Translations || (Translations = {}));

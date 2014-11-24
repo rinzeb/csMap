@@ -1116,3 +1116,13 @@ declare module csComp.Search {
         public doSearch(): void;
     }
 }
+declare module Translations {
+    class English {
+        static locale: ng.translate.ITranslationTable;
+    }
+}
+declare module Translations {
+    class Dutch {
+        static locale: ng.translate.ITranslationTable;
+    }
+}
