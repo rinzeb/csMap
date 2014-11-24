@@ -436,18 +436,25 @@ declare module Mca {
     class McaCtrl {
         private $scope;
         private $modal;
+        private $localStorageService;
         private $layerService;
         private messageBusService;
+        private static mcas;
         public selectedFeature: csComp.GeoJson.IFeature;
         public properties: FeatureProps.CallOutProperty[];
         public showFeature: boolean;
+        public showChart: boolean;
         public mca: Models.Mca;
-        public mcas: Models.Mca[];
+        public selectedCriterion: Models.Criterion;
         public availableMcas: Models.Mca[];
         private groupStyle;
         static $inject: string[];
-        constructor($scope: IMcaScope, $modal: any, $layerService: csComp.Services.LayerService, messageBusService: csComp.Services.MessageBusService);
+        constructor($scope: IMcaScope, $modal: any, $localStorageService: ng.localStorage.ILocalStorageService, $layerService: csComp.Services.LayerService, messageBusService: csComp.Services.MessageBusService);
+        private createDummyMca();
+        public weightUpdated(criterion: Models.Criterion): void;
         private mcaMessageReceived;
+        private addMcaToLocalStorage(mca);
+        private removeMcaFromLocalStorage(mca);
         private featureMessageReceived;
         private updateSelectedFeature(feature);
         public drawChart(criterion?: Models.Criterion): void;
@@ -455,7 +462,7 @@ declare module Mca {
         private drawAsterPlot(criterion?);
         private drawPieChart(criterion?);
         /** Based on the currently loaded features, which MCA can we use */
-        public availableMca(): void;
+        public updateAvailableMcas(): void;
         public calculateMca(): void;
         private applyPropertyInfoToCriteria(mca, featureType);
         private addPropertyInfo(featureId, mca);
@@ -468,21 +475,27 @@ declare module Mca {
     interface IMcaEditorScope extends ng.IScope {
         vm: McaEditorCtrl;
     }
+    interface IExtendedPropertyInfo extends csComp.GeoJson.IMetaInfo {
+        isSelected?: boolean;
+        category?: string;
+        scores?: string;
+        scoringFunctionType?: Models.ScoringFunctionType;
+    }
     class McaEditorCtrl {
         private $scope;
         private $modal;
         private $layerService;
         private messageBusService;
         public dataset: csComp.GeoJson.IGeoJsonFile;
-        public metaInfos: csComp.GeoJson.IMetaInfo[];
+        public metaInfos: IExtendedPropertyInfo[];
         public headers: string[];
         public selectedFeatureType: csComp.GeoJson.IFeatureType;
         public mcaTitle: string;
         public rankTitle: string;
         public hasRank: boolean;
+        public scoringFunctions: Models.ScoringFunction[];
         static $inject: string[];
         constructor($scope: IMcaEditorScope, $modal: any, $layerService: csComp.Services.LayerService, messageBusService: csComp.Services.MessageBusService);
-        public sayHi(): void;
         public loadPropertyTypes(): void;
         /**
         * Load the features as visible on the map.
@@ -490,14 +503,43 @@ declare module Mca {
         private loadMapLayers();
         private updateMetaInfo(featureType);
         public toggleSelection(metaInfoTitle: string): void;
+        public isDisabled(): boolean;
         /**
         * Create a new MCA criterion
         */
-        public ok(): void;
+        public save(): void;
         public cancel(): void;
     }
 }
 declare module Mca.Models {
+    enum ScoringFunctionType {
+        Manual = 0,
+        Ascending = 1,
+        Descending = 2,
+        AscendingSigmoid = 3,
+        DescendingSigmoid = 4,
+        GaussianPeak = 5,
+        GaussianValley = 6,
+    }
+    /**
+    * Scoring function creates a PLA of the scoring algorithm.
+    */
+    class ScoringFunction {
+        public type: ScoringFunctionType;
+        public scores: string;
+        public cssClass : string;
+        constructor(scoringFunctionType?: ScoringFunctionType);
+        /**
+        * Create a score based on the type, in which x in [0,10] and y in [0.1].
+        * Before applying it, you need to scale the x-axis based on your actual range.
+        * Typically, you would map x=0 to the min(x)+0.1*range(x) and x(10)-0.1*range(x) to max(x),
+        * i.e. x' = ax+b, where a=100/(8r) and b=-100(min+0.1r)/(8r) and r=max-min
+        */
+        static createScores(type: ScoringFunctionType): string;
+    }
+    class ScoringFunctions {
+        static scoringFunctions: ScoringFunctions[];
+    }
     class Criterion {
         public title: string;
         public description: string;
@@ -519,8 +561,11 @@ declare module Mca.Models {
         public criteria: Criterion[];
         /** Piece-wise linear approximation of the scoring function by a set of x and y points */
         public isPlaUpdated: boolean;
+        /** Piece-wise linear approximation must be scaled:x' = ax+b, where a=100/(8r) and b=-100(min+0.1r)/(8r) and r=max-min */
+        public isPlaScaled: boolean;
         private x;
         private y;
+        public deserialize(input: Criterion): Criterion;
         private requiresMinimum();
         private requiresMaximum();
         public getTitle(): string;
@@ -529,12 +574,11 @@ declare module Mca.Models {
         * which translates a property value to a MCA value in the range [0,1] using all features.
         */
         public updatePla(features: csComp.GeoJson.Feature[]): void;
-        public getScore(feature: csComp.GeoJson.Feature, criterion?: Criterion): number;
+        public getScore(feature: csComp.GeoJson.Feature): number;
     }
-    class Mca extends Criterion {
+    class Mca extends Criterion implements csComp.Services.ISerializable<Mca> {
         /** Section of the callout */
         public section: string;
-        public description: string;
         public stringFormat: string;
         /** Optionally, export the result also as a rank */
         public rankTitle: string;
@@ -546,7 +590,7 @@ declare module Mca.Models {
         /** Applicable feature ids as a string[]. */
         public featureIds: string[];
         constructor();
-        public updatePla(features: csComp.GeoJson.Feature[]): void;
+        public deserialize(input: Mca): Mca;
         /**
         * Update the MCA by calculating the weights and setting the colors.
         */
@@ -590,6 +634,10 @@ declare module StyleList {
     }
 }
 declare module csComp.StringExt {
+    class Utils {
+        /** Convert a CamelCase string to one with underscores. */
+        static toUnderscore(s: string): string;
+    }
     function isNullOrEmpty(s: string): boolean;
     /**
     * String formatting
@@ -714,6 +762,13 @@ declare module csComp.Services {
         public title: string;
         public url: string;
     }
+    /**
+    * Implement this interface to make your object serializable
+    * @see http://stackoverflow.com/a/22886730/319711
+    */
+    interface ISerializable<T> {
+        deserialize(input: Object): T;
+    }
     interface IBaseLayer {
         id: string;
         title: string;
@@ -741,11 +796,12 @@ declare module csComp.Services {
         public baselayers: IBaseLayer[];
         public projects: SolutionProject[];
     }
-    class Project {
-        public viewBounds: IBoundingBox;
+    class Project implements ISerializable<Project> {
         public title: string;
         public description: string;
         public logo: string;
+        public viewBounds: IBoundingBox;
+        public startposition: Coordinates;
         public featureTypes: {
             [id: string]: GeoJson.IFeatureType;
         };
@@ -753,9 +809,10 @@ declare module csComp.Services {
             [id: string]: GeoJson.IMetaInfo;
         };
         public groups: ProjectGroup[];
-        public startposition: Coordinates;
+        public mcas: Mca.Models.Mca[];
         public features: GeoJson.IFeature[];
         public markers: {};
+        public deserialize(input: Project): Project;
     }
     class PropertyInfo {
         public max: number;

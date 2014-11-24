@@ -1392,7 +1392,7 @@ var LegendList;
 })(LegendList || (LegendList = {}));
 var Mca;
 (function (Mca) {
-    Mca.html = '<div>    <h4 class="leftpanel-header">MCA</h4>    <div>        <select data-ng-model="vm.mca"                data-ng-options="mca.title for mca in vm.availableMcas"                style="width: 85%; margin-bottom:10px;"></select>        <a href="" data-ng-click="showDialog=!showDialog" class="pull-right" style="margin:0 10px;"><i class="fa fa-plus"></i></a>    </div>        <div>        <!--MCA EDITOR DIALOG-->        <!--<input type="checkbox" ng-model="showDialog"> Show-->        <div show-modal="showDialog" class="modal fade">            <div class="modal-dialog" data-ng-controller="mcaEditorCtrl">                <div class="modal-content">                    <div class="modal-header">                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>                        <h4 class="modal-title">MCA Editor</h4>                    </div>                    <div class="modal-body">                        <input type="text" data-ng-model="vm.mcaTitle" placeholder="MCA title..." />                        <input type="checkbox" value="Has rank" data-ng-checked="vm.hasRank" />                        <input type="text" data-ng-if="vm.hasRank" data-ng-model="vm.rankTitle" placeholder="Rank title..." />                        <p>Select the main feature.</p>                        <select data-ng-model="vm.selectedFeatureType"                                data-ng-change="vm.loadPropertyTypes()"                                data-ng-options="item as item.name for (key, item) in vm.dataset.poiTypes"                                class="form-control tt-input"></select>                        <p>Select the properties.</p>                        <ul class="form-group" style="margin-top: 1em; margin-left: -2em; overflow-y: auto; overflow-x: hidden;"                            resize resize-y="450">                            <li ng-repeat="mi in vm.metaInfos" class="list-unstyled" style="white-space: nowrap; text-overflow: ellipsis">                                <label>                                    <input type="checkbox" name="vm.selectedTitles[]" value="{{mi.title}}"                                           data-ng-checked="vm.headers.indexOf(mi.title) > -1"                                           data-ng-click="vm.toggleSelection(mi.title)">&nbsp;&nbsp;{{mi.title}}                                    <select class="form-control tt-input pull-right" data-ng-if="vm.headers.indexOf(mi.title) > -1">                                        <option value="0">More is better</option>                                        <option value="1">Less is better</option>                                    </select>                                </label>                            </li>                        </ul>                    </div>                    <pre>{{vm.headers}}</pre>                    <div class="modal-footer">                        <button type="button" class="btn btn-warning" data-dismiss="modal" data-ng-click="vm.cancel()">Cancel</button>                        <button type="button" class="btn btn-primary" data-dismiss="modal" data-ng-click="vm.ok()">OK</button>                    </div>                </div><!-- /.modal-content -->            </div><!-- /.modal-dialog -->        </div>    </div>    <div data-ng-if="vm.mca">        <ul class="list-unstyled">            <li data-ng-repeat="criterion in vm.mca.criteria">                <div data-ng-style="{\'display\': \'inline-block\', \'width\':\'10px\', \'height\':\'10px\', \'border\':\'solid 1px black\', \'background-color\': criterion.color}">                </div>                <div style="display: inline-block;">{{criterion.getTitle()}}</div>                <rating class="pull-right" style="margin:0 10px;" ng-model="criterion.userWeight" max="{{vm.mca.userWeightMax}}" readonly="isReadonly"                        state-on="\'fa fa-circle\'" state-off="\'fa fa-circle-o\'"                        on-hover="hoveringOver(value)" on-leave="overStar = null"></rating>                <ul data-ng-if="criterion.criteria.length > 0">                    <li data-ng-repeat="crit in criterion.criteria">{{crit.label}}</li>                </ul>            </li>        </ul>        <!--<a href="" style="display: inline-block; width: 100%; text-transform: uppercase"           data-ng-click="vm.calculateMca()" translate="MCA_COMPUTE_MGS" translate-values="{ mcaTitle: vm.mca.title }"></a>-->        <div style="margin-top: 5px; margin-left: 70px;" id="mcaPieChart"></div>        <div data-ng-if="vm.showFeature">            <h4>{{vm.selectedFeature.properties[\'Name\']}}</h4>            <table class="table table-condensed">                <tr data-ng-repeat="item in vm.properties"                    popover="{{item.description}}"                    popover-placement="right"                    popover-trigger="mouseenter"                    popover-append-to-body="true">                    <td><a class="fa fa-filter makeNarrow" data-ng-if="item.canFilter" data-ng-click="vm.$layerService.setFilter(item)" style="cursor: pointer"></a></td>                    <td><a class="fa fa-eye makeNarrow" data-ng-if="item.canStyle" data-ng-click="vm.setStyle(item)" style="cursor: pointer"></a></td>                    <td>{{item.key}}</td>                    <td class="text-right">{{item.value}}</td>                </tr>            </table>        </div>        <i data-ng-if="!vm.showFeature"><div translate="SHOW_FEATURE_MSG"></div></i>    </div></div>';
+    Mca.html = '<div>    <h4 class="leftpanel-header">MCA</h4>    <div>        <select data-ng-model="vm.mca"                data-ng-options="mca.title for mca in vm.availableMcas"                style="width: 85%; margin-bottom:10px;"></select>        <a href="" data-ng-click="showDialog=!showDialog" class="pull-right" style="margin:0 10px;"><i class="fa fa-plus"></i></a>    </div>        <!--MCA EDITOR DIALOG-->    <div id="mcaEditorView">        <!--<input type="checkbox" ng-model="showDialog"> Show-->        <div show-modal="showDialog" class="modal fade">            <div class="modal-dialog" data-ng-controller="mcaEditorCtrl">                <div class="modal-content">                    <div class="modal-header">                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>                        <h3 class="modal-title">MCA Editor</h3>                    </div>                    <div class="modal-body">                        <input type="text" data-ng-model="vm.mcaTitle" placeholder="MCA title..." />                        <span><input type="checkbox" data-ng-model="vm.hasRank" style="margin-left: 10px;" />&nbsp;&nbsp;Include rank</span>                        <input type="text" data-ng-if="vm.hasRank" data-ng-model="vm.rankTitle" placeholder="Rank title..." />                        <h4>Select the main feature</h4>                        <select data-ng-model="vm.selectedFeatureType"                                data-ng-change="vm.loadPropertyTypes()"                                data-ng-options="item as item.name for (key, item) in vm.dataset.poiTypes"                                class="form-control tt-input"></select>                        <h4>Select the properties</h4>                        <ul class="form-group" style="margin-top: 1em; margin-left: -2em; overflow-y: auto; overflow-x: hidden;"                            resize resize-y="450">                            <li ng-repeat="mi in vm.metaInfos" class="list-unstyled" style="white-space: nowrap; text-overflow: ellipsis">                                <div>                                    <span>                                        <input type="checkbox" name="vm.selectedTitles[]" value="{{mi.title}}"                                               data-ng-checked="mi.isSelected"                                               data-ng-click="mi.isSelected = !mi.isSelected">&nbsp;&nbsp;{{mi.title}}                                        <span data-ng-if="mi.isSelected" style="margin-left: 10px;">                                            <input type="checkbox" data-ng-model="specifyCategory" /><span>&nbsp;&nbsp;Use category:&nbsp;</span>                                            <input type="text" data-ng-if="specifyCategory" data-ng-model="mi.category" placeholder="..." />                                        </span>                                    </span>                                    <form data-ng-if="mi.isSelected" name="myForm" style="margin-left: 20px;">                                        <label id="scoringFunctions" data-ng-repeat="sf in vm.scoringFunctions">                                            <input type="radio" data-ng-model="mi.scoringFunctionType" value="{{sf.type}}">                                            <a data-ng-href="" data-ng-class="sf.cssClass" data-ng-click="mi.isSelected = !mi.isSelected"></a>                                        </label>                                    </form>                                    <div data-ng-if="mi.scoringFunctionType == 0" style="margin-left: 20px;">                                        input -> score:&nbsp;<input type="text" data-ng-model="mi.scores" placeholder="[x0,y0 x1,y1 ...]" />                                    </div>                                </div>                            </li>                        </ul>                    </div>                    <div class="modal-footer">                        <button type="button" class="btn btn-warning" data-dismiss="modal" data-ng-click="vm.cancel()">Cancel</button>                        <button type="button" class="btn btn-primary" data-dismiss="modal" data-ng-disabled="vm.isDisabled()" data-ng-click="vm.save()">OK</button>                    </div>                </div><!-- /.modal-content -->            </div><!-- /.modal-dialog -->        </div>    </div>    <div data-ng-if="vm.mca">        <ul class="list-unstyled">            <li data-ng-repeat="criterion in vm.mca.criteria">                <div data-ng-style="{\'display\': \'inline-block\', \'width\':\'10px\', \'height\':\'10px\', \'border\':\'solid 1px black\', \'background-color\': criterion.color}">                </div>                <div style="display: inline-block;">{{criterion.getTitle() | limitTo: 26}}</div>                <rating class="pull-right" style="margin:0 10px;" ng-model="criterion.userWeight" max="{{vm.mca.userWeightMax}}" readonly="isReadonly"                        state-on="\'fa fa-circle\'" state-off="\'fa fa-circle-o\'"                        data-ng-click="vm.weightUpdated(criterion)"                        on-hover="hoveringOver(value)" on-leave="overStar = null"></rating>                <ul class="list-unstyled" style="margin-left: 10px;" data-ng-if="criterion.criteria.length > 0">                    <li data-ng-repeat="crit in criterion.criteria">                        <div data-ng-style="{\'display\': \'inline-block\', \'width\':\'10px\', \'height\':\'10px\', \'border\':\'solid 1px black\', \'background-color\': crit.color}">                        </div>                        <div style="display: inline-block;">{{crit.getTitle() | limitTo: 28}}</div>                        <rating class="pull-right" style="margin:0 10px;" ng-model="crit.userWeight" max="{{vm.mca.userWeightMax}}" readonly="isReadonly"                                state-on="\'fa fa-circle\'" state-off="\'fa fa-circle-o\'"                                data-ng-click="vm.weightUpdated(crit)"                                on-hover="hoveringOver(value)" on-leave="overStar = null"></rating>                    </li>                </ul>            </li>        </ul>        <!--<a href="" style="display: inline-block; width: 100%; text-transform: uppercase"           data-ng-click="vm.calculateMca()" translate="MCA_COMPUTE_MGS" translate-values="{ mcaTitle: vm.mca.title }"></a>-->        <h4 data-ng-if="vm.showChart">            <a href="" data-ng-click="vm.weightUpdated(vm.mca)">Total results</a>            <a href="" data-ng-if="vm.selectedCriterion">&nbsp;&gt;&nbsp;{{vm.selectedCriterion.title}}</a>        </h4>        <div style="margin-top: 5px; margin-left: 70px;" id="mcaPieChart"></div>        <div data-ng-if="vm.showFeature">            <h4>{{vm.selectedFeature.properties[\'Name\']}}</h4>            <table class="table table-condensed">                <tr data-ng-repeat="item in vm.properties"                    popover="{{item.description}}"                    popover-placement="right"                    popover-trigger="mouseenter"                    popover-append-to-body="true">                    <td><a class="fa fa-filter makeNarrow" data-ng-if="item.canFilter" data-ng-click="vm.$layerService.setFilter(item)" style="cursor: pointer"></a></td>                    <td><a class="fa fa-eye makeNarrow" data-ng-if="item.canStyle" data-ng-click="vm.setStyle(item)" style="cursor: pointer"></a></td>                    <td>{{item.key}}</td>                    <td class="text-right">{{item.value}}</td>                </tr>            </table>        </div>        <i data-ng-if="!vm.showFeature"><div translate="SHOW_FEATURE_MSG"></div></i>    </div></div>';
 })(Mca || (Mca = {}));
 var Mca;
 (function (Mca) {
@@ -1413,7 +1413,7 @@ var Mca;
     }
 
     /**
-    * Directive to display the available map layers.
+    * Directive to display an MCA control.
     */
     Mca.myModule.directive('mca', [
         '$window', '$compile',
@@ -1442,29 +1442,53 @@ var Mca;
 })(Mca || (Mca = {}));
 var Mca;
 (function (Mca) {
-    // TODO MCA Editor
-    // TODO Saving and uploading MCA definitions
-    // TODO Adding MCA definitions to the project file
+    // DONE MCA Editor
+    // DONE Adding MCA definitions to the project file
+    // TODO Localize
+    // TODO Edit and delete an MCA
+    // TODO Save MCA after changing a value
     // TODO Optimize me button.
+    // TODO Save the project file
     var McaCtrl = (function () {
-        function McaCtrl($scope, $modal, $layerService, messageBusService) {
+        function McaCtrl($scope, $modal, $localStorageService, $layerService, messageBusService) {
             var _this = this;
             this.$scope = $scope;
             this.$modal = $modal;
+            this.$localStorageService = $localStorageService;
             this.$layerService = $layerService;
             this.messageBusService = messageBusService;
-            this.mcas = [];
             this.availableMcas = [];
             this.mcaMessageReceived = function (title, data) {
+                var mcaIndex = -1;
+                var mcas = _this.$layerService.project.mcas;
+                for (var i = 0; i < mcas.length; i++) {
+                    if (mcas[i].title != data.mca.title)
+                        continue;
+                    mcaIndex = i;
+                    break;
+                }
                 switch (title) {
                     case "add":
-                        _this.mcas.push(data.mca);
+                        if (mcaIndex >= 0) {
+                            mcas[mcaIndex] = data.mca;
+                        } else {
+                            mcas.push(data.mca);
+                            _this.addMcaToLocalStorage(data.mca);
+                        }
+                        _this.updateAvailableMcas();
                         _this.mca = data.mca;
-                        _this.availableMca();
                         break;
                     case "delete":
+                        if (mcaIndex >= 0)
+                            mcas.splice(mcaIndex, 1);
+                        _this.removeMcaFromLocalStorage(data.mca);
+                        _this.updateAvailableMcas();
+                        if (_this.availableMcas.length > 0)
+                            _this.mca = _this.availableMcas[0];
                         break;
                 }
+                _this.calculateMca();
+                _this.drawPieChart();
             };
             this.featureMessageReceived = function (title, feature) {
                 switch (title) {
@@ -1486,20 +1510,42 @@ var Mca;
             };
             $scope.vm = this;
 
-            messageBusService.subscribe('layer', function (title, layer) {
+            messageBusService.subscribe('layer', function (title) {
                 switch (title) {
                     case 'activated':
                     case 'deactivate':
-                        _this.availableMca();
+                        _this.updateAvailableMcas();
                         _this.calculateMca();
-                        _this.calculateMca();
+                        break;
+                }
+            });
+
+            messageBusService.subscribe('project', function (title) {
+                switch (title) {
+                    case 'loaded':
+                        if (typeof $layerService.project.mcas === 'undefined' || $layerService.project.mcas == null)
+                            $layerService.project.mcas = [];
+                        var mcas = _this.$localStorageService.get(McaCtrl.mcas);
+                        if (typeof mcas === 'undefined' || mcas === null)
+                            return;
+                        mcas.forEach(function (mca) {
+                            $layerService.project.mcas.push(new Mca.Models.Mca().deserialize(mca));
+                        });
+
                         break;
                 }
             });
 
             messageBusService.subscribe("feature", this.featureMessageReceived);
             messageBusService.subscribe("mca", this.mcaMessageReceived);
-
+            //$scope.$watch('vm.mca', () => {
+            //    if (!this.mca) return;
+            //    this.calculateMca();
+            //    this.drawChart();
+            //    // console.log(JSON.stringify(d));
+            //}, true);
+        }
+        McaCtrl.prototype.createDummyMca = function () {
             var mca = new Mca.Models.Mca();
             mca.title = 'Mijn Zelfredzaamheid';
             mca.description = 'Analyse van de zelfredzaamheid van een gemeente.';
@@ -1528,7 +1574,7 @@ var Mca;
             criterion.scores = '[0,0 25,1]';
             criterion.userWeight = 3;
             mca.criteria.push(criterion);
-            this.mcas.push(mca);
+            this.$layerService.project.mcas.push(mca);
 
             mca = new Mca.Models.Mca();
             mca.title = 'test';
@@ -1550,16 +1596,40 @@ var Mca;
             criterion.scores = '[0,0 25,1]';
             criterion.userWeight = 3;
             mca.criteria.push(criterion);
-            this.mcas.push(mca);
+            this.$layerService.project.mcas.push(mca);
+        };
 
-            $scope.$watch('vm.mca', function (d) {
-                if (!_this.mca)
-                    return;
-                _this.calculateMca();
-                _this.drawChart();
-                // console.log(JSON.stringify(d));
-            }, true);
-        }
+        McaCtrl.prototype.weightUpdated = function (criterion) {
+            this.calculateMca();
+            this.drawChart(criterion);
+        };
+
+        McaCtrl.prototype.addMcaToLocalStorage = function (mca) {
+            var mcas = this.$localStorageService.get(McaCtrl.mcas);
+            if (typeof mcas === 'undefined' || mcas === null)
+                mcas = [];
+            this.removeMcaFromLocalStorage(mca);
+            mcas.push(mca);
+            this.$localStorageService.set(McaCtrl.mcas, mcas); // You first need to set the key
+        };
+
+        McaCtrl.prototype.removeMcaFromLocalStorage = function (mca) {
+            var mcas = this.$localStorageService.get(McaCtrl.mcas);
+            if (typeof mcas === 'undefined' || mcas === null)
+                return;
+            var mcaIndex = -1;
+            for (var i = 0; i < mcas.length; i++) {
+                if (mcas[i].title != mca.title)
+                    continue;
+                mcaIndex = i;
+                break;
+            }
+            if (mcaIndex < 0)
+                return;
+            mcas.splice(mcaIndex, 1);
+            this.$localStorageService.set(McaCtrl.mcas, mcas); // You first need to set the key
+        };
+
         McaCtrl.prototype.updateSelectedFeature = function (feature) {
             if (typeof feature === 'undefined' || feature == null)
                 return;
@@ -1580,6 +1650,7 @@ var Mca;
         };
 
         McaCtrl.prototype.drawChart = function (criterion) {
+            this.showChart = true;
             if (this.showFeature)
                 this.drawAsterPlot(criterion);
             else
@@ -1587,14 +1658,18 @@ var Mca;
         };
 
         McaCtrl.prototype.getParentOfSelectedCriterion = function (criterion) {
+            var _this = this;
             var parent;
             this.mca.update();
             if (typeof criterion === 'undefined' || this.mca.criteria.indexOf(criterion) >= 0) {
+                this.selectedCriterion = null;
                 parent = this.mca.criteria;
             } else {
                 this.mca.criteria.forEach(function (c) {
-                    if (c.criteria.indexOf(criterion) >= 0)
+                    if (c.criteria.indexOf(criterion) >= 0) {
+                        _this.selectedCriterion = c;
                         parent = c.criteria;
+                    }
                 });
             }
             return parent;
@@ -1615,7 +1690,7 @@ var Mca;
                 pieData.label = c.getTitle();
                 pieData.weight = c.weight;
                 pieData.color = c.color;
-                pieData.score = c.getScore(_this.selectedFeature, c) * 100;
+                pieData.score = c.getScore(_this.selectedFeature) * 100;
                 data.push(pieData);
             });
             csComp.Helpers.Plot.drawAsterPlot(100, data, 'mcaPieChart');
@@ -1641,11 +1716,13 @@ var Mca;
         };
 
         /** Based on the currently loaded features, which MCA can we use */
-        McaCtrl.prototype.availableMca = function () {
+        McaCtrl.prototype.updateAvailableMcas = function () {
             var _this = this;
+            this.showChart = false;
             this.mca = null;
             this.availableMcas = [];
-            this.mcas.forEach(function (m) {
+
+            this.$layerService.project.mcas.forEach(function (m) {
                 m.featureIds.forEach(function (featureId) {
                     if (_this.availableMcas.indexOf(m) < 0 && featureId in _this.$layerService.featureTypes) {
                         _this.availableMcas.push(m);
@@ -1678,8 +1755,8 @@ var Mca;
                 _this.$layerService.project.features.forEach(function (feature) {
                     var score = mca.getScore(feature);
                     if (mca.rankTitle) {
-                        var item = { score: score, index: index++ };
-                        tempScores.push(item);
+                        var tempItem = { score: score, index: index++ };
+                        tempScores.push(tempItem);
                     }
                     feature.properties[mca.label] = score * 100;
                     _this.$layerService.updateFeature(feature);
@@ -1771,9 +1848,12 @@ var Mca;
             mi.section = mca.section || 'MCA';
             return mi;
         };
+        McaCtrl.mcas = 'MCAs';
+
         McaCtrl.$inject = [
             '$scope',
             '$modal',
+            'localStorageService',
             'layerService',
             'messageBusService'
         ];
@@ -1783,6 +1863,8 @@ var Mca;
 })(Mca || (Mca = {}));
 var Mca;
 (function (Mca) {
+    'use strict';
+
     var McaEditorCtrl = (function () {
         function McaEditorCtrl($scope, $modal, $layerService, messageBusService) {
             var _this = this;
@@ -1792,9 +1874,18 @@ var Mca;
             this.messageBusService = messageBusService;
             this.metaInfos = [];
             this.headers = [];
+            this.scoringFunctions = [];
             $scope.vm = this;
-            console.log("McaEditorCtlr");
-            messageBusService.subscribe('layer', function (title, layer) {
+
+            this.scoringFunctions.push(new Mca.Models.ScoringFunction(1 /* Ascending */));
+            this.scoringFunctions.push(new Mca.Models.ScoringFunction(2 /* Descending */));
+            this.scoringFunctions.push(new Mca.Models.ScoringFunction(3 /* AscendingSigmoid */));
+            this.scoringFunctions.push(new Mca.Models.ScoringFunction(4 /* DescendingSigmoid */));
+            this.scoringFunctions.push(new Mca.Models.ScoringFunction(5 /* GaussianPeak */));
+            this.scoringFunctions.push(new Mca.Models.ScoringFunction(6 /* GaussianValley */));
+            this.scoringFunctions.push(new Mca.Models.ScoringFunction(0 /* Manual */));
+
+            messageBusService.subscribe('layer', function (title) {
                 switch (title) {
                     case 'activated':
                     case 'deactivate':
@@ -1803,10 +1894,6 @@ var Mca;
                 }
             });
         }
-        McaEditorCtrl.prototype.sayHi = function () {
-            alert('Hello ' + this.$scope.$parent);
-        };
-
         McaEditorCtrl.prototype.loadPropertyTypes = function () {
             console.log("loadPropertyTypes");
         };
@@ -1861,7 +1948,8 @@ var Mca;
                 title: "Naam",
                 type: "text",
                 filterType: "text",
-                isSearchable: true
+                isSelected: false,
+                scoringFunctionType: this.scoringFunctions[0].type
             });
             if (featureType.metaInfoKeys != null) {
                 var keys = featureType.metaInfoKeys.split(';');
@@ -1901,13 +1989,22 @@ var Mca;
             }
         };
 
+        McaEditorCtrl.prototype.isDisabled = function () {
+            if (typeof this.mcaTitle === 'undefined' || this.mcaTitle.length === 0)
+                return true;
+            if (this.hasRank && this.rankTitle && this.rankTitle.length === 0)
+                return true;
+            if (!this.metaInfos.reduce(function (p, c) {
+                return p || c.isSelected;
+            }))
+                return true;
+            return false;
+        };
+
         /**
         * Create a new MCA criterion
         */
-        McaEditorCtrl.prototype.ok = function () {
-            var _this = this;
-            console.log("McaEditorCtrl says OK");
-
+        McaEditorCtrl.prototype.save = function () {
             var mca = new Mca.Models.Mca();
             mca.title = this.mcaTitle || 'New MCA criterion';
             mca.label = 'mca_' + mca.title.replace(' ', '_');
@@ -1917,24 +2014,46 @@ var Mca;
                 mca.rankFormat = '{0} / {1}';
             }
             mca.userWeightMax = 5;
-            mca.featureIds = [this.selectedFeatureType.name];
+            for (var key in this.dataset.poiTypes) {
+                if (this.dataset.poiTypes[key] === this.selectedFeatureType)
+                    mca.featureIds = [key];
+            }
 
-            var meta = [this.headers.length];
             this.metaInfos.forEach(function (mi) {
-                // Keep headers and mi in the right order
-                var index = _this.headers.indexOf(mi.title);
-                if (index >= 0)
-                    meta[index] = mi;
-            });
-
-            meta.forEach(function (mi) {
+                if (!mi.isSelected)
+                    return;
                 var criterion = new Mca.Models.Criterion();
                 criterion.label = mi.label;
                 criterion.title = mi.title;
+                criterion.isPlaScaled = true;
                 criterion.description = mi.description;
-                criterion.scores = '[0,0 20,1]';
                 criterion.userWeight = 1;
-                mca.criteria.push(criterion);
+
+                if (mi.scoringFunctionType === 0 /* Manual */) {
+                    criterion.scores = mi.scores;
+                } else {
+                    criterion.scores = Mca.Models.ScoringFunction.createScores(mi.scoringFunctionType);
+                    criterion.isPlaScaled = true;
+                }
+                if (mi.category) {
+                    var parent;
+                    for (var i in mca.criteria) {
+                        var c = mca.criteria[i];
+                        if (c.title != mi.category)
+                            continue;
+                        parent = c;
+                        break;
+                    }
+                    if (parent == null) {
+                        parent = new Mca.Models.Criterion;
+                        parent.title = mi.category;
+                        parent.isPlaUpdated = false;
+                        mca.criteria.push(parent);
+                    }
+                    parent.criteria.push(criterion);
+                } else {
+                    mca.criteria.push(criterion);
+                }
             });
             this.messageBusService.publish('mca', 'add', { mca: mca });
         };
@@ -1964,6 +2083,85 @@ var __extends = this.__extends || function (d, b) {
 var Mca;
 (function (_Mca) {
     (function (Models) {
+        (function (ScoringFunctionType) {
+            ScoringFunctionType[ScoringFunctionType["Manual"] = 0] = "Manual";
+            ScoringFunctionType[ScoringFunctionType["Ascending"] = 1] = "Ascending";
+            ScoringFunctionType[ScoringFunctionType["Descending"] = 2] = "Descending";
+            ScoringFunctionType[ScoringFunctionType["AscendingSigmoid"] = 3] = "AscendingSigmoid";
+            ScoringFunctionType[ScoringFunctionType["DescendingSigmoid"] = 4] = "DescendingSigmoid";
+            ScoringFunctionType[ScoringFunctionType["GaussianPeak"] = 5] = "GaussianPeak";
+            ScoringFunctionType[ScoringFunctionType["GaussianValley"] = 6] = "GaussianValley";
+        })(Models.ScoringFunctionType || (Models.ScoringFunctionType = {}));
+        var ScoringFunctionType = Models.ScoringFunctionType;
+
+        /**
+        * Scoring function creates a PLA of the scoring algorithm.
+        */
+        var ScoringFunction = (function () {
+            //get img(): string {
+            //    return '/includes/images/plot' + csComp.StringExt.Utils.toUnderscore(ScoringFunctionType[this.type]) + '.png';
+            //}
+            function ScoringFunction(scoringFunctionType) {
+                if (typeof scoringFunctionType != 'undefined' && scoringFunctionType != null)
+                    this.type = scoringFunctionType;
+            }
+            Object.defineProperty(ScoringFunction.prototype, "cssClass", {
+                get: function () {
+                    return ScoringFunctionType[this.type].toLowerCase();
+                },
+                enumerable: true,
+                configurable: true
+            });
+
+            /**
+            * Create a score based on the type, in which x in [0,10] and y in [0.1].
+            * Before applying it, you need to scale the x-axis based on your actual range.
+            * Typically, you would map x=0 to the min(x)+0.1*range(x) and x(10)-0.1*range(x) to max(x),
+            * i.e. x' = ax+b, where a=100/(8r) and b=-100(min+0.1r)/(8r) and r=max-min
+            */
+            ScoringFunction.createScores = function (type) {
+                var scores;
+                switch (type) {
+                    default:
+                    case 1 /* Ascending */:
+                        scores = '[0,0 10,1]';
+                        break;
+                    case 2 /* Descending */:
+                        scores = '[0,1 10,0]';
+                        break;
+                    case 3 /* AscendingSigmoid */:
+                        // http://mathnotepad.com/: f(x) = (3.5+2*atan(x-5))/7
+                        // f([0,1,2,3,4,5,6,7,8,9,10])
+                        // round(100*f([0,1,2,3,4,5,6,7,8,9,10]))/100
+                        // [0.11 0.12 0.14 0.18 0.28 0.5 0.72 0.82 0.86 0.88 0.89]
+                        scores = '[0,0.11 1,0.12 2,0.14 3,0.18 4,0.28 5,0.5 6,0.72 7,0.82 8,0.86 9,0.88 10,0.89]';
+                        break;
+                    case 4 /* DescendingSigmoid */:
+                        // 1-f(x)
+                        scores = '[0,0.89 1,0.88 2,0.86 3,0.82 4,0.72 5,0.5 6,0.28 7,0.18 8,0.14 9,0.12 10,0.11]';
+                        break;
+                    case 5 /* GaussianPeak */:
+                        // h(x)=3*exp(-((x-u)^2)/(2s^2))/(s*sqrt(2pi))
+                        scores = '[0,0 2,0.04 3,0.25 4,0.7 5,1 6,0.7 7,0.25 8,0.04 9,0]';
+                        break;
+                    case 6 /* GaussianValley */:
+                        // 1-h(x)
+                        scores = '[0,1 2,0.96 3,0.75 4,0.3 5,0 6,0.3 7,0.75 8,0.96 9,0]';
+                        break;
+                }
+                return scores;
+            };
+            return ScoringFunction;
+        })();
+        Models.ScoringFunction = ScoringFunction;
+
+        var ScoringFunctions = (function () {
+            function ScoringFunctions() {
+            }
+            return ScoringFunctions;
+        })();
+        Models.ScoringFunctions = ScoringFunctions;
+
         var Criterion = (function () {
             function Criterion() {
                 /** Specified weight by the user */
@@ -1971,9 +2169,27 @@ var Mca;
                 this.criteria = [];
                 /** Piece-wise linear approximation of the scoring function by a set of x and y points */
                 this.isPlaUpdated = false;
+                /** Piece-wise linear approximation must be scaled:x' = ax+b, where a=100/(8r) and b=-100(min+0.1r)/(8r) and r=max-min */
+                this.isPlaScaled = false;
                 this.x = [];
                 this.y = [];
             }
+            Criterion.prototype.deserialize = function (input) {
+                var _this = this;
+                this.title = input.title;
+                this.description = input.description;
+                this.label = input.label;
+                this.color = input.color;
+                this.userWeight = input.userWeight;
+                this.weight = input.weight;
+                this.isPlaScaled = input.isPlaScaled;
+                this.scores = input.scores;
+                input.criteria.forEach(function (c) {
+                    _this.criteria.push(new Models.Criterion().deserialize(c));
+                });
+                return this;
+            };
+
             Criterion.prototype.requiresMinimum = function () {
                 return this.scores && this.scores.indexOf('min') >= 0;
             };
@@ -1996,19 +2212,18 @@ var Mca;
                 var _this = this;
                 if (this.isPlaUpdated)
                     return;
+                if (this.criteria.length > 0) {
+                    this.criteria.forEach(function (c) {
+                        c.updatePla(features);
+                    });
+                    this.isPlaUpdated = true;
+                    return;
+                }
 
                 // Replace min and max by their values:
                 var scores = this.scores;
-                if (!scores) {
-                    if (this.criteria.length > 0) {
-                        this.criteria.forEach(function (criterion) {
-                            criterion.updatePla(features);
-                        });
-                    }
-                    return;
-                }
                 var propValues = [];
-                if (this.requiresMaximum() || this.requiresMinimum()) {
+                if (this.requiresMaximum() || this.requiresMinimum() || this.isPlaScaled) {
                     features.forEach(function (feature) {
                         if (_this.label in feature.properties) {
                             // The property is available
@@ -2016,11 +2231,14 @@ var Mca;
                         }
                     });
                 }
-                if (this.requiresMaximum()) {
-                    scores.replace('max', Math.max.apply(null, propValues));
+                var max = 0, min = 0;
+                if (this.isPlaScaled || this.requiresMaximum()) {
+                    max = Math.max.apply(null, propValues);
+                    scores.replace('max', max.toPrecision(3));
                 }
-                if (this.requiresMinimum()) {
-                    scores.replace('min', Math.min.apply(null, propValues));
+                if (this.isPlaScaled || this.requiresMinimum()) {
+                    min = Math.min.apply(null, propValues);
+                    scores.replace('min', min.toPrecision(3));
                 }
 
                 // Regex to split the scores: [^\d\.]+ and remove empty entries
@@ -2029,15 +2247,23 @@ var Mca;
                 });
 
                 // Test that we have an equal number of x and y,
+                var range = max - min, a = 0.08 * range, b = min + 0.1 * range;
+
                 if (pla.length % 2 != 0)
                     throw Error(this.label + ' does not have an even (x,y) pair in scores.');
-
                 for (var i = 0; i < pla.length / 2; i++) {
                     var x = parseFloat(pla[2 * i]);
+                    if (this.isPlaScaled) {
+                        // Scale x, i.e. x'=ax+b with x'(0)=min+0.1r and x'(10)=max-0.1r, r=max-min
+                        // min+0.1r=b
+                        // max-0.1r=10a+b=10a+min+0.1r <=> max-min-0.2r=10a <=> 0.8r=10a <=> a=0.08r
+                        x = a * x + b;
+                    }
                     if (i > 0 && this.x[i - 1] > x)
                         throw Error(this.label + ': x should increment continuously.');
                     this.x.push(x);
 
+                    // Test that y in [0, 1].
                     var y = parseFloat(pla[2 * i + 1]);
                     if (y < 0)
                         y = 0;
@@ -2048,36 +2274,28 @@ var Mca;
                 this.isPlaUpdated = true;
             };
 
-            Criterion.prototype.getScore = function (feature, criterion) {
-                var _this = this;
+            Criterion.prototype.getScore = function (feature) {
                 if (!this.isPlaUpdated)
-                    throw ('Error: PLA must be updated!');
-                if (!criterion)
-                    criterion = this;
-                if (criterion.criteria.length == 0) {
+                    throw ('Error: PLA must be updated for criterion ' + this.title + '!');
+                if (this.criteria.length == 0) {
                     // End point: compute the score for each feature
-                    var y = 0;
-                    if (criterion.label in feature.properties) {
+                    if (this.label in feature.properties) {
                         // The property is available
-                        var x = feature.properties[criterion.label];
-                        if (x < criterion.x[0])
-                            return criterion.y[0];
-                        var last = criterion.x.length - 1;
-                        if (x > criterion.x[last])
-                            return criterion.y[last];
-                        for (var k in criterion.x) {
-                            if (x < criterion.x[k]) {
-                                // Found relative position of x in criterion.x
-                                // TODO Use linear interpolation
-                                var x0 = criterion.x[k - 1];
-                                var x1 = criterion.x[k];
-                                var y0 = criterion.y[k - 1];
-                                var y1 = criterion.y[k];
+                        var x = feature.properties[this.label];
+                        if (x < this.x[0])
+                            return this.y[0];
+                        var last = this.x.length - 1;
+                        if (x > this.x[last])
+                            return this.y[last];
+                        for (var k in this.x) {
+                            if (x < this.x[k]) {
+                                // Found relative position of x in this.x
+                                var x0 = this.x[k - 1];
+                                var x1 = this.x[k];
+                                var y0 = this.y[k - 1];
+                                var y1 = this.y[k];
 
-                                //var x0 = criterion.x[Math.max(0, k - 1)];
-                                //var x1 = criterion.x[Math.min(last, k)];
-                                //var y0 = criterion.y[Math.max(0, k - 1)];
-                                //var y1 = criterion.y[Math.min(last, k)];
+                                // Use linear interpolation
                                 return (y1 - y0) * (x - x0) / (x1 - x0);
                             }
                         }
@@ -2088,7 +2306,7 @@ var Mca;
                     // Sum all the sub-criteria.
                     var finalScore = 0;
                     this.criteria.forEach(function (crit) {
-                        finalScore += crit.weight * _this.getScore(feature, crit);
+                        finalScore += crit.weight * crit.getScore(feature);
                     });
                     return this.weight * finalScore;
                 }
@@ -2108,12 +2326,18 @@ var Mca;
                 /** Applicable feature ids as a string[]. */
                 this.featureIds = [];
                 this.weight = 1;
-                this.isPlaUpdated = true;
+                this.isPlaUpdated = false;
             }
-            Mca.prototype.updatePla = function (features) {
-                this.criteria.forEach(function (criterion) {
-                    criterion.updatePla(features);
-                });
+            Mca.prototype.deserialize = function (input) {
+                this.section = input.section;
+                this.stringFormat = input.stringFormat;
+                this.rankTitle = input.rankTitle;
+                this.rankDescription = input.rankDescription;
+                this.rankFormat = input.rankFormat;
+                this.userWeightMax = input.userWeightMax;
+                this.featureIds = input.featureIds;
+                _super.prototype.deserialize.call(this, input);
+                return this;
             };
 
             /**
@@ -2149,13 +2373,15 @@ var Mca;
                 var i = 0;
                 this.criteria.forEach(function (c) {
                     totalSubcrit += c.criteria.length;
-                    c.color = redColors(i++).hex();
+                    if (!c.color)
+                        c.color = redColors(i++).hex();
                 });
                 var blueColors = chroma.scale('PRGn').domain([0, totalSubcrit - 1], totalSubcrit);
                 i = 0;
                 this.criteria.forEach(function (c) {
                     c.criteria.forEach(function (crit) {
-                        crit.color = blueColors(i++).hex();
+                        if (!crit.color)
+                            crit.color = blueColors(i++).hex();
                     });
                 });
             };
@@ -2386,6 +2612,19 @@ var StyleList;
 var csComp;
 (function (csComp) {
     (function (StringExt) {
+        var Utils = (function () {
+            function Utils() {
+            }
+            /** Convert a CamelCase string to one with underscores. */
+            Utils.toUnderscore = function (s) {
+                return s.replace(/([A-Z])/g, function ($1) {
+                    return "_" + $1.toLowerCase();
+                });
+            };
+            return Utils;
+        })();
+        StringExt.Utils = Utils;
+
         function isNullOrEmpty(s) {
             return !s;
         }
@@ -2801,6 +3040,8 @@ var csComp;
         })();
         Services.SolutionProject = SolutionProject;
 
+        
+
         /**
         * Represents to the overall projects class.
         */
@@ -2815,6 +3056,23 @@ var csComp;
             function Project() {
                 this.markers = {};
             }
+            Project.prototype.deserialize = function (input) {
+                this.viewBounds = input.viewBounds;
+                this.title = input.title;
+                this.description = input.description;
+                this.logo = input.logo;
+                this.markers = input.markers;
+                this.startposition = input.startposition;
+                this.features = input.features;
+                this.featureTypes = input.featureTypes;
+                this.metaInfoData = input.metaInfoData;
+                this.groups = input.groups;
+                this.mcas = [];
+                for (var mca in input.mcas) {
+                    this.mcas.push(new Mca.Models.Mca().deserialize(mca));
+                }
+                return this;
+            };
             return Project;
         })();
         Services.Project = Project;
@@ -3795,7 +4053,7 @@ var csComp;
                 this.featureTypes = {};
 
                 $.getJSON(url, function (data) {
-                    _this.project = data;
+                    _this.project = new Project().deserialize(data);
 
                     if (_this.project.viewBounds) {
                         _this.$mapService.map.fitBounds(new L.LatLngBounds(_this.project.viewBounds.southWest, _this.project.viewBounds.northEast));
