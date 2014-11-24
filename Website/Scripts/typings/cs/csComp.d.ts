@@ -442,6 +442,7 @@ declare module Mca {
         private messageBusService;
         private static mcas;
         private static confirmationMsg1;
+        private static confirmationMsg2;
         public selectedFeature: csComp.GeoJson.IFeature;
         public properties: FeatureProps.CallOutProperty[];
         public showDialog: boolean;
@@ -645,6 +646,9 @@ declare module StyleList {
     }
 }
 declare module csComp.StringExt {
+    interface IStringExt extends String {
+        format(s: string, ...args: string[]): string;
+    }
     class Utils {
         /** Convert a CamelCase string to one with underscores. */
         static toUnderscore(s: string): string;
