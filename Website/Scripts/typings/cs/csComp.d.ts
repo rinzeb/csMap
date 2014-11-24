@@ -436,12 +436,15 @@ declare module Mca {
     class McaCtrl {
         private $scope;
         private $modal;
+        private $translate;
         private $localStorageService;
         private $layerService;
         private messageBusService;
         private static mcas;
+        private static confirmationMsg1;
         public selectedFeature: csComp.GeoJson.IFeature;
         public properties: FeatureProps.CallOutProperty[];
+        public showDialog: boolean;
         public showFeature: boolean;
         public showChart: boolean;
         public mca: Models.Mca;
@@ -449,10 +452,17 @@ declare module Mca {
         public availableMcas: Models.Mca[];
         private groupStyle;
         static $inject: string[];
-        constructor($scope: IMcaScope, $modal: any, $localStorageService: ng.localStorage.ILocalStorageService, $layerService: csComp.Services.LayerService, messageBusService: csComp.Services.MessageBusService);
+        constructor($scope: IMcaScope, $modal: any, $translate: ng.translate.ITranslateService, $localStorageService: ng.localStorage.ILocalStorageService, $layerService: csComp.Services.LayerService, messageBusService: csComp.Services.MessageBusService);
         private createDummyMca();
         public weightUpdated(criterion: Models.Criterion): void;
+        /** Add or delete the received MCA model. */
         private mcaMessageReceived;
+        public editMca(mca: Models.Mca): void;
+        public createMca(): void;
+        public removeMca(mca: Models.Mca): void;
+        private getMcaIndex(mca);
+        private addMca(mca);
+        private deleteMca(mca);
         private addMcaToLocalStorage(mca);
         private removeMcaFromLocalStorage(mca);
         private featureMessageReceived;
@@ -496,6 +506,7 @@ declare module Mca {
         public scoringFunctions: Models.ScoringFunction[];
         static $inject: string[];
         constructor($scope: IMcaEditorScope, $modal: any, $layerService: csComp.Services.LayerService, messageBusService: csComp.Services.MessageBusService);
+        private updateMetaInfoUponEdit(criterion, category?);
         public loadPropertyTypes(): void;
         /**
         * Load the features as visible on the map.
@@ -674,6 +685,13 @@ declare module csComp.Services {
         * @text:  the contents of the notification
         */
         public notify(title: string, text: string): void;
+        /**
+        * Show a confirm dialog
+        * @title           : the title of the notification
+        * @text            : the contents of the notification
+        * @callback        : the callback that will be called after the confirmation has been answered.
+        */
+        public confirm(title: string, text: string, callback: (result: boolean) => any): void;
         public notifyBottom(title: string, text: string): void;
         /**
         * Publish a notification
