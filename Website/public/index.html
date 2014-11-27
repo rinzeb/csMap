@@ -40,13 +40,14 @@
 		<link rel="stylesheet" href="css/xbbcode.css">
 		<link rel="stylesheet" href="css/style.css">
 		<link rel="stylesheet" href="css/pnotify.custom.min.css" />
+        <link rel="stylesheet" href="css/colorpicker.css">
         
         <link rel="shortcut icon" href="favicon.ico">
 	</head>
 <body data-ng-controller="appCtrl" data-ng-cloak data-ng-init="showMap=true">
     <script src="bower_components/jquery/dist/jquery.min.js"></script>
     <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-    <script src="bower_components/angular/angular.min.js"></script>
+    <script src="bower_components/angular/angular.js"></script>
     <script src="bower_components/angular-cookies/angular-cookies.min.js"></script>
     <script src="bower_components/angular-ui-router/release/angular-ui-router.min.js"></script>
     <script src="bower_components/leaflet/dist/leaflet.js"></script>
@@ -77,6 +78,7 @@
     <script src="bower_components/async/lib/async.js"></script>
     <script src="js/cs/pnotify.custom.min.js"></script>
     <script src="js/cs/jqueryinjectCSS.min.js"></script>
+    <script src="js/cs/bootstrap-colorpicker.js"></script>
 
     <div role="navigation" class="navbar navbar-inverse navbar-fixed-top">
         
@@ -99,6 +101,10 @@
             <form class="navbar-form navbar-right" style="margin-right:0" role="search" data-ng-controller="searchCtrl">
                 <div id="scrollable-dropdown-menu" class="form-group has-feedback navbar-right">
 <!--                     <pre>Model: {{location | json}}</pre>-->
+
+                    <!-- Edit button -->
+                    <button type="button" class="btn btn-primary" ng-click="this.editMode=!this.editMode" ng-show="!this.editMode">Edit mode</button>
+                    <button type="button" class="btn btn-danger" ng-click="this.editMode=!this.editMode" ng-show="this.editMode">Cancel</button>
 
                     <input data-ng-model="vm.searchText"
                            typeahead="address as address.shortName(25) for address in vm.getLocation($viewValue)"

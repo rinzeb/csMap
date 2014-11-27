@@ -301,6 +301,19 @@ input[type="checkbox"] { margin: 0; }
 	margin-top: 5px;
 }
 
+.rightpanel-label {
+    padding-top: 5px;
+}
+
+.rightpanel-button {
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+
+.bold {
+    font-weight: bold;
+}
+
 /*TODO Specify the color for the navigation bar: default black */
 .navbar {
     background: black; 

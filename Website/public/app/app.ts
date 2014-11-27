@@ -13,6 +13,11 @@
         showMap      : boolean;
         showMenuRight: boolean;
         featureSelected: boolean;
+        // FeatureTypeCtrl - TODO: should be extracted to a directive
+        featureTypes;
+        updateFeatureTypes;
+        editMode: boolean;
+        boolToStr;
     }
 
     // TODO For setting the current culture for string formatting (note you need to include public/js/cs/stringformat.YOUR-CULTURE.js. See sffjs.1.09.zip for your culture.) 
@@ -52,6 +57,7 @@
             $scope.vm = this;
             $scope.showMenuRight = false;
             $scope.featureSelected = false;
+            $scope.editMode = true;
 
             $messageBusService.subscribe("project", () => {
                 // NOTE EV: You may run into problems here when calling this inside an angular apply cycle.
@@ -68,6 +74,15 @@
             $messageBusService.notify('Welcome to csMap', 'Your mapping solution.');
 
             this.showMap = this.$location.path() === "/map";
+
+            // FeatureTypeCtrl - TODO: should be extracted to a directive
+            $scope.updateFeatureTypes = () => {
+                this.$layerService.project.features.forEach((feature: IFeature) => {
+                    this.$layerService.updateFeature(feature);
+                });
+            };
+
+            $scope.boolToStr = function (arg) {return arg ? 'Ja' : 'Nee' };
         }
 
         /**
@@ -165,7 +180,8 @@
             'csWeb.legendList',
             'csWeb.resize',
             'csWeb.datatable',
-            'ngCookies'
+            'ngCookies',
+            'colorpicker.module' // FeatureTypeCtrl - TODO: extract to a directive
         ])
         .config(localStorageServiceProvider => {
             localStorageServiceProvider.prefix = 'csMap';
@@ -375,5 +391,16 @@
                     });
                 }
             };
+        })
+        .directive('errSrc', function () {
+          return {
+                link: function (scope, element, attrs) {
+                    element.bind('error', function () {
+                        if (attrs.src != attrs.errSrc) {
+                            attrs.$set('src', attrs.errSrc);
+                        }
+                    });
+                }
+            }
         });
 }

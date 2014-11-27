@@ -2563,7 +2563,7 @@
 			"style": {
 				"fillColor": "#ffffff",
 				"strokeColor": "#000000",
-				"drawingMode": "Point",
+				"drawingMode": "Polygon",
 				"strokeWidth": 1,
 				"iconWidth": 32,
 				"iconHeight": 32,
