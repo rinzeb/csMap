@@ -40,7 +40,7 @@
 		<link rel="stylesheet" href="css/xbbcode.css">
 		<link rel="stylesheet" href="css/style.css">
 		<link rel="stylesheet" href="css/pnotify.custom.min.css" />
-        <link rel="stylesheet" href="css/colorpicker.css">
+        <link rel="stylesheet" href="css/spectrum.css">
         
         <link rel="shortcut icon" href="favicon.ico">
 	</head>
@@ -78,7 +78,8 @@
     <script src="bower_components/async/lib/async.js"></script>
     <script src="js/cs/pnotify.custom.min.js"></script>
     <script src="js/cs/jqueryinjectCSS.min.js"></script>
-    <script src="js/cs/bootstrap-colorpicker.js"></script>
+    <script src="js/cs/spectrum.js"></script>
+    <script src="js/cs/angular-spectrum-colorpicker.min.js"></script>
 
     <div role="navigation" class="navbar navbar-inverse navbar-fixed-top">
         
@@ -103,8 +104,8 @@
 <!--                     <pre>Model: {{location | json}}</pre>-->
 
                     <!-- Edit button -->
-                    <button type="button" class="btn btn-primary" ng-click="this.editMode=!this.editMode" ng-show="!this.editMode">Edit mode</button>
-                    <button type="button" class="btn btn-danger" ng-click="this.editMode=!this.editMode" ng-show="this.editMode">Cancel</button>
+                    <button type="button" class="btn btn-primary" ng-click="vm.$layerService.editMode=!vm.$layerService.editMode" ng-show="!vm.$layerService.editMode"><i class="fa fa-pencil"></i> Edit mode</button>
+                    <button type="button" class="btn btn-danger" ng-click="vm.$layerService.editMode=!vm.$layerService.editMode" ng-show="vm.$layerService.editMode"><i class="fa fa-times"></i> Edit mode</button>
 
                     <input data-ng-model="vm.searchText"
                            typeahead="address as address.shortName(25) for address in vm.getLocation($viewValue)"

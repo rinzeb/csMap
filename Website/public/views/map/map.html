@@ -20,11 +20,10 @@ $1$ Right side panel #1#
         <!--<div id="rightPanelToggle">
                 <i class="fa fa-2x fa-chevron-right" style="margin-left: 10px;margin-top: 108px;"></i>
             </div>-->
-        
         <ul id="rightpanelTabs" class="nav nav-tabs" style="margin-right:0px; margin-top:100px; display:inline-block">
             <li class="rightPanelTab rightPanelTabAnimated active" ng-show="featureSelected"><a href="#info" style="" data-toggle="tab"><span class="fa fa-info fa-lg"></span></a></li>
-            <li class="rightPanelTab rightPanelTabAnimated" ng-show="featureSelected && editMode"><a href="#featuretype" style="" data-toggle="tab"><span class="fa fa-map-marker fa-lg"></span></a></li>
-            <li class="rightPanelTab rightPanelTabAnimated" ng-show="featureSelected && editMode"><a href="#propertytype" style="" data-toggle="tab"><span class="fa fa-list fa-lg"></span></a></li>
+            <li class="rightPanelTab rightPanelTabAnimated" ng-show="featureSelected && vm.$layerService.editMode"><a href="#featuretype" style="" data-toggle="tab"><span class="fa fa-map-marker fa-lg"></span></a></li>
+            <li class="rightPanelTab rightPanelTabAnimated" ng-show="featureSelected && vm.$layerService.editMode"><a href="#propertytype" style="" data-toggle="tab"><span class="fa fa-list fa-lg"></span></a></li>
         </ul>
         <div id="rightpanelTabPanes" class="tab-content" style="display: inline-block; height:100%; background-color: white;">
             <div class="tab-pane active" id="info">
@@ -76,9 +75,14 @@ $1$ Right side panel #1#
                                         </div>
 
                                         <div class="row">
-                                            <div class="col-md-6">
+                                            <div class="col-md-3">
+                                                <div class="rightpanel-label">Vulkleur</div>
+                                                <spectrum-colorpicker data-ng-model="featureType.style['fillColor']" options="{ cancelText: 'Annuleren', chooseText: 'Kiezen' }"></spectrum-colorpicker>
+                                            </div>
+
+                                            <div class="col-md-3">
                                                 <div class="rightpanel-label">Lijnkleur</div>
-                                                <input colorpicker colorpicker-with-input="true" data-ng-model="featureType.style['strokeColor']" class="form-control" id="strokeColor" style="background-color: {{ featureType.style['strokeColor'] }};" />
+                                                <spectrum-colorpicker data-ng-model="featureType.style['strokeColor']" options="{cancelText: 'Annuleren', chooseText: 'Kiezen'}"></spectrum-colorpicker>
                                             </div>
 
                                             <div class="col-md-6">
@@ -86,10 +90,7 @@ $1$ Right side panel #1#
                                                 <input type="text" data-ng-model="featureType.style['strokeWidth']" class="form-control">
                                             </div>
                                         </div>
-
-                                        <div class="rightpanel-label">Vulkleur</div>
-                                        <input colorpicker colorpicker-with-input="true" data-ng-model="featureType.style['fillColor']" class="form-control" id="fillColor" style="background-color: {{ featureType.style['fillColor'] }};" />
-
+                                    
                                         <button class="btn btn-primary rightpanel-button" data-ng-click="updateFeatureTypes()">Opslaan</button>
                                     </form>
                                 </div>

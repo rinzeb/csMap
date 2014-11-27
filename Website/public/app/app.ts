@@ -57,7 +57,6 @@
             $scope.vm = this;
             $scope.showMenuRight = false;
             $scope.featureSelected = false;
-            $scope.editMode = true;
 
             $messageBusService.subscribe("project", () => {
                 // NOTE EV: You may run into problems here when calling this inside an angular apply cycle.
@@ -166,23 +165,23 @@
 
     // Start the application
     angular.module('csWebApp', [
-            'ui.router',
-            'ui.bootstrap',
-            'LocalStorageModule',
-            'angularUtils.directives.dirPagination',
-            'pascalprecht.translate',
-            'csWeb.featureprops',
-            'csWeb.layersDirective',
-            'csWeb.featureList',
-            'csWeb.filterList',
-            'csWeb.baseMapList',
-            'csWeb.styleList',
-            'csWeb.legendList',
-            'csWeb.resize',
-            'csWeb.datatable',
-            'ngCookies',
-            'colorpicker.module' // FeatureTypeCtrl - TODO: extract to a directive
-        ])
+        'ui.router',
+        'ui.bootstrap',
+        'LocalStorageModule',
+        'angularUtils.directives.dirPagination',
+        'pascalprecht.translate',
+        'csWeb.featureprops',
+        'csWeb.layersDirective',
+        'csWeb.featureList',
+        'csWeb.filterList',
+        'csWeb.baseMapList',
+        'csWeb.styleList',
+        'csWeb.legendList',
+        'csWeb.resize',
+        'csWeb.datatable',
+        'ngCookies',
+        'angularSpectrumColorpicker' // FeatureTypeCtrl - TODO: extract to a directive
+    ])
         .config(localStorageServiceProvider => {
             localStorageServiceProvider.prefix = 'csMap';
         })
@@ -256,38 +255,38 @@
             // See https://github.com/angular-ui/angular-ui-OLDREPO/blob/master/modules/filters/unique/unique.js
             return (items, filterOn) => {
 
-                    if (filterOn === false) {
-                        return items;
-                    }
-
-                    if ((filterOn || angular.isUndefined(filterOn)) && angular.isArray(items)) {
-                        var hashCheck = {}, newItems = [];
-
-                        var extractValueToCompare = function (item) {
-                            if (angular.isObject(item) && angular.isString(filterOn)) {
-                                return item[filterOn];
-                            } else {
-                                return item;
-                            }
-                        };
-
-                        angular.forEach(items, function (item) {
-                            var valueToCheck, isDuplicate = false;
-
-                            for (var i = 0; i < newItems.length; i++) {
-                                if (angular.equals(extractValueToCompare(newItems[i]), extractValueToCompare(item))) {
-                                    isDuplicate = true;
-                                    break;
-                                }
-                            }
-                            if (!isDuplicate) {
-                                newItems.push(item);
-                            }
-
-                        });
-                        items = newItems;
-                    }
+                if (filterOn === false) {
                     return items;
+                }
+
+                if ((filterOn || angular.isUndefined(filterOn)) && angular.isArray(items)) {
+                    var hashCheck = {}, newItems = [];
+
+                    var extractValueToCompare = function (item) {
+                        if (angular.isObject(item) && angular.isString(filterOn)) {
+                            return item[filterOn];
+                        } else {
+                            return item;
+                        }
+                    };
+
+                    angular.forEach(items, function (item) {
+                        var valueToCheck, isDuplicate = false;
+
+                        for (var i = 0; i < newItems.length; i++) {
+                            if (angular.equals(extractValueToCompare(newItems[i]), extractValueToCompare(item))) {
+                                isDuplicate = true;
+                                break;
+                            }
+                        }
+                        if (!isDuplicate) {
+                            newItems.push(item);
+                        }
+
+                    });
+                    items = newItems;
+                }
+                return items;
             };
         })
     // Example switching the language (see http://angular-translate.github.io/).
@@ -320,8 +319,8 @@
         .service('mapService', csComp.Services.MapService)
         .service('layerService', csComp.Services.LayerService)
         .filter('csmillions', [
-            '$filter', '$locale', function(filter, locale) {
-                return function(amount, currencySymbol) {
+            '$filter', '$locale', function (filter, locale) {
+                return function (amount, currencySymbol) {
                     if (isNaN(amount)) return "";
                     var millions = amount / 1000000;
 
@@ -330,52 +329,52 @@
             }
         ])
         .filter('format', [
-            '$filter', '$locale', function(filter, locale) {
-                return function(value, format) {
+            '$filter', '$locale', function (filter, locale) {
+                return function (value, format) {
                     return String.format(format, value);
                 };
             }
         ])
-        .directive('percentage', function() {
+        .directive('percentage', function () {
             return {
                 require: 'ngModel',
-                link: function(scope, element, attrs, ngModelController) {
-                    ngModelController.$parsers.push(function(data) {
+                link: function (scope, element, attrs, ngModelController) {
+                    ngModelController.$parsers.push(function (data) {
                         if (data == null) return 0;
                         return parseInt(data.replace('%', '')) / 100; //converted
                     });
 
-                    ngModelController.$formatters.push(function(data) {
+                    ngModelController.$formatters.push(function (data) {
                         if (data == null) return '';
                         return Math.round((data * 100)) + '%'; //converted
                     });
                 }
             }
         })
-        //.directive('googlePlaces', () => {
-        //    return {
-        //        restrict: 'E',
-        //        replace: true,
-        //        // transclude:true,
-        //        scope: { location: '=' },
-        //        template: '<input id="searchbox" type="text" placeholder="Zoek..." autocomplete="off" spellcheck="false" dir="auto" style="position: relative; vertical-align: top;" class="form-control tt-input"/>',
-        //        //template: '<input id="google_places_ac" name="google_places_ac" type="text" class="input-block-level"/>',
-        //        link: ($scope, elm, attrs) => {
-        //            var autocomplete = new google.maps.places.Autocomplete($("#searchbox")[0], {});
-        //            google.maps.event.addListener(autocomplete, 'place_changed', () => {
-        //                var place = autocomplete.getPlace();
-        //                $scope.location = new L.LatLng(place.geometry.location.lat(), place.geometry.location.lng());
-        //                //$scope.location = place.geometry.location.lat() + ',' + place.geometry.location.lng();
-        //                $scope.$apply();
-        //            });
-        //        }
-        //    }
-        //})
-        //.directive('bsPopover', () => {
-        //    return (scope, element, attrs) => {
-        //        element.find("a[rel=popover]").popover({ placement: 'right', html: 'true' });
-        //    };
-        //})
+    //.directive('googlePlaces', () => {
+    //    return {
+    //        restrict: 'E',
+    //        replace: true,
+    //        // transclude:true,
+    //        scope: { location: '=' },
+    //        template: '<input id="searchbox" type="text" placeholder="Zoek..." autocomplete="off" spellcheck="false" dir="auto" style="position: relative; vertical-align: top;" class="form-control tt-input"/>',
+    //        //template: '<input id="google_places_ac" name="google_places_ac" type="text" class="input-block-level"/>',
+    //        link: ($scope, elm, attrs) => {
+    //            var autocomplete = new google.maps.places.Autocomplete($("#searchbox")[0], {});
+    //            google.maps.event.addListener(autocomplete, 'place_changed', () => {
+    //                var place = autocomplete.getPlace();
+    //                $scope.location = new L.LatLng(place.geometry.location.lat(), place.geometry.location.lng());
+    //                //$scope.location = place.geometry.location.lat() + ',' + place.geometry.location.lng();
+    //                $scope.$apply();
+    //            });
+    //        }
+    //    }
+    //})
+    //.directive('bsPopover', () => {
+    //    return (scope, element, attrs) => {
+    //        element.find("a[rel=popover]").popover({ placement: 'right', html: 'true' });
+    //    };
+    //})
         .directive('ngModelOnblur', () => {
             return {
                 restrict: 'A',
