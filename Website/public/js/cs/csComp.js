@@ -404,6 +404,46 @@ var csComp;
             return !(isOldIE || isIE11);
         }
         Helpers.supportsDataUri = supportsDataUri;
+
+        /**
+        * Convert a property value to a display value using the property info.
+        */
+        function convertPropertyInfo(mi, text) {
+            var displayValue;
+            if (!csComp.StringExt.isNullOrEmpty(text) && !$.isNumeric(text))
+                text = text.replace(/&amp;/g, '&');
+            if (csComp.StringExt.isNullOrEmpty(text))
+                return '';
+            switch (mi.type) {
+                case "bbcode":
+                    if (!csComp.StringExt.isNullOrEmpty(mi.stringFormat))
+                        text = String.format(mi.stringFormat, text);
+                    displayValue = XBBCODE.process({ text: text }).html;
+                    break;
+                case "number":
+                    if (!$.isNumeric(text))
+                        displayValue = text;
+                    else if (csComp.StringExt.isNullOrEmpty(mi.stringFormat))
+                        displayValue = text.toString();
+                    else
+                        displayValue = String.format(mi.stringFormat, parseFloat(text));
+                    break;
+                case "rank":
+                    var rank = text.split(',');
+                    if (rank.length != 2)
+                        return text;
+                    if (mi.stringFormat)
+                        displayValue = String.format(mi.stringFormat, rank[0], rank[1]);
+                    else
+                        displayValue = String.format("{0) / {1}", rank[0], rank[1]);
+                    break;
+                default:
+                    displayValue = text;
+                    break;
+            }
+            return displayValue;
+        }
+        Helpers.convertPropertyInfo = convertPropertyInfo;
     })(csComp.Helpers || (csComp.Helpers = {}));
     var Helpers = csComp.Helpers;
 })(csComp || (csComp = {}));
@@ -1263,6 +1303,9 @@ var Mca;
                 }
             };
             this.featureMessageReceived = function (title, feature) {
+                //console.log("MC: featureMessageReceived");
+                if (_this.mca == null)
+                    return;
                 switch (title) {
                     case "onFeatureSelect":
                         _this.updateSelectedFeature(feature);
@@ -1473,11 +1516,11 @@ var Mca;
                 this.showFeature = true;
                 this.properties = [];
                 var mi = McaCtrl.createMetaInfo(this.mca);
-                var displayValue = FeatureProps.CallOut.convertPropertyInfo(mi, feature.properties[mi.label]);
+                var displayValue = csComp.Helpers.convertPropertyInfo(mi, feature.properties[mi.label]);
                 this.properties.push(new FeatureProps.CallOutProperty(mi.title, displayValue, mi.label, true, true, feature, false, mi.description));
                 if (this.mca.rankTitle) {
                     mi = McaCtrl.createMetaInfoRank(this.mca);
-                    displayValue = FeatureProps.CallOut.convertPropertyInfo(mi, feature.properties[mi.label]);
+                    displayValue = csComp.Helpers.convertPropertyInfo(mi, feature.properties[mi.label]);
                     this.properties.push(new FeatureProps.CallOutProperty(mi.title, displayValue, mi.label, false, false, feature, false, mi.description));
                 }
                 this.drawChart();
@@ -2447,28 +2490,35 @@ var csComp;
             };
 
             /***
-            * Show tooltip with name, styles & filters
+            * Show tooltip with name, styles & filters.
             */
             LayerService.prototype.showFeatureTooltip = function (e, group) {
                 var layer = e.target;
                 var feature = layer.feature;
 
-                var content = "<span class='popup-title'>" + layer.feature.properties.Name + " </span>";
+                // add title
+                var title = layer.feature.properties.Name;
+                var rowLength = title.length;
+                var content = "<td colspan='3'>" + title + "</td></tr>";
 
                 // add filter values
                 if (group.filters != null && group.filters.length > 0) {
                     group.filters.forEach(function (f) {
                         if (feature.properties.hasOwnProperty(f.property)) {
                             var value = feature.properties[f.property];
-                            if (f.meta != null && !csComp.StringExt.isNullOrEmpty(f.meta.stringFormat)) {
-                                value = String.format(f.meta.stringFormat, parseFloat(value));
+                            var valueLength = value.toString().length;
+                            if (f.meta != null) {
+                                value = csComp.Helpers.convertPropertyInfo(f.meta, value);
+                                if (f.meta.type != 'bbcode')
+                                    valueLength = value.toString().length;
                             }
-                            content += "<br><kimg src='includes/images/filter-black.png' style='width:12px; height:12px; margin-top:4px;float:left; margin-right:4px'/>" + f.title + ":<b>" + value + "</b>";
+                            rowLength = Math.max(rowLength, valueLength + f.title.length);
+                            content += "<tr><td><div class='smallFilterIcon'></td><td>" + f.title + "</td><td>" + value + "</td></tr>";
                         }
                     });
                 }
 
-                // add style values
+                // add style values, only in case they haven't been added already as filter
                 if (group.styles != null && group.styles.length > 0) {
                     group.styles.forEach(function (s) {
                         if (group.filters != null && group.filters.filter(function (f) {
@@ -2476,20 +2526,26 @@ var csComp;
                         }).length == 0) {
                             if (feature.properties.hasOwnProperty(s.property)) {
                                 var value = feature.properties[s.property];
-
-                                //if (f.meta != null && !StringExt.isNullOrEmpty(s.meta.stringFormat)) {
-                                //    value = String.format(s.meta.stringFormat, parseFloat(value));
-                                //}
-                                content += "<br><img src='includes/images/style-black.png' style='width:12px; height:12px; margin-top:4px;float:left; margin-right:4px'/>" + s.title + ":<b>" + value + "</b>";
+                                var valueLength = value.toString().length;
+                                if (s.meta != null) {
+                                    value = csComp.Helpers.convertPropertyInfo(s.meta, value);
+                                    if (s.meta.type != 'bbcode')
+                                        valueLength = value.toString().length;
+                                }
+                                rowLength = Math.max(rowLength, valueLength + s.title.length);
+                                content += "<tr><td><div class='smallStyleIcon'></td><td>" + s.title + "</td><td>" + value + "</td></tr>";
                             }
                         }
                     });
                 }
+                var widthInPixels = Math.min(rowLength * 7 + 15, 250);
+                content = "<table style='width:" + widthInPixels + "px;'>" + content + "</table>";
 
                 this.popup = L.popup({
-                    offset: new L.Point(0, -10),
+                    offset: new L.Point(-widthInPixels / 2 - 40, -5),
                     closeOnClick: true,
-                    autoPan: false
+                    autoPan: false,
+                    className: 'featureTooltip'
                 }).setLatLng(e.latlng).setContent(content).openOn(this.map.map);
             };
 
@@ -2833,6 +2889,7 @@ var csComp;
                     var gs = new GroupStyle(this.$translate);
                     gs.id = this.getGuid();
                     gs.title = property.key;
+                    gs.meta = property.meta;
                     gs.visualAspect = "fillColor";
                     gs.canSelectColor = gs.visualAspect.toLowerCase().indexOf('color') > -1;
 
@@ -4121,7 +4178,7 @@ var FeatureProps;
                     var callOutSection = _this.getOrCreateCallOutSection(mi.section) || infoCallOutSection;
                     callOutSection.metaInfos[mi.label] = mi;
                     var text = feature.properties[mi.label];
-                    displayValue = CallOut.convertPropertyInfo(mi, text);
+                    displayValue = csComp.Helpers.convertPropertyInfo(mi, text);
 
                     // Skip empty, non-editable values
                     if (!mi.canEdit && csComp.StringExt.isNullOrEmpty(displayValue))
@@ -4141,45 +4198,42 @@ var FeatureProps;
             if (searchCallOutSection.properties.length > 0)
                 this.sections['Zzz Search'] = searchCallOutSection;
         }
-        /**
-        * Convert a property value to a display value using the property info.
-        */
-        CallOut.convertPropertyInfo = function (mi, text) {
-            var displayValue;
-            if (!csComp.StringExt.isNullOrEmpty(text) && !$.isNumeric(text))
-                text = text.replace(/&amp;/g, '&');
-            if (csComp.StringExt.isNullOrEmpty(text))
-                return '';
-            switch (mi.type) {
-                case "bbcode":
-                    if (!csComp.StringExt.isNullOrEmpty(mi.stringFormat))
-                        text = String.format(mi.stringFormat, text);
-                    displayValue = XBBCODE.process({ text: text }).html;
-                    break;
-                case "number":
-                    if (!$.isNumeric(text))
-                        displayValue = text;
-                    else if (csComp.StringExt.isNullOrEmpty(mi.stringFormat))
-                        displayValue = text.toString();
-                    else
-                        displayValue = String.format(mi.stringFormat, parseFloat(text));
-                    break;
-                case "rank":
-                    var rank = text.split(',');
-                    if (rank.length != 2)
-                        return text;
-                    if (mi.stringFormat)
-                        displayValue = String.format(mi.stringFormat, rank[0], rank[1]);
-                    else
-                        displayValue = String.format("{0) / {1}", rank[0], rank[1]);
-                    break;
-                default:
-                    displayValue = text;
-                    break;
-            }
-            return displayValue;
-        };
-
+        ///**
+        //* Convert a property value to a display value using the property info.
+        //*/
+        //public static convertPropertyInfo(mi: IMetaInfo, text: string): string {
+        //    var displayValue: string;
+        //    if (!csComp.StringExt.isNullOrEmpty(text) && !$.isNumeric(text))
+        //        text = text.replace(/&amp;/g, '&');
+        //    if (csComp.StringExt.isNullOrEmpty(text)) return '';
+        //    switch (mi.type) {
+        //        case "bbcode":
+        //            if (!csComp.StringExt.isNullOrEmpty(mi.stringFormat))
+        //                text = String.format(mi.stringFormat, text);
+        //            displayValue = XBBCODE.process({ text: text }).html;
+        //            break;
+        //        case "number":
+        //            if (!$.isNumeric(text))
+        //                displayValue = text;
+        //            else if (csComp.StringExt.isNullOrEmpty(mi.stringFormat))
+        //                displayValue = text.toString();
+        //            else
+        //                displayValue = String.format(mi.stringFormat, parseFloat(text));
+        //            break;
+        //        case "rank":
+        //            var rank = text.split(',');
+        //            if (rank.length != 2) return text;
+        //            if (mi.stringFormat)
+        //                displayValue = String.format(mi.stringFormat, rank[0], rank[1]);
+        //            else
+        //                displayValue = String.format("{0) / {1}", rank[0], rank[1]);
+        //            break;
+        //        default:
+        //            displayValue = text;
+        //            break;
+        //    }
+        //    return displayValue;
+        //}
         ///**
         // * In case we are dealing with a regular JSON file without type information, create a default type.
         // */
@@ -4362,17 +4416,21 @@ var FeatureProps;
             });
         }
         FeaturePropsCtrl.prototype.toTrusted = function (html) {
-            return this.$sce.trustAsHtml(html);
+            try  {
+                return this.$sce.trustAsHtml(html.toString());
+            } catch (e) {
+                console.log(e + ': ' + html);
+                return '';
+            }
         };
 
         FeaturePropsCtrl.prototype.displayFeature = function (feature) {
             var featureType = this.$layerService.featureTypes[feature.featureTypeName];
             this.$scope.callOut = new CallOut(featureType, feature, this.$layerService.metaInfoData);
-
             // Probably not needed
-            if (this.$scope.$root.$$phase != '$apply' && this.$scope.$root.$$phase != '$digest') {
-                this.$scope.$apply();
-            }
+            //if (this.$scope.$root.$$phase != '$apply' && this.$scope.$root.$$phase != '$digest') {
+            //    this.$scope.$apply();
+            //}
         };
         FeaturePropsCtrl.$inject = [
             '$scope',
@@ -4624,7 +4682,7 @@ var DataTable;
                 var row = [];
                 meta.forEach(function (mi) {
                     var text = f.properties[mi.label];
-                    displayValue = FeatureProps.CallOut.convertPropertyInfo(mi, text);
+                    displayValue = csComp.Helpers.convertPropertyInfo(mi, text);
 
                     //if (!text)
                     //    text = ' ';
@@ -4723,6 +4781,7 @@ var DataTable;
             } else {
                 // Support for browsers that support the data uri.
                 var a = document.createElement('a');
+                document.body.appendChild(a);
                 a.href = 'data:text/csv;charset=utf-8,' + encodeURI(csvData);
                 a.target = '_blank';
                 a.download = filename;
@@ -4735,7 +4794,12 @@ var DataTable;
         * Convert to trusted html string.
         */
         DataTableCtrl.prototype.toTrusted = function (html) {
-            return this.$sce.trustAsHtml(html);
+            try  {
+                return this.$sce.trustAsHtml(html.toString());
+            } catch (e) {
+                console.log(e + ': ' + html);
+                return '';
+            }
         };
         DataTableCtrl.$inject = [
             '$scope',
@@ -4855,4 +4919,60 @@ var Translations;
         return English;
     })();
     Translations.English = English;
+})(Translations || (Translations = {}));
+var Translations;
+(function (Translations) {
+    var Dutch = (function () {
+        function Dutch() {
+        }
+        Dutch.locale = {
+            CANCEL_BTN: 'Annuleren',
+            OK_BTN: 'OK',
+            MAP: 'Kaarten',
+            MAP_LABEL: 'Kaart',
+            TABLE_LABEL: 'Tabel',
+            LAYERS: 'Kaartlagen',
+            FILTERS: 'Filters',
+            FILTER_INFO: 'Momenteel zijn er geen filters geselecteerd. Klik op een icoon of gebied op de kaart, en klik op het filter icoontje (<span class="fa fa-filter"></span>) in het rechter menu om een filter toe te voegen. Dan wordt er een filter aangemaakt voor de geselecteerde eigenschap.',
+            STYLES: 'Stijlen',
+            STYLE_INFO: 'Momenteel zijn er geen stijlen geselecteerd. Klik op een icoon of gebied op de kaart, en klik op het stijl icoontje (<span class="fa fa-eye"></span>) in het rechter menu om een stijl toe te voegen. Dan wordt er een stijl aangemaakt voor de geselecteerde eigenschap.',
+            FEATURES: 'Features',
+            LEGEND: 'Legenda',
+            SEARCH: 'Zoeken',
+            MAP_FEATURES: 'Kaartfeatures',
+            WHITE_RED: 'wit - rood',
+            RED_WHITE: 'rood - wit',
+            GREEN_RED: 'groen - rood',
+            RED_GREEN: 'rood - groen',
+            WHITE_BLUE: 'wit - blauw',
+            BLUE_WHITE: 'wit - groen',
+            WHITE_GREEN: 'wit - groen',
+            GREEN_WHITE: 'groen - wit',
+            WHITE_ORANGE: 'wit - oranje',
+            ORANGE_WHITE: 'oranje - wit',
+            MCA: {
+                SHOW_FEATURE_MSG: 'Selecteer een feature op de kaart om de Multi-Criteria Analyse (MCA) resultaten in detail te bekijken.',
+                TOTAL_RESULT: 'Gecombineerd resultaat',
+                DELETE_MSG: 'Verwijder "{0}"',
+                DELETE_MSG2: 'Weet u het zeker?',
+                HAS_CATEGORY: '  Specificeer categorie? ',
+                EDITOR_TITLE: 'MCA Editor',
+                MAIN_FEATURE: 'Selecteer het type feature',
+                PROPERTIES: 'Selecteer de eigenschappen',
+                INCLUDE_RANK: '  Toon een rangorde? ',
+                RANK_TITLE: 'Titel voor de rangorde...',
+                TITLE: 'Titel...'
+            },
+            SHOW5: 'Toon 5 regels',
+            SHOW10: 'Toon 10 regels',
+            SHOW15: 'Toon 15 regels',
+            SHOW20: 'Toon 20 regels',
+            SHOW25: 'Toon 25 regels',
+            SHOW30: 'Toon 30 regels',
+            SHOW35: 'Toon 35 regels',
+            SHOW40: 'Toon 40 regels'
+        };
+        return Dutch;
+    })();
+    Translations.Dutch = Dutch;
 })(Translations || (Translations = {}));

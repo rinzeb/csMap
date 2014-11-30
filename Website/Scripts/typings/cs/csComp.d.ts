@@ -53,7 +53,7 @@ declare module Mca {
 }
 declare module csComp.StringExt {
     interface IStringExt extends String {
-        format(s: string, ...args: string[]): string;
+        format(s: string, ...args: any[]): string;
     }
     class Utils {
         /** Convert a CamelCase string to one with underscores. */
@@ -72,6 +72,10 @@ declare module csComp.StringExt {
 }
 declare module csComp.Helpers {
     function supportsDataUri(): boolean;
+    /**
+    * Convert a property value to a display value using the property info.
+    */
+    function convertPropertyInfo(mi: GeoJson.IMetaInfo, text: string): string;
 }
 declare module csComp.Services {
     interface IMessageBusCallback {
@@ -722,7 +726,7 @@ declare module csComp.Services {
         */
         private filterProperties(group);
         /***
-        * Show tooltip with name, styles & filters
+        * Show tooltip with name, styles & filters.
         */
         public showFeatureTooltip(e: any, group: ProjectGroup): void;
         public hideFeatureTooltip(e: any): void;
@@ -1003,10 +1007,6 @@ declare module FeatureProps {
         constructor(type: csComp.GeoJson.IFeatureType, feature: csComp.GeoJson.IFeature, metaInfoData: {
             [key: string]: csComp.GeoJson.IMetaInfo;
         });
-        /**
-        * Convert a property value to a display value using the property info.
-        */
-        static convertPropertyInfo(mi: csComp.GeoJson.IMetaInfo, text: string): string;
         private getOrCreateCallOutSection(sectionTitle);
         /**
         * Set the title of the callout to the title of the feature.
@@ -1105,7 +1105,7 @@ declare module DataTable {
         /**
         * Convert to trusted html string.
         */
-        public toTrusted(html: string): string;
+        public toTrusted(html: string): any;
     }
 }
 declare module DataTable {
@@ -1119,6 +1119,11 @@ declare module DataTable {
 }
 declare module Translations {
     class English {
+        static locale: ng.translate.ITranslationTable;
+    }
+}
+declare module Translations {
+    class Dutch {
         static locale: ng.translate.ITranslationTable;
     }
 }

@@ -960,28 +960,6 @@ margin-top: -10px;
   display: block !important;
 }
 
-.leaflet-popup-content-wrapper {
-  background:#CCC;
-  color:black;
-  font-size:16px;
-  line-height:24px;
-  border-radius: 0;
-}
-
-.leaflet-popup-close-button {
-  display: none;
-}
-.leaflet-popup-content-wrapper a {
-  color:rgba(255,255,255,0.5);
-  }
-.leaflet-popup-tip-container {
-  width:30px;
-  height:10px;
-}
-.leaflet-popup-tip {
-  display: none;
-}
-
 #scrollable-dropdown-menu ul {
   max-height: 500px;
   overflow-y: auto;
