@@ -1656,7 +1656,7 @@ var LegendList;
 })(LegendList || (LegendList = {}));
 var Mca;
 (function (Mca) {
-    Mca.html = '<div>    <h4 class="leftpanel-header">MCA</h4>    <div>        <select data-ng-model="vm.mca"                data-ng-options="mca.title for mca in vm.availableMcas"                style="width: 75%; margin-bottom:10px;"></select>        <a href="" data-ng-click="vm.createMca()" class="pull-right" style="margin-right:5px;"><i class="fa fa-plus"></i></a>        <a href="" data-ng-click="vm.removeMca(vm.mca)" class="pull-right" style="margin-right:5px;"><i class="fa fa-trash"></i></a>        <a href="" data-ng-click="vm.editMca(vm.mca)" class="pull-right" style="margin-right:5px;"><i class="fa fa-edit"></i></a>    </div>        <!--MCA EDITOR DIALOG-->    <div id="mcaEditorView">        <!--<input type="checkbox" ng-model="showDialog"> Show-->        <div show-modal="vm.showDialog" class="modal fade">            <div class="modal-dialog" data-ng-controller="mcaEditorCtrl">                <div class="modal-content">                    <div class="modal-header">                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>                        <h3 class="modal-title" translate>MCA.EDITOR_TITLE</h3>                    </div>                    <div class="modal-body">                        <input type="text" data-ng-model="vm.mcaTitle" placeholder="{{ \'MCA.TITLE\' | translate }}" />                        <span><input type="checkbox" data-ng-model="vm.hasRank" style="margin-left: 10px;" /><span translate>MCA.INCLUDE_RANK</span></span>                        <input type="text" data-ng-if="vm.hasRank" data-ng-model="vm.rankTitle" placeholder="{{ \'MCA.RANK_TITLE\' | translate }}" />                        <h4 translate>MCA.MAIN_FEATURE</h4>                        <select data-ng-model="vm.selectedFeatureType"                                data-ng-change="vm.loadPropertyTypes()"                                data-ng-options="item as item.name for (key, item) in vm.dataset.poiTypes"                                class="form-control"></select>                        <h4 translate>MCA.PROPERTIES</h4>                        <ul class="form-group" style="margin-top: 1em; margin-left: -2em; overflow-y: auto; overflow-x: hidden;"                            resize resize-y="450">                            <li ng-repeat="mi in vm.metaInfos" class="list-unstyled" style="white-space: nowrap; -moz-text-overflow: ellipsis; text-overflow: ellipsis">                                <div>                                    <span>                                        <input type="checkbox" name="vm.selectedTitles[]" value="{{mi.title}}"                                               data-ng-checked="mi.isSelected"                                               data-ng-click="mi.isSelected = !mi.isSelected">&nbsp;&nbsp;{{mi.title}}                                        <span data-ng-if="mi.isSelected" style="margin-left: 10px;">                                            <input type="checkbox" data-ng-model="mi.hasCategory" /><span translate>MCA.HAS_CATEGORY</span>                                            <input type="text" data-ng-if="mi.hasCategory" data-ng-model="mi.category" placeholder="..." />                                        </span>                                    </span>                                    <form data-ng-if="mi.isSelected" name="myForm" style="margin-left: 20px;">                                        <label id="scoringFunctions" data-ng-repeat="sf in vm.scoringFunctions">                                            <input type="radio" data-ng-model="mi.scoringFunctionType" value="{{sf.type}}">                                            <a data-ng-href="" data-ng-class="sf.cssClass" data-ng-click="mi.isSelected = !mi.isSelected"></a>                                        </label>                                    </form>                                    <div data-ng-if="mi.scoringFunctionType == 0" style="margin-left: 20px;">                                        input -> score:&nbsp;<input type="text" data-ng-model="mi.scores" placeholder="[x0,y0 x1,y1 ...]" />                                    </div>                                </div>                            </li>                        </ul>                    </div>                    <div class="modal-footer">                        <button type="button" class="btn btn-warning" data-dismiss="modal" data-ng-click="vm.cancel()" translate>CANCEL_BTN</button>                        <button type="button" class="btn btn-primary" data-dismiss="modal" data-ng-disabled="vm.isDisabled()" data-ng-click="vm.save()" translate>OK_BTN</button>                    </div>                </div><!-- /.modal-content -->            </div><!-- /.modal-dialog -->        </div>    </div>    <div data-ng-if="vm.mca">        <ul class="list-unstyled">            <li data-ng-repeat="criterion in vm.mca.criteria">                <div data-ng-style="{\'display\': \'inline-block\', \'margin-bottom\': \'6px\', \'width\':\'10px\', \'height\':\'10px\', \'border\':\'solid 1px black\', \'background-color\': criterion.color}"></div>                <div class="truncate" style="display: inline-block; width: 170px;">{{criterion.getTitle()}}</div>                <div rating class="pull-right" style="margin:0 10px;" ng-model="criterion.userWeight" max="{{vm.mca.userWeightMax}}" readonly="isReadonly"                        state-on="\'fa fa-circle\'" state-off="\'fa fa-circle-o\'"                        data-ng-click="vm.weightUpdated(criterion)"                        on-hover="hoveringOver(value)" on-leave="overStar = null"></div>                <ul class="list-unstyled" style="margin-left: 10px;" data-ng-if="criterion.criteria.length > 0">                    <li data-ng-repeat="crit in criterion.criteria">                        <div data-ng-style="{\'display\': \'inline-block\', \'margin-bottom\': \'6px\', \'width\':\'10px\', \'height\':\'10px\', \'border\':\'solid 1px black\', \'background-color\': crit.color}">                        </div>                        <div class="truncate" style="display: inline-block; width: 150px;">{{crit.getTitle()}}</div>                        <div rating class="pull-right" style="margin:0 10px;" ng-model="crit.userWeight" max="{{vm.mca.userWeightMax}}" readonly="isReadonly"                             state-on="\'fa fa-circle\'" state-off="\'fa fa-circle-o\'"                             data-ng-click="vm.weightUpdated(crit)"                             on-hover="hoveringOver(value)" on-leave="overStar = null"></div>                    </li>                </ul>            </li>        </ul>        <!--<a href="" style="display: inline-block; width: 100%; text-transform: uppercase"           data-ng-click="vm.calculateMca()" translate="MCA.COMPUTE_MGS" translate-values="{ mcaTitle: vm.mca.title }"></a>-->        <h4 data-ng-if="vm.showChart">            <a href="" data-ng-click="vm.weightUpdated(vm.mca)" translate="MCA.TOTAL_RESULT"></a>            <a href="" data-ng-if="vm.selectedCriterion">&gt;&nbsp;{{vm.selectedCriterion.title}}</a>        </h4>        <div style="margin-top: 5px; margin-left: 70px;" id="mcaPieChart"></div>        <div data-ng-if="vm.showFeature">            <h4>{{vm.selectedFeature.properties[\'Name\']}}</h4>            <table class="table table-condensed">                <tr data-ng-repeat="item in vm.properties"                    popover="{{item.description}}"                    popover-placement="right"                    popover-trigger="mouseenter"                    popover-append-to-body="true">                    <td><a class="fa fa-filter makeNarrow" data-ng-if="item.canFilter" data-ng-click="vm.$layerService.setFilter(item)" style="cursor: pointer"></a></td>                    <td><a class="fa fa-eye makeNarrow" data-ng-if="item.canStyle" data-ng-click="vm.setStyle(item)" style="cursor: pointer"></a></td>                    <td>{{item.key}}</td>                    <td class="text-right">{{item.value}}</td>                </tr>            </table>        </div>        <i data-ng-if="!vm.showFeature"><div translate="MCA.SHOW_FEATURE_MSG"></div></i>    </div></div>';
+    Mca.html = '<div>    <h4 class="leftpanel-header">MCA</h4>    <div>        <select data-ng-model="vm.mca"                data-ng-options="mca.title for mca in vm.availableMcas"                style="width: 75%; margin-bottom:10px;"></select>        <a href="" data-ng-click="vm.createMca()" class="pull-right" style="margin-right:5px;"><i class="fa fa-plus"></i></a>        <a href="" data-ng-click="vm.removeMca(vm.mca)" class="pull-right" style="margin-right:5px;"><i class="fa fa-trash"></i></a>        <a href="" data-ng-click="vm.editMca(vm.mca)" class="pull-right" style="margin-right:5px;"><i class="fa fa-edit"></i></a>    </div>        <!--MCA EDITOR DIALOG-->    <div id="mcaEditorView">        <!--<input type="checkbox" ng-model="showDialog"> Show-->        <div show-modal="vm.showDialog" class="modal fade">            <div class="modal-dialog" data-ng-controller="mcaEditorCtrl">                <div class="modal-content">                    <div class="modal-header">                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>                        <h3 class="modal-title" translate>MCA.EDITOR_TITLE</h3>                    </div>                    <div class="modal-body">                        <input type="text" data-ng-model="vm.mcaTitle" placeholder="{{ \'MCA.TITLE\' | translate }}" />                        <span><input type="checkbox" data-ng-model="vm.hasRank" style="margin-left: 10px;" /><span translate>MCA.INCLUDE_RANK</span></span>                        <input type="text" data-ng-if="vm.hasRank" data-ng-model="vm.rankTitle" placeholder="{{ \'MCA.RANK_TITLE\' | translate }}" />                        <h4 translate>MCA.MAIN_FEATURE</h4>                        <select data-ng-model="vm.selectedFeatureType"                                data-ng-change="vm.loadPropertyTypes()"                                data-ng-options="item as item.name for (key, item) in vm.dataset.featureTypes"                                class="form-control"></select>                        <h4 translate>MCA.PROPERTIES</h4>                        <ul class="form-group" style="margin-top: 1em; margin-left: -2em; overflow-y: auto; overflow-x: hidden;"                            resize resize-y="450">                            <li ng-repeat="mi in vm.propInfos" class="list-unstyled" style="white-space: nowrap; -moz-text-overflow: ellipsis; text-overflow: ellipsis">                                <div>                                    <span>                                        <input type="checkbox" name="vm.selectedTitles[]" value="{{mi.title}}"                                               data-ng-checked="mi.isSelected"                                               data-ng-click="mi.isSelected = !mi.isSelected">&nbsp;&nbsp;{{mi.title}}                                        <span data-ng-if="mi.isSelected" style="margin-left: 10px;">                                            <input type="checkbox" data-ng-model="mi.hasCategory" /><span translate>MCA.HAS_CATEGORY</span>                                            <input type="text" data-ng-if="mi.hasCategory" data-ng-model="mi.category" placeholder="..." />                                        </span>                                    </span>                                    <form data-ng-if="mi.isSelected" name="myForm" style="margin-left: 20px;">                                        <label id="scoringFunctions" data-ng-repeat="sf in vm.scoringFunctions">                                            <input type="radio" data-ng-model="mi.scoringFunctionType" value="{{sf.type}}">                                            <a data-ng-href="" data-ng-class="sf.cssClass" data-ng-click="mi.isSelected = !mi.isSelected"></a>                                        </label>                                    </form>                                    <div data-ng-if="mi.scoringFunctionType == 0" style="margin-left: 20px;">                                        input -> score:&nbsp;<input type="text" data-ng-model="mi.scores" placeholder="[x0,y0 x1,y1 ...]" />                                    </div>                                </div>                            </li>                        </ul>                    </div>                    <div class="modal-footer">                        <button type="button" class="btn btn-warning" data-dismiss="modal" data-ng-click="vm.cancel()" translate>CANCEL_BTN</button>                        <button type="button" class="btn btn-primary" data-dismiss="modal" data-ng-disabled="vm.isDisabled()" data-ng-click="vm.save()" translate>OK_BTN</button>                    </div>                </div><!-- /.modal-content -->            </div><!-- /.modal-dialog -->        </div>    </div>    <div data-ng-if="vm.mca">        <ul class="list-unstyled">            <li data-ng-repeat="criterion in vm.mca.criteria">                <div data-ng-style="{\'display\': \'inline-block\', \'margin-bottom\': \'6px\', \'width\':\'10px\', \'height\':\'10px\', \'border\':\'solid 1px black\', \'background-color\': criterion.color}"></div>                <div class="truncate" style="display: inline-block; width: 170px;">{{criterion.getTitle()}}</div>                <div rating class="pull-right" style="margin:0 10px;" ng-model="criterion.userWeight" max="{{vm.mca.userWeightMax}}" readonly="isReadonly"                        state-on="\'fa fa-circle\'" state-off="\'fa fa-circle-o\'"                        data-ng-click="vm.weightUpdated(criterion)"                        on-hover="hoveringOver(value)" on-leave="overStar = null"></div>                <ul class="list-unstyled" style="margin-left: 10px;" data-ng-if="criterion.criteria.length > 0">                    <li data-ng-repeat="crit in criterion.criteria">                        <div data-ng-style="{\'display\': \'inline-block\', \'margin-bottom\': \'6px\', \'width\':\'10px\', \'height\':\'10px\', \'border\':\'solid 1px black\', \'background-color\': crit.color}">                        </div>                        <div class="truncate" style="display: inline-block; width: 150px;">{{crit.getTitle()}}</div>                        <div rating class="pull-right" style="margin:0 10px;" ng-model="crit.userWeight" max="{{vm.mca.userWeightMax}}" readonly="isReadonly"                             state-on="\'fa fa-circle\'" state-off="\'fa fa-circle-o\'"                             data-ng-click="vm.weightUpdated(crit)"                             on-hover="hoveringOver(value)" on-leave="overStar = null"></div>                    </li>                </ul>            </li>        </ul>        <!--<a href="" style="display: inline-block; width: 100%; text-transform: uppercase"           data-ng-click="vm.calculateMca()" translate="MCA.COMPUTE_MGS" translate-values="{ mcaTitle: vm.mca.title }"></a>-->        <h4 data-ng-if="vm.showChart">            <a href="" data-ng-click="vm.weightUpdated(vm.mca)" translate="MCA.TOTAL_RESULT"></a>            <a href="" data-ng-if="vm.selectedCriterion">&gt;&nbsp;{{vm.selectedCriterion.title}}</a>        </h4>        <div style="margin-top: 5px; margin-left: 70px;" id="mcaPieChart"></div>        <div data-ng-if="vm.showFeature">            <h4>{{vm.selectedFeature.properties[\'Name\']}}</h4>            <table class="table table-condensed">                <tr data-ng-repeat="item in vm.properties"                    popover="{{item.description}}"                    popover-placement="right"                    popover-trigger="mouseenter"                    popover-append-to-body="true">                    <td><a class="fa fa-filter makeNarrow" data-ng-if="item.canFilter" data-ng-click="vm.$layerService.setFilter(item)" style="cursor: pointer"></a></td>                    <td><a class="fa fa-eye makeNarrow" data-ng-if="item.canStyle" data-ng-click="vm.setStyle(item)" style="cursor: pointer"></a></td>                    <td>{{item.key}}</td>                    <td class="text-right">{{item.value}}</td>                </tr>            </table>        </div>        <i data-ng-if="!vm.showFeature"><div translate="MCA.SHOW_FEATURE_MSG"></div></i>    </div></div>';
 })(Mca || (Mca = {}));
 var Mca;
 (function (Mca) {
@@ -1782,10 +1782,10 @@ var Mca;
             messageBusService.subscribe("feature", this.featureMessageReceived);
             messageBusService.subscribe("mca", this.mcaMessageReceived);
 
-            $translate('MCA_DELETE_MSG').then(function (translation) {
+            $translate('MCA.DELETE_MSG').then(function (translation) {
                 McaCtrl.confirmationMsg1 = translation;
             });
-            $translate('MCA_DELETE_MSG2').then(function (translation) {
+            $translate('MCA.DELETE_MSG2').then(function (translation) {
                 McaCtrl.confirmationMsg2 = translation;
             });
         }
@@ -2039,6 +2039,7 @@ var Mca;
             });
             if (this.availableMcas.length > 0)
                 this.mca = this.availableMcas[0];
+            this.$scope.$apply();
         };
 
         McaCtrl.prototype.calculateMca = function () {
@@ -2181,7 +2182,7 @@ var Mca;
             this.$modal = $modal;
             this.$layerService = $layerService;
             this.messageBusService = messageBusService;
-            this.metaInfos = [];
+            this.propInfos = [];
             this.headers = [];
             this.scoringFunctions = [];
             $scope.vm = this;
@@ -2211,8 +2212,8 @@ var Mca;
                         _this.rankTitle = mca.rankTitle;
                         _this.hasRank = _this.rankTitle != '';
                         _this.selectedFeatureType = _this.dataset.featureTypes[mca.featureIds[0]];
-                        _this.updateMetaInfo(_this.selectedFeatureType);
-                        _this.updateMetaInfoUponEdit(mca);
+                        _this.updatePropertyInfo(_this.selectedFeatureType);
+                        _this.updatePropertyInfoUponEdit(mca);
                         break;
                     case 'create':
                         _this.mcaTitle = '';
@@ -2224,12 +2225,12 @@ var Mca;
                 }
             });
         }
-        McaEditorCtrl.prototype.updateMetaInfoUponEdit = function (criterion, category) {
+        McaEditorCtrl.prototype.updatePropertyInfoUponEdit = function (criterion, category) {
             var _this = this;
             criterion.criteria.forEach(function (c) {
                 if (c.label) {
-                    for (var i in _this.metaInfos) {
-                        var mi = _this.metaInfos[i];
+                    for (var i in _this.propInfos) {
+                        var mi = _this.propInfos[i];
                         if (mi.label != c.label)
                             continue;
                         mi.isSelected = true;
@@ -2240,7 +2241,7 @@ var Mca;
                         break;
                     }
                 } else {
-                    _this.updateMetaInfoUponEdit(c, c.title);
+                    _this.updatePropertyInfoUponEdit(c, c.title);
                 }
             });
         };
@@ -2280,20 +2281,20 @@ var Mca;
             this.dataset = data;
             for (var key in data.featureTypes) {
                 this.selectedFeatureType = data.featureTypes[key];
-                this.updateMetaInfo(this.selectedFeatureType);
+                this.updatePropertyInfo(this.selectedFeatureType);
                 return;
             }
         };
 
-        McaEditorCtrl.prototype.updateMetaInfo = function (featureType) {
+        McaEditorCtrl.prototype.updatePropertyInfo = function (featureType) {
             var _this = this;
-            this.metaInfos = [];
+            this.propInfos = [];
             this.headers = [];
             var titles = [];
-            var mis = [];
+            var pis = [];
 
             // Push the Name, so it always appears on top.
-            mis.push({
+            pis.push({
                 label: "Name",
                 visibleInCallOut: true,
                 title: "Naam",
@@ -2305,26 +2306,26 @@ var Mca;
             if (featureType.propertyTypeKeys != null) {
                 var keys = featureType.propertyTypeKeys.split(';');
                 keys.forEach(function (k) {
-                    if (k in _this.$layerService.propertyTypeData)
-                        mis.push(_this.$layerService.propertyTypeData[k]);
+                    if (_this.$layerService.propertyTypeData.hasOwnProperty(k))
+                        pis.push(_this.$layerService.propertyTypeData[k]);
                     else if (featureType.propertyTypeData != null) {
                         var result = $.grep(featureType.propertyTypeData, function (e) {
                             return e.label === k;
                         });
                         if (result.length >= 1)
-                            mis.push(result);
+                            pis.push(result);
                     }
                 });
             } else if (featureType.propertyTypeData != null) {
                 featureType.propertyTypeData.forEach(function (mi) {
-                    return mis.push(mi);
+                    return pis.push(mi);
                 });
             }
-            mis.forEach(function (mi) {
+            pis.forEach(function (pi) {
                 // TODO Later, we could also include categories and not only numbers, where each category represents a certain value.
-                if (mi.visibleInCallOut && mi.type === 'number' && mi.label.indexOf("mca_") < 0 && titles.indexOf(mi.title) < 0) {
-                    titles.push(mi.title);
-                    _this.metaInfos.push(mi);
+                if (pi.visibleInCallOut && pi.type === 'number' && pi.label.indexOf("mca_") < 0 && titles.indexOf(pi.title) < 0) {
+                    titles.push(pi.title);
+                    _this.propInfos.push(pi);
                 }
             });
         };
@@ -2345,7 +2346,7 @@ var Mca;
                 return true;
             if (this.hasRank && this.rankTitle && this.rankTitle.length === 0)
                 return true;
-            if (!this.metaInfos.reduce(function (p, c) {
+            if (this.propInfos.length === 0 || !this.propInfos.reduce(function (p, c) {
                 return p || c.isSelected;
             }))
                 return true;
@@ -2370,7 +2371,7 @@ var Mca;
                     mca.featureIds = [key];
             }
 
-            this.metaInfos.forEach(function (mi) {
+            this.propInfos.forEach(function (mi) {
                 if (!mi.isSelected)
                     return;
                 var criterion = new Mca.Models.Criterion();

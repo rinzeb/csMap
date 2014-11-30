@@ -752,7 +752,7 @@ declare module Mca {
         private $layerService;
         private messageBusService;
         public dataset: csComp.Services.IGeoJsonFile;
-        public metaInfos: IExtendedPropertyInfo[];
+        public propInfos: IExtendedPropertyInfo[];
         public headers: string[];
         public selectedFeatureType: csComp.Services.IFeatureType;
         public mcaTitle: string;
@@ -761,13 +761,13 @@ declare module Mca {
         public scoringFunctions: Models.ScoringFunction[];
         static $inject: string[];
         constructor($scope: IMcaEditorScope, $modal: any, $layerService: csComp.Services.LayerService, messageBusService: csComp.Services.MessageBusService);
-        private updateMetaInfoUponEdit(criterion, category?);
+        private updatePropertyInfoUponEdit(criterion, category?);
         public loadPropertyTypes(): void;
         /**
         * Load the features as visible on the map.
         */
         private loadMapLayers();
-        private updateMetaInfo(featureType);
+        private updatePropertyInfo(featureType);
         public toggleSelection(metaInfoTitle: string): void;
         public isDisabled(): boolean;
         /**
