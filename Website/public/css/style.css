@@ -42,25 +42,20 @@ html, body, #container {
 
 .sidebar-wrapper {
 	height: 100%;
+	width: 100%;
 	position: relative;
-	width: 100%;
-}
-
-.sidebar-table {
-	bottom: 0;
-	overflow: auto;
-	position: absolute;
-	top: 124px;
-	width: 100%;
+	overflow: hidden;
 }
 
 #sidebar {
-	-moz-transition: all 0.25s ease-out;
+    -moz-transition: all 0.25s ease-out;
 	-webkit-transition: all 0.25s ease-out;
 	float: left;
 	height: 100%;
 	max-width: 100%;
-	transition: all 0.25s ease-out;
+    -ms-transition: all 0.25s ease-out;
+    -o-transition: all 0.25s ease-out;
+    transition: all 0.25s ease-out;
 	width: 100%;
 }
 
@@ -77,13 +72,6 @@ input[type="checkbox"] { margin: 0; }
 	top: 50%;
 	width: 220px;
 	z-index: 20001;
-}
-
-.sidebar-wrapper {
-	height: 100%;
-	overflow: hidden;
-	position: relative;
-	width: 100%;
 }
 
 .sidebar-table {

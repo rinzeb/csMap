@@ -13,13 +13,13 @@
         source   : string;
         lat?     : any;
         lng?     : any;
-        feature? : csComp.GeoJson.IFeature;
+        feature? : csComp.Services.IFeature;
     }
 
     export class LookupAddress {
         public lat     : any;
         public lng     : any;
-        public feature: csComp.GeoJson.IFeature;
+        public feature: csComp.Services.IFeature;
 
         constructor(
             public name     : string,

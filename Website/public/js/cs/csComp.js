@@ -1,669 +1,94 @@
-var Mca;
-(function (Mca) {
-    Mca.html = '<div>    <h4 class="leftpanel-header">MCA</h4>    <div>        <select data-ng-model="vm.mca"                data-ng-options="mca.title for mca in vm.availableMcas"                style="width: 75%; margin-bottom:10px;"></select>        <a href="" data-ng-click="vm.createMca()" class="pull-right" style="margin-right:5px;"><i class="fa fa-plus"></i></a>        <a href="" data-ng-click="vm.removeMca(vm.mca)" class="pull-right" style="margin-right:5px;"><i class="fa fa-trash"></i></a>        <a href="" data-ng-click="vm.editMca(vm.mca)" class="pull-right" style="margin-right:5px;"><i class="fa fa-edit"></i></a>    </div>        <!--MCA EDITOR DIALOG-->    <div id="mcaEditorView">        <!--<input type="checkbox" ng-model="showDialog"> Show-->        <div show-modal="vm.showDialog" class="modal fade">            <div class="modal-dialog" data-ng-controller="mcaEditorCtrl">                <div class="modal-content">                    <div class="modal-header">                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>                        <h3 class="modal-title" translate>MCA.EDITOR_TITLE</h3>                    </div>                    <div class="modal-body">                        <input type="text" data-ng-model="vm.mcaTitle" placeholder="{{ \'MCA.TITLE\' | translate }}" />                        <span><input type="checkbox" data-ng-model="vm.hasRank" style="margin-left: 10px;" /><span translate>MCA.INCLUDE_RANK</span></span>                        <input type="text" data-ng-if="vm.hasRank" data-ng-model="vm.rankTitle" placeholder="{{ \'MCA.RANK_TITLE\' | translate }}" />                        <h4 translate>MCA.MAIN_FEATURE</h4>                        <select data-ng-model="vm.selectedFeatureType"                                data-ng-change="vm.loadPropertyTypes()"                                data-ng-options="item as item.name for (key, item) in vm.dataset.poiTypes"                                class="form-control"></select>                        <h4 translate>MCA.PROPERTIES</h4>                        <ul class="form-group" style="margin-top: 1em; margin-left: -2em; overflow-y: auto; overflow-x: hidden;"                            resize resize-y="450">                            <li ng-repeat="mi in vm.metaInfos" class="list-unstyled" style="white-space: nowrap; -moz-text-overflow: ellipsis; text-overflow: ellipsis">                                <div>                                    <span>                                        <input type="checkbox" name="vm.selectedTitles[]" value="{{mi.title}}"                                               data-ng-checked="mi.isSelected"                                               data-ng-click="mi.isSelected = !mi.isSelected">&nbsp;&nbsp;{{mi.title}}                                        <span data-ng-if="mi.isSelected" style="margin-left: 10px;">                                            <input type="checkbox" data-ng-model="mi.hasCategory" /><span translate>MCA.HAS_CATEGORY</span>                                            <input type="text" data-ng-if="mi.hasCategory" data-ng-model="mi.category" placeholder="..." />                                        </span>                                    </span>                                    <form data-ng-if="mi.isSelected" name="myForm" style="margin-left: 20px;">                                        <label id="scoringFunctions" data-ng-repeat="sf in vm.scoringFunctions">                                            <input type="radio" data-ng-model="mi.scoringFunctionType" value="{{sf.type}}">                                            <a data-ng-href="" data-ng-class="sf.cssClass" data-ng-click="mi.isSelected = !mi.isSelected"></a>                                        </label>                                    </form>                                    <div data-ng-if="mi.scoringFunctionType == 0" style="margin-left: 20px;">                                        input -> score:&nbsp;<input type="text" data-ng-model="mi.scores" placeholder="[x0,y0 x1,y1 ...]" />                                    </div>                                </div>                            </li>                        </ul>                    </div>                    <div class="modal-footer">                        <button type="button" class="btn btn-warning" data-dismiss="modal" data-ng-click="vm.cancel()" translate>CANCEL_BTN</button>                        <button type="button" class="btn btn-primary" data-dismiss="modal" data-ng-disabled="vm.isDisabled()" data-ng-click="vm.save()" translate>OK_BTN</button>                    </div>                </div><!-- /.modal-content -->            </div><!-- /.modal-dialog -->        </div>    </div>    <div data-ng-if="vm.mca">        <ul class="list-unstyled">            <li data-ng-repeat="criterion in vm.mca.criteria">                <div data-ng-style="{\'display\': \'inline-block\', \'margin-bottom\': \'6px\', \'width\':\'10px\', \'height\':\'10px\', \'border\':\'solid 1px black\', \'background-color\': criterion.color}"></div>                <div class="truncate" style="display: inline-block; width: 170px;">{{criterion.getTitle()}}</div>                <div rating class="pull-right" style="margin:0 10px;" ng-model="criterion.userWeight" max="{{vm.mca.userWeightMax}}" readonly="isReadonly"                        state-on="\'fa fa-circle\'" state-off="\'fa fa-circle-o\'"                        data-ng-click="vm.weightUpdated(criterion)"                        on-hover="hoveringOver(value)" on-leave="overStar = null"></div>                <ul class="list-unstyled" style="margin-left: 10px;" data-ng-if="criterion.criteria.length > 0">                    <li data-ng-repeat="crit in criterion.criteria">                        <div data-ng-style="{\'display\': \'inline-block\', \'margin-bottom\': \'6px\', \'width\':\'10px\', \'height\':\'10px\', \'border\':\'solid 1px black\', \'background-color\': crit.color}">                        </div>                        <div class="truncate" style="display: inline-block; width: 150px;">{{crit.getTitle()}}</div>                        <div rating class="pull-right" style="margin:0 10px;" ng-model="crit.userWeight" max="{{vm.mca.userWeightMax}}" readonly="isReadonly"                             state-on="\'fa fa-circle\'" state-off="\'fa fa-circle-o\'"                             data-ng-click="vm.weightUpdated(crit)"                             on-hover="hoveringOver(value)" on-leave="overStar = null"></div>                    </li>                </ul>            </li>        </ul>        <!--<a href="" style="display: inline-block; width: 100%; text-transform: uppercase"           data-ng-click="vm.calculateMca()" translate="MCA.COMPUTE_MGS" translate-values="{ mcaTitle: vm.mca.title }"></a>-->        <h4 data-ng-if="vm.showChart">            <a href="" data-ng-click="vm.weightUpdated(vm.mca)" translate="MCA.TOTAL_RESULT"></a>            <a href="" data-ng-if="vm.selectedCriterion">&gt;&nbsp;{{vm.selectedCriterion.title}}</a>        </h4>        <div style="margin-top: 5px; margin-left: 70px;" id="mcaPieChart"></div>        <div data-ng-if="vm.showFeature">            <h4>{{vm.selectedFeature.properties[\'Name\']}}</h4>            <table class="table table-condensed">                <tr data-ng-repeat="item in vm.properties"                    popover="{{item.description}}"                    popover-placement="right"                    popover-trigger="mouseenter"                    popover-append-to-body="true">                    <td><a class="fa fa-filter makeNarrow" data-ng-if="item.canFilter" data-ng-click="vm.$layerService.setFilter(item)" style="cursor: pointer"></a></td>                    <td><a class="fa fa-eye makeNarrow" data-ng-if="item.canStyle" data-ng-click="vm.setStyle(item)" style="cursor: pointer"></a></td>                    <td>{{item.key}}</td>                    <td class="text-right">{{item.value}}</td>                </tr>            </table>        </div>        <i data-ng-if="!vm.showFeature"><div translate="MCA.SHOW_FEATURE_MSG"></div></i>    </div></div>';
-})(Mca || (Mca = {}));
-var Mca;
-(function (Mca) {
-    /**
-    * Config
-    */
-    var moduleName = 'csWeb.mca';
-
-    /**
-    * Module
-    */
-    Mca.myModule;
-    try  {
-        Mca.myModule = angular.module(moduleName);
-    } catch (err) {
-        // named module does not exist, so create one
-        Mca.myModule = angular.module(moduleName, []);
-    }
-
-    /**
-    * Directive to display an MCA control.
-    */
-    Mca.myModule.directive('mca', [
-        '$window', '$compile',
-        function ($window, $compile) {
-            return {
-                terminal: true,
-                restrict: 'EA',
-                scope: {},
-                template: Mca.html,
-                compile: function (el) {
-                    var fn = $compile(el);
-                    return function (scope) {
-                        fn(scope);
-                    };
-                },
-                replace: true,
-                transclude: true,
-                controller: Mca.McaCtrl
-            };
-        }
-    ]).directive('bsPopover', function () {
-        return function (scope, element, attrs) {
-            element.find("a[rel=popover]").popover({ placement: 'right', html: 'true' });
-        };
-    });
-})(Mca || (Mca = {}));
-var Mca;
-(function (Mca) {
-    'use strict';
-
-    var McaEditorCtrl = (function () {
-        function McaEditorCtrl($scope, $modal, $layerService, messageBusService) {
-            var _this = this;
-            this.$scope = $scope;
-            this.$modal = $modal;
-            this.$layerService = $layerService;
-            this.messageBusService = messageBusService;
-            this.metaInfos = [];
-            this.headers = [];
-            this.scoringFunctions = [];
-            $scope.vm = this;
-
-            this.scoringFunctions.push(new Mca.Models.ScoringFunction(1 /* Ascending */));
-            this.scoringFunctions.push(new Mca.Models.ScoringFunction(2 /* Descending */));
-            this.scoringFunctions.push(new Mca.Models.ScoringFunction(3 /* AscendingSigmoid */));
-            this.scoringFunctions.push(new Mca.Models.ScoringFunction(4 /* DescendingSigmoid */));
-            this.scoringFunctions.push(new Mca.Models.ScoringFunction(5 /* GaussianPeak */));
-            this.scoringFunctions.push(new Mca.Models.ScoringFunction(6 /* GaussianValley */));
-            this.scoringFunctions.push(new Mca.Models.ScoringFunction(0 /* Manual */));
-
-            messageBusService.subscribe('layer', function (title) {
-                switch (title) {
-                    case 'activated':
-                    case 'deactivate':
-                        _this.loadMapLayers();
-                        break;
-                }
-            });
-
-            messageBusService.subscribe('mca', function (title, data) {
-                switch (title) {
-                    case 'edit':
-                        var mca = data.mca;
-                        _this.mcaTitle = mca.title;
-                        _this.rankTitle = mca.rankTitle;
-                        _this.hasRank = _this.rankTitle != '';
-                        _this.selectedFeatureType = _this.dataset.poiTypes[mca.featureIds[0]];
-                        _this.updateMetaInfo(_this.selectedFeatureType);
-                        _this.updateMetaInfoUponEdit(mca);
-                        break;
-                    case 'create':
-                        _this.mcaTitle = '';
-                        _this.rankTitle = '';
-                        _this.hasRank = false;
-                        _this.selectedFeatureType = null;
-                        _this.loadMapLayers();
-                        break;
-                }
-            });
-        }
-        McaEditorCtrl.prototype.updateMetaInfoUponEdit = function (criterion, category) {
-            var _this = this;
-            criterion.criteria.forEach(function (c) {
-                if (c.label) {
-                    for (var i in _this.metaInfos) {
-                        var mi = _this.metaInfos[i];
-                        if (mi.label != c.label)
-                            continue;
-                        mi.isSelected = true;
-                        if (category) {
-                            mi.hasCategory = true;
-                            mi.category = category;
-                        }
-                        break;
-                    }
-                } else {
-                    _this.updateMetaInfoUponEdit(c, c.title);
-                }
-            });
-        };
-
-        McaEditorCtrl.prototype.loadPropertyTypes = function () {
-            console.log("loadPropertyTypes");
-        };
-
-        /**
-        * Load the features as visible on the map.
-        */
-        McaEditorCtrl.prototype.loadMapLayers = function () {
-            var _this = this;
-            var data = {
-                type: '',
-                features: [],
-                poiTypes: {}
-            };
-
-            // If we are filtering, load the filter results
-            this.$layerService.project.groups.forEach(function (group) {
-                if (group.filterResult != null)
-                    group.filterResult.forEach(function (f) {
-                        return data.features.push(f);
-                    });
-            });
-
-            // Otherwise, take all loaded features
-            if (data.features.length === 0)
-                data.features = this.$layerService.project.features;
-
-            data.features.forEach(function (f) {
-                if (!(f.featureTypeName in data.poiTypes))
-                    data.poiTypes[f.featureTypeName] = _this.$layerService.featureTypes[f.featureTypeName];
-            });
-
-            this.dataset = data;
-            for (var key in data.poiTypes) {
-                this.selectedFeatureType = data.poiTypes[key];
-                this.updateMetaInfo(this.selectedFeatureType);
-                return;
-            }
-        };
-
-        McaEditorCtrl.prototype.updateMetaInfo = function (featureType) {
-            var _this = this;
-            this.metaInfos = [];
-            this.headers = [];
-            var titles = [];
-            var mis = [];
-
-            // Push the Name, so it always appears on top.
-            mis.push({
-                label: "Name",
-                visibleInCallOut: true,
-                title: "Naam",
-                type: "text",
-                filterType: "text",
-                isSelected: false,
-                scoringFunctionType: this.scoringFunctions[0].type
-            });
-            if (featureType.metaInfoKeys != null) {
-                var keys = featureType.metaInfoKeys.split(';');
-                keys.forEach(function (k) {
-                    if (k in _this.$layerService.metaInfoData)
-                        mis.push(_this.$layerService.metaInfoData[k]);
-                    else if (featureType.metaInfoData != null) {
-                        var result = $.grep(featureType.metaInfoData, function (e) {
-                            return e.label === k;
-                        });
-                        if (result.length >= 1)
-                            mis.push(result);
-                    }
-                });
-            } else if (featureType.metaInfoData != null) {
-                featureType.metaInfoData.forEach(function (mi) {
-                    return mis.push(mi);
-                });
-            }
-            mis.forEach(function (mi) {
-                // TODO Later, we could also include categories and not only numbers, where each category represents a certain value.
-                if (mi.visibleInCallOut && mi.type === 'number' && mi.label.indexOf("mca_") < 0 && titles.indexOf(mi.title) < 0) {
-                    titles.push(mi.title);
-                    _this.metaInfos.push(mi);
-                }
-            });
-        };
-
-        McaEditorCtrl.prototype.toggleSelection = function (metaInfoTitle) {
-            var idx = this.headers.indexOf(metaInfoTitle);
-
-            // is currently selected
-            if (idx > -1) {
-                this.headers.splice(idx, 1);
-            } else {
-                this.headers.push(metaInfoTitle);
-            }
-        };
-
-        McaEditorCtrl.prototype.isDisabled = function () {
-            if (typeof this.mcaTitle === 'undefined' || this.mcaTitle.length === 0)
-                return true;
-            if (this.hasRank && this.rankTitle && this.rankTitle.length === 0)
-                return true;
-            if (!this.metaInfos.reduce(function (p, c) {
-                return p || c.isSelected;
-            }))
-                return true;
-            return false;
-        };
-
-        /**
-        * Create a new MCA criterion
-        */
-        McaEditorCtrl.prototype.save = function () {
-            var mca = new Mca.Models.Mca();
-            mca.title = this.mcaTitle || 'New MCA criterion';
-            mca.label = 'mca_' + mca.title.replace(' ', '_');
-            mca.stringFormat = '{0:0.0}';
-            if (this.hasRank) {
-                mca.rankTitle = this.rankTitle || 'Rank';
-                mca.rankFormat = '{0} / {1}';
-            }
-            mca.userWeightMax = 5;
-            for (var key in this.dataset.poiTypes) {
-                if (this.dataset.poiTypes[key] === this.selectedFeatureType)
-                    mca.featureIds = [key];
-            }
-
-            this.metaInfos.forEach(function (mi) {
-                if (!mi.isSelected)
-                    return;
-                var criterion = new Mca.Models.Criterion();
-                criterion.label = mi.label;
-                criterion.title = mi.title;
-                criterion.isPlaScaled = true;
-                criterion.description = mi.description;
-                criterion.userWeight = 1;
-
-                if (mi.scoringFunctionType === 0 /* Manual */) {
-                    criterion.scores = mi.scores;
-                } else {
-                    criterion.scores = Mca.Models.ScoringFunction.createScores(mi.scoringFunctionType);
-                    criterion.isPlaScaled = true;
-                }
-                if (mi.category) {
-                    var parent;
-                    for (var i in mca.criteria) {
-                        var c = mca.criteria[i];
-                        if (c.title != mi.category)
-                            continue;
-                        parent = c;
-                        break;
-                    }
-                    if (parent == null) {
-                        parent = new Mca.Models.Criterion;
-                        parent.title = mi.category;
-                        parent.isPlaUpdated = false;
-                        mca.criteria.push(parent);
-                    }
-                    parent.criteria.push(criterion);
-                } else {
-                    mca.criteria.push(criterion);
-                }
-            });
-            this.messageBusService.publish('mca', 'add', { mca: mca });
-        };
-
-        McaEditorCtrl.prototype.cancel = function () {
-            this.mcaTitle = '';
-            this.hasRank = false;
-            this.rankTitle = '';
-            this.headers = [];
-        };
-        McaEditorCtrl.$inject = [
-            '$scope',
-            '$modal',
-            'layerService',
-            'messageBusService'
-        ];
-        return McaEditorCtrl;
-    })();
-    Mca.McaEditorCtrl = McaEditorCtrl;
-})(Mca || (Mca = {}));
-var csComp;
-(function (csComp) {
-    (function (StringExt) {
-        var Utils = (function () {
-            function Utils() {
-            }
-            /** Convert a CamelCase string to one with underscores. */
-            Utils.toUnderscore = function (s) {
-                return s.replace(/([A-Z])/g, function ($1) {
-                    return "_" + $1.toLowerCase();
-                });
-            };
-            return Utils;
-        })();
-        StringExt.Utils = Utils;
-
-        function isNullOrEmpty(s) {
-            return !s;
-        }
-        StringExt.isNullOrEmpty = isNullOrEmpty;
-
-        /**
-        * String formatting
-        * 'Added {0} by {1} to your collection'.f(title, artist)
-        * 'Your balance is {0} USD'.f(77.7)
-        */
-        function format(s) {
-            var args = [];
-            for (var _i = 0; _i < (arguments.length - 1); _i++) {
-                args[_i] = arguments[_i + 1];
-            }
-            var i = args.length;
-
-            while (i--) {
-                // "gm" = RegEx options for Global search (more than one instance) and for Multiline search
-                s = s.replace(new RegExp('\\{' + i + '\\}', 'gm'), args[i]);
-            }
-            return s;
-        }
-        StringExt.format = format;
-        ;
-
-        /*
-        * Returns true if we are dealing with a number, false otherwise.
-        */
-        function isNumber(n) {
-            return !isNaN(parseFloat(n)) && isFinite(n);
-        }
-        StringExt.isNumber = isNumber;
-
-        /*
-        * Returns true if we are dealing with a boolean, false otherwise.
-        */
-        function isBoolean(s) {
-            return s === 'true' || s === 'false';
-        }
-        StringExt.isBoolean = isBoolean;
-
-        /*
-        * Returns true if we are dealing with a bbcode, false otherwise.
-        */
-        function isBbcode(s) {
-            return false;
-            if (s == null)
-                return false;
-            return s.indexOf("[b]") > 0 || s.indexOf("[i]") > 0 || s.indexOf("[url") > 0;
-        }
-        StringExt.isBbcode = isBbcode;
-    })(csComp.StringExt || (csComp.StringExt = {}));
-    var StringExt = csComp.StringExt;
-})(csComp || (csComp = {}));
-//module String {
-//    export function isNullOrEmpty(s: string): boolean {
-//        return !s;
-//    }
-//}
-////interface String {
-////    format: () => string;
-////    isNullOrEmpty: () => boolean;
-////}
-////String.prototype.format = function (...args: any[]): string {
-////    var formatted = this;
-////    for (var i = 0; i < args.length; i++) {
-////        formatted = formatted.replace(
-////            RegExp("\\{" + i + "\\}", 'g'), args[i].toString());
-////    }
-////    return formatted;
-////};
-////String.prototype.isNullOrEmpty = function (): boolean {
-////    //var s: string = this;
-////    return this.length == 0;
-//}
-var csComp;
-(function (csComp) {
-    (function (Helpers) {
-        function supportsDataUri() {
-            var isOldIE = navigator.appName === "Microsoft Internet Explorer";
-            var isIE11 = !!navigator.userAgent.match(/Trident\/7\./);
-            return !(isOldIE || isIE11);
-        }
-        Helpers.supportsDataUri = supportsDataUri;
-
-        /**
-        * Convert a property value to a display value using the property info.
-        */
-        function convertPropertyInfo(mi, text) {
-            var displayValue;
-            if (!csComp.StringExt.isNullOrEmpty(text) && !$.isNumeric(text))
-                text = text.replace(/&amp;/g, '&');
-            if (csComp.StringExt.isNullOrEmpty(text))
-                return '';
-            switch (mi.type) {
-                case "bbcode":
-                    if (!csComp.StringExt.isNullOrEmpty(mi.stringFormat))
-                        text = String.format(mi.stringFormat, text);
-                    displayValue = XBBCODE.process({ text: text }).html;
-                    break;
-                case "number":
-                    if (!$.isNumeric(text))
-                        displayValue = text;
-                    else if (csComp.StringExt.isNullOrEmpty(mi.stringFormat))
-                        displayValue = text.toString();
-                    else
-                        displayValue = String.format(mi.stringFormat, parseFloat(text));
-                    break;
-                case "rank":
-                    var rank = text.split(',');
-                    if (rank.length != 2)
-                        return text;
-                    if (mi.stringFormat)
-                        displayValue = String.format(mi.stringFormat, rank[0], rank[1]);
-                    else
-                        displayValue = String.format("{0) / {1}", rank[0], rank[1]);
-                    break;
-                default:
-                    displayValue = text;
-                    break;
-            }
-            return displayValue;
-        }
-        Helpers.convertPropertyInfo = convertPropertyInfo;
-    })(csComp.Helpers || (csComp.Helpers = {}));
-    var Helpers = csComp.Helpers;
-})(csComp || (csComp = {}));
 var csComp;
 (function (csComp) {
     (function (Services) {
-        
-
-        // Handle returned when subscribing to a topic
-        var MessageBusHandle = (function () {
-            function MessageBusHandle(topic, callback) {
-                this.topic = topic;
-                this.callback = callback;
+        var Widget = (function () {
+            function Widget() {
             }
-            return MessageBusHandle;
+            return Widget;
         })();
-        Services.MessageBusHandle = MessageBusHandle;
+        Services.Widget = Widget;
 
-        /**
-        * Simple message bus service, used for subscribing and unsubsubscribing to topics.
-        * @see {@link https://gist.github.com/floatingmonkey/3384419}
-        */
-        var MessageBusService = (function () {
-            function MessageBusService() {
-                PNotify.prototype.options.styling = "fontawesome";
+        var BaseWidget = (function () {
+            function BaseWidget(title, type) {
+                this.sizeY = 2;
+                this.sizeX = 4;
+                this.renderer = function ($scope) {
+                };
+                this.resize = function (status) {
+                };
+                if (title)
+                    this.title = title;
+                if (type)
+                    this.widgetType = type;
+                this.properties = {};
+                this.dataSets = [];
             }
-            /**
-            * Publish a notification
-            * @title: the title of the notification
-            * @text:  the contents of the notification
-            */
-            MessageBusService.prototype.notify = function (title, text) {
-                var options = {
-                    title: title,
-                    text: text,
-                    icon: 'fa fa-info',
-                    cornerclass: 'ui-pnotify-sharp',
-                    addclass: "stack-bottomright",
-                    stack: { "dir1": "up", "dir2": "left", "firstpos1": 25, "firstpos2": 25 }
-                };
-
-                var pn = new PNotify(options);
+            BaseWidget.prototype.init = function (sX, sY, c, r, id) {
+                this.sizeX = sX;
+                this.sizeY = sY;
+                this.col = c;
+                this.row = r;
+                this.background = "red";
+                if (!id)
+                    id = "widget" + csComp.Helpers.getGuid().replace('-', '');
+                this.id = id;
+                this.elementId = id;
             };
 
-            /**
-            * Show a confirm dialog
-            * @title           : the title of the notification
-            * @text            : the contents of the notification
-            * @callback        : the callback that will be called after the confirmation has been answered.
-            */
-            MessageBusService.prototype.confirm = function (title, text, callback) {
-                var options = {
-                    title: title,
-                    text: text,
-                    hide: false,
-                    confirm: {
-                        confirm: true
-                    },
-                    buttons: {
-                        closer: false,
-                        sticker: false
-                    },
-                    history: {
-                        history: false
-                    },
-                    icon: 'fa fa-question-circle',
-                    cornerclass: 'ui-pnotify-sharp',
-                    addclass: "stack-topright",
-                    stack: { "dir1": "down", "dir2": "left", "firstpos1": 25, "firstpos2": 25 }
-                };
-
-                var pn = new PNotify(options).get().on('pnotify.confirm', function () {
-                    callback(true);
-                }).on('pnotify.cancel', function () {
-                    callback(false);
-                });
+            BaseWidget.prototype.updateDateRange = function (r) {
+                this.range = r;
             };
-
-            MessageBusService.prototype.notifyBottom = function (title, text) {
-                var stack_bar_bottom = { "dir1": "up", "dir2": "right", "spacing1": 0, "spacing2": 0 };
-                var options = {
-                    title: "Over Here",
-                    text: "Check me out. I'm in a different stack.",
-                    addclass: "stack-bar-bottom",
-                    cornerclass: "",
-                    width: "70%",
-                    stack: stack_bar_bottom
-                };
-                var pn = new PNotify(options);
-            };
-
-            /**
-            * Publish a notification
-            * @title: the title of the notification
-            * @text:  the contents of the notification
-            */
-            MessageBusService.prototype.notifyData = function (data) {
-                var pn = new PNotify(data);
-                //this.publish("notify", "", data);
-            };
-
-            /**
-            * Publish to a topic
-            */
-            MessageBusService.prototype.publish = function (topic, title, data) {
-                //window.console.log("publish: " + topic + ", " + title);
-                if (!MessageBusService.cache[topic])
-                    return;
-                MessageBusService.cache[topic].forEach(function (cb) {
-                    return cb(title, data);
-                });
-            };
-
-            //public publish(topic: string, title: string, data?: any): void {
-            //	MessageBusService.publish(topic, title, data);
-            //}
-            /**
-            * Subscribe to a topic
-            * @param {string} topic The desired topic of the message.
-            * @param {IMessageBusCallback} callback The callback to call.
-            */
-            MessageBusService.prototype.subscribe = function (topic, callback) {
-                if (!MessageBusService.cache[topic])
-                    MessageBusService.cache[topic] = new Array();
-                MessageBusService.cache[topic].push(callback);
-                return new MessageBusHandle(topic, callback);
-            };
-
-            //public subscribe(topic: string, callback: IMessageBusCallback): MessageBusHandle {
-            //	return MessageBusService.subscribe(topic, callback);
-            //}
-            /**
-            * Unsubscribe to a topic by providing its handle
-            */
-            MessageBusService.prototype.unsubscribe = function (handle) {
-                var topic = handle.topic;
-                var callback = handle.callback;
-                if (!MessageBusService.cache[topic])
-                    return;
-                MessageBusService.cache[topic].forEach(function (cb, idx) {
-                    if (cb == callback) {
-                        MessageBusService.cache[topic].splice(idx, 1);
-                        return;
-                    }
-                });
-            };
-            MessageBusService.cache = {};
-            return MessageBusService;
+            return BaseWidget;
         })();
-        Services.MessageBusService = MessageBusService;
+        Services.BaseWidget = BaseWidget;
 
-        var EventObj = (function () {
-            function EventObj() {
+        var Dashboard = (function () {
+            function Dashboard(id, name) {
+                this.id = id;
+                this.name = name;
+                this.widgets = [];
             }
-            // Events primitives ======================
-            EventObj.prototype.bind = function (event, fct) {
-                this.myEvents = this.myEvents || {};
-                this.myEvents[event] = this.myEvents[event] || [];
-                this.myEvents[event].push(fct);
-            };
-            EventObj.prototype.unbind = function (event, fct) {
-                this.myEvents = this.myEvents || {};
-                if (event in this.myEvents === false)
-                    return;
-                this.myEvents[event].splice(this.myEvents[event].indexOf(fct), 1);
-            };
-            EventObj.prototype.unbindEvent = function (event) {
-                this.myEvents = this.myEvents || {};
-                this.myEvents[event] = [];
-            };
-            EventObj.prototype.unbindAll = function () {
-                this.myEvents = this.myEvents || {};
-                for (var event in this.myEvents)
-                    this.myEvents[event] = false;
-            };
-            EventObj.prototype.trigger = function (event) {
-                var args = [];
-                for (var _i = 0; _i < (arguments.length - 1); _i++) {
-                    args[_i] = arguments[_i + 1];
-                }
-                this.myEvents = this.myEvents || {};
-                if (event in this.myEvents === false)
-                    return;
-                for (var i = 0; i < this.myEvents[event].length; i++) {
-                    this.myEvents[event][i].apply(this, Array.prototype.slice.call(arguments, 1));
-                }
-            };
-            EventObj.prototype.registerEvent = function (evtname) {
-                this[evtname] = function (callback, replace) {
-                    if (typeof callback == 'function') {
-                        if (replace)
-                            this.unbindEvent(evtname);
-
-                        this.bind(evtname, callback);
-                    }
-
-                    return this;
-                };
-            };
-            EventObj.prototype.registerEvents = function (evtnames) {
-                var _this = this;
-                evtnames.forEach(function (evtname) {
-                    _this.registerEvent(evtname);
-                });
-            };
-            return EventObj;
+            return Dashboard;
         })();
-        Services.EventObj = EventObj;
+        Services.Dashboard = Dashboard;
+
+        var DataSet = (function () {
+            function DataSet(id, title) {
+                this.id = id;
+                this.title = title;
+                this.data = [];
+            }
+            return DataSet;
+        })();
+        Services.DataSet = DataSet;
     })(csComp.Services || (csComp.Services = {}));
     var Services = csComp.Services;
 })(csComp || (csComp = {}));
 var csComp;
 (function (csComp) {
-    (function (GeoJson) {
+    (function (Services) {
+        var Event = (function () {
+            function Event() {
+                var _this = this;
+                this.startDate = function () {
+                    return new Date(_this.start);
+                };
+            }
+            return Event;
+        })();
+        Services.Event = Event;
+
+        /**
+        * A feature is a single object that is show on a map (e.g. point, polyline, etc)
+        * Features are part of a layer and filtered and styled using group filters and styles
+        *
+        */
         var Feature = (function () {
             function Feature() {
             }
             return Feature;
         })();
-        GeoJson.Feature = Feature;
+        Services.Feature = Feature;
 
         (function (DrawingModeType) {
             DrawingModeType[DrawingModeType["None"] = 0] = "None";
@@ -677,10 +102,10 @@ var csComp;
             DrawingModeType[DrawingModeType["Polyline"] = 8] = "Polyline";
             DrawingModeType[DrawingModeType["Polygon"] = 9] = "Polygon";
             DrawingModeType[DrawingModeType["MultiPolygon"] = 10] = "MultiPolygon";
-        })(GeoJson.DrawingModeType || (GeoJson.DrawingModeType = {}));
-        var DrawingModeType = GeoJson.DrawingModeType;
+        })(Services.DrawingModeType || (Services.DrawingModeType = {}));
+        var DrawingModeType = Services.DrawingModeType;
 
-        //export enum MetaInfoType {
+        //export enum propertyTypeType {
         //    Text,
         //    TextArea,
         //    Rating,
@@ -705,231 +130,1374 @@ var csComp;
 
             /** Default for text */
             featureFilterType[featureFilterType["text"] = 2] = "text";
-        })(GeoJson.featureFilterType || (GeoJson.featureFilterType = {}));
-        var featureFilterType = GeoJson.featureFilterType;
+        })(Services.featureFilterType || (Services.featureFilterType = {}));
+        var featureFilterType = Services.featureFilterType;
 
-        var MetaInfo = (function () {
-            function MetaInfo() {
-                this.visibleInCallOut = true;
-                this.canEdit = false;
-                this.isSearchable = true;
+        var PropertyInfo = (function () {
+            function PropertyInfo() {
             }
-            return MetaInfo;
+            return PropertyInfo;
         })();
-        GeoJson.MetaInfo = MetaInfo;
-    })(csComp.GeoJson || (csComp.GeoJson = {}));
-    var GeoJson = csComp.GeoJson;
+        Services.PropertyInfo = PropertyInfo;
+    })(csComp.Services || (csComp.Services = {}));
+    var Services = csComp.Services;
 })(csComp || (csComp = {}));
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
 var csComp;
 (function (csComp) {
-    (function (Helpers) {
-        var PieData = (function () {
-            function PieData() {
+    (function (Services) {
+        (function (LayerType) {
+            LayerType[LayerType["GeoJson"] = 0] = "GeoJson";
+            LayerType[LayerType["Kml"] = 1] = "Kml";
+        })(Services.LayerType || (Services.LayerType = {}));
+        var LayerType = Services.LayerType;
+
+        /** a project group contains a list of layers that can be grouped together.
+        * Filters, styles can clustering is always defined on the group level.
+        * If a filter is selected (e.g. show only the features within a certain property range)
+        * this filter is applied to all layers within this group.
+        * If clustering is enabled all features in all layers are grouped together
+        */
+        var ProjectGroup = (function () {
+            function ProjectGroup() {
             }
-            return PieData;
+            return ProjectGroup;
         })();
-        Helpers.PieData = PieData;
+        Services.ProjectGroup = ProjectGroup;
 
-        var AsterPieData = (function (_super) {
-            __extends(AsterPieData, _super);
-            function AsterPieData() {
-                _super.apply(this, arguments);
+        /**
+        * Filters are used to select a subset of features within a group.
+        */
+        var GroupFilter = (function () {
+            function GroupFilter() {
             }
-            return AsterPieData;
-        })(PieData);
-        Helpers.AsterPieData = AsterPieData;
+            return GroupFilter;
+        })();
+        Services.GroupFilter = GroupFilter;
 
-        var Plot = (function () {
-            function Plot() {
+        /**
+        * Styles can determine how features are shown on the map
+        */
+        var GroupStyle = (function () {
+            function GroupStyle($translate) {
+                var _this = this;
+                this.availableAspects = ["strokeColor", "fillColor", "strokeWidth"];
+                this.colorScales = {};
+
+                $translate('WHITE_RED').then(function (translation) {
+                    _this.colorScales[translation] = ["white", "red"];
+                });
+                $translate('RED_WHITE').then(function (translation) {
+                    _this.colorScales[translation] = ["red", "white"];
+                });
+                $translate('GREEN_RED').then(function (translation) {
+                    _this.colorScales[translation] = ["green", "red"];
+                });
+                $translate('RED_GREEN').then(function (translation) {
+                    _this.colorScales[translation] = ["red", "green"];
+                });
+                $translate('WHITE_BLUE').then(function (translation) {
+                    _this.colorScales[translation] = ["white", "blue"];
+                });
+                $translate('BLUE_WHITE').then(function (translation) {
+                    _this.colorScales[translation] = ["blue", "white"];
+                });
+                $translate('WHITE_GREEN').then(function (translation) {
+                    _this.colorScales[translation] = ["white", "green"];
+                });
+                $translate('GREEN_WHITE').then(function (translation) {
+                    _this.colorScales[translation] = ["green", "white"];
+                });
+                $translate('WHITE_ORANGE').then(function (translation) {
+                    _this.colorScales[translation] = ["white", "orange"];
+                });
+                $translate('ORANGE_WHITE').then(function (translation) {
+                    _this.colorScales[translation] = ["orange", "white"];
+                });
             }
-            /**
-            * Draw a Pie chart.
-            */
-            Plot.drawPie = function (pieRadius, data, parentId, colorScale, svgId) {
-                if (typeof parentId === "undefined") { parentId = 'mcaPieChart'; }
-                if (typeof colorScale === "undefined") { colorScale = 'Reds'; }
-                if (typeof svgId === "undefined") { svgId = 'the_SVG_ID'; }
-                Plot.clearSvg(svgId);
+            return GroupStyle;
+        })();
+        Services.GroupStyle = GroupStyle;
+    })(csComp.Services || (csComp.Services = {}));
+    var Services = csComp.Services;
+})(csComp || (csComp = {}));
+var csComp;
+(function (csComp) {
+    (function (Services) {
+        
 
-                if (!data)
-                    return;
+        var DateRange = (function () {
+            function DateRange() {
+                var _this = this;
+                this.startDate = function () {
+                    return new Date(_this.start);
+                };
+                this.focusDate = function () {
+                    return new Date(_this.start);
+                };
+                this.endDate = function () {
+                    return new Date(_this.start);
+                };
+                if (!focus)
+                    this.setFocus(new Date());
+            }
+            DateRange.prototype.setFocus = function (d, s, e) {
+                this.focus = d.getTime();
+                if (s)
+                    this.start = s.getTime();
+                if (e)
+                    this.end = e.getTime();
+            };
+            return DateRange;
+        })();
+        Services.DateRange = DateRange;
 
-                var width = pieRadius, height = pieRadius, radius = Math.min(width, height) / 2, innerRadius = 0;
+        /**
+        * Represents to the overall solution class. A solution can contain multiple project.
+        * This can be usefull when you want to have the same website, but with different content.
+        * e.g. you could make it so that you can switch between different regions
+        */
+        var Solution = (function () {
+            function Solution() {
+            }
+            return Solution;
+        })();
+        Services.Solution = Solution;
 
-                var pie = d3.layout.pie().sort(null).value(function (d) {
-                    return d.weight;
+        /** project within a solution file, refers to a project url*/
+        var SolutionProject = (function () {
+            function SolutionProject() {
+            }
+            return SolutionProject;
+        })();
+        Services.SolutionProject = SolutionProject;
+
+        /** project configuration. */
+        var Project = (function () {
+            function Project() {
+                this.markers = {};
+            }
+            Project.prototype.deserialize = function (input) {
+                this.viewBounds = input.viewBounds;
+                this.title = input.title;
+                this.description = input.description;
+                this.logo = input.logo;
+                this.markers = input.markers;
+                this.startposition = input.startposition;
+                this.features = input.features;
+                this.featureTypes = input.featureTypes;
+                this.propertyTypeData = input.propertyTypeData;
+                this.groups = input.groups;
+                this.mcas = [];
+                for (var mca in input.mcas) {
+                    this.mcas.push(new Mca.Models.Mca().deserialize(mca));
+                }
+                return this;
+            };
+            return Project;
+        })();
+        Services.Project = Project;
+
+        
+
+        /** layer information. a layer is described in a project file and is always part of a group */
+        var ProjectLayer = (function () {
+            function ProjectLayer() {
+            }
+            return ProjectLayer;
+        })();
+        Services.ProjectLayer = ProjectLayer;
+
+        
+    })(csComp.Services || (csComp.Services = {}));
+    var Services = csComp.Services;
+})(csComp || (csComp = {}));
+var BaseMapList;
+(function (BaseMapList) {
+    BaseMapList.html = '<div>    <h4 class="leftpanel-header" translate="MAP"></h4>    <div data-ng-repeat="(key, value) in vm.$mapService.baseLayers" style="clear:left;">        <div ng-click="vm.selectBaseLayer(key);" class="select-basestyle">            <img data-ng-src="{{value.options.preview}}" class="preview-base-layer" style="margin-bottom:5px" />            <div style="margin:3px;float:left">                <span style="font-size: 18px;font-weight: bold;">{{key}}</span><br />                {{value.options.subtitle}}            </div>        </div>    </div></div>';
+})(BaseMapList || (BaseMapList = {}));
+var BaseMapList;
+(function (BaseMapList) {
+    /**
+    * Config
+    */
+    var moduleName = 'csWeb.baseMapList';
+
+    /**
+    * Module
+    */
+    BaseMapList.myModule;
+    try  {
+        BaseMapList.myModule = angular.module(moduleName);
+    } catch (err) {
+        // named module does not exist, so create one
+        BaseMapList.myModule = angular.module(moduleName, []);
+    }
+
+    /**
+    * Directive to display the available map layers.
+    */
+    BaseMapList.myModule.directive('baseMapList', [
+        '$window', '$compile',
+        function ($window, $compile) {
+            return {
+                terminal: false,
+                restrict: 'E',
+                scope: {},
+                template: BaseMapList.html,
+                //compile : el          => {    // I need to explicitly compile it in order to use interpolation like {{xxx}}
+                //    var fn                        = $compile(el);
+                //    return scope                  => {
+                //        fn(scope);
+                //    };
+                //},
+                link: function (scope, element, attrs) {
+                    // Deal with resizing the element list
+                    scope.onResizeFunction = function () {
+                        var filterHeight = 50;
+                        var paginationCtrlHeight = 100;
+                        var itemHeight = 60;
+
+                        //scope.windowHeight          = $window.innerHeight;
+                        //scope.windowWidth           = $window.innerWidth;
+                        scope.numberOfItems = Math.floor(($window.innerHeight - filterHeight - paginationCtrlHeight) / itemHeight);
+                    };
+
+                    // Call to the function when the page is first loaded
+                    scope.onResizeFunction();
+
+                    angular.element($window).bind('resize', function () {
+                        scope.onResizeFunction();
+                        scope.$apply();
+                    });
+                },
+                replace: true,
+                transclude: true,
+                controller: BaseMapList.BaseMapListCtrl
+            };
+        }
+    ]).directive('bsPopover', function () {
+        return function (scope, element, attrs) {
+            element.find("a[rel=popover]").popover({ placement: 'right', html: 'true' });
+        };
+    });
+})(BaseMapList || (BaseMapList = {}));
+var BaseMapList;
+(function (BaseMapList) {
+    var BaseMapListCtrl = (function () {
+        // dependencies are injected via AngularJS $injector
+        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
+        function BaseMapListCtrl($scope, $mapService) {
+            this.$scope = $scope;
+            this.$mapService = $mapService;
+            $scope.vm = this;
+        }
+        BaseMapListCtrl.prototype.selectBaseLayer = function (key) {
+            var bl = this.$mapService.baseLayers[key];
+            this.$mapService.changeBaseLayer(bl);
+        };
+        BaseMapListCtrl.$inject = [
+            '$scope',
+            'mapService'
+        ];
+        return BaseMapListCtrl;
+    })();
+    BaseMapList.BaseMapListCtrl = BaseMapListCtrl;
+})(BaseMapList || (BaseMapList = {}));
+var DataTable;
+(function (DataTable) {
+    DataTable.html = '<div>    <div style="width:100%; margin: 10px auto;">        <div style="float: left; width: 15%; margin: 0; padding: 1em">            <!-- Pull down of map layers -->            <select data-ng-model="vm.selectedLayerId"                    data-ng-change="vm.loadLayer()"                    data-ng-options="layer.id as layer.title group by layer.group for layer in vm.layerOptions"                    class="form-control tt-input"></select>            <!-- List of headers -->            <ul class="form-group" style="margin-top: 1em; margin-left: -2em; overflow-y: auto; overflow-x: hidden;"                resize resize-y="150">                <li ng-repeat="mi in vm.propertyTypes" class="list-unstyled" style="white-space: nowrap; text-overflow: ellipsis">                    <label>                        <input type="checkbox" name="vm.selectedTitles[]" value="{{mi.title}}"                               data-ng-checked="vm.headers.indexOf(mi.title) > -1"                               data-ng-click="vm.toggleSelection(mi.title)">&nbsp;&nbsp;{{mi.title}}                    </label>                    <!--<div class="checkbox">                        <label>                            <input type="checkbox" name="vm.selectedTitles[]" value="{{mi.title}}"                                   data-ng-checked="vm.headers.indexOf(mi.title) > -1"                                   data-ng-click="vm.toggleSelection(mi.title)">&nbsp;&nbsp;{{mi.title}}                        </label>                    </div>-->                </li>            </ul>            <!--       <pre>{{vm.headers|json}}</pre>-->        </div>        <!-- Right side of the table view -->        <div style="margin-left: 16%; border-left: 1px solid gray; padding: 1em;" ng-init="poiTypeFilter">            <!-- Filter -->            <div class="has-feedback" style="margin-bottom: 1em; float: right; width: 16%; min-width: 200px;">                <span style="direction: ltr; position: static; display: block;">                    <input id="searchbox" data-ng-model="featureFilter" type="text"                           placeholder="Filter" autocomplete="off" spellcheck="false"                           style="position: relative; vertical-align: top;" class="form-control tt-input">                </span>                <span id="searchicon" class="fa form-control-feedback fa-filter" style="padding-top: 0px;"></span>            </div>            <!--Download to CSV option-->            <a href="" data-ng-click="vm.downloadCsv()" alt="Download CSV" style="margin-top: 5px; margin-right: 1em; float: right;"><i class="fa fa-download fa-2x"></i></a>            <!-- Specify how many items to show -->            <select data-ng-model="vm.numberOfItems" style="margin-bottom: 1em; margin-right: 10px; float: left; width: 16%; min-width: 200px;" class="form-control tt-input">                <option value="5" translate="SHOW5"></option>                <option value="10" translate="SHOW10"></option>                <option value="15" translate="SHOW15"></option>                <option value="20" translate="SHOW20"></option>                <option value="25" translate="SHOW25"></option>                <option value="30" translate="SHOW30"></option>                <option value="35" translate="SHOW35"></option>                <option value="40" translate="SHOW40"></option>            </select>            <!-- Data table -->            <table class="table table-striped table-condensed">                <tr>                    <th data-ng-repeat="header in vm.headers track by $index">                        {{header}}&nbsp;                        <a data-ng-click="reverseSort = !reverseSort; vm.orderBy($index, reverseSort);"><i data-ng-class="vm.sortOrderClass($index, reverseSort)">&nbsp;&nbsp;</i></a>                    </th>                </tr>                <tr dir-paginate="row in vm.rows | filter:featureFilter | itemsPerPage: vm.numberOfItems"                    style="cursor: pointer; vertical-align: central">                    <td data-ng-class="{\'text-right\': field.type == \'number\'}" data-ng-repeat="field in row track by $index" data-ng-bind-html="vm.toTrusted(field.displayValue)"></td>                </tr>            </table>            <dir-pagination-controls style="" max-size="10" boundary-links="true" direction-links="true"                                     template-url="bower_components/angular-utils-pagination/dirPagination.tpl.html"></dir-pagination-controls>        </div>    </div>    <div style="clear: both; margin: 0; padding: .5em"></div></div>';
+})(DataTable || (DataTable = {}));
+var DataTable;
+(function (DataTable) {
+    /**
+    * Config
+    */
+    var moduleName = 'csWeb.datatable';
+
+    /**
+    * Module
+    */
+    DataTable.myModule;
+    try  {
+        DataTable.myModule = angular.module(moduleName);
+    } catch (err) {
+        // named module does not exist, so create one
+        DataTable.myModule = angular.module(moduleName, []);
+    }
+
+    /**
+    * Directive to display a feature's properties in a panel.
+    *
+    * @seealso : http://www.youtube.com/watch?v=gjJ5vLRK8R8&list=UUGD_0i6L48hucTiiyhb5QzQ
+    * @seealso : http://plnkr.co/edit/HyBP9d?p=preview
+    */
+    DataTable.myModule.directive('datatable', [
+        '$compile',
+        function ($compile) {
+            return {
+                terminal: false,
+                restrict: 'E',
+                scope: {},
+                template: DataTable.html,
+                //compile   : el => {     // I need to explicitly compile it in order to use interpolation like {{xxx}}
+                //    var fn = $compile(el);
+                //    return scope => {
+                //        fn(scope);
+                //    };
+                //},
+                replace: true,
+                transclude: true,
+                controller: DataTable.DataTableCtrl
+            };
+        }
+    ]);
+})(DataTable || (DataTable = {}));
+var DataTable;
+(function (DataTable) {
+    /**
+    * Represents a field in the table.
+    * The value is the actual displayValue shown, the type is the propertyType type (e.g. number or text, useful when aligning the data), and the header is used for sorting.
+    */
+    var TableField = (function () {
+        function TableField(displayValue, originalValue, type, header) {
+            this.displayValue = displayValue;
+            this.originalValue = originalValue;
+            this.type = type;
+            this.header = header;
+        }
+        return TableField;
+    })();
+    DataTable.TableField = TableField;
+
+    var DataTableCtrl = (function () {
+        // dependencies are injected via AngularJS $injector
+        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
+        function DataTableCtrl($scope, $http, $sce, $translate, $layerService, $localStorageService, $messageBusService) {
+            var _this = this;
+            this.$scope = $scope;
+            this.$http = $http;
+            this.$sce = $sce;
+            this.$translate = $translate;
+            this.$layerService = $layerService;
+            this.$localStorageService = $localStorageService;
+            this.$messageBusService = $messageBusService;
+            this.mapLabel = "map";
+            this.numberOfItems = 10;
+            this.layerOptions = [];
+            this.propertyTypes = [];
+            this.headers = [];
+            this.rows = [];
+            // 'vm' stands for 'view model'. We're adding a reference to the controller to the scope
+            // for its methods to be accessible from view / HTML
+            $scope.vm = this;
+
+            $translate('MAP_FEATURES').then(function (translation) {
+                _this.layerOptions[0].title = translation;
+            });
+
+            this.bindToStorage('vm.numberOfItems', 10);
+            this.numberOfItems = $localStorageService.get('vm.numberOfItems');
+            this.bindToStorage('vm.selectedLayerId', this.mapLabel);
+
+            if (this.$layerService.project == null || this.$layerService.project.groups == null)
+                return;
+            this.updateLayerOptions();
+            this.loadLayer();
+        }
+        /**
+        * Add a label to local storage and bind it to the scope.
+        */
+        DataTableCtrl.prototype.bindToStorage = function (label, defaultValue) {
+            if (this.$localStorageService.get(label) === null)
+                this.$localStorageService.set(label, defaultValue); // You first need to set the key
+            this.$localStorageService.bind(this.$scope, label);
+        };
+
+        /**
+        * Create a list of layer options and select the one used previously.
+        */
+        DataTableCtrl.prototype.updateLayerOptions = function () {
+            var _this = this;
+            this.layerOptions.push({
+                "group": '',
+                "id": this.mapLabel,
+                "title": this.mapFeatureTitle
+            });
+            if (this.$layerService.project == null || this.$layerService.project.groups == null)
+                return;
+            this.$layerService.project.groups.forEach(function (group) {
+                group.layers.forEach(function (layer) {
+                    _this.layerOptions.push({
+                        "group": group.title,
+                        "id": layer.id,
+                        "title": layer.title
+                    });
+                });
+            });
+            this.selectedLayerId = this.$localStorageService.get('vm.selectedLayerId');
+        };
+
+        DataTableCtrl.prototype.loadLayer = function () {
+            var _this = this;
+            if (!this.selectedLayerId || this.selectedLayerId === this.mapLabel)
+                return this.loadMapLayers();
+            var selectedLayer = this.findLayerById(this.selectedLayerId);
+            if (selectedLayer == null)
+                return this.loadMapLayers();
+            this.$http.get(selectedLayer.url).success(function (data) {
+                _this.dataset = data;
+                if (data.featureTypes == null)
+                    data.featureTypes = {};
+                data.features.forEach(function (f) {
+                    f.featureTypeName = f.properties['FeatureTypeId'];
+                    if (!(f.featureTypeName in data.featureTypes))
+                        data.featureTypes[f.featureTypeName] = _this.$layerService.featureTypes[f.featureTypeName];
                 });
 
-                var tip = d3.tip().attr('class', 'd3-tip').offset([0, 0]).html(function (d) {
-                    return '<strong>' + d.data.label + ": </strong><span style='color:orangered'>" + Math.round(d.data.weight * 100) + "%</span>";
-                });
+                _this.updatepropertyType(data);
+            }).error(function (data, status, headers, config) {
+                _this.$messageBusService.notify("ERROR opening " + selectedLayer.title, "Could not get the data.");
+            });
+        };
 
-                var arc = d3.svg.arc().innerRadius(innerRadius).outerRadius(radius);
-
-                var outlineArc = d3.svg.arc().innerRadius(innerRadius).outerRadius(radius);
-
-                var svg = d3.select('#' + parentId).append("svg").attr("id", svgId).attr("width", width).attr("height", height).append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
-
-                svg.call(tip);
-
-                var colors = chroma.scale(colorScale).domain([0, data.length - 1], data.length);
-                var path = svg.selectAll(".solidArc").data(pie(data)).enter().append("path").attr("fill", function (d, i) {
-                    return d.data.color || colors(i).hex();
-                }).attr("class", "solidArc").attr("stroke", "gray").attr("d", arc).on('mouseover', function (d, i) {
-                    tip.show(d, i);
-                }).on('mouseout', tip.hide);
-
-                var outerPath = svg.selectAll(".outlineArc").data(pie(data)).enter().append("path").attr("fill", "none").attr("stroke", "gray").attr("class", "outlineArc").attr("d", outlineArc);
+        /**
+        * Load the features as visible on the map.
+        */
+        DataTableCtrl.prototype.loadMapLayers = function () {
+            var _this = this;
+            this.selectedLayerId = this.mapLabel;
+            var data = {
+                type: '',
+                features: [],
+                featureTypes: {}
             };
 
+            // If we are filtering, load the filter results
+            this.$layerService.project.groups.forEach(function (group) {
+                if (group.filterResult != null)
+                    group.filterResult.forEach(function (f) {
+                        return data.features.push(f);
+                    });
+            });
+
+            // Otherwise, take all loaded features
+            if (data.features.length === 0)
+                data.features = this.$layerService.project.features;
+
+            data.features.forEach(function (f) {
+                if (!(f.featureTypeName in data.featureTypes))
+                    data.featureTypes[f.featureTypeName] = _this.$layerService.featureTypes[f.featureTypeName];
+            });
+
+            this.dataset = data;
+            this.updatepropertyType(data);
+        };
+
+        DataTableCtrl.prototype.updatepropertyType = function (data) {
+            var _this = this;
+            this.propertyTypes = [];
+            this.headers = [];
+            this.rows = [];
+            var titles = [];
+            var mis = [];
+
+            // Push the Name, so it always appears on top.
+            mis.push({
+                label: "Name",
+                visibleInCallOut: true,
+                title: "Naam",
+                type: "text",
+                filterType: "text",
+                isSearchable: true
+            });
+            var featureType;
+            for (var key in data.featureTypes) {
+                featureType = data.featureTypes[key];
+                if (featureType.propertyTypeKeys != null) {
+                    var keys = featureType.propertyTypeKeys.split(';');
+                    keys.forEach(function (k) {
+                        if (k in _this.$layerService.propertyTypeData)
+                            mis.push(_this.$layerService.propertyTypeData[k]);
+                        else if (featureType.propertyTypeData != null) {
+                            var result = $.grep(featureType.propertyTypeData, function (e) {
+                                return e.label === k;
+                            });
+                            if (result.length >= 1)
+                                mis.push(result);
+                        }
+                    });
+                } else if (featureType.propertyTypeData != null) {
+                    featureType.propertyTypeData.forEach(function (mi) {
+                        return mis.push(mi);
+                    });
+                }
+                mis.forEach(function (mi) {
+                    if ((mi.visibleInCallOut || mi.label === "Name") && titles.indexOf(mi.title) < 0) {
+                        titles.push(mi.title);
+                        _this.propertyTypes.push(mi);
+                    }
+                });
+            }
+
+            // Select the first couple of headers
+            var nmbrOfDefaultSelectedHeaders = 3;
+            for (var i = 0; i < nmbrOfDefaultSelectedHeaders; i++) {
+                this.headers.push(titles[i]);
+            }
+            this.rows = this.getRows();
+        };
+
+        DataTableCtrl.prototype.toggleSelection = function (propertyTypeTitle) {
+            var idx = this.headers.indexOf(propertyTypeTitle);
+
+            // is currently selected
+            if (idx > -1) {
+                this.headers.splice(idx, 1);
+            } else {
+                this.headers.push(propertyTypeTitle);
+            }
+            this.rows = this.getRows();
+        };
+
+        DataTableCtrl.prototype.findLayerById = function (id) {
+            for (var i = 0; i < this.$layerService.project.groups.length; i++) {
+                var group = this.$layerService.project.groups[i];
+                for (var j = 0; j < group.layers.length; j++) {
+                    var layer = group.layers[j];
+                    if (layer.id != id)
+                        continue;
+                    return layer;
+                }
+            }
+            return null;
+        };
+
+        /**
+        * Returns the data rows that are relevant for the current selection.
+        */
+        DataTableCtrl.prototype.getRows = function () {
+            var _this = this;
+            var meta = [this.headers.length];
+            this.propertyTypes.forEach(function (mi) {
+                // Keep headers and mi in the right order
+                var index = _this.headers.indexOf(mi.title);
+                if (index >= 0)
+                    meta[index] = mi;
+            });
+            var props = [];
+            var displayValue;
+            this.dataset.features.forEach(function (f) {
+                var row = [];
+                meta.forEach(function (mi) {
+                    var text = f.properties[mi.label];
+                    displayValue = csComp.Helpers.convertPropertyInfo(mi, text);
+
+                    //if (!text)
+                    //    text = ' ';
+                    //else if (!$.isNumeric(text))
+                    //    text = text.replace(/&amp;/g, '&');
+                    //switch (mi.type) {
+                    //    case "bbcode":
+                    //        displayValue = XBBCODE.process({ text: text }).html;
+                    //        break;
+                    //    case "number":
+                    //        if (!$.isNumeric(text)) displayValue ='??';
+                    //        else if (!mi.stringFormat)
+                    //            displayValue = text.toString();
+                    //        else
+                    //            displayValue = String.format(mi.stringFormat, parseFloat(text));
+                    //        break;
+                    //    default:
+                    //        displayValue = text;
+                    //        break;
+                    //}
+                    row.push(new TableField(displayValue, text, mi.type, mi.title));
+                });
+                props.push(row);
+            });
+            return props;
+        };
+
+        /**
+        * Generate a font awesome class based on the order.
+        */
+        DataTableCtrl.prototype.sortOrderClass = function (headerIndex, reverseOrder) {
+            var t;
+            if (reverseOrder != null && headerIndex == this.sortingColumn) {
+                t = ('fa fa-sort-' + ((reverseOrder) ? 'desc' : 'asc'));
+            } else {
+                t = 'fa fa-sort';
+            }
+            return t;
+        };
+
+        /**
+        * Order the rows based on the header index and the order.
+        */
+        DataTableCtrl.prototype.orderBy = function (headerIndex, reverseOrder) {
+            this.sortingColumn = headerIndex;
+            this.rows = this.rows.sort(function (a, b) {
+                var order;
+                if (a[headerIndex].type == 'number')
+                    order = a[headerIndex].originalValue > b[headerIndex].originalValue;
+                else
+                    order = a[headerIndex].originalValue.toLowerCase() > b[headerIndex].originalValue.toLowerCase();
+                if (order == reverseOrder)
+                    return 1;
+                else
+                    return -1;
+            });
+        };
+
+        DataTableCtrl.prototype.downloadCsv = function () {
+            var csvRows = [];
+
+            csvRows.push(this.headers.join(';'));
+
+            for (var i = 0; i < this.rows.length; i++) {
+                csvRows.push(this.rows[i].map(function (f) {
+                    return f.originalValue;
+                }).join(';'));
+            }
+
+            var csvString = csvRows.join('\r\n');
+
+            var filename = this.mapLabel;
+            if (this.selectedLayerId !== this.mapLabel) {
+                var layer = this.findLayerById(this.selectedLayerId);
+                if (layer)
+                    filename = layer.title.replace(' ', '_');
+            }
+            this.saveData(csvString, filename + '.csv');
+        };
+
+        DataTableCtrl.prototype.saveData = function (csvData, filename) {
+            if (navigator.msSaveBlob) {
+                // IE 10+
+                var link = document.createElement('a');
+                link.addEventListener("click", function (event) {
+                    var blob = new Blob([csvData], { "type": "text/csv;charset=utf-8;" });
+                    navigator.msSaveBlob(blob, filename);
+                }, false);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } else if (!csComp.Helpers.supportsDataUri()) {
+                // Older versions of IE: show the data in a new window
+                var popup = window.open('', 'csv', '');
+                popup.document.body.innerHTML = '<pre>' + csvData + '</pre>';
+            } else {
+                // Support for browsers that support the data uri.
+                var a = document.createElement('a');
+                document.body.appendChild(a);
+                a.href = 'data:text/csv;charset=utf-8,' + encodeURI(csvData);
+                a.target = '_blank';
+                a.download = filename;
+                a.click();
+                document.body.removeChild(a);
+            }
+        };
+
+        /**
+        * Convert to trusted html string.
+        */
+        DataTableCtrl.prototype.toTrusted = function (html) {
+            try  {
+                return this.$sce.trustAsHtml(html.toString());
+            } catch (e) {
+                console.log(e + ': ' + html);
+                return '';
+            }
+        };
+        DataTableCtrl.$inject = [
+            '$scope',
+            '$http',
+            '$sce',
+            '$translate',
+            'layerService',
+            'localStorageService',
+            'messageBusService'
+        ];
+        return DataTableCtrl;
+    })();
+    DataTable.DataTableCtrl = DataTableCtrl;
+})(DataTable || (DataTable = {}));
+var FeatureList;
+(function (FeatureList) {
+    FeatureList.html = '<div style="position: relative;">    <h4 class="leftpanel-header" translate="FEATURES"></h4>    <div class="has-feedback" style="padding:10px 4px 4px 4px;">        <span style="direction: ltr; position: static; display: block;">            <input id="searchbox" data-ng-model="featureFilter.properties" type="text"                   placeholder="Filter" autocomplete="off" spellcheck="false"                   style="position: relative; vertical-align: top;" class="form-control tt-input">        </span>        <span id="searchicon" class="fa form-control-feedback fa-filter" style="padding-top: 10px;"></span>    </div>    <table class="table table-striped table-condensed">        <!--vm.$layerService.features-->        <tr dir-paginate="feature in vm.$layerService.project.features | filter:featureFilter | orderBy:\'properties.Name\' | itemsPerPage: numberOfItems "            data-ng-click="vm.$mapService.zoomTo(feature);vm.$layerService.selectFeature(feature);" style="cursor: pointer; height: 50px; vertical-align: central">            <!--<td>Icon</td>-->            <td>{{ feature.properties.Name }}</td>            <td>                <i class="fa fa-chevron-right pull-right"></i>            </td>        </tr>    </table>    <dir-pagination-controls style="position: absolute; bottom: -80px;" max-size="6" boundary-links="false" direction-links="false" template-url="bower_components/angular-utils-pagination/dirPagination.tpl.html"></dir-pagination-controls></div>';
+})(FeatureList || (FeatureList = {}));
+var FeatureList;
+(function (FeatureList) {
+    /**
+    * Config
+    */
+    var moduleName = 'csWeb.featureList';
+
+    /**
+    * Module
+    */
+    FeatureList.myModule;
+    try  {
+        FeatureList.myModule = angular.module(moduleName);
+    } catch (err) {
+        // named module does not exist, so create one
+        FeatureList.myModule = angular.module(moduleName, []);
+    }
+
+    /**
+    * Directive to display the available map layers.
+    */
+    FeatureList.myModule.directive('featureList', [
+        '$window', '$compile',
+        function ($window, $compile) {
+            return {
+                terminal: false,
+                restrict: 'E',
+                scope: {},
+                template: FeatureList.html,
+                //compile             : el          => {    // I need to explicitly compile it in order to use interpolation like {{xxx}}
+                //    var fn                        = $compile(el);
+                //    return scope                  => {
+                //        fn(scope);
+                //    };
+                //},
+                // Directives that want to modify the DOM typically use the link option.link takes a function with the following signature, function link(scope, element, attrs) { ... } where:
+                // scope is an Angular scope object.
+                // element is the jqLite - wrapped element that this directive matches.
+                // attrs is a hash object with key - value pairs of normalized attribute names and their corresponding attribute values.
+                link: function (scope, element, attrs) {
+                    // Deal with resizing the element list
+                    scope.onResizeFunction = function () {
+                        var filterHeight = 50;
+                        var paginationCtrlHeight = 100;
+                        var itemHeight = 60;
+
+                        //scope.windowHeight          = $window.innerHeight;
+                        //scope.windowWidth           = $window.innerWidth;
+                        scope.numberOfItems = Math.floor(($window.innerHeight - filterHeight - paginationCtrlHeight) / itemHeight);
+                    };
+
+                    // Call to the function when the page is first loaded
+                    scope.onResizeFunction();
+
+                    angular.element($window).bind('resize', function () {
+                        scope.onResizeFunction();
+                        scope.$apply();
+                    });
+                },
+                replace: true,
+                transclude: true,
+                controller: FeatureList.FeatureListCtrl
+            };
+        }
+    ]).directive('bsPopover', function () {
+        return function (scope, element, attrs) {
+            element.find("a[rel=popover]").popover({ placement: 'right', html: 'true' });
+        };
+    });
+})(FeatureList || (FeatureList = {}));
+var FeatureList;
+(function (FeatureList) {
+    var FeatureListCtrl = (function () {
+        // dependencies are injected via AngularJS $injector
+        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
+        function FeatureListCtrl($scope, $layerService, $mapService) {
+            this.$scope = $scope;
+            this.$layerService = $layerService;
+            this.$mapService = $mapService;
+            $scope.vm = this;
+            $scope.numberOfItems = 10; // This is being reset in the directive upon receiving a resize.
+        }
+        FeatureListCtrl.$inject = [
+            '$scope',
+            'layerService',
+            'mapService'
+        ];
+        return FeatureListCtrl;
+    })();
+    FeatureList.FeatureListCtrl = FeatureListCtrl;
+})(FeatureList || (FeatureList = {}));
+var FeatureProps;
+(function (FeatureProps) {
+    FeatureProps.html = '<div data-ng-cloak data-ng-show="showMenu" >    <h4 class="rightpanel-header">        &nbsp;&nbsp;{{callOut.title}}    </h4>        <div class="container-fluid rightpanel-tabs" style="position: relative">            <div class="row" style="overflow:hidden">            <!-- Nav tabs -->            <span id="leftArr" style="display:block;padding:10px;margin-top:5px;position:absolute;background-color:transparent;z-index:2">                <i class="glyphicon glyphicon-chevron-left"></i>            </span>            <span id="rightArr" style="display:block;padding:10px;margin-top:5px;position:absolute;background-color:transparent;z-index:2">                <i class="glyphicon glyphicon-chevron-right"></i>            </span>            <ul class="nav nav-tabs" id="featureTabs" style="margin-left:10px">                <li data-toggle="tab" data-ng-class="{active : $first}" data-ng-repeat="(sectionTitle, section) in callOut.sections" ng-if="section.hasProperties()">                    <a ng-href="#rp-{{$index}}" data-toggle="tab" data-ng-if="section.showSectionIcon()" ng-click="featureTabActivated(sectionTitle, section)"><i class="fa {{section.sectionIcon}}"></i></a>                    <a ng-href="#rp-{{$index}}" data-toggle="tab" data-ng-if="!section.showSectionIcon()" ng-click="featureTabActivated(sectionTitle, section)">{{sectionTitle}}</a>                </li>            </ul>        </div>    </div>    <div class="tab-content" style="top:50px; width:355px; overflow-y: auto; overflow-x: hidden" resize resize-y="150">        <div data-ng-if="!$last" class="tab-pane" data-ng-class="{active : $first}" id="rp-{{$index}}" data-ng-repeat="(sectionTitle, section) in callOut.sections">            <table class="table table-condensed">                <tr popover="{{(item.description) ? item.description : \'\'}}"                    popover-placement="left"                    popover-trigger="mouseenter"                    popover-append-to-body="true"                    data-ng-repeat="item in section.properties">                    <td><a class="fa fa-filter makeNarrow" data-ng-show="item.canFilter" data-ng-click="vm.$layerService.setFilter(item)" style="cursor: pointer"></a></td>                    <td><a class="fa fa-eye makeNarrow" data-ng-show="item.canStyle" data-ng-click="vm.$layerService.setStyle(item)" style="cursor: pointer"></a></td>                    <td>{{item.key}}</td>                    <td class="text-right" data-ng-bind-html="vm.toTrusted(item.value)"></td>                </tr>            </table>        </div>        <!-- Treat last tab (filter) differently -->        <div data-ng-if="$last" class="tab-pane" data-ng-class="{active : $first}" id="rp-{{$index}}" data-ng-repeat="(sectionTitle, section) in callOut.sections">            <!-- Add filter panel to the last rendered element -->            <div class="has-feedback" style="padding:0 4px 4px 4px;">                <span style="direction: ltr; position: static; display: block;">                    <input id="searchbox" data-ng-model="search.key" type="text"                            placeholder="Filter" autocomplete="off" spellcheck="false"                            style="position: relative; vertical-align: top;" class="form-control tt-input">                </span>                <span id="searchicon" class="fa form-control-feedback fa-filter"></span>            </div>            <!--<input style="padding:4px;" class=" form-control" data-ng-model="search" placeholder="...">-->            <table id="searchTextResults" class="table table-condensed">                <tr popover="{{(item.description) ? item.description : \'\'}}"                    popover-placement="left"                    popover-trigger="mouseenter"                    popover-append-to-body="true"                    data-ng-repeat="item in section.properties | filter:search">                    <td><a class="fa fa-filter makeNarrow" data-ng-show="item.canFilter" data-ng-click="vm.$layerService.setFilter(item)"></a></td>                    <td><a class="fa fa-eye makeNarrow" data-ng-show="item.canStyle" data-ng-click="vm.$layerService.setStyle(item)"></a></td>                    <td>{{item.key}}</td>                    <td class="text-right" data-ng-bind-html="vm.toTrusted(item.value)"></td>                </tr>            </table>        </div>    </div></div>';
+})(FeatureProps || (FeatureProps = {}));
+var FeatureProps;
+(function (FeatureProps) {
+    /**
+    * Config
+    */
+    var moduleName = 'csWeb.featureprops';
+
+    /**
+    * Module
+    */
+    FeatureProps.myModule;
+    try  {
+        FeatureProps.myModule = angular.module(moduleName);
+    } catch (err) {
+        // named module does not exist, so create one
+        FeatureProps.myModule = angular.module(moduleName, []);
+    }
+
+    /**
+    * Directive to display a feature's properties in a panel.
+    *
+    * @seealso          : http://www.youtube.com/watch?v=gjJ5vLRK8R8&list=UUGD_0i6L48hucTiiyhb5QzQ
+    * @seealso          : http://plnkr.co/edit/HyBP9d?p=preview
+    */
+    FeatureProps.myModule.directive('featureprops', [
+        '$compile',
+        function ($compile) {
+            return {
+                terminal: true,
+                restrict: 'E',
+                scope: {},
+                template: FeatureProps.html,
+                compile: function (el) {
+                    var fn = $compile(el);
+                    return function (scope) {
+                        fn(scope);
+                    };
+                },
+                replace: true,
+                transclude: true,
+                controller: FeatureProps.FeaturePropsCtrl
+            };
+        }
+    ]);
+})(FeatureProps || (FeatureProps = {}));
+var FeatureProps;
+(function (FeatureProps) {
+    var FeaturePropsOptions = (function () {
+        function FeaturePropsOptions(position) {
+            this.position = position;
+            this.closeButton = true;
+            this.autoPan = true;
+        }
+        return FeaturePropsOptions;
+    })();
+
+    var CallOutProperty = (function () {
+        function CallOutProperty(key, value, property, canFilter, canStyle, feature, isFilter, description, meta) {
+            this.key = key;
+            this.value = value;
+            this.property = property;
+            this.canFilter = canFilter;
+            this.canStyle = canStyle;
+            this.feature = feature;
+            this.isFilter = isFilter;
+            this.description = description;
+            this.meta = meta;
+        }
+        return CallOutProperty;
+    })();
+    FeatureProps.CallOutProperty = CallOutProperty;
+
+    var CallOutSection = (function () {
+        function CallOutSection(sectionIcon) {
+            this.propertyTypes = {};
+            this.properties = [];
+            this.sectionIcon = sectionIcon;
+        }
+        CallOutSection.prototype.showSectionIcon = function () {
+            return !csComp.StringExt.isNullOrEmpty(this.sectionIcon);
+        };
+
+        CallOutSection.prototype.addProperty = function (key, value, property, canFilter, canStyle, feature, isFilter, description, meta) {
+            if (description)
+                this.properties.push(new CallOutProperty(key, value, property, canFilter, canStyle, feature, isFilter, description, meta));
+            else
+                this.properties.push(new CallOutProperty(key, value, property, canFilter, canStyle, feature, isFilter, null, meta));
+        };
+
+        CallOutSection.prototype.hasProperties = function () {
+            return this.properties != null && this.properties.length > 0;
+        };
+        return CallOutSection;
+    })();
+    FeatureProps.CallOutSection = CallOutSection;
+
+    var CallOut = (function () {
+        function CallOut(type, feature, propertyTypeData) {
+            var _this = this;
+            this.type = type;
+            this.feature = feature;
+            this.propertyTypeData = propertyTypeData;
+            this.sections = {};
+
+            //if (type == null) this.createDefaultType();
+            this.setTitle();
+
+            var infoCallOutSection = new CallOutSection('fa-info');
+            var searchCallOutSection = new CallOutSection('fa-filter');
+            var displayValue;
+            if (type != null) {
+                var propertyTypes = [];
+                if (type.propertyTypeKeys != null) {
+                    var keys = type.propertyTypeKeys.split(';');
+                    keys.forEach(function (key) {
+                        if (key in propertyTypeData)
+                            propertyTypes.push(propertyTypeData[key]);
+                        else if (type.propertyTypeData != null) {
+                            var result = $.grep(type.propertyTypeData, function (e) {
+                                return e.label === key;
+                            });
+                            if (result.length >= 1)
+                                propertyTypes.push(result);
+                        }
+                    });
+                } else if (type.propertyTypeData != null) {
+                    propertyTypes = type.propertyTypeData;
+                }
+                propertyTypes.forEach(function (mi) {
+                    var callOutSection = _this.getOrCreateCallOutSection(mi.section) || infoCallOutSection;
+                    callOutSection.propertyTypes[mi.label] = mi;
+                    var text = feature.properties[mi.label];
+                    displayValue = csComp.Helpers.convertPropertyInfo(mi, text);
+
+                    // Skip empty, non-editable values
+                    if (!mi.canEdit && csComp.StringExt.isNullOrEmpty(displayValue))
+                        return;
+
+                    var canFilter = (mi.type == "number" || mi.type == "text");
+                    var canStyle = (mi.type == "number" || mi.type == "color");
+                    if (mi.filterType != null)
+                        canFilter = mi.filterType.toLowerCase() != "none";
+                    if (mi.visibleInCallOut)
+                        callOutSection.addProperty(mi.title, displayValue, mi.label, canFilter, canStyle, feature, false, mi.description, mi);
+                    searchCallOutSection.addProperty(mi.title, displayValue, mi.label, canFilter, canStyle, feature, false, mi.description);
+                });
+            }
+            if (infoCallOutSection.properties.length > 0)
+                this.sections['AAA Info'] = infoCallOutSection; // The AAA is added as the sections are sorted alphabetically
+            if (searchCallOutSection.properties.length > 0)
+                this.sections['Zzz Search'] = searchCallOutSection;
+        }
+        ///**
+        //* Convert a property value to a display value using the property info.
+        //*/
+        //public static convertPropertyInfo(mi: IMetaInfo, text: string): string {
+        //    var displayValue: string;
+        //    if (!csComp.StringExt.isNullOrEmpty(text) && !$.isNumeric(text))
+        //        text = text.replace(/&amp;/g, '&');
+        //    if (csComp.StringExt.isNullOrEmpty(text)) return '';
+        //    switch (mi.type) {
+        //        case "bbcode":
+        //            if (!csComp.StringExt.isNullOrEmpty(mi.stringFormat))
+        //                text = String.format(mi.stringFormat, text);
+        //            displayValue = XBBCODE.process({ text: text }).html;
+        //            break;
+        //        case "number":
+        //            if (!$.isNumeric(text))
+        //                displayValue = text;
+        //            else if (csComp.StringExt.isNullOrEmpty(mi.stringFormat))
+        //                displayValue = text.toString();
+        //            else
+        //                displayValue = String.format(mi.stringFormat, parseFloat(text));
+        //            break;
+        //        case "rank":
+        //            var rank = text.split(',');
+        //            if (rank.length != 2) return text;
+        //            if (mi.stringFormat)
+        //                displayValue = String.format(mi.stringFormat, rank[0], rank[1]);
+        //            else
+        //                displayValue = String.format("{0) / {1}", rank[0], rank[1]);
+        //            break;
+        //        default:
+        //            displayValue = text;
+        //            break;
+        //    }
+        //    return displayValue;
+        //}
+        ///**
+        // * In case we are dealing with a regular JSON file without type information, create a default type.
+        // */
+        //private createDefaultType(): void {
+        //    this.type              = [];
+        //    this.type.style        = { nameLabel: "Name", iconHeight: 30, iconWidth: 30 };
+        //    this.type.propertyTypeData = [];
+        //    for (var kvp in this.feature.properties) {
+        //        var propertyType: IpropertyType = [];
+        //        propertyType.label          = kvp.key;
+        //        propertyType.title          = kvp.key.replace("_", " ");
+        //        propertyType.isSearchable   = true;
+        //        propertyType.type           = propertyTypeType.Text;
+        //        this.type.propertyTypeData.push(propertyType);
+        //    }
+        //}
+        CallOut.prototype.getOrCreateCallOutSection = function (sectionTitle) {
+            if (!sectionTitle) {
+                return null;
+            }
+            if (sectionTitle in this.sections)
+                return this.sections[sectionTitle];
+            this.sections[sectionTitle] = new CallOutSection();
+            return this.sections[sectionTitle];
+        };
+
+        /**
+        * Set the title of the callout to the title of the feature.
+        */
+        CallOut.prototype.setTitle = function () {
+            this.title = CallOut.title(this.type, this.feature);
+        };
+
+        CallOut.title = function (type, feature) {
+            var title = '';
+            if (type != null && type.style != null && type.style.nameLabel)
+                title = feature.properties[type.style.nameLabel];
+            else {
+                if (feature.hasOwnProperty('Name'))
+                    title = feature.properties['Name'];
+                else if (feature.hasOwnProperty('name'))
+                    title = feature.properties['name'];
+            }
+            if (!csComp.StringExt.isNullOrEmpty(title) && !$.isNumeric(title))
+                title = title.replace(/&amp;/g, '&');
+            return title;
+        };
+        return CallOut;
+    })();
+    FeatureProps.CallOut = CallOut;
+
+    var FeaturePropsCtrl = (function () {
+        // dependencies are injected via AngularJS $injector
+        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
+        function FeaturePropsCtrl($scope, $location, $sce, $mapService, $layerService, $messageBusService) {
+            var _this = this;
+            this.$scope = $scope;
+            this.$location = $location;
+            this.$sce = $sce;
+            this.$mapService = $mapService;
+            this.$layerService = $layerService;
+            this.$messageBusService = $messageBusService;
             /**
-            * Draw an Aster Pie chart, i.e. a pie chart with varying radius depending on the score, where the maximum score of 100 equals the pie radius.
-            * See http://bl.ocks.org/bbest/2de0e25d4840c68f2db1
+            * Callback function
+            * @see {http://stackoverflow.com/questions/12756423/is-there-an-alias-for-this-in-typescript}
+            * @see {http://stackoverflow.com/questions/20627138/typescript-this-scoping-issue-when-called-in-jquery-callback}
+            * @todo {notice the strange syntax using a fat arrow =>, which is to preserve the this reference in a callback!}
             */
-            Plot.drawAsterPlot = function (pieRadius, data, parentId, colorScale, svgId) {
-                if (typeof parentId === "undefined") { parentId = 'mcaPieChart'; }
-                if (typeof colorScale === "undefined") { colorScale = 'Reds'; }
-                if (typeof svgId === "undefined") { svgId = 'the_SVG_ID'; }
-                Plot.clearSvg(svgId);
-
-                if (!data)
-                    return;
-
-                var width = pieRadius, height = pieRadius, radius = Math.min(width, height) / 2, innerRadius = 0.3 * radius;
-
-                var pie = d3.layout.pie().sort(null).value(function (d) {
-                    return d.weight;
-                });
-
-                var tip = d3.tip().attr('class', 'd3-tip').offset([0, 0]).html(function (d) {
-                    return '<strong>' + d.data.label + ": </strong> <span style='color:orangered'>" + Math.round(d.data.weight * 100) + "% x " + Math.round(d.data.score) + "&nbsp; = " + Math.round(d.data.weight * d.data.score) + "</span>";
-                });
-
-                var arc = d3.svg.arc().innerRadius(innerRadius).outerRadius(function (d) {
-                    return (radius - innerRadius) * (d.data.score / 100.0) + innerRadius;
-                });
-
-                var outlineArc = d3.svg.arc().innerRadius(innerRadius).outerRadius(radius);
-
-                var svg = d3.select('#' + parentId).append("svg").attr("id", svgId).attr("width", width).attr("height", height).append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
-
-                try  {
-                    svg.call(tip);
-                } catch (err) {
-                    console.log("Error: " + err.message);
+            this.sidebarMessageReceived = function (title) {
+                switch (title) {
+                    case "toggle":
+                        _this.$scope.showMenu = !_this.$scope.showMenu;
+                        break;
+                    case "show":
+                        _this.$scope.showMenu = true;
+                        break;
+                    case "hide":
+                        _this.$scope.showMenu = false;
+                        break;
+                    default:
                 }
 
-                var colors = chroma.scale(colorScale).domain([0, data.length - 1], data.length);
-                var path = svg.selectAll(".solidArc").data(pie(data)).enter().append("path").attr("fill", function (d, i) {
-                    return d.data.color || colors(i).hex();
-                }).attr("class", "solidArc").attr("stroke", "gray").attr("d", arc).on('mouseover', function (d, i) {
-                    tip.show(d, i);
-                    //$rootScope.$broadcast('tooltipShown', { id: d.data.id });
-                }).on('mouseout', tip.hide);
+                // NOTE EV: You need to call apply only when an event is received outside the angular scope.
+                // However, make sure you are not calling this inside an angular apply cycle, as it will generate an error.
+                if (_this.$scope.$root.$$phase != '$apply' && _this.$scope.$root.$$phase != '$digest') {
+                    _this.$scope.$apply();
+                }
+            };
+            this.featureMessageReceived = function (title, feature) {
+                switch (title) {
+                    case "onFeatureSelect":
+                        _this.displayFeature(feature);
+                        _this.$scope.poi = feature;
+                        _this.$scope.autocollapse(true);
+                        break;
+                    case "onFeatureUpdated":
+                        _this.displayFeature(_this.$layerService.lastSelectedFeature);
+                        _this.$scope.poi = _this.$layerService.lastSelectedFeature;
+                        break;
+                    default:
+                }
+                if (_this.$scope.$root.$$phase != '$apply' && _this.$scope.$root.$$phase != '$digest') {
+                    _this.$scope.$apply();
+                }
+            };
+            this.scope = $scope;
+            $scope.vm = this;
+            $scope.showMenu = false;
 
-                var outerPath = svg.selectAll(".outlineArc").data(pie(data)).enter().append("path").attr("fill", "none").attr("stroke", "gray").attr("class", "outlineArc").attr("d", outlineArc);
+            $scope.featureTabActivated = function (sectionTitle, section) {
+                $messageBusService.publish('FeatureTab', 'activated', { sectionTitle: sectionTitle, section: section });
+            };
 
-                // calculate the weighted mean score
-                var totalWeight = 0;
-                var totalScore = 0;
-                data.forEach(function (p) {
-                    totalWeight += p.weight;
-                    totalScore += p.weight * p.score;
+            $messageBusService.subscribe("sidebar", this.sidebarMessageReceived);
+            $messageBusService.subscribe("feature", this.featureMessageReceived);
+
+            var widthOfList = function () {
+                var itemsWidth = 0;
+                $('#featureTabs>li').each(function () {
+                    var itemWidth = $(this).outerWidth();
+
+                    itemsWidth += itemWidth;
                 });
-
-                svg.append("svg:text").attr("class", "aster-score").attr("dy", ".35em").attr("text-anchor", "middle").text(Math.round(totalScore / totalWeight));
+                return itemsWidth;
             };
 
-            Plot.clearSvg = function (svgId) {
-                var svgElement = d3.select('#' + svgId);
-                if (svgElement)
-                    svgElement.remove();
-            };
-            Plot.pieColors = ["#fff7ec", "#fee8c8", "#fdd49e", "#fdbb84", "#fc8d59", "#ef6548", "#d7301f", "#b30000", "#7f0000"];
-            return Plot;
-        })();
-        Helpers.Plot = Plot;
-    })(csComp.Helpers || (csComp.Helpers = {}));
-    var Helpers = csComp.Helpers;
-})(csComp || (csComp = {}));
-var Helpers;
-(function (Helpers) {
-    (function (Resize) {
-        /**
-        * Config
-        */
-        var moduleName = 'csWeb.resize';
+            $scope.autocollapse = function (initializeTabPosition) {
+                if (typeof initializeTabPosition === "undefined") { initializeTabPosition = false; }
+                //                console.log('autocollapse');
+                var tabs = $('#featureTabs');
 
-        /**
-        * Module
-        */
-        Resize.myModule;
-
-        try  {
-            Resize.myModule = angular.module(moduleName);
-        } catch (err) {
-            // named module does not exist, so create one
-            Resize.myModule = angular.module(moduleName, []);
-        }
-
-        /**
-        * Directive to resize an element by settings its width or height,
-        * for example to make sure that the scrollbar appears.
-        * Typical usage:
-        * <div style="overflow-y: auto; overflow-x: hidden" resize resize-x="20" resize-y="250">...</div>
-        * Load the directive in your module, e.g.
-        * angular.module('myWebApp', ['csWeb.resize'])
-        */
-        Resize.myModule.directive('resize', [
-            '$window',
-            function ($window) {
-                return {
-                    terminal: false,
-                    // E = elements, A=attributes and C=css classes. Can be compined, e.g. EAC
-                    restrict: 'A',
-                    // Name if optional. Text Binding (Prefix: @), One-way Binding (Prefix: &), Two-way Binding (Prefix: =)
-                    scope: {
-                        resizeX: '@',
-                        resizeY: '@'
-                    },
-                    // Directives that want to modify the DOM typically use the link option.link takes a function with the following signature, function link(scope, element, attrs) { ... } where:
-                    // * scope is an Angular scope object.
-                    // * element is the jqLite wrapped element that this directive matches.
-                    // * attrs is a hash object with key-value pairs of normalized attribute names and their corresponding attribute values.
-                    link: function (scope, element, attrs) {
-                        scope.onResizeFunction = function () {
-                            // console.log(scope.resizeX + "-" + scope.resizeY);
-                            if (scope.resizeX) {
-                                var windowWidth = $window.innerWidth;
-                                element.width((windowWidth - scope.resizeX) + 'px');
-                            }
-                            if (scope.resizeY) {
-                                var windowHeight = $window.innerHeight;
-                                element.height((windowHeight - scope.resizeY) + 'px');
-                            }
-                        };
-
-                        // Call to the function when the page is first loaded
-                        scope.onResizeFunction();
-
-                        // Listen to the resize event.
-                        angular.element($window).bind('resize', function () {
-                            scope.onResizeFunction();
-                            scope.$apply();
-                        });
+                //                console.log('#ft.ow(): ' + tabs.outerWidth());
+                //                console.log('wol: ' + widthOfList());
+                //                console.log('ml: ' + tabs.css('margin-left'));
+                if (tabs.outerWidth() < widthOfList() || parseFloat(tabs.css('margin-left')) < 0) {
+                    $('#leftArr').show();
+                    $('#rightArr').show();
+                    if (initializeTabPosition) {
+                        tabs.animate({ 'margin-left': '20px' }, 'slow');
                     }
-                };
+                } else {
+                    $('#leftArr').hide();
+                    $('#rightArr').hide();
+                    if (initializeTabPosition) {
+                        tabs.animate({ 'margin-left': '0px' }, 'slow');
+                    }
+                }
+            };
+
+            $scope.autocollapse(true); // when document first loads
+            $scope.tabs = $('#featureTabs');
+            $scope.tabScrollDelta = $scope.tabs.outerWidth();
+
+            $('#leftArr').click(function () {
+                //console.log('leftArr');
+                //var tabs = $('#featureTabs');
+                var current = parseFloat($scope.tabs.css('margin-left'));
+                var min = 20;
+                var nextPos = $scope.tabScrollDelta;
+
+                if (current + nextPos > min) {
+                    nextPos = min - current;
+                }
+
+                $scope.tabs.animate({ 'margin-left': '+=' + nextPos + 'px' }, 'slow', function () {
+                    //                    console.log('rightarr hide');
+                    $('#rightArr').show();
+                    $('#leftArr').show();
+                    $scope.autocollapse(false);
+                });
+            });
+
+            $('#rightArr').click(function () {
+                //var tabs = $('#featureTabs');
+                var max = widthOfList() - $scope.tabs.outerWidth() + 30;
+
+                //var current = Math.abs(parseFloat($scope.tabs.css('margin-left')));
+                var nextPos = $scope.tabScrollDelta;
+                nextPos = Math.min(max, nextPos);
+
+                $scope.tabs.animate({ 'margin-left': '-=' + nextPos + 'px' }, 'slow', function () {
+                    $('#leftArr').show();
+                    $('#rightArr').show();
+
+                    $scope.autocollapse(false);
+                });
+            });
+        }
+        FeaturePropsCtrl.prototype.toTrusted = function (html) {
+            try  {
+                return this.$sce.trustAsHtml(html.toString());
+            } catch (e) {
+                console.log(e + ': ' + html);
+                return '';
             }
-        ]);
-    })(Helpers.Resize || (Helpers.Resize = {}));
-    var Resize = Helpers.Resize;
-})(Helpers || (Helpers = {}));
+        };
+
+        FeaturePropsCtrl.prototype.displayFeature = function (feature) {
+            if (!feature)
+                return;
+            var featureType = this.$layerService.featureTypes[feature.featureTypeName];
+            this.$scope.callOut = new CallOut(featureType, feature, this.$layerService.propertyTypeData);
+            // Probably not needed
+            //if (this.$scope.$root.$$phase != '$apply' && this.$scope.$root.$$phase != '$digest') {
+            //    this.$scope.$apply();
+            //}
+        };
+        FeaturePropsCtrl.$inject = [
+            '$scope',
+            '$location',
+            '$sce',
+            'mapService',
+            'layerService',
+            'messageBusService'
+        ];
+        return FeaturePropsCtrl;
+    })();
+    FeatureProps.FeaturePropsCtrl = FeaturePropsCtrl;
+})(FeatureProps || (FeatureProps = {}));
+var FilterList;
+(function (FilterList) {
+    FilterList.html = '<div>    <h4 class="leftpanel-header" translate="FILTERS"></h4>    <div ng-show="vm.$layerService.noFilters" translate="FILTER_INFO"></div>    <a ng-hide="vm.$layerService.noFilters" ng-click="vm.$layerService.resetFilters()"><span class="fa fa-refresh"></span> reset</a>    <div id="filterChart"></div></div>';
+})(FilterList || (FilterList = {}));
+var FilterList;
+(function (FilterList) {
+    /**
+    * Config
+    */
+    var moduleName = 'csWeb.filterList';
+
+    /**
+    * Module
+    */
+    FilterList.myModule;
+    try  {
+        FilterList.myModule = angular.module(moduleName);
+    } catch (err) {
+        // named module does not exist, so create one
+        FilterList.myModule = angular.module(moduleName, []);
+    }
+
+    /**
+    * Directive to display the available map layers.
+    */
+    FilterList.myModule.directive('filterList', [
+        '$window', '$compile',
+        function ($window, $compile) {
+            return {
+                terminal: false,
+                restrict: 'E',
+                scope: {},
+                template: FilterList.html,
+                //compile             : el          => {    // I need to explicitly compile it in order to use interpolation like {{xxx}}
+                //    var fn                        = $compile(el);
+                //    return scope                  => {
+                //        fn(scope);
+                //    };
+                //},
+                link: function (scope, element, attrs) {
+                    // Deal with resizing the element list
+                    scope.onResizeFunction = function () {
+                        var filterHeight = 50;
+                        var paginationCtrlHeight = 100;
+                        var itemHeight = 60;
+
+                        //scope.windowHeight          = $window.innerHeight;
+                        //scope.windowWidth           = $window.innerWidth;
+                        scope.numberOfItems = Math.floor(($window.innerHeight - filterHeight - paginationCtrlHeight) / itemHeight);
+                    };
+
+                    // Call to the function when the page is first loaded
+                    scope.onResizeFunction();
+
+                    angular.element($window).bind('resize', function () {
+                        scope.onResizeFunction();
+                        scope.$apply();
+                    });
+                },
+                replace: true,
+                transclude: true,
+                controller: FilterList.FilterListCtrl
+            };
+        }
+    ]).directive('bsPopover', function () {
+        return function (scope, element, attrs) {
+            element.find("a[rel=popover]").popover({ placement: 'right', html: 'true' });
+        };
+    });
+})(FilterList || (FilterList = {}));
+var FilterList;
+(function (FilterList) {
+    var FilterListCtrl = (function () {
+        // dependencies are injected via AngularJS $injector
+        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
+        function FilterListCtrl($scope, $layerService) {
+            this.$scope = $scope;
+            this.$layerService = $layerService;
+            $scope.vm = this;
+        }
+        FilterListCtrl.$inject = [
+            '$scope',
+            'layerService'
+        ];
+        return FilterListCtrl;
+    })();
+    FilterList.FilterListCtrl = FilterListCtrl;
+})(FilterList || (FilterList = {}));
+var LayersDirective;
+(function (LayersDirective) {
+    LayersDirective.html = '<div>    <h4 class="leftpanel-header" translate="LAYERS"></h4>    <div data-ng-repeat="group in vm.$layerService.project.groups" style="margin-left: 5px">        <div style="float: left; margin-left: -10px; margin-top: 5px" data-toggle="collapse" data-target="#layergroup_{{group.id}}"><i class="fa fa-chevron-down togglebutton toggle-arrow-down"></i><i class="fa fa-chevron-up togglebutton toggle-arrow-up"></i></div>        <div popover="{{(group.description) ? group.description : \'\'}}"             popover-placement="right"             popover-width="400"             popover-trigger="mouseenter"             class="group-title">{{group.title}}</div>        <div id="layergroup_{{group.id}}" class="collapse in">            <div popover="{{(layer.description) ? layer.description : \'\'}}"                 popover-placement="right"                 popover-trigger="mouseenter"                                  data-ng-repeat="layer in group.layers">                <!--bs-popover>-->                <div style="list-style-type: none; padding: 0;" data-ng-class="{indent: layer.isSublayer}">                    <!--<button type="button" class="btn btn-default" data-container="body" data-toggle="popover" data-placement="right" data-content="Vivamus sagittis lacus vel augue laoreet rutrum faucibus." data-original-title="" title="">Right</button>-->                    <div ng-hide="group.oneLayerActive" class="checkbox checkbox-primary" style="margin-left: 20px">                        <input type="checkbox" id="cblayer{{layer.id}}" ng-model="layer.enabled" data-ng-click="vm.toggleLayer(layer);">                        <label for="cblayer{{layer.id}}">                            {{layer.title}}                        </label>                    </div>                    <div ng-show="group.oneLayerActive" class="radio radio-primary" style="margin-left: 20px">                        <input type="radio" ng-value="true" id="rblayer{{layer.id}}" ng-model="layer.enabled" data-ng-click="vm.toggleLayer(layer);">                        <label for="rblayer{{layer.id}}">                            {{layer.title}}                        </label>                    </div>                </div>            </div>        </div>    </div></div>';
+})(LayersDirective || (LayersDirective = {}));
+var LayersDirective;
+(function (LayersDirective) {
+    /**
+    * Config
+    */
+    var moduleName = 'csWeb.layersDirective';
+
+    /**
+    * Module
+    */
+    LayersDirective.myModule;
+    try  {
+        LayersDirective.myModule = angular.module(moduleName);
+    } catch (err) {
+        // named module does not exist, so create one
+        LayersDirective.myModule = angular.module(moduleName, []);
+    }
+
+    /**
+    * Directive to display the available map layers.
+    */
+    LayersDirective.myModule.directive('layersDirective', [
+        '$compile',
+        function ($compile) {
+            return {
+                terminal: true,
+                restrict: 'E',
+                scope: {},
+                template: LayersDirective.html,
+                compile: function (el) {
+                    var fn = $compile(el);
+                    return function (scope) {
+                        fn(scope);
+                    };
+                },
+                replace: true,
+                transclude: true,
+                controller: LayersDirective.LayersDirectiveCtrl
+            };
+        }
+    ]).directive('bsPopover', function () {
+        return function (scope, element, attrs) {
+            element.find("a[rel=popover]").popover({ placement: 'right', html: 'true' });
+        };
+    });
+})(LayersDirective || (LayersDirective = {}));
+var LayersDirective;
+(function (LayersDirective) {
+    var LayersDirectiveCtrl = (function () {
+        // dependencies are injected via AngularJS $injector
+        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
+        function LayersDirectiveCtrl($scope, $layerService) {
+            this.$scope = $scope;
+            this.$layerService = $layerService;
+            $scope.vm = this;
+        }
+        LayersDirectiveCtrl.prototype.toggleLayer = function (layer) {
+            layer.enabled = !layer.enabled;
+            if (layer.enabled) {
+                this.$layerService.addLayer(layer);
+            } else {
+                this.$layerService.removeLayer(layer);
+            }
+
+            // NOTE EV: You need to call apply only when an event is received outside the angular scope.
+            // However, make sure you are not calling this inside an angular apply cycle, as it will generate an error.
+            if (this.$scope.$root.$$phase != '$apply' && this.$scope.$root.$$phase != '$digest') {
+                this.$scope.$apply();
+            }
+        };
+        LayersDirectiveCtrl.$inject = [
+            '$scope',
+            'layerService'
+        ];
+        return LayersDirectiveCtrl;
+    })();
+    LayersDirective.LayersDirectiveCtrl = LayersDirectiveCtrl;
+})(LayersDirective || (LayersDirective = {}));
 var LegendList;
 (function (LegendList) {
     LegendList.html = '<div style="position: relative;">    <h4 class="leftpanel-header" translate="LEGEND"></h4>        <div>        <div ng-repeat="legendItem in legendItems" class="legendItem">            <div class="legendIcon">                <img ng-src="{{legendItem.uri}}" class="legendImage" />            </div><span class="legendText">                {{legendItem.title}}            </span>        </div>    </div></div>';
@@ -1057,7 +1625,7 @@ var LegendList;
         };
 
         LegendListCtrl.prototype.getImageUri = function (ft) {
-            if (ft.style != null && ft.style.drawingMode.toLowerCase() != "point") {
+            if (ft.style != null && ft.style.drawingMode != null && ft.style.drawingMode.toLowerCase() != "point") {
                 if (ft.style.iconUri && ft.style.iconUri.indexOf('_Media') < 0)
                     return ft.style.iconUri;
                 else
@@ -1086,198 +1654,58 @@ var LegendList;
     })();
     LegendList.LegendListCtrl = LegendListCtrl;
 })(LegendList || (LegendList = {}));
-var FeatureList;
-(function (FeatureList) {
-    FeatureList.html = '<div style="position: relative;">    <h4 class="leftpanel-header" translate="FEATURES"></h4>    <div class="has-feedback" style="padding:10px 4px 4px 4px;">        <span style="direction: ltr; position: static; display: block;">            <input id="searchbox" data-ng-model="featureFilter.properties" type="text"                   placeholder="Filter" autocomplete="off" spellcheck="false"                   style="position: relative; vertical-align: top;" class="form-control tt-input">        </span>        <span id="searchicon" class="fa form-control-feedback fa-filter" style="padding-top: 10px;"></span>    </div>    <table class="table table-striped table-condensed">        <!--vm.$layerService.features-->        <tr dir-paginate="feature in vm.$layerService.project.features | filter:featureFilter | orderBy:\'properties.Name\' | itemsPerPage: numberOfItems "            data-ng-click="vm.$mapService.zoomTo(feature);vm.$layerService.selectFeature(feature);" style="cursor: pointer; height: 50px; vertical-align: central">            <!--<td>Icon</td>-->            <td>{{ feature.properties.Name }}</td>            <td>                <i class="fa fa-chevron-right pull-right"></i>            </td>        </tr>    </table>    <dir-pagination-controls style="position: absolute; bottom: -80px;" max-size="6" boundary-links="false" direction-links="false" template-url="bower_components/angular-utils-pagination/dirPagination.tpl.html"></dir-pagination-controls></div>';
-})(FeatureList || (FeatureList = {}));
-var FeatureList;
-(function (FeatureList) {
-    /**
-    * Config
-    */
-    var moduleName = 'csWeb.featureList';
-
-    /**
-    * Module
-    */
-    FeatureList.myModule;
-    try  {
-        FeatureList.myModule = angular.module(moduleName);
-    } catch (err) {
-        // named module does not exist, so create one
-        FeatureList.myModule = angular.module(moduleName, []);
-    }
-
-    /**
-    * Directive to display the available map layers.
-    */
-    FeatureList.myModule.directive('featureList', [
-        '$window', '$compile',
-        function ($window, $compile) {
-            return {
-                terminal: false,
-                restrict: 'E',
-                scope: {},
-                template: FeatureList.html,
-                //compile             : el          => {    // I need to explicitly compile it in order to use interpolation like {{xxx}}
-                //    var fn                        = $compile(el);
-                //    return scope                  => {
-                //        fn(scope);
-                //    };
-                //},
-                // Directives that want to modify the DOM typically use the link option.link takes a function with the following signature, function link(scope, element, attrs) { ... } where:
-                // scope is an Angular scope object.
-                // element is the jqLite - wrapped element that this directive matches.
-                // attrs is a hash object with key - value pairs of normalized attribute names and their corresponding attribute values.
-                link: function (scope, element, attrs) {
-                    // Deal with resizing the element list
-                    scope.onResizeFunction = function () {
-                        var filterHeight = 50;
-                        var paginationCtrlHeight = 100;
-                        var itemHeight = 60;
-
-                        //scope.windowHeight          = $window.innerHeight;
-                        //scope.windowWidth           = $window.innerWidth;
-                        scope.numberOfItems = Math.floor(($window.innerHeight - filterHeight - paginationCtrlHeight) / itemHeight);
-                    };
-
-                    // Call to the function when the page is first loaded
-                    scope.onResizeFunction();
-
-                    angular.element($window).bind('resize', function () {
-                        scope.onResizeFunction();
-                        scope.$apply();
-                    });
-                },
-                replace: true,
-                transclude: true,
-                controller: FeatureList.FeatureListCtrl
-            };
-        }
-    ]).directive('bsPopover', function () {
-        return function (scope, element, attrs) {
-            element.find("a[rel=popover]").popover({ placement: 'right', html: 'true' });
-        };
-    });
-})(FeatureList || (FeatureList = {}));
-var FeatureList;
-(function (FeatureList) {
-    var FeatureListCtrl = (function () {
-        // dependencies are injected via AngularJS $injector
-        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
-        function FeatureListCtrl($scope, $layerService, $mapService) {
-            this.$scope = $scope;
-            this.$layerService = $layerService;
-            this.$mapService = $mapService;
-            $scope.vm = this;
-            $scope.numberOfItems = 10; // This is being reset in the directive upon receiving a resize.
-        }
-        FeatureListCtrl.$inject = [
-            '$scope',
-            'layerService',
-            'mapService'
-        ];
-        return FeatureListCtrl;
-    })();
-    FeatureList.FeatureListCtrl = FeatureListCtrl;
-})(FeatureList || (FeatureList = {}));
-var FilterList;
-(function (FilterList) {
-    FilterList.html = '<div>    <h4 class="leftpanel-header" translate="FILTERS"></h4>    <div ng-show="vm.$layerService.noFilters" translate="FILTER_INFO"></div>    <a ng-hide="vm.$layerService.noFilters" ng-click="vm.$layerService.resetFilters()"><span class="fa fa-refresh"></span> reset</a>    <div id="filterChart"></div></div>';
-})(FilterList || (FilterList = {}));
-var FilterList;
-(function (FilterList) {
-    /**
-    * Config
-    */
-    var moduleName = 'csWeb.filterList';
-
-    /**
-    * Module
-    */
-    FilterList.myModule;
-    try  {
-        FilterList.myModule = angular.module(moduleName);
-    } catch (err) {
-        // named module does not exist, so create one
-        FilterList.myModule = angular.module(moduleName, []);
-    }
-
-    /**
-    * Directive to display the available map layers.
-    */
-    FilterList.myModule.directive('filterList', [
-        '$window', '$compile',
-        function ($window, $compile) {
-            return {
-                terminal: false,
-                restrict: 'E',
-                scope: {},
-                template: FilterList.html,
-                //compile             : el          => {    // I need to explicitly compile it in order to use interpolation like {{xxx}}
-                //    var fn                        = $compile(el);
-                //    return scope                  => {
-                //        fn(scope);
-                //    };
-                //},
-                link: function (scope, element, attrs) {
-                    // Deal with resizing the element list
-                    scope.onResizeFunction = function () {
-                        var filterHeight = 50;
-                        var paginationCtrlHeight = 100;
-                        var itemHeight = 60;
-
-                        //scope.windowHeight          = $window.innerHeight;
-                        //scope.windowWidth           = $window.innerWidth;
-                        scope.numberOfItems = Math.floor(($window.innerHeight - filterHeight - paginationCtrlHeight) / itemHeight);
-                    };
-
-                    // Call to the function when the page is first loaded
-                    scope.onResizeFunction();
-
-                    angular.element($window).bind('resize', function () {
-                        scope.onResizeFunction();
-                        scope.$apply();
-                    });
-                },
-                replace: true,
-                transclude: true,
-                controller: FilterList.FilterListCtrl
-            };
-        }
-    ]).directive('bsPopover', function () {
-        return function (scope, element, attrs) {
-            element.find("a[rel=popover]").popover({ placement: 'right', html: 'true' });
-        };
-    });
-})(FilterList || (FilterList = {}));
-var FilterList;
-(function (FilterList) {
-    var FilterListCtrl = (function () {
-        // dependencies are injected via AngularJS $injector
-        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
-        function FilterListCtrl($scope, $layerService) {
-            this.$scope = $scope;
-            this.$layerService = $layerService;
-            $scope.vm = this;
-        }
-        FilterListCtrl.$inject = [
-            '$scope',
-            'layerService'
-        ];
-        return FilterListCtrl;
-    })();
-    FilterList.FilterListCtrl = FilterListCtrl;
-})(FilterList || (FilterList = {}));
 var Mca;
 (function (Mca) {
-    // DONE MCA Editor
-    // DONE Adding MCA definitions to the project file
-    // TODO Localize
-    // TODO Edit and delete an MCA
-    // TODO Save MCA after changing a value
-    // TODO Optimize me button.
-    // TODO Save the project file
+    Mca.html = '<div>    <h4 class="leftpanel-header">MCA</h4>    <div>        <select data-ng-model="vm.mca"                data-ng-options="mca.title for mca in vm.availableMcas"                style="width: 75%; margin-bottom:10px;"></select>        <a href="" data-ng-click="vm.createMca()" class="pull-right" style="margin-right:5px;"><i class="fa fa-plus"></i></a>        <a href="" data-ng-click="vm.removeMca(vm.mca)" class="pull-right" style="margin-right:5px;"><i class="fa fa-trash"></i></a>        <a href="" data-ng-click="vm.editMca(vm.mca)" class="pull-right" style="margin-right:5px;"><i class="fa fa-edit"></i></a>    </div>        <!--MCA EDITOR DIALOG-->    <div id="mcaEditorView">        <!--<input type="checkbox" ng-model="showDialog"> Show-->        <div show-modal="vm.showDialog" class="modal fade">            <div class="modal-dialog" data-ng-controller="mcaEditorCtrl">                <div class="modal-content">                    <div class="modal-header">                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>                        <h3 class="modal-title" translate>MCA.EDITOR_TITLE</h3>                    </div>                    <div class="modal-body">                        <input type="text" data-ng-model="vm.mcaTitle" placeholder="{{ \'MCA.TITLE\' | translate }}" />                        <span><input type="checkbox" data-ng-model="vm.hasRank" style="margin-left: 10px;" /><span translate>MCA.INCLUDE_RANK</span></span>                        <input type="text" data-ng-if="vm.hasRank" data-ng-model="vm.rankTitle" placeholder="{{ \'MCA.RANK_TITLE\' | translate }}" />                        <h4 translate>MCA.MAIN_FEATURE</h4>                        <select data-ng-model="vm.selectedFeatureType"                                data-ng-change="vm.loadPropertyTypes()"                                data-ng-options="item as item.name for (key, item) in vm.dataset.poiTypes"                                class="form-control"></select>                        <h4 translate>MCA.PROPERTIES</h4>                        <ul class="form-group" style="margin-top: 1em; margin-left: -2em; overflow-y: auto; overflow-x: hidden;"                            resize resize-y="450">                            <li ng-repeat="mi in vm.metaInfos" class="list-unstyled" style="white-space: nowrap; -moz-text-overflow: ellipsis; text-overflow: ellipsis">                                <div>                                    <span>                                        <input type="checkbox" name="vm.selectedTitles[]" value="{{mi.title}}"                                               data-ng-checked="mi.isSelected"                                               data-ng-click="mi.isSelected = !mi.isSelected">&nbsp;&nbsp;{{mi.title}}                                        <span data-ng-if="mi.isSelected" style="margin-left: 10px;">                                            <input type="checkbox" data-ng-model="mi.hasCategory" /><span translate>MCA.HAS_CATEGORY</span>                                            <input type="text" data-ng-if="mi.hasCategory" data-ng-model="mi.category" placeholder="..." />                                        </span>                                    </span>                                    <form data-ng-if="mi.isSelected" name="myForm" style="margin-left: 20px;">                                        <label id="scoringFunctions" data-ng-repeat="sf in vm.scoringFunctions">                                            <input type="radio" data-ng-model="mi.scoringFunctionType" value="{{sf.type}}">                                            <a data-ng-href="" data-ng-class="sf.cssClass" data-ng-click="mi.isSelected = !mi.isSelected"></a>                                        </label>                                    </form>                                    <div data-ng-if="mi.scoringFunctionType == 0" style="margin-left: 20px;">                                        input -> score:&nbsp;<input type="text" data-ng-model="mi.scores" placeholder="[x0,y0 x1,y1 ...]" />                                    </div>                                </div>                            </li>                        </ul>                    </div>                    <div class="modal-footer">                        <button type="button" class="btn btn-warning" data-dismiss="modal" data-ng-click="vm.cancel()" translate>CANCEL_BTN</button>                        <button type="button" class="btn btn-primary" data-dismiss="modal" data-ng-disabled="vm.isDisabled()" data-ng-click="vm.save()" translate>OK_BTN</button>                    </div>                </div><!-- /.modal-content -->            </div><!-- /.modal-dialog -->        </div>    </div>    <div data-ng-if="vm.mca">        <ul class="list-unstyled">            <li data-ng-repeat="criterion in vm.mca.criteria">                <div data-ng-style="{\'display\': \'inline-block\', \'margin-bottom\': \'6px\', \'width\':\'10px\', \'height\':\'10px\', \'border\':\'solid 1px black\', \'background-color\': criterion.color}"></div>                <div class="truncate" style="display: inline-block; width: 170px;">{{criterion.getTitle()}}</div>                <div rating class="pull-right" style="margin:0 10px;" ng-model="criterion.userWeight" max="{{vm.mca.userWeightMax}}" readonly="isReadonly"                        state-on="\'fa fa-circle\'" state-off="\'fa fa-circle-o\'"                        data-ng-click="vm.weightUpdated(criterion)"                        on-hover="hoveringOver(value)" on-leave="overStar = null"></div>                <ul class="list-unstyled" style="margin-left: 10px;" data-ng-if="criterion.criteria.length > 0">                    <li data-ng-repeat="crit in criterion.criteria">                        <div data-ng-style="{\'display\': \'inline-block\', \'margin-bottom\': \'6px\', \'width\':\'10px\', \'height\':\'10px\', \'border\':\'solid 1px black\', \'background-color\': crit.color}">                        </div>                        <div class="truncate" style="display: inline-block; width: 150px;">{{crit.getTitle()}}</div>                        <div rating class="pull-right" style="margin:0 10px;" ng-model="crit.userWeight" max="{{vm.mca.userWeightMax}}" readonly="isReadonly"                             state-on="\'fa fa-circle\'" state-off="\'fa fa-circle-o\'"                             data-ng-click="vm.weightUpdated(crit)"                             on-hover="hoveringOver(value)" on-leave="overStar = null"></div>                    </li>                </ul>            </li>        </ul>        <!--<a href="" style="display: inline-block; width: 100%; text-transform: uppercase"           data-ng-click="vm.calculateMca()" translate="MCA.COMPUTE_MGS" translate-values="{ mcaTitle: vm.mca.title }"></a>-->        <h4 data-ng-if="vm.showChart">            <a href="" data-ng-click="vm.weightUpdated(vm.mca)" translate="MCA.TOTAL_RESULT"></a>            <a href="" data-ng-if="vm.selectedCriterion">&gt;&nbsp;{{vm.selectedCriterion.title}}</a>        </h4>        <div style="margin-top: 5px; margin-left: 70px;" id="mcaPieChart"></div>        <div data-ng-if="vm.showFeature">            <h4>{{vm.selectedFeature.properties[\'Name\']}}</h4>            <table class="table table-condensed">                <tr data-ng-repeat="item in vm.properties"                    popover="{{item.description}}"                    popover-placement="right"                    popover-trigger="mouseenter"                    popover-append-to-body="true">                    <td><a class="fa fa-filter makeNarrow" data-ng-if="item.canFilter" data-ng-click="vm.$layerService.setFilter(item)" style="cursor: pointer"></a></td>                    <td><a class="fa fa-eye makeNarrow" data-ng-if="item.canStyle" data-ng-click="vm.setStyle(item)" style="cursor: pointer"></a></td>                    <td>{{item.key}}</td>                    <td class="text-right">{{item.value}}</td>                </tr>            </table>        </div>        <i data-ng-if="!vm.showFeature"><div translate="MCA.SHOW_FEATURE_MSG"></div></i>    </div></div>';
+})(Mca || (Mca = {}));
+var Mca;
+(function (Mca) {
+    /**
+    * Config
+    */
+    var moduleName = 'csWeb.mca';
+
+    /**
+    * Module
+    */
+    Mca.myModule;
+    try  {
+        Mca.myModule = angular.module(moduleName);
+    } catch (err) {
+        // named module does not exist, so create one
+        Mca.myModule = angular.module(moduleName, []);
+    }
+
+    /**
+    * Directive to display an MCA control.
+    */
+    Mca.myModule.directive('mca', [
+        '$window', '$compile',
+        function ($window, $compile) {
+            return {
+                terminal: true,
+                restrict: 'EA',
+                scope: {},
+                template: Mca.html,
+                compile: function (el) {
+                    var fn = $compile(el);
+                    return function (scope) {
+                        fn(scope);
+                    };
+                },
+                replace: true,
+                transclude: true,
+                controller: Mca.McaCtrl
+            };
+        }
+    ]).directive('bsPopover', function () {
+        return function (scope, element, attrs) {
+            element.find("a[rel=popover]").popover({ placement: 'right', html: 'true' });
+        };
+    });
+})(Mca || (Mca = {}));
+var Mca;
+(function (Mca) {
     var McaCtrl = (function () {
         function McaCtrl($scope, $modal, $translate, $localStorageService, $layerService, messageBusService) {
             var _this = this;
@@ -1668,7 +2096,7 @@ var Mca;
         McaCtrl.prototype.applyPropertyInfoToCriteria = function (mca, featureType) {
             mca.criteria.forEach(function (criterion) {
                 var label = criterion.label;
-                featureType.metaInfoData.forEach(function (propInfo) {
+                featureType.propertyTypeData.forEach(function (propInfo) {
                     if (propInfo.label === label) {
                         criterion.title = propInfo.title;
                         criterion.description = propInfo.description;
@@ -1679,18 +2107,18 @@ var Mca;
 
         McaCtrl.prototype.addPropertyInfo = function (featureId, mca) {
             var featureType = this.$layerService.featureTypes[featureId];
-            if (featureType.metaInfoData.reduce(function (prevValue, curItem) {
+            if (featureType.propertyTypeData.reduce(function (prevValue, curItem) {
                 return prevValue || (curItem.label === mca.label);
             }, false))
                 return;
 
             var mi = McaCtrl.createMetaInfo(mca);
-            featureType.metaInfoData.push(mi);
+            featureType.propertyTypeData.push(mi);
 
             if (!mca.rankTitle)
                 return;
             mi = McaCtrl.createMetaInfoRank(mca);
-            featureType.metaInfoData.push(mi);
+            featureType.propertyTypeData.push(mi);
         };
 
         McaCtrl.prototype.setStyle = function (item) {
@@ -1704,26 +2132,28 @@ var Mca;
         };
 
         McaCtrl.createMetaInfo = function (mca) {
-            var mi = new csComp.GeoJson.MetaInfo();
-            mi.title = mca.title;
-            mi.label = mca.label;
-            mi.type = 'number';
-            mi.maxValue = 1;
-            mi.minValue = 0;
-            mi.description = mca.description;
-            mi.stringFormat = mca.stringFormat;
-            mi.section = mca.section || 'MCA';
+            var mi = {
+                title: mca.title,
+                label: mca.label,
+                type: 'number',
+                maxValue: 1,
+                minValue: 0,
+                description: mca.description,
+                stringFormat: mca.stringFormat,
+                section: mca.section || 'MCA'
+            };
             return mi;
         };
 
         McaCtrl.createMetaInfoRank = function (mca) {
-            var mi = new csComp.GeoJson.MetaInfo();
-            mi.title = mca.rankTitle;
-            mi.label = mca.label + '#';
-            mi.type = 'rank';
-            mi.description = mca.rankDescription;
-            mi.stringFormat = mca.rankFormat;
-            mi.section = mca.section || 'MCA';
+            var mi = {
+                title: mca.rankTitle,
+                label: mca.label + '#',
+                type: 'rank',
+                description: mca.rankDescription,
+                stringFormat: mca.rankFormat,
+                section: mca.section || 'MCA'
+            };
             return mi;
         };
         McaCtrl.mcas = 'MCAs';
@@ -1740,6 +2170,267 @@ var Mca;
     })();
     Mca.McaCtrl = McaCtrl;
 })(Mca || (Mca = {}));
+var Mca;
+(function (Mca) {
+    'use strict';
+
+    var McaEditorCtrl = (function () {
+        function McaEditorCtrl($scope, $modal, $layerService, messageBusService) {
+            var _this = this;
+            this.$scope = $scope;
+            this.$modal = $modal;
+            this.$layerService = $layerService;
+            this.messageBusService = messageBusService;
+            this.metaInfos = [];
+            this.headers = [];
+            this.scoringFunctions = [];
+            $scope.vm = this;
+
+            this.scoringFunctions.push(new Mca.Models.ScoringFunction(1 /* Ascending */));
+            this.scoringFunctions.push(new Mca.Models.ScoringFunction(2 /* Descending */));
+            this.scoringFunctions.push(new Mca.Models.ScoringFunction(3 /* AscendingSigmoid */));
+            this.scoringFunctions.push(new Mca.Models.ScoringFunction(4 /* DescendingSigmoid */));
+            this.scoringFunctions.push(new Mca.Models.ScoringFunction(5 /* GaussianPeak */));
+            this.scoringFunctions.push(new Mca.Models.ScoringFunction(6 /* GaussianValley */));
+            this.scoringFunctions.push(new Mca.Models.ScoringFunction(0 /* Manual */));
+
+            messageBusService.subscribe('layer', function (title) {
+                switch (title) {
+                    case 'activated':
+                    case 'deactivate':
+                        _this.loadMapLayers();
+                        break;
+                }
+            });
+
+            messageBusService.subscribe('mca', function (title, data) {
+                switch (title) {
+                    case 'edit':
+                        var mca = data.mca;
+                        _this.mcaTitle = mca.title;
+                        _this.rankTitle = mca.rankTitle;
+                        _this.hasRank = _this.rankTitle != '';
+                        _this.selectedFeatureType = _this.dataset.featureTypes[mca.featureIds[0]];
+                        _this.updateMetaInfo(_this.selectedFeatureType);
+                        _this.updateMetaInfoUponEdit(mca);
+                        break;
+                    case 'create':
+                        _this.mcaTitle = '';
+                        _this.rankTitle = '';
+                        _this.hasRank = false;
+                        _this.selectedFeatureType = null;
+                        _this.loadMapLayers();
+                        break;
+                }
+            });
+        }
+        McaEditorCtrl.prototype.updateMetaInfoUponEdit = function (criterion, category) {
+            var _this = this;
+            criterion.criteria.forEach(function (c) {
+                if (c.label) {
+                    for (var i in _this.metaInfos) {
+                        var mi = _this.metaInfos[i];
+                        if (mi.label != c.label)
+                            continue;
+                        mi.isSelected = true;
+                        if (category) {
+                            mi.hasCategory = true;
+                            mi.category = category;
+                        }
+                        break;
+                    }
+                } else {
+                    _this.updateMetaInfoUponEdit(c, c.title);
+                }
+            });
+        };
+
+        McaEditorCtrl.prototype.loadPropertyTypes = function () {
+            console.log("loadPropertyTypes");
+        };
+
+        /**
+        * Load the features as visible on the map.
+        */
+        McaEditorCtrl.prototype.loadMapLayers = function () {
+            var _this = this;
+            var data = {
+                type: '',
+                features: [],
+                featureTypes: {}
+            };
+
+            // If we are filtering, load the filter results
+            this.$layerService.project.groups.forEach(function (group) {
+                if (group.filterResult != null)
+                    group.filterResult.forEach(function (f) {
+                        return data.features.push(f);
+                    });
+            });
+
+            // Otherwise, take all loaded features
+            if (data.features.length === 0)
+                data.features = this.$layerService.project.features;
+
+            data.features.forEach(function (f) {
+                if (!(data.featureTypes.hasOwnProperty(f.featureTypeName)))
+                    data.featureTypes[f.featureTypeName] = _this.$layerService.featureTypes[f.featureTypeName];
+            });
+
+            this.dataset = data;
+            for (var key in data.featureTypes) {
+                this.selectedFeatureType = data.featureTypes[key];
+                this.updateMetaInfo(this.selectedFeatureType);
+                return;
+            }
+        };
+
+        McaEditorCtrl.prototype.updateMetaInfo = function (featureType) {
+            var _this = this;
+            this.metaInfos = [];
+            this.headers = [];
+            var titles = [];
+            var mis = [];
+
+            // Push the Name, so it always appears on top.
+            mis.push({
+                label: "Name",
+                visibleInCallOut: true,
+                title: "Naam",
+                type: "text",
+                filterType: "text",
+                isSelected: false,
+                scoringFunctionType: this.scoringFunctions[0].type
+            });
+            if (featureType.propertyTypeKeys != null) {
+                var keys = featureType.propertyTypeKeys.split(';');
+                keys.forEach(function (k) {
+                    if (k in _this.$layerService.propertyTypeData)
+                        mis.push(_this.$layerService.propertyTypeData[k]);
+                    else if (featureType.propertyTypeData != null) {
+                        var result = $.grep(featureType.propertyTypeData, function (e) {
+                            return e.label === k;
+                        });
+                        if (result.length >= 1)
+                            mis.push(result);
+                    }
+                });
+            } else if (featureType.propertyTypeData != null) {
+                featureType.propertyTypeData.forEach(function (mi) {
+                    return mis.push(mi);
+                });
+            }
+            mis.forEach(function (mi) {
+                // TODO Later, we could also include categories and not only numbers, where each category represents a certain value.
+                if (mi.visibleInCallOut && mi.type === 'number' && mi.label.indexOf("mca_") < 0 && titles.indexOf(mi.title) < 0) {
+                    titles.push(mi.title);
+                    _this.metaInfos.push(mi);
+                }
+            });
+        };
+
+        McaEditorCtrl.prototype.toggleSelection = function (metaInfoTitle) {
+            var idx = this.headers.indexOf(metaInfoTitle);
+
+            // is currently selected
+            if (idx > -1) {
+                this.headers.splice(idx, 1);
+            } else {
+                this.headers.push(metaInfoTitle);
+            }
+        };
+
+        McaEditorCtrl.prototype.isDisabled = function () {
+            if (typeof this.mcaTitle === 'undefined' || this.mcaTitle.length === 0)
+                return true;
+            if (this.hasRank && this.rankTitle && this.rankTitle.length === 0)
+                return true;
+            if (!this.metaInfos.reduce(function (p, c) {
+                return p || c.isSelected;
+            }))
+                return true;
+            return false;
+        };
+
+        /**
+        * Create a new MCA criterion
+        */
+        McaEditorCtrl.prototype.save = function () {
+            var mca = new Mca.Models.Mca();
+            mca.title = this.mcaTitle || 'New MCA criterion';
+            mca.label = 'mca_' + mca.title.replace(' ', '_');
+            mca.stringFormat = '{0:0.0}';
+            if (this.hasRank) {
+                mca.rankTitle = this.rankTitle || 'Rank';
+                mca.rankFormat = '{0} / {1}';
+            }
+            mca.userWeightMax = 5;
+            for (var key in this.dataset.featureTypes) {
+                if (this.dataset.featureTypes[key] === this.selectedFeatureType)
+                    mca.featureIds = [key];
+            }
+
+            this.metaInfos.forEach(function (mi) {
+                if (!mi.isSelected)
+                    return;
+                var criterion = new Mca.Models.Criterion();
+                criterion.label = mi.label;
+                criterion.title = mi.title;
+                criterion.isPlaScaled = true;
+                criterion.description = mi.description;
+                criterion.userWeight = 1;
+
+                if (mi.scoringFunctionType === 0 /* Manual */) {
+                    criterion.scores = mi.scores;
+                } else {
+                    criterion.scores = Mca.Models.ScoringFunction.createScores(mi.scoringFunctionType);
+                    criterion.isPlaScaled = true;
+                }
+                if (mi.category) {
+                    var parent;
+                    for (var i in mca.criteria) {
+                        var c = mca.criteria[i];
+                        if (c.title != mi.category)
+                            continue;
+                        parent = c;
+                        break;
+                    }
+                    if (parent == null) {
+                        parent = new Mca.Models.Criterion;
+                        parent.title = mi.category;
+                        parent.isPlaUpdated = false;
+                        mca.criteria.push(parent);
+                    }
+                    parent.criteria.push(criterion);
+                } else {
+                    mca.criteria.push(criterion);
+                }
+            });
+            this.messageBusService.publish('mca', 'add', { mca: mca });
+        };
+
+        McaEditorCtrl.prototype.cancel = function () {
+            this.mcaTitle = '';
+            this.hasRank = false;
+            this.rankTitle = '';
+            this.headers = [];
+        };
+        McaEditorCtrl.$inject = [
+            '$scope',
+            '$modal',
+            'layerService',
+            'messageBusService'
+        ];
+        return McaEditorCtrl;
+    })();
+    Mca.McaEditorCtrl = McaEditorCtrl;
+})(Mca || (Mca = {}));
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
 var Mca;
 (function (_Mca) {
     (function (Models) {
@@ -2051,6 +2742,78 @@ var Mca;
     })(_Mca.Models || (_Mca.Models = {}));
     var Models = _Mca.Models;
 })(Mca || (Mca = {}));
+var Helpers;
+(function (Helpers) {
+    (function (Resize) {
+        /**
+        * Config
+        */
+        var moduleName = 'csWeb.resize';
+
+        /**
+        * Module
+        */
+        Resize.myModule;
+
+        try  {
+            Resize.myModule = angular.module(moduleName);
+        } catch (err) {
+            // named module does not exist, so create one
+            Resize.myModule = angular.module(moduleName, []);
+        }
+
+        /**
+        * Directive to resize an element by settings its width or height,
+        * for example to make sure that the scrollbar appears.
+        * Typical usage:
+        * <div style="overflow-y: auto; overflow-x: hidden" resize resize-x="20" resize-y="250">...</div>
+        * Load the directive in your module, e.g.
+        * angular.module('myWebApp', ['csWeb.resize'])
+        */
+        Resize.myModule.directive('resize', [
+            '$window',
+            function ($window) {
+                return {
+                    terminal: false,
+                    // E = elements, A=attributes and C=css classes. Can be compined, e.g. EAC
+                    restrict: 'A',
+                    // Name if optional. Text Binding (Prefix: @), One-way Binding (Prefix: &), Two-way Binding (Prefix: =)
+                    scope: {
+                        resizeX: '@',
+                        resizeY: '@'
+                    },
+                    // Directives that want to modify the DOM typically use the link option.link takes a function with the following signature, function link(scope, element, attrs) { ... } where:
+                    // * scope is an Angular scope object.
+                    // * element is the jqLite wrapped element that this directive matches.
+                    // * attrs is a hash object with key-value pairs of normalized attribute names and their corresponding attribute values.
+                    link: function (scope, element, attrs) {
+                        scope.onResizeFunction = function () {
+                            // console.log(scope.resizeX + "-" + scope.resizeY);
+                            if (scope.resizeX) {
+                                var windowWidth = $window.innerWidth;
+                                element.width((windowWidth - scope.resizeX) + 'px');
+                            }
+                            if (scope.resizeY) {
+                                var windowHeight = $window.innerHeight;
+                                element.height((windowHeight - scope.resizeY) + 'px');
+                            }
+                        };
+
+                        // Call to the function when the page is first loaded
+                        scope.onResizeFunction();
+
+                        // Listen to the resize event.
+                        angular.element($window).bind('resize', function () {
+                            scope.onResizeFunction();
+                            scope.$apply();
+                        });
+                    }
+                };
+            }
+        ]);
+    })(Helpers.Resize || (Helpers.Resize = {}));
+    var Resize = Helpers.Resize;
+})(Helpers || (Helpers = {}));
 var ShowModal;
 (function (ShowModal) {
     /**
@@ -2109,50 +2872,127 @@ var ShowModal;
         }
     ]);
 })(ShowModal || (ShowModal = {}));
-var csComp;
-(function (csComp) {
-    (function (Services) {
-        (function (LayerType) {
-            LayerType[LayerType["GeoJson"] = 0] = "GeoJson";
-            LayerType[LayerType["Kml"] = 1] = "Kml";
-        })(Services.LayerType || (Services.LayerType = {}));
-        var LayerType = Services.LayerType;
-    })(csComp.Services || (csComp.Services = {}));
-    var Services = csComp.Services;
-})(csComp || (csComp = {}));
-var LayersDirective;
-(function (LayersDirective) {
-    LayersDirective.html = '<div>    <h4 class="leftpanel-header" translate="LAYERS"></h4>    <div data-ng-repeat="group in vm.$layerService.project.groups" style="margin-left: 5px">        <div style="float: left; margin-left: -10px; margin-top: 5px" data-toggle="collapse" data-target="#layergroup_{{group.id}}"><i class="fa fa-chevron-down togglebutton toggle-arrow-down"></i><i class="fa fa-chevron-up togglebutton toggle-arrow-up"></i></div>        <div popover="{{(group.description) ? group.description : \'\'}}"             popover-placement="right"             popover-width="400"             popover-trigger="mouseenter"             class="group-title">{{group.title}}</div>        <div id="layergroup_{{group.id}}" class="collapse in">            <div popover="{{(layer.description) ? layer.description : \'\'}}"                 popover-placement="right"                 popover-trigger="mouseenter"                                  data-ng-repeat="layer in group.layers">                <!--bs-popover>-->                <div style="list-style-type: none; padding: 0;" data-ng-class="{indent: layer.isSublayer}">                    <!--<button type="button" class="btn btn-default" data-container="body" data-toggle="popover" data-placement="right" data-content="Vivamus sagittis lacus vel augue laoreet rutrum faucibus." data-original-title="" title="">Right</button>-->                    <div ng-hide="group.oneLayerActive" class="checkbox checkbox-primary" style="margin-left: 20px">                        <input type="checkbox" id="cblayer{{layer.id}}" ng-model="layer.enabled" data-ng-click="vm.toggleLayer(layer);">                        <label for="cblayer{{layer.id}}">                            {{layer.title}}                        </label>                    </div>                    <div ng-show="group.oneLayerActive" class="radio radio-primary" style="margin-left: 20px">                        <input type="radio" ng-value="true" id="rblayer{{layer.id}}" ng-model="layer.enabled" data-ng-click="vm.toggleLayer(layer);">                        <label for="rblayer{{layer.id}}">                            {{layer.title}}                        </label>                    </div>                </div>            </div>        </div>    </div></div>';
-})(LayersDirective || (LayersDirective = {}));
-var LayersDirective;
-(function (LayersDirective) {
+var StyleList;
+(function (StyleList) {
+    StyleList.html = '<div>    <h4 class="leftpanel-header" translate="STYLES"></h4>    <div ng-show="vm.$layerService.noStyles" translate="STYLE_INFO"></div>    <div data-ng-repeat="group in vm.$layerService.project.groups" style="margin-left: 5px">        <div ng-show="group.styles.length">            <div style="float:left;margin-left: -10px; margin-top: 5px" data-toggle="collapse" data-target="#stylegroup_{{group.id}}"><i class="fa fa-chevron-down togglebutton toggle-arrow-down"></i><i class="fa fa-chevron-up togglebutton toggle-arrow-up"></i></div>            <div class="group-title">{{group.title}}</div>            <div id="stylegroup_{{group.id}}" class="collapse in">                <div data-ng-repeat="style in group.styles">                    <div class="checkbox checkbox-primary" style="margin-left:20px;float:left">                        <input type="checkbox" id="cbstyle{{style.id}}" ng-model="style.enabled" data-ng-change="vm.$layerService.updateStyle(style);">                        <label class="style-title" for="cbstyle{{style.id}}" style="width:175px">{{style.title}}</label>                    </div>                    <div style="float:right;margin-top:10px; width: 50px">                        <div data-ng-show="style.canSelectColor" style="float:left">                            <div class="dropdown">                                <div class="style-settings" data-toggle="dropdown">                                    <style>                                                                             </style>                                    <!--<img src="includes/images/fillcolor.png" style="width: 32px; height:32px" />-->                                    <div id="colors" style="border-radius: 50%;width: 20px;height:20px;border-style:solid;border-color: black;border-width: 1px;background: linear-gradient(to right, {{style.colors[0]}} , {{style.colors[1]}})">                                                                        </div>                                    <b class="caret"></b>                                </div>                                <!--<a class="btn btn-primary btn-sm" ng-model="style.visualAspect"  style="padding-left: 10px" href="#"> {{ style.visualAspect }} </a>-->                                <ul class="dropdown-menu" role="menu">                                    <li ng-repeat="(key,val) in style.colorScales" style="margin:3px;cursor: pointer">                                        <span ng-click="$parent.style.colors = val;vm.$layerService.updateStyle($parent.style)"> {{key}} </span>                                    </li>                                </ul>                            </div>                        </div>                        <div style="float:right">                            <div class="dropdown">                                <div class="style-settings" data-toggle="dropdown">                                    <!--<img src="includes/images/fillcolor.png" style="width: 32px; height:32px" />-->                                    <div class="style-aspect style-{{style.visualAspect}}"></div><b class="caret"></b>                                </div>                                <!--<a class="btn btn-primary btn-sm" ng-model="style.visualAspect"  style="padding-left: 10px" href="#"> {{ style.visualAspect }} </a>-->                                <ul class="dropdown-menu" role="menu">                                    <li ng-repeat="title in style.availableAspects" style="margin:3px;cursor: pointer">                                        <i class="style-aspect style-{{title}}" style="float:left" /><span ng-click="$parent.style.visualAspect = title;vm.$layerService.updateStyle($parent.style)"><img class="fa fa-search" style="margin-right: 8px" /> {{title}} </span>                                    </li>                                    <li class="divider"></li>                                    <li style="margin:3px;cursor: pointer"><i class="fa fa-remove" style="margin-right: 8px" style=" float:left" /><span ng-click="vm.$layerService.removeStyle(style)">Verwijder</span></li>                                </ul>                            </div>                        </div>                    </div>                </div>                <!--<div style="right:5px; position:absolute; margin-top: -15px"><a href="#" id="stylepop{{style.id}}" rel="popover" popover-template="template.html"><img src="includes/images/settings.png" width="20px"></a></div>-->            </div>        </div>    </div></div>';
+})(StyleList || (StyleList = {}));
+var StyleList;
+(function (StyleList) {
     /**
     * Config
     */
-    var moduleName = 'csWeb.layersDirective';
+    var moduleName = 'csWeb.styleList';
 
     /**
     * Module
     */
-    LayersDirective.myModule;
+    StyleList.myModule;
     try  {
-        LayersDirective.myModule = angular.module(moduleName);
+        StyleList.myModule = angular.module(moduleName);
     } catch (err) {
         // named module does not exist, so create one
-        LayersDirective.myModule = angular.module(moduleName, []);
+        StyleList.myModule = angular.module(moduleName, []);
     }
 
     /**
     * Directive to display the available map layers.
     */
-    LayersDirective.myModule.directive('layersDirective', [
+    StyleList.myModule.directive('styleList', [
+        '$window', '$compile',
+        function ($window, $compile) {
+            return {
+                terminal: false,
+                restrict: 'E',
+                scope: {},
+                template: StyleList.html,
+                //compile             : el          => {    // I need to explicitly compile it in order to use interpolation like {{xxx}}
+                //    var fn                        = $compile(el);
+                //    return scope                  => {
+                //        fn(scope);
+                //    };
+                //},
+                link: function (scope, element, attrs) {
+                    // Deal with resizing the element list
+                    scope.onResizeFunction = function () {
+                        var filterHeight = 50;
+                        var paginationCtrlHeight = 100;
+                        var itemHeight = 60;
+
+                        //scope.windowHeight          = $window.innerHeight;
+                        //scope.windowWidth           = $window.innerWidth;
+                        scope.numberOfItems = Math.floor(($window.innerHeight - filterHeight - paginationCtrlHeight) / itemHeight);
+                    };
+
+                    // Call to the function when the page is first loaded
+                    scope.onResizeFunction();
+
+                    angular.element($window).bind('resize', function () {
+                        scope.onResizeFunction();
+                        scope.$apply();
+                    });
+                },
+                replace: true,
+                transclude: true,
+                controller: StyleList.StyleListCtrl
+            };
+        }
+    ]).directive('bsPopover', function () {
+        return function (scope, element, attrs) {
+            element.find("a[rel=popover]").popover({ placement: 'right', html: 'true' });
+        };
+    });
+})(StyleList || (StyleList = {}));
+var StyleList;
+(function (StyleList) {
+    var StyleListCtrl = (function () {
+        // dependencies are injected via AngularJS $injector
+        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
+        function StyleListCtrl($scope, $layerService) {
+            this.$scope = $scope;
+            this.$layerService = $layerService;
+            $scope.vm = this;
+        }
+        StyleListCtrl.$inject = [
+            '$scope',
+            'layerService'
+        ];
+        return StyleListCtrl;
+    })();
+    StyleList.StyleListCtrl = StyleListCtrl;
+})(StyleList || (StyleList = {}));
+var Timeline;
+(function (Timeline) {
+    Timeline.html = '<div>    <style>    #timeline {        position:absolute;bottom:0;height:100px;width:100%;background: white    }         .callout.top::before {left: 45%;bottom: -20px;border-top: 10px solid #444;}.callout::before {content: "";width: 0px;height: 0px;border: 0.8em solid transparent;position: absolute;}#focustimeContainer {    width: 150px;    cursor: e-resize;height: 50px;background: #444;right: 200px;bottom: 105px;    color: white;position: absolute;    z-index: 1000;/* float: right; */display: block;}    </style>    <div>        <div id="timelinecontainer">            <div id="timeline"></div>                    </div>        <div class="callout top" id="focustimeContainer">            <div style="text-align: center">                <span style="font-weight: bold">{{vm.focusDate | date:"MM/dd/yyyy"}}</span><br />                <span>{{vm.focusDate | date:"h:mma"}}</span>            </div>        </div>    </div></div>';
+})(Timeline || (Timeline = {}));
+var Timeline;
+(function (Timeline) {
+    /**
+    * Config
+    */
+    var moduleName = 'csWeb.timeline';
+
+    /**
+    * Module
+    */
+    Timeline.myModule;
+    try  {
+        Timeline.myModule = angular.module(moduleName);
+    } catch (err) {
+        // named module does not exist, so create one
+        Timeline.myModule = angular.module(moduleName, []);
+    }
+
+    /**
+    * Directive to display the available map layers.
+    */
+    Timeline.myModule.directive('timeline', [
         '$compile',
         function ($compile) {
             return {
                 terminal: true,
                 restrict: 'E',
                 scope: {},
-                template: LayersDirective.html,
+                template: Timeline.html,
                 compile: function (el) {
                     var fn = $compile(el);
                     return function (scope) {
@@ -2161,165 +3001,550 @@ var LayersDirective;
                 },
                 replace: true,
                 transclude: true,
-                controller: LayersDirective.LayersDirectiveCtrl
+                controller: Timeline.TimelineCtrl
             };
         }
-    ]).directive('bsPopover', function () {
-        return function (scope, element, attrs) {
-            element.find("a[rel=popover]").popover({ placement: 'right', html: 'true' });
-        };
-    });
-})(LayersDirective || (LayersDirective = {}));
-var LayersDirective;
-(function (LayersDirective) {
-    var LayersDirectiveCtrl = (function () {
+    ]);
+})(Timeline || (Timeline = {}));
+var Timeline;
+(function (Timeline) {
+    var TimelineCtrl = (function () {
         // dependencies are injected via AngularJS $injector
         // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
-        function LayersDirectiveCtrl($scope, $layerService) {
+        function TimelineCtrl($scope, $layerService, $mapService, $messageBusService) {
+            var _this = this;
             this.$scope = $scope;
             this.$layerService = $layerService;
+            this.$mapService = $mapService;
+            this.$messageBusService = $messageBusService;
             $scope.vm = this;
-        }
-        LayersDirectiveCtrl.prototype.toggleLayer = function (layer) {
-            layer.enabled = !layer.enabled;
-            if (layer.enabled) {
-                this.$layerService.addLayer(layer);
-            } else {
-                this.$layerService.removeLayer(layer);
-            }
 
-            // NOTE EV: You need to call apply only when an event is received outside the angular scope.
-            // However, make sure you are not calling this inside an angular apply cycle, as it will generate an error.
-            if (this.$scope.$root.$$phase != '$apply' && this.$scope.$root.$$phase != '$digest') {
-                this.$scope.$apply();
-            }
+            //$scope.focusDate = $layerService.project.timeLine.focusDate();
+            // Options voor de timeline
+            var options = {
+                'width': '100%',
+                'height': '100px',
+                'editable': false,
+                'layout': 'box'
+            };
+
+            $scope.timeline = new links.Timeline(document.getElementById('timeline'), options);
+            this.$layerService.timeline = $scope.timeline;
+
+            $scope.timeline.draw();
+            links.events.addListener($scope.timeline, 'rangechange', _.throttle(function (prop) {
+                return _this.onRangeChanged(prop);
+            }, 200));
+            $("#focustimeContainer").draggable({
+                axis: "x",
+                containment: "parent",
+                drag: _.throttle(function () {
+                    return _this.updateFocusTime();
+                }, 200)
+            });
+
+            this.updateFocusTime();
+        }
+        TimelineCtrl.prototype.onRangeChanged = function (properties) {
+            this.updateFocusTime();
         };
-        LayersDirectiveCtrl.$inject = [
+
+        TimelineCtrl.prototype.updateFocusTime = function () {
+            var tc1 = $("#focustimeContainer").offset().left;
+            var tc2 = $("#timelinecontainer").offset().left - 15;
+            var centerX = tc1 - tc2 + $("#focustimeContainer").width() / 2;
+            var end = $("#timeline").width;
+
+            this.focusDate = new Date(this.$scope.timeline.screenToTime(centerX));
+            this.startDate = new Date(this.$scope.timeline.screenToTime(0));
+            this.endDate = new Date(this.$scope.timeline.screenToTime(end));
+
+            if (this.$layerService.project != null && this.$layerService.project.timeLine != null) {
+                this.$layerService.project.timeLine.setFocus(this.focusDate, this.startDate, this.endDate);
+            }
+            this.$messageBusService.publish("timeline", "focusChange", this.focusDate);
+            //this.$layerService.focusTime = new Date(this.timelineCtrl.screenToTime(centerX));
+            //this.$scope.$apply();
+        };
+        TimelineCtrl.$inject = [
             '$scope',
-            'layerService'
+            'layerService',
+            'mapService',
+            'messageBusService'
         ];
-        return LayersDirectiveCtrl;
+        return TimelineCtrl;
     })();
-    LayersDirective.LayersDirectiveCtrl = LayersDirectiveCtrl;
-})(LayersDirective || (LayersDirective = {}));
+    Timeline.TimelineCtrl = TimelineCtrl;
+})(Timeline || (Timeline = {}));
+var csComp;
+(function (csComp) {
+    (function (Helpers) {
+        function supportsDataUri() {
+            var isOldIE = navigator.appName === "Microsoft Internet Explorer";
+            var isIE11 = !!navigator.userAgent.match(/Trident\/7\./);
+            return !(isOldIE || isIE11);
+        }
+        Helpers.supportsDataUri = supportsDataUri;
+
+        /**
+        * Convert a property value to a display value using the property info.
+        */
+        function convertPropertyInfo(pt, text) {
+            var displayValue;
+            if (!csComp.StringExt.isNullOrEmpty(text) && !$.isNumeric(text))
+                text = text.replace(/&amp;/g, '&');
+            if (csComp.StringExt.isNullOrEmpty(text))
+                return '';
+            switch (pt.type) {
+                case "bbcode":
+                    if (!csComp.StringExt.isNullOrEmpty(pt.stringFormat))
+                        text = String.format(pt.stringFormat, text);
+                    displayValue = XBBCODE.process({ text: text }).html;
+                    break;
+                case "number":
+                    if (!$.isNumeric(text))
+                        displayValue = text;
+                    else if (csComp.StringExt.isNullOrEmpty(pt.stringFormat))
+                        displayValue = text.toString();
+                    else
+                        displayValue = String.format(pt.stringFormat, parseFloat(text));
+                    break;
+                case "rank":
+                    var rank = text.split(',');
+                    if (rank.length != 2)
+                        return text;
+                    if (pt.stringFormat)
+                        displayValue = String.format(pt.stringFormat, rank[0], rank[1]);
+                    else
+                        displayValue = String.format("{0) / {1}", rank[0], rank[1]);
+                    break;
+                default:
+                    displayValue = text;
+                    break;
+            }
+            return displayValue;
+        }
+        Helpers.convertPropertyInfo = convertPropertyInfo;
+
+        function getGuid() {
+            var guid = (this.S4() + this.S4() + "-" + this.S4() + "-4" + this.S4().substr(0, 3) + "-" + this.S4() + "-" + this.S4() + this.S4() + this.S4()).toLowerCase();
+            return guid;
+        }
+        Helpers.getGuid = getGuid;
+
+        function S4() {
+            return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+        }
+        Helpers.S4 = S4;
+    })(csComp.Helpers || (csComp.Helpers = {}));
+    var Helpers = csComp.Helpers;
+})(csComp || (csComp = {}));
 var csComp;
 (function (csComp) {
     (function (Services) {
-        var SolutionProject = (function () {
-            function SolutionProject() {
-            }
-            return SolutionProject;
-        })();
-        Services.SolutionProject = SolutionProject;
-
         
 
+        // Handle returned when subscribing to a topic
+        var MessageBusHandle = (function () {
+            function MessageBusHandle(topic, callback) {
+                this.topic = topic;
+                this.callback = callback;
+            }
+            return MessageBusHandle;
+        })();
+        Services.MessageBusHandle = MessageBusHandle;
+
         /**
-        * Represents to the overall projects class.
+        * Simple message bus service, used for subscribing and unsubsubscribing to topics.
+        * @see {@link https://gist.github.com/floatingmonkey/3384419}
         */
-        var Solution = (function () {
-            function Solution() {
+        var MessageBusService = (function () {
+            function MessageBusService() {
+                PNotify.prototype.options.styling = "fontawesome";
             }
-            return Solution;
-        })();
-        Services.Solution = Solution;
+            /**
+            * Publish a notification
+            * @title: the title of the notification
+            * @text:  the contents of the notification
+            */
+            MessageBusService.prototype.notify = function (title, text) {
+                var options = {
+                    title: title,
+                    text: text,
+                    icon: 'fa fa-info',
+                    cornerclass: 'ui-pnotify-sharp',
+                    addclass: "stack-bottomright",
+                    stack: { "dir1": "up", "dir2": "left", "firstpos1": 25, "firstpos2": 25 }
+                };
 
-        var Project = (function () {
-            function Project() {
-                this.markers = {};
-            }
-            Project.prototype.deserialize = function (input) {
-                this.viewBounds = input.viewBounds;
-                this.title = input.title;
-                this.description = input.description;
-                this.logo = input.logo;
-                this.markers = input.markers;
-                this.startposition = input.startposition;
-                this.features = input.features;
-                this.featureTypes = input.featureTypes;
-                this.metaInfoData = input.metaInfoData;
-                this.groups = input.groups;
-                this.mcas = [];
-                for (var mca in input.mcas) {
-                    this.mcas.push(new Mca.Models.Mca().deserialize(mca));
-                }
-                return this;
+                var pn = new PNotify(options);
             };
-            return Project;
-        })();
-        Services.Project = Project;
 
-        var PropertyInfo = (function () {
-            function PropertyInfo() {
+            /**
+            * Show a confirm dialog
+            * @title           : the title of the notification
+            * @text            : the contents of the notification
+            * @callback        : the callback that will be called after the confirmation has been answered.
+            */
+            MessageBusService.prototype.confirm = function (title, text, callback) {
+                var options = {
+                    title: title,
+                    text: text,
+                    hide: false,
+                    confirm: {
+                        confirm: true
+                    },
+                    buttons: {
+                        closer: false,
+                        sticker: false
+                    },
+                    history: {
+                        history: false
+                    },
+                    icon: 'fa fa-question-circle',
+                    cornerclass: 'ui-pnotify-sharp',
+                    addclass: "stack-topright",
+                    stack: { "dir1": "down", "dir2": "left", "firstpos1": 25, "firstpos2": 25 }
+                };
+
+                var pn = new PNotify(options).get().on('pnotify.confirm', function () {
+                    callback(true);
+                }).on('pnotify.cancel', function () {
+                    callback(false);
+                });
+            };
+
+            MessageBusService.prototype.notifyBottom = function (title, text) {
+                var stack_bar_bottom = { "dir1": "up", "dir2": "right", "spacing1": 0, "spacing2": 0 };
+                var options = {
+                    title: "Over Here",
+                    text: "Check me out. I'm in a different stack.",
+                    addclass: "stack-bar-bottom",
+                    cornerclass: "",
+                    width: "70%",
+                    stack: stack_bar_bottom
+                };
+                var pn = new PNotify(options);
+            };
+
+            /**
+            * Publish a notification
+            * @title: the title of the notification
+            * @text:  the contents of the notification
+            */
+            MessageBusService.prototype.notifyData = function (data) {
+                var pn = new PNotify(data);
+                //this.publish("notify", "", data);
+            };
+
+            /**
+            * Publish to a topic
+            */
+            MessageBusService.prototype.publish = function (topic, title, data) {
+                //window.console.log("publish: " + topic + ", " + title);
+                if (!MessageBusService.cache[topic])
+                    return;
+                MessageBusService.cache[topic].forEach(function (cb) {
+                    return cb(title, data);
+                });
+            };
+
+            //public publish(topic: string, title: string, data?: any): void {
+            //	MessageBusService.publish(topic, title, data);
+            //}
+            /**
+            * Subscribe to a topic
+            * @param {string} topic The desired topic of the message.
+            * @param {IMessageBusCallback} callback The callback to call.
+            */
+            MessageBusService.prototype.subscribe = function (topic, callback) {
+                if (!MessageBusService.cache[topic])
+                    MessageBusService.cache[topic] = new Array();
+                MessageBusService.cache[topic].push(callback);
+                return new MessageBusHandle(topic, callback);
+            };
+
+            //public subscribe(topic: string, callback: IMessageBusCallback): MessageBusHandle {
+            //	return MessageBusService.subscribe(topic, callback);
+            //}
+            /**
+            * Unsubscribe to a topic by providing its handle
+            */
+            MessageBusService.prototype.unsubscribe = function (handle) {
+                var topic = handle.topic;
+                var callback = handle.callback;
+                if (!MessageBusService.cache[topic])
+                    return;
+                MessageBusService.cache[topic].forEach(function (cb, idx) {
+                    if (cb == callback) {
+                        MessageBusService.cache[topic].splice(idx, 1);
+                        return;
+                    }
+                });
+            };
+            MessageBusService.cache = {};
+            return MessageBusService;
+        })();
+        Services.MessageBusService = MessageBusService;
+
+        var EventObj = (function () {
+            function EventObj() {
             }
-            return PropertyInfo;
-        })();
-        Services.PropertyInfo = PropertyInfo;
+            // Events primitives ======================
+            EventObj.prototype.bind = function (event, fct) {
+                this.myEvents = this.myEvents || {};
+                this.myEvents[event] = this.myEvents[event] || [];
+                this.myEvents[event].push(fct);
+            };
+            EventObj.prototype.unbind = function (event, fct) {
+                this.myEvents = this.myEvents || {};
+                if (event in this.myEvents === false)
+                    return;
+                this.myEvents[event].splice(this.myEvents[event].indexOf(fct), 1);
+            };
+            EventObj.prototype.unbindEvent = function (event) {
+                this.myEvents = this.myEvents || {};
+                this.myEvents[event] = [];
+            };
+            EventObj.prototype.unbindAll = function () {
+                this.myEvents = this.myEvents || {};
+                for (var event in this.myEvents)
+                    this.myEvents[event] = false;
+            };
+            EventObj.prototype.trigger = function (event) {
+                var args = [];
+                for (var _i = 0; _i < (arguments.length - 1); _i++) {
+                    args[_i] = arguments[_i + 1];
+                }
+                this.myEvents = this.myEvents || {};
+                if (event in this.myEvents === false)
+                    return;
+                for (var i = 0; i < this.myEvents[event].length; i++) {
+                    this.myEvents[event][i].apply(this, Array.prototype.slice.call(arguments, 1));
+                }
+            };
+            EventObj.prototype.registerEvent = function (evtname) {
+                this[evtname] = function (callback, replace) {
+                    if (typeof callback == 'function') {
+                        if (replace)
+                            this.unbindEvent(evtname);
 
-        var ProjectLayer = (function () {
-            function ProjectLayer() {
-            }
-            return ProjectLayer;
-        })();
-        Services.ProjectLayer = ProjectLayer;
+                        this.bind(evtname, callback);
+                    }
 
-        var GroupFilter = (function () {
-            function GroupFilter() {
-            }
-            return GroupFilter;
-        })();
-        Services.GroupFilter = GroupFilter;
-
-        var GroupStyle = (function () {
-            function GroupStyle($translate) {
+                    return this;
+                };
+            };
+            EventObj.prototype.registerEvents = function (evtnames) {
                 var _this = this;
-                this.availableAspects = ["strokeColor", "fillColor", "strokeWidth"];
-                this.colorScales = {};
-
-                $translate('WHITE_RED').then(function (translation) {
-                    _this.colorScales[translation] = ["white", "red"];
+                evtnames.forEach(function (evtname) {
+                    _this.registerEvent(evtname);
                 });
-                $translate('RED_WHITE').then(function (translation) {
-                    _this.colorScales[translation] = ["red", "white"];
-                });
-                $translate('GREEN_RED').then(function (translation) {
-                    _this.colorScales[translation] = ["green", "red"];
-                });
-                $translate('RED_GREEN').then(function (translation) {
-                    _this.colorScales[translation] = ["red", "green"];
-                });
-                $translate('WHITE_BLUE').then(function (translation) {
-                    _this.colorScales[translation] = ["white", "blue"];
-                });
-                $translate('BLUE_WHITE').then(function (translation) {
-                    _this.colorScales[translation] = ["blue", "white"];
-                });
-                $translate('WHITE_GREEN').then(function (translation) {
-                    _this.colorScales[translation] = ["white", "green"];
-                });
-                $translate('GREEN_WHITE').then(function (translation) {
-                    _this.colorScales[translation] = ["green", "white"];
-                });
-                $translate('WHITE_ORANGE').then(function (translation) {
-                    _this.colorScales[translation] = ["white", "orange"];
-                });
-                $translate('ORANGE_WHITE').then(function (translation) {
-                    _this.colorScales[translation] = ["orange", "white"];
-                });
-            }
-            return GroupStyle;
+            };
+            return EventObj;
         })();
-        Services.GroupStyle = GroupStyle;
-
-        var ProjectGroup = (function () {
-            function ProjectGroup() {
+        Services.EventObj = EventObj;
+    })(csComp.Services || (csComp.Services = {}));
+    var Services = csComp.Services;
+})(csComp || (csComp = {}));
+var csComp;
+(function (csComp) {
+    (function (Helpers) {
+        var PieData = (function () {
+            function PieData() {
             }
-            return ProjectGroup;
+            return PieData;
         })();
-        Services.ProjectGroup = ProjectGroup;
+        Helpers.PieData = PieData;
+
+        var AsterPieData = (function (_super) {
+            __extends(AsterPieData, _super);
+            function AsterPieData() {
+                _super.apply(this, arguments);
+            }
+            return AsterPieData;
+        })(PieData);
+        Helpers.AsterPieData = AsterPieData;
+
+        var Plot = (function () {
+            function Plot() {
+            }
+            /**
+            * Draw a Pie chart.
+            */
+            Plot.drawPie = function (pieRadius, data, parentId, colorScale, svgId) {
+                if (typeof parentId === "undefined") { parentId = 'mcaPieChart'; }
+                if (typeof colorScale === "undefined") { colorScale = 'Reds'; }
+                if (typeof svgId === "undefined") { svgId = 'the_SVG_ID'; }
+                Plot.clearSvg(svgId);
+
+                if (!data)
+                    return;
+
+                var width = pieRadius, height = pieRadius, radius = Math.min(width, height) / 2, innerRadius = 0;
+
+                var pie = d3.layout.pie().sort(null).value(function (d) {
+                    return d.weight;
+                });
+
+                var tip = d3.tip().attr('class', 'd3-tip').offset([0, 0]).html(function (d) {
+                    return '<strong>' + d.data.label + ": </strong><span style='color:orangered'>" + Math.round(d.data.weight * 100) + "%</span>";
+                });
+
+                var arc = d3.svg.arc().innerRadius(innerRadius).outerRadius(radius);
+
+                var outlineArc = d3.svg.arc().innerRadius(innerRadius).outerRadius(radius);
+
+                var svg = d3.select('#' + parentId).append("svg").attr("id", svgId).attr("width", width).attr("height", height).append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+                svg.call(tip);
+
+                var colors = chroma.scale(colorScale).domain([0, data.length - 1], data.length);
+                var path = svg.selectAll(".solidArc").data(pie(data)).enter().append("path").attr("fill", function (d, i) {
+                    return d.data.color || colors(i).hex();
+                }).attr("class", "solidArc").attr("stroke", "gray").attr("d", arc).on('mouseover', function (d, i) {
+                    tip.show(d, i);
+                }).on('mouseout', tip.hide);
+
+                var outerPath = svg.selectAll(".outlineArc").data(pie(data)).enter().append("path").attr("fill", "none").attr("stroke", "gray").attr("class", "outlineArc").attr("d", outlineArc);
+            };
+
+            /**
+            * Draw an Aster Pie chart, i.e. a pie chart with varying radius depending on the score, where the maximum score of 100 equals the pie radius.
+            * See http://bl.ocks.org/bbest/2de0e25d4840c68f2db1
+            */
+            Plot.drawAsterPlot = function (pieRadius, data, parentId, colorScale, svgId) {
+                if (typeof parentId === "undefined") { parentId = 'mcaPieChart'; }
+                if (typeof colorScale === "undefined") { colorScale = 'Reds'; }
+                if (typeof svgId === "undefined") { svgId = 'the_SVG_ID'; }
+                Plot.clearSvg(svgId);
+
+                if (!data)
+                    return;
+
+                var width = pieRadius, height = pieRadius, radius = Math.min(width, height) / 2, innerRadius = 0.3 * radius;
+
+                var pie = d3.layout.pie().sort(null).value(function (d) {
+                    return d.weight;
+                });
+
+                var tip = d3.tip().attr('class', 'd3-tip').offset([0, 0]).html(function (d) {
+                    return '<strong>' + d.data.label + ": </strong> <span style='color:orangered'>" + Math.round(d.data.weight * 100) + "% x " + Math.round(d.data.score) + "&nbsp; = " + Math.round(d.data.weight * d.data.score) + "</span>";
+                });
+
+                var arc = d3.svg.arc().innerRadius(innerRadius).outerRadius(function (d) {
+                    return (radius - innerRadius) * (d.data.score / 100.0) + innerRadius;
+                });
+
+                var outlineArc = d3.svg.arc().innerRadius(innerRadius).outerRadius(radius);
+
+                var svg = d3.select('#' + parentId).append("svg").attr("id", svgId).attr("width", width).attr("height", height).append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+                try  {
+                    svg.call(tip);
+                } catch (err) {
+                    console.log("Error: " + err.message);
+                }
+
+                var colors = chroma.scale(colorScale).domain([0, data.length - 1], data.length);
+                var path = svg.selectAll(".solidArc").data(pie(data)).enter().append("path").attr("fill", function (d, i) {
+                    return d.data.color || colors(i).hex();
+                }).attr("class", "solidArc").attr("stroke", "gray").attr("d", arc).on('mouseover', function (d, i) {
+                    tip.show(d, i);
+                    //$rootScope.$broadcast('tooltipShown', { id: d.data.id });
+                }).on('mouseout', tip.hide);
+
+                var outerPath = svg.selectAll(".outlineArc").data(pie(data)).enter().append("path").attr("fill", "none").attr("stroke", "gray").attr("class", "outlineArc").attr("d", outlineArc);
+
+                // calculate the weighted mean score
+                var totalWeight = 0;
+                var totalScore = 0;
+                data.forEach(function (p) {
+                    totalWeight += p.weight;
+                    totalScore += p.weight * p.score;
+                });
+
+                svg.append("svg:text").attr("class", "aster-score").attr("dy", ".35em").attr("text-anchor", "middle").text(Math.round(totalScore / totalWeight));
+            };
+
+            Plot.clearSvg = function (svgId) {
+                var svgElement = d3.select('#' + svgId);
+                if (svgElement)
+                    svgElement.remove();
+            };
+            Plot.pieColors = ["#fff7ec", "#fee8c8", "#fdd49e", "#fdbb84", "#fc8d59", "#ef6548", "#d7301f", "#b30000", "#7f0000"];
+            return Plot;
+        })();
+        Helpers.Plot = Plot;
+    })(csComp.Helpers || (csComp.Helpers = {}));
+    var Helpers = csComp.Helpers;
+})(csComp || (csComp = {}));
+var csComp;
+(function (csComp) {
+    (function (StringExt) {
+        function isNullOrEmpty(s) {
+            return !s;
+        }
+        StringExt.isNullOrEmpty = isNullOrEmpty;
+
+        /**
+        * String formatting
+        * 'Added {0} by {1} to your collection'.f(title, artist)
+        * 'Your balance is {0} USD'.f(77.7)
+        */
+        function format(s) {
+            var args = [];
+            for (var _i = 0; _i < (arguments.length - 1); _i++) {
+                args[_i] = arguments[_i + 1];
+            }
+            var i = args.length;
+
+            while (i--) {
+                // "gm" = RegEx options for Global search (more than one instance) and for Multiline search
+                s = s.replace(new RegExp('\\{' + i + '\\}', 'gm'), args[i]);
+            }
+            return s;
+        }
+        StringExt.format = format;
+        ;
+
+        /*
+        * Returns true if we are dealing with a number, false otherwise.
+        */
+        function isNumber(n) {
+            return !isNaN(parseFloat(n)) && isFinite(n);
+        }
+        StringExt.isNumber = isNumber;
+
+        /*
+        * Returns true if we are dealing with a boolean, false otherwise.
+        */
+        function isBoolean(s) {
+            return s === 'true' || s === 'false';
+        }
+        StringExt.isBoolean = isBoolean;
+
+        /*
+        * Returns true if we are dealing with a bbcode, false otherwise.
+        */
+        function isBbcode(s) {
+            return false;
+            if (s == null)
+                return false;
+            return s.indexOf("[b]") > 0 || s.indexOf("[i]") > 0 || s.indexOf("[url") > 0;
+        }
+        StringExt.isBbcode = isBbcode;
+    })(csComp.StringExt || (csComp.StringExt = {}));
+    var StringExt = csComp.StringExt;
+})(csComp || (csComp = {}));
+var csComp;
+(function (csComp) {
+    (function (Services) {
+        'use strict';
 
         var LayerService = (function () {
             function LayerService($location, $translate, $messageBusService, $mapService) {
+                var _this = this;
                 this.$location = $location;
                 this.$translate = $translate;
                 this.$messageBusService = $messageBusService;
@@ -2334,10 +3559,52 @@ var csComp;
                 this.title = "";
                 this.layerGroup = new L.LayerGroup();
                 this.featureTypes = {};
-                this.metaInfoData = {};
+                this.propertyTypeData = {};
                 this.map.map.addLayer(this.layerGroup);
                 this.noStyles = true;
+
+                this.$messageBusService.subscribe("timeline", function (trigger) {
+                    switch (trigger) {
+                        case "focusChange":
+                            _this.updateSensorData();
+                            break;
+                    }
+                });
             }
+            LayerService.prototype.updateSensorData = function () {
+                var _this = this;
+                if (this.project == null || this.project.timeLine == null)
+                    return;
+                var date = this.project.timeLine.focus;
+                var timepos = {};
+                this.project.features.forEach(function (f) {
+                    var l = _this.findLayer(f.layerId);
+
+                    if (l != null) {
+                        if (!timepos.hasOwnProperty(f.layerId)) {
+                            for (var i = 1; i < l.timestamps.length; i++) {
+                                if (l.timestamps[i] > date) {
+                                    timepos[f.layerId] = i;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (f.sensors != null) {
+                            for (var sensorTitle in f.sensors) {
+                                var sensor = f.sensors[sensorTitle];
+                                var value = sensor[timepos[f.layerId]];
+
+                                //console.log(sensorTitle + ":" + value);
+                                f.properties[sensorTitle] = value;
+                            }
+                            _this.updateFeatureIcon(f, l);
+                        }
+                    }
+                });
+                this.$messageBusService.publish("feature", "onFeatureUpdated");
+            };
+
             /**
             * Add a layer
             */
@@ -2364,9 +3631,9 @@ var csComp;
                                         if (err)
                                             _this.$messageBusService.notify('ERROR loading' + layer.title, err);
                                         else {
-                                            if (dta.poiTypes)
-                                                for (var featureTypeName in dta.poiTypes) {
-                                                    var featureType = dta.poiTypes[featureTypeName];
+                                            if (dta.featureTypes)
+                                                for (var featureTypeName in dta.featureTypes) {
+                                                    var featureType = dta.featureTypes[featureTypeName];
                                                     featureTypeName = layer.id + '_' + featureTypeName;
                                                     _this.featureTypes[featureTypeName] = featureType;
                                                 }
@@ -2380,12 +3647,27 @@ var csComp;
                                     if (error)
                                         _this.$messageBusService.notify('ERROR loading' + layer.title, error);
                                     else {
-                                        for (var featureTypeName in data.poiTypes) {
-                                            var featureType = data.poiTypes[featureTypeName];
+                                        if (data.events && _this.timeline) {
+                                            layer.events = data.events;
+                                            var devents = [];
+                                            layer.events.forEach(function (e) {
+                                                if (!e.id)
+                                                    e.id = csComp.Helpers.getGuid();
+                                                devents.push({
+                                                    'start': new Date(e.start),
+                                                    'content': e.title
+                                                });
+                                            });
+                                            _this.timeline.draw(devents);
+                                        }
+
+                                        for (var featureTypeName in data.featureTypes) {
+                                            var featureType = data.featureTypes[featureTypeName];
                                             featureTypeName = layer.id + '_' + featureTypeName;
                                             _this.featureTypes[featureTypeName] = featureType;
-                                            var pt = "." + featureTypeName;
-                                            var icon = featureType.style.iconUri;
+
+                                            //var pt = "." + featureTypeName;
+                                            //var icon = featureType.style.iconUri;
                                             var t = "{\".style" + featureTypeName + "\":";
                                             if (featureType.style.iconUri != null) {
                                                 t += " { \"background\": \"url(" + featureType.style.iconUri + ") no-repeat right center\",";
@@ -2396,7 +3678,8 @@ var csComp;
                                             $.injectCSS(json);
                                             //console.log(JSON.stringify(poiType, null, 2));
                                         }
-
+                                        if (data.timestamps)
+                                            layer.timestamps = data.timestamps;
                                         if (layer.group.clustering) {
                                             var markers = L.geoJson(data, {
                                                 pointToLayer: function (feature, latlng) {
@@ -2711,7 +3994,7 @@ var csComp;
                  {
                     feature.isInitialized = true;
                     if (feature.id == null)
-                        feature.id = this.getGuid();
+                        feature.id = csComp.Helpers.getGuid();
                     feature.layerId = layer.id;
                     this.project.features.push(feature); // list of features
                     layer.group.ndx.add([feature]);
@@ -2754,10 +4037,16 @@ var csComp;
                     layer.group.styles.forEach(function (gs) {
                         if (gs.enabled && feature.properties.hasOwnProperty(gs.property)) {
                             var v = feature.properties[gs.property];
+
                             switch (gs.visualAspect) {
                                 case "fillColor":
-                                    var bezInterpolator = chroma.interpolate.bezier(gs.colors);
-                                    props["background-color"] = bezInterpolator((v - gs.info.sdMin) / (gs.info.sdMax - gs.info.sdMin)).hex();
+                                    if (gs.meta.type == "color") {
+                                        props["background-color"] = v;
+                                    } else {
+                                        var bezInterpolator = chroma.interpolate.bezier(gs.colors);
+                                        props["background-color"] = bezInterpolator((v - gs.info.sdMin) / (gs.info.sdMax - gs.info.sdMin)).hex();
+                                    }
+
                                     break;
                             }
                             //s.fillColor = this.getColor(feature.properties[layer.group.styleProperty], null);
@@ -2886,8 +4175,8 @@ var csComp;
                 if (f != null) {
                     this.noStyles = false;
                     var layer = this.findLayer(f.layerId);
-                    var gs = new GroupStyle(this.$translate);
-                    gs.id = this.getGuid();
+                    var gs = new Services.GroupStyle(this.$translate);
+                    gs.id = csComp.Helpers.getGuid();
                     gs.title = property.key;
                     gs.meta = property.meta;
                     gs.visualAspect = "fillColor";
@@ -2899,8 +4188,9 @@ var csComp;
 
                     gs.enabled = true;
                     gs.group = layer.group;
-
+                    gs.meta = property.meta;
                     var ft = this.getFeatureType(f);
+
                     if (ft.style && ft.style.fillColor) {
                         gs.colors = ['white', 'orange'];
                     } else {
@@ -2916,6 +4206,7 @@ var csComp;
                     } else {
                         this.updateStyle(gs);
                     }
+
                     if (openStyleTab)
                         $('#leftPanelTab a[href="#styles"]').tab('show'); // Select tab by name
                     return gs;
@@ -2938,7 +4229,7 @@ var csComp;
             LayerService.prototype.addFilter = function (group, prop) {
                 var filter = this.findFilter(group, prop);
                 if (filter == null) {
-                    var gf = new GroupFilter();
+                    var gf = new Services.GroupFilter();
                     gf.property = prop;
 
                     //gf.filterType = "row";
@@ -2966,7 +4257,7 @@ var csComp;
                     if (layer != null) {
                         var filter = this.findFilter(layer.group, prop);
                         if (filter == null) {
-                            var gf = new GroupFilter();
+                            var gf = new Services.GroupFilter();
                             gf.property = prop;
                             gf.meta = property.meta;
                             gf.filterType = "bar";
@@ -3022,10 +4313,10 @@ var csComp;
             * In case both fail, create a default feature type at the layer level.
             */
             LayerService.prototype.getFeatureType = function (feature) {
-                var projectFeatureTypeName = feature.properties['PoiTypeId'] || "Default";
+                var projectFeatureTypeName = feature.properties['FeatureTypeId'] || "Default";
                 var featureTypeName = feature.layerId + '_' + projectFeatureTypeName;
-                if (!(featureTypeName in this.featureTypes)) {
-                    if (projectFeatureTypeName in this.featureTypes)
+                if (!(this.featureTypes.hasOwnProperty(featureTypeName))) {
+                    if (this.featureTypes.hasOwnProperty(projectFeatureTypeName))
                         featureTypeName = projectFeatureTypeName;
                     else
                         this.featureTypes[featureTypeName] = this.createDefaultType(feature);
@@ -3040,26 +4331,26 @@ var csComp;
             LayerService.prototype.createDefaultType = function (feature) {
                 var type = {};
                 type.style = { nameLabel: "Name" };
-                type.metaInfoData = [];
+                type.propertyTypeData = [];
 
                 for (var key in feature.properties) {
-                    var metaInfo = [];
-                    metaInfo.label = key;
-                    metaInfo.title = key.replace("_", " ");
-                    metaInfo.isSearchable = true;
-                    metaInfo.visibleInCallOut = true;
-                    metaInfo.canEdit = false;
+                    var propertyType = [];
+                    propertyType.label = key;
+                    propertyType.title = key.replace("_", " ");
+                    propertyType.isSearchable = true;
+                    propertyType.visibleInCallOut = true;
+                    propertyType.canEdit = false;
                     var value = feature.properties[key];
                     if (csComp.StringExt.isNumber(value))
-                        metaInfo.type = "number";
+                        propertyType.type = "number";
                     else if (csComp.StringExt.isBoolean(value))
-                        metaInfo.type = "boolean";
+                        propertyType.type = "boolean";
                     else if (csComp.StringExt.isBbcode(value))
-                        metaInfo.type = "bbcode";
+                        propertyType.type = "bbcode";
                     else
-                        metaInfo.type = "text";
+                        propertyType.type = "text";
 
-                    type.metaInfoData.push(metaInfo);
+                    type.propertyTypeData.push(propertyType);
                 }
                 return type;
             };
@@ -3100,7 +4391,7 @@ var csComp;
             * deactivate layer
             */
             LayerService.prototype.removeLayer = function (layer) {
-                this.$messageBusService.publish("layer", "deactivating", layer);
+                this.$messageBusService.publish("layer", "deactivate", layer);
 
                 var m;
                 var g = layer.group;
@@ -3150,16 +4441,6 @@ var csComp;
                 }
 
                 this.rebuildFilters(g);
-                this.$messageBusService.publish("layer", "deactivate", layer);
-            };
-
-            LayerService.prototype.S4 = function () {
-                return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
-            };
-
-            LayerService.prototype.getGuid = function () {
-                var guid = (this.S4() + this.S4() + "-" + this.S4() + "-4" + this.S4().substr(0, 3) + "-" + this.S4() + "-" + this.S4() + this.S4() + this.S4()).toLowerCase();
-                return guid;
             };
 
             /***
@@ -3239,7 +4520,11 @@ var csComp;
                 this.featureTypes = {};
 
                 $.getJSON(url, function (data) {
-                    _this.project = new Project().deserialize(data);
+                    _this.project = data;
+
+                    if (!_this.project.timeLine) {
+                        _this.project.timeLine = new Services.DateRange();
+                    }
 
                     if (_this.project.viewBounds) {
                         _this.$mapService.map.fitBounds(new L.LatLngBounds(_this.project.viewBounds.southWest, _this.project.viewBounds.northEast));
@@ -3252,18 +4537,28 @@ var csComp;
                         }
                     }
 
-                    if (_this.project.metaInfoData) {
-                        for (var key in _this.project.metaInfoData) {
-                            var metaInfo = _this.project.metaInfoData[key];
-                            _this.metaInfoData[key] = metaInfo;
+                    if (_this.project.propertyTypeData) {
+                        for (var key in _this.project.propertyTypeData) {
+                            var propertyType = _this.project.propertyTypeData[key];
+                            _this.propertyTypeData[key] = propertyType;
                         }
                     }
+
+                    if (!_this.project.dashboards) {
+                        _this.project.dashboards = {};
+                        var d = new csComp.Services.Dashboard("1", _this.project.title);
+                        d.widgets = [];
+                        _this.project.dashboards[_this.project.title] = d;
+                    }
+
+                    if (!_this.project.dataSets)
+                        _this.project.dataSets = [];
 
                     _this.project.features = [];
 
                     _this.project.groups.forEach(function (group) {
                         if (group.id == null)
-                            group.id = _this.getGuid();
+                            group.id = csComp.Helpers.getGuid();
                         group.ndx = crossfilter([]);
                         if (group.styles == null)
                             group.styles = [];
@@ -3283,7 +4578,7 @@ var csComp;
                         }
                         group.layers.forEach(function (layer) {
                             if (layer.reference == null)
-                                layer.reference = _this.getGuid();
+                                layer.reference = csComp.Helpers.getGuid();
                             layer.group = group;
                             if (layer.enabled || layerIds.indexOf(layer.reference.toLowerCase()) >= 0) {
                                 layer.enabled = true;
@@ -3293,12 +4588,12 @@ var csComp;
 
                         group.styles.forEach(function (style) {
                             if (style.id != null)
-                                style.id = _this.getGuid();
+                                style.id = csComp.Helpers.getGuid();
                         });
 
                         group.filters.forEach(function (filter) {
                             if (filter.id != null)
-                                filter.id = _this.getGuid();
+                                filter.id = csComp.Helpers.getGuid();
                         });
 
                         if (data.startposition)
@@ -3320,7 +4615,7 @@ var csComp;
             */
             LayerService.prototype.calculatePropertyInfo = function (group, property) {
                 var _this = this;
-                var r = new PropertyInfo();
+                var r = new Services.PropertyInfo();
                 r.count = 0;
                 var sum = 0;
                 var sumsq = 0;
@@ -3357,8 +4652,8 @@ var csComp;
                     r.sdMin = r.min;
                 if (r.sdMax == NaN)
                     r.sdMax = r.max;
-                if (this.metaInfoData.hasOwnProperty(property)) {
-                    var mid = this.metaInfoData[property];
+                if (this.propertyTypeData.hasOwnProperty(property)) {
+                    var mid = this.propertyTypeData[property];
                     if (mid.maxValue != null)
                         r.sdMax = mid.maxValue;
                     if (mid.minValue != null)
@@ -3422,7 +4717,7 @@ var csComp;
             */
             LayerService.prototype.addTextFilter = function (group, filter) {
                 var _this = this;
-                filter.id = this.getGuid();
+                filter.id = csComp.Helpers.getGuid();
                 var divid = "filter_" + filter.id;
 
                 var dcDim = group.ndx.dimension(function (d) {
@@ -3487,7 +4782,7 @@ var csComp;
             */
             LayerService.prototype.addBarFilter = function (group, filter) {
                 var _this = this;
-                filter.id = this.getGuid();
+                filter.id = csComp.Helpers.getGuid();
                 var info = this.calculatePropertyInfo(group, filter.property);
 
                 var divid = "filter_" + filter.id;
@@ -3655,98 +4950,6 @@ var csComp;
     })(csComp.Services || (csComp.Services = {}));
     var Services = csComp.Services;
 })(csComp || (csComp = {}));
-var BaseMapList;
-(function (BaseMapList) {
-    BaseMapList.html = '<div>    <h4 class="leftpanel-header" translate="MAP"></h4>    <div data-ng-repeat="(key, value) in vm.$mapService.baseLayers" style="clear:left;">        <div ng-click="vm.selectBaseLayer(key);" class="select-basestyle">            <img data-ng-src="{{value.options.preview}}" class="preview-base-layer" style="margin-bottom:5px" />            <div style="margin:3px;float:left">                <span style="font-size: 18px;font-weight: bold;">{{key}}</span><br />                {{value.options.subtitle}}            </div>        </div>    </div></div>';
-})(BaseMapList || (BaseMapList = {}));
-var BaseMapList;
-(function (BaseMapList) {
-    /**
-    * Config
-    */
-    var moduleName = 'csWeb.baseMapList';
-
-    /**
-    * Module
-    */
-    BaseMapList.myModule;
-    try  {
-        BaseMapList.myModule = angular.module(moduleName);
-    } catch (err) {
-        // named module does not exist, so create one
-        BaseMapList.myModule = angular.module(moduleName, []);
-    }
-
-    /**
-    * Directive to display the available map layers.
-    */
-    BaseMapList.myModule.directive('baseMapList', [
-        '$window', '$compile',
-        function ($window, $compile) {
-            return {
-                terminal: false,
-                restrict: 'E',
-                scope: {},
-                template: BaseMapList.html,
-                //compile : el          => {    // I need to explicitly compile it in order to use interpolation like {{xxx}}
-                //    var fn                        = $compile(el);
-                //    return scope                  => {
-                //        fn(scope);
-                //    };
-                //},
-                link: function (scope, element, attrs) {
-                    // Deal with resizing the element list
-                    scope.onResizeFunction = function () {
-                        var filterHeight = 50;
-                        var paginationCtrlHeight = 100;
-                        var itemHeight = 60;
-
-                        //scope.windowHeight          = $window.innerHeight;
-                        //scope.windowWidth           = $window.innerWidth;
-                        scope.numberOfItems = Math.floor(($window.innerHeight - filterHeight - paginationCtrlHeight) / itemHeight);
-                    };
-
-                    // Call to the function when the page is first loaded
-                    scope.onResizeFunction();
-
-                    angular.element($window).bind('resize', function () {
-                        scope.onResizeFunction();
-                        scope.$apply();
-                    });
-                },
-                replace: true,
-                transclude: true,
-                controller: BaseMapList.BaseMapListCtrl
-            };
-        }
-    ]).directive('bsPopover', function () {
-        return function (scope, element, attrs) {
-            element.find("a[rel=popover]").popover({ placement: 'right', html: 'true' });
-        };
-    });
-})(BaseMapList || (BaseMapList = {}));
-var BaseMapList;
-(function (BaseMapList) {
-    var BaseMapListCtrl = (function () {
-        // dependencies are injected via AngularJS $injector
-        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
-        function BaseMapListCtrl($scope, $mapService) {
-            this.$scope = $scope;
-            this.$mapService = $mapService;
-            $scope.vm = this;
-        }
-        BaseMapListCtrl.prototype.selectBaseLayer = function (key) {
-            var bl = this.$mapService.baseLayers[key];
-            this.$mapService.changeBaseLayer(bl);
-        };
-        BaseMapListCtrl.$inject = [
-            '$scope',
-            'mapService'
-        ];
-        return BaseMapListCtrl;
-    })();
-    BaseMapList.BaseMapListCtrl = BaseMapListCtrl;
-})(BaseMapList || (BaseMapList = {}));
 var csComp;
 (function (csComp) {
     (function (Services) {
@@ -3925,94 +5128,6 @@ var csComp;
     })(csComp.Services || (csComp.Services = {}));
     var Services = csComp.Services;
 })(csComp || (csComp = {}));
-var StyleList;
-(function (StyleList) {
-    StyleList.html = '<div>    <h4 class="leftpanel-header" translate="STYLES"></h4>    <div ng-show="vm.$layerService.noStyles" translate="STYLE_INFO"></div>    <div data-ng-repeat="group in vm.$layerService.project.groups" style="margin-left: 5px">        <div ng-show="group.styles.length">            <div style="float:left;margin-left: -10px; margin-top: 5px" data-toggle="collapse" data-target="#stylegroup_{{group.id}}"><i class="fa fa-chevron-down togglebutton toggle-arrow-down"></i><i class="fa fa-chevron-up togglebutton toggle-arrow-up"></i></div>            <div class="group-title">{{group.title}}</div>            <div id="stylegroup_{{group.id}}" class="collapse in">                <div data-ng-repeat="style in group.styles">                    <div class="checkbox checkbox-primary" style="margin-left:20px;float:left">                        <input type="checkbox" id="cbstyle{{style.id}}" ng-model="style.enabled" data-ng-change="vm.$layerService.updateStyle(style);">                        <label class="style-title" for="cbstyle{{style.id}}" style="width:175px">{{style.title}}</label>                    </div>                    <div style="float:right;margin-top:10px; width: 50px">                        <div data-ng-show="style.canSelectColor" style="float:left">                            <div class="dropdown">                                <div class="style-settings" data-toggle="dropdown">                                    <style>                                                                             </style>                                    <!--<img src="includes/images/fillcolor.png" style="width: 32px; height:32px" />-->                                    <div id="colors" style="border-radius: 50%;width: 20px;height:20px;border-style:solid;border-color: black;border-width: 1px;background: linear-gradient(to right, {{style.colors[0]}} , {{style.colors[1]}})">                                                                        </div>                                    <b class="caret"></b>                                </div>                                <!--<a class="btn btn-primary btn-sm" ng-model="style.visualAspect"  style="padding-left: 10px" href="#"> {{ style.visualAspect }} </a>-->                                <ul class="dropdown-menu" role="menu">                                    <li ng-repeat="(key,val) in style.colorScales" style="margin:3px;cursor: pointer">                                        <span ng-click="$parent.style.colors = val;vm.$layerService.updateStyle($parent.style)"> {{key}} </span>                                    </li>                                </ul>                            </div>                        </div>                        <div style="float:right">                            <div class="dropdown">                                <div class="style-settings" data-toggle="dropdown">                                    <!--<img src="includes/images/fillcolor.png" style="width: 32px; height:32px" />-->                                    <div class="style-aspect style-{{style.visualAspect}}"></div><b class="caret"></b>                                </div>                                <!--<a class="btn btn-primary btn-sm" ng-model="style.visualAspect"  style="padding-left: 10px" href="#"> {{ style.visualAspect }} </a>-->                                <ul class="dropdown-menu" role="menu">                                    <li ng-repeat="title in style.availableAspects" style="margin:3px;cursor: pointer">                                        <i class="style-aspect style-{{title}}" style="float:left" /><span ng-click="$parent.style.visualAspect = title;vm.$layerService.updateStyle($parent.style)"><img class="fa fa-search" style="margin-right: 8px" /> {{title}} </span>                                    </li>                                    <li class="divider"></li>                                    <li style="margin:3px;cursor: pointer"><i class="fa fa-remove" style="margin-right: 8px" style=" float:left" /><span ng-click="vm.$layerService.removeStyle(style)">Verwijder</span></li>                                </ul>                            </div>                        </div>                    </div>                </div>                <!--<div style="right:5px; position:absolute; margin-top: -15px"><a href="#" id="stylepop{{style.id}}" rel="popover" popover-template="template.html"><img src="includes/images/settings.png" width="20px"></a></div>-->            </div>        </div>    </div></div>';
-})(StyleList || (StyleList = {}));
-var StyleList;
-(function (StyleList) {
-    /**
-    * Config
-    */
-    var moduleName = 'csWeb.styleList';
-
-    /**
-    * Module
-    */
-    StyleList.myModule;
-    try  {
-        StyleList.myModule = angular.module(moduleName);
-    } catch (err) {
-        // named module does not exist, so create one
-        StyleList.myModule = angular.module(moduleName, []);
-    }
-
-    /**
-    * Directive to display the available map layers.
-    */
-    StyleList.myModule.directive('styleList', [
-        '$window', '$compile',
-        function ($window, $compile) {
-            return {
-                terminal: false,
-                restrict: 'E',
-                scope: {},
-                template: StyleList.html,
-                //compile             : el          => {    // I need to explicitly compile it in order to use interpolation like {{xxx}}
-                //    var fn                        = $compile(el);
-                //    return scope                  => {
-                //        fn(scope);
-                //    };
-                //},
-                link: function (scope, element, attrs) {
-                    // Deal with resizing the element list
-                    scope.onResizeFunction = function () {
-                        var filterHeight = 50;
-                        var paginationCtrlHeight = 100;
-                        var itemHeight = 60;
-
-                        //scope.windowHeight          = $window.innerHeight;
-                        //scope.windowWidth           = $window.innerWidth;
-                        scope.numberOfItems = Math.floor(($window.innerHeight - filterHeight - paginationCtrlHeight) / itemHeight);
-                    };
-
-                    // Call to the function when the page is first loaded
-                    scope.onResizeFunction();
-
-                    angular.element($window).bind('resize', function () {
-                        scope.onResizeFunction();
-                        scope.$apply();
-                    });
-                },
-                replace: true,
-                transclude: true,
-                controller: StyleList.StyleListCtrl
-            };
-        }
-    ]).directive('bsPopover', function () {
-        return function (scope, element, attrs) {
-            element.find("a[rel=popover]").popover({ placement: 'right', html: 'true' });
-        };
-    });
-})(StyleList || (StyleList = {}));
-var StyleList;
-(function (StyleList) {
-    var StyleListCtrl = (function () {
-        // dependencies are injected via AngularJS $injector
-        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
-        function StyleListCtrl($scope, $layerService) {
-            this.$scope = $scope;
-            this.$layerService = $layerService;
-            $scope.vm = this;
-        }
-        StyleListCtrl.$inject = [
-            '$scope',
-            'layerService'
-        ];
-        return StyleListCtrl;
-    })();
-    StyleList.StyleListCtrl = StyleListCtrl;
-})(StyleList || (StyleList = {}));
 var csComp;
 (function (csComp) {
     (function (Search) {
@@ -4042,827 +5157,34 @@ var csComp;
     })(csComp.Search || (csComp.Search = {}));
     var Search = csComp.Search;
 })(csComp || (csComp = {}));
-var FeatureProps;
-(function (FeatureProps) {
-    FeatureProps.html = '<div data-ng-cloak data-ng-show="showMenu" >    <h4 class="rightpanel-header">        &nbsp;&nbsp;{{callOut.title}}    </h4>        <div class="container-fluid rightpanel-tabs" style="position: relative">            <div class="row" style="overflow:hidden">            <!-- Nav tabs -->            <span id="leftArr" style="display:block;padding:10px;margin-top:5px;position:absolute;background-color:transparent;z-index:2">                <i class="glyphicon glyphicon-chevron-left"></i>            </span>            <span id="rightArr" style="display:block;padding:10px;margin-top:5px;position:absolute;background-color:transparent;z-index:2">                <i class="glyphicon glyphicon-chevron-right"></i>            </span>            <ul class="nav nav-tabs" id="featureTabs" style="margin-left:10px">                <li data-toggle="tab" data-ng-class="{active : $first}" data-ng-repeat="(sectionTitle, section) in callOut.sections" ng-if="section.hasProperties()">                    <a ng-href="#rp-{{$index}}" data-toggle="tab" data-ng-if="section.showSectionIcon()" ng-click="featureTabActivated(sectionTitle, section)"><i class="fa {{section.sectionIcon}}"></i></a>                    <a ng-href="#rp-{{$index}}" data-toggle="tab" data-ng-if="!section.showSectionIcon()" ng-click="featureTabActivated(sectionTitle, section)">{{sectionTitle}}</a>                </li>            </ul>        </div>    </div>    <div class="tab-content" style="top:50px; width:355px; overflow-y: auto; overflow-x: hidden" resize resize-y="150">        <div data-ng-if="!$last" class="tab-pane" data-ng-class="{active : $first}" id="rp-{{$index}}" data-ng-repeat="(sectionTitle, section) in callOut.sections">            <table class="table table-condensed">                <tr popover="{{(item.description) ? item.description : \'\'}}"                    popover-placement="left"                    popover-trigger="mouseenter"                    popover-append-to-body="true"                    data-ng-repeat="item in section.properties">                    <td><a class="fa fa-filter makeNarrow" data-ng-show="item.canFilter" data-ng-click="vm.$layerService.setFilter(item)" style="cursor: pointer"></a></td>                    <td><a class="fa fa-eye makeNarrow" data-ng-show="item.canStyle" data-ng-click="vm.$layerService.setStyle(item)" style="cursor: pointer"></a></td>                    <td>{{item.key}}</td>                    <td class="text-right" data-ng-bind-html="vm.toTrusted(item.value)"></td>                </tr>            </table>        </div>        <!-- Treat last tab (filter) differently -->        <div data-ng-if="$last" class="tab-pane" data-ng-class="{active : $first}" id="rp-{{$index}}" data-ng-repeat="(sectionTitle, section) in callOut.sections">            <!-- Add filter panel to the last rendered element -->            <div class="has-feedback" style="padding:0 4px 4px 4px;">                <span style="direction: ltr; position: static; display: block;">                    <input id="searchbox" data-ng-model="search.key" type="text"                            placeholder="Filter" autocomplete="off" spellcheck="false"                            style="position: relative; vertical-align: top;" class="form-control tt-input">                </span>                <span id="searchicon" class="fa form-control-feedback fa-filter"></span>            </div>            <!--<input style="padding:4px;" class=" form-control" data-ng-model="search" placeholder="...">-->            <table id="searchTextResults" class="table table-condensed">                <tr popover="{{(item.description) ? item.description : \'\'}}"                    popover-placement="left"                    popover-trigger="mouseenter"                    popover-append-to-body="true"                    data-ng-repeat="item in section.properties | filter:search">                    <td><a class="fa fa-filter makeNarrow" data-ng-show="item.canFilter" data-ng-click="vm.$layerService.setFilter(item)"></a></td>                    <td><a class="fa fa-eye makeNarrow" data-ng-show="item.canStyle" data-ng-click="vm.$layerService.setStyle(item)"></a></td>                    <td>{{item.key}}</td>                    <td class="text-right" data-ng-bind-html="vm.toTrusted(item.value)"></td>                </tr>            </table>        </div>    </div></div>';
-})(FeatureProps || (FeatureProps = {}));
-var FeatureProps;
-(function (FeatureProps) {
-    /**
-    * Config
-    */
-    var moduleName = 'csWeb.featureprops';
+var csComp;
+(function (csComp) {
+    (function (Services) {
+        'use strict';
 
-    /**
-    * Module
-    */
-    FeatureProps.myModule;
-    try  {
-        FeatureProps.myModule = angular.module(moduleName);
-    } catch (err) {
-        // named module does not exist, so create one
-        FeatureProps.myModule = angular.module(moduleName, []);
-    }
-
-    /**
-    * Directive to display a feature's properties in a panel.
-    *
-    * @seealso          : http://www.youtube.com/watch?v=gjJ5vLRK8R8&list=UUGD_0i6L48hucTiiyhb5QzQ
-    * @seealso          : http://plnkr.co/edit/HyBP9d?p=preview
-    */
-    FeatureProps.myModule.directive('featureprops', [
-        '$compile',
-        function ($compile) {
-            return {
-                terminal: true,
-                restrict: 'E',
-                scope: {},
-                template: FeatureProps.html,
-                compile: function (el) {
-                    var fn = $compile(el);
-                    return function (scope) {
-                        fn(scope);
-                    };
-                },
-                replace: true,
-                transclude: true,
-                controller: FeatureProps.FeaturePropsCtrl
-            };
-        }
-    ]);
-})(FeatureProps || (FeatureProps = {}));
-var FeatureProps;
-(function (FeatureProps) {
-    var FeaturePropsOptions = (function () {
-        function FeaturePropsOptions(position) {
-            this.position = position;
-            this.closeButton = true;
-            this.autoPan = true;
-        }
-        return FeaturePropsOptions;
-    })();
-
-    var CallOutProperty = (function () {
-        function CallOutProperty(key, value, property, canFilter, canStyle, feature, isFilter, description, meta) {
-            this.key = key;
-            this.value = value;
-            this.property = property;
-            this.canFilter = canFilter;
-            this.canStyle = canStyle;
-            this.feature = feature;
-            this.isFilter = isFilter;
-            this.description = description;
-            this.meta = meta;
-        }
-        return CallOutProperty;
-    })();
-    FeatureProps.CallOutProperty = CallOutProperty;
-
-    var CallOutSection = (function () {
-        function CallOutSection(sectionIcon) {
-            this.metaInfos = {};
-            this.properties = [];
-            this.sectionIcon = sectionIcon;
-        }
-        CallOutSection.prototype.showSectionIcon = function () {
-            return !csComp.StringExt.isNullOrEmpty(this.sectionIcon);
-        };
-
-        CallOutSection.prototype.addProperty = function (key, value, property, canFilter, canStyle, feature, isFilter, description, meta) {
-            if (description)
-                this.properties.push(new CallOutProperty(key, value, property, canFilter, canStyle, feature, isFilter, description, meta));
-            else
-                this.properties.push(new CallOutProperty(key, value, property, canFilter, canStyle, feature, isFilter, null, meta));
-        };
-
-        CallOutSection.prototype.hasProperties = function () {
-            return this.properties != null && this.properties.length > 0;
-        };
-        return CallOutSection;
-    })();
-    FeatureProps.CallOutSection = CallOutSection;
-
-    var CallOut = (function () {
-        function CallOut(type, feature, metaInfoData) {
-            var _this = this;
-            this.type = type;
-            this.feature = feature;
-            this.metaInfoData = metaInfoData;
-            this.sections = {};
-
-            //if (type == null) this.createDefaultType();
-            this.setTitle();
-
-            var infoCallOutSection = new CallOutSection('fa-info');
-            var searchCallOutSection = new CallOutSection('fa-filter');
-            var displayValue;
-            if (type != null) {
-                var metaInfos = [];
-                if (type.metaInfoKeys != null) {
-                    var keys = type.metaInfoKeys.split(';');
-                    keys.forEach(function (key) {
-                        if (key in metaInfoData)
-                            metaInfos.push(metaInfoData[key]);
-                        else if (type.metaInfoData != null) {
-                            var result = $.grep(type.metaInfoData, function (e) {
-                                return e.label === key;
-                            });
-                            if (result.length >= 1)
-                                metaInfos.push(result);
-                        }
-                    });
-                } else if (type.metaInfoData != null) {
-                    metaInfos = type.metaInfoData;
-                }
-                metaInfos.forEach(function (mi) {
-                    var callOutSection = _this.getOrCreateCallOutSection(mi.section) || infoCallOutSection;
-                    callOutSection.metaInfos[mi.label] = mi;
-                    var text = feature.properties[mi.label];
-                    displayValue = csComp.Helpers.convertPropertyInfo(mi, text);
-
-                    // Skip empty, non-editable values
-                    if (!mi.canEdit && csComp.StringExt.isNullOrEmpty(displayValue))
-                        return;
-
-                    var canFilter = (mi.type == "number" || mi.type == "text");
-                    var canStyle = (mi.type == "number");
-                    if (mi.filterType != null)
-                        canFilter = mi.filterType.toLowerCase() != "none";
-                    if (mi.visibleInCallOut)
-                        callOutSection.addProperty(mi.title, displayValue, mi.label, canFilter, canStyle, feature, false, mi.description, mi);
-                    searchCallOutSection.addProperty(mi.title, displayValue, mi.label, canFilter, canStyle, feature, false, mi.description);
-                });
-            }
-            if (infoCallOutSection.properties.length > 0)
-                this.sections['AAA Info'] = infoCallOutSection; // The AAA is added as the sections are sorted alphabetically
-            if (searchCallOutSection.properties.length > 0)
-                this.sections['Zzz Search'] = searchCallOutSection;
-        }
-        ///**
-        //* Convert a property value to a display value using the property info.
-        //*/
-        //public static convertPropertyInfo(mi: IMetaInfo, text: string): string {
-        //    var displayValue: string;
-        //    if (!csComp.StringExt.isNullOrEmpty(text) && !$.isNumeric(text))
-        //        text = text.replace(/&amp;/g, '&');
-        //    if (csComp.StringExt.isNullOrEmpty(text)) return '';
-        //    switch (mi.type) {
-        //        case "bbcode":
-        //            if (!csComp.StringExt.isNullOrEmpty(mi.stringFormat))
-        //                text = String.format(mi.stringFormat, text);
-        //            displayValue = XBBCODE.process({ text: text }).html;
-        //            break;
-        //        case "number":
-        //            if (!$.isNumeric(text))
-        //                displayValue = text;
-        //            else if (csComp.StringExt.isNullOrEmpty(mi.stringFormat))
-        //                displayValue = text.toString();
-        //            else
-        //                displayValue = String.format(mi.stringFormat, parseFloat(text));
-        //            break;
-        //        case "rank":
-        //            var rank = text.split(',');
-        //            if (rank.length != 2) return text;
-        //            if (mi.stringFormat)
-        //                displayValue = String.format(mi.stringFormat, rank[0], rank[1]);
-        //            else
-        //                displayValue = String.format("{0) / {1}", rank[0], rank[1]);
-        //            break;
-        //        default:
-        //            displayValue = text;
-        //            break;
-        //    }
-        //    return displayValue;
-        //}
-        ///**
-        // * In case we are dealing with a regular JSON file without type information, create a default type.
-        // */
-        //private createDefaultType(): void {
-        //    this.type              = [];
-        //    this.type.style        = { nameLabel: "Name", iconHeight: 30, iconWidth: 30 };
-        //    this.type.metaInfoData = [];
-        //    for (var kvp in this.feature.properties) {
-        //        var metaInfo: IMetaInfo = [];
-        //        metaInfo.label          = kvp.key;
-        //        metaInfo.title          = kvp.key.replace("_", " ");
-        //        metaInfo.isSearchable   = true;
-        //        metaInfo.type           = MetaInfoType.Text;
-        //        this.type.metaInfoData.push(metaInfo);
-        //    }
-        //}
-        CallOut.prototype.getOrCreateCallOutSection = function (sectionTitle) {
-            if (csComp.StringExt.isNullOrEmpty(sectionTitle)) {
-                return null;
-            }
-            if (sectionTitle in this.sections)
-                return this.sections[sectionTitle];
-            this.sections[sectionTitle] = new CallOutSection();
-            return this.sections[sectionTitle];
-        };
-
-        /**
-        * Set the title of the callout to the title of the feature.
+        /*
+        * Singleton service that holds a reference to the map.
+        * In case other controllers need access to the map, they can inject this service.
         */
-        CallOut.prototype.setTitle = function () {
-            this.title = CallOut.title(this.type, this.feature);
-        };
-
-        CallOut.title = function (type, feature) {
-            var title;
-            if (type == null || type.style == null || csComp.StringExt.isNullOrEmpty(type.style.nameLabel))
-                title = feature.properties['Name'];
-            else
-                title = feature.properties[type.style.nameLabel];
-            if (!csComp.StringExt.isNullOrEmpty(title) && !$.isNumeric(title))
-                title = title.replace(/&amp;/g, '&');
-            return title;
-        };
-        return CallOut;
-    })();
-    FeatureProps.CallOut = CallOut;
-
-    var FeaturePropsCtrl = (function () {
-        // dependencies are injected via AngularJS $injector
-        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
-        function FeaturePropsCtrl($scope, $location, $sce, $mapService, $layerService, $messageBusService) {
-            var _this = this;
-            this.$scope = $scope;
-            this.$location = $location;
-            this.$sce = $sce;
-            this.$mapService = $mapService;
-            this.$layerService = $layerService;
-            this.$messageBusService = $messageBusService;
-            /**
-            * Callback function
-            * @see {http://stackoverflow.com/questions/12756423/is-there-an-alias-for-this-in-typescript}
-            * @see {http://stackoverflow.com/questions/20627138/typescript-this-scoping-issue-when-called-in-jquery-callback}
-            * @todo {notice the strange syntax using a fat arrow =>, which is to preserve the this reference in a callback!}
-            */
-            this.sidebarMessageReceived = function (title) {
-                switch (title) {
-                    case "toggle":
-                        _this.$scope.showMenu = !_this.$scope.showMenu;
-                        break;
-                    case "show":
-                        _this.$scope.showMenu = true;
-                        break;
-                    case "hide":
-                        _this.$scope.showMenu = false;
-                        break;
-                    default:
-                }
-
-                // NOTE EV: You need to call apply only when an event is received outside the angular scope.
-                // However, make sure you are not calling this inside an angular apply cycle, as it will generate an error.
-                if (_this.$scope.$root.$$phase != '$apply' && _this.$scope.$root.$$phase != '$digest') {
-                    _this.$scope.$apply();
-                }
-            };
-            this.featureMessageReceived = function (title, feature) {
-                switch (title) {
-                    case "onFeatureSelect":
-                        //console.log(feature);
-                        _this.displayFeature(feature);
-                        _this.$scope.poi = feature;
-                        _this.$scope.autocollapse(true);
-                        break;
-                    default:
-                }
-                if (_this.$scope.$root.$$phase != '$apply' && _this.$scope.$root.$$phase != '$digest') {
-                    _this.$scope.$apply();
-                }
-            };
-            this.scope = $scope;
-            $scope.vm = this;
-            $scope.showMenu = false;
-
-            $scope.featureTabActivated = function (sectionTitle, section) {
-                $messageBusService.publish('FeatureTab', 'activated', { sectionTitle: sectionTitle, section: section });
-            };
-
-            //console.log('SidebarCtrl: constructed');
-            $messageBusService.subscribe("sidebar", this.sidebarMessageReceived);
-            $messageBusService.subscribe("feature", this.featureMessageReceived);
-
-            var widthOfList = function () {
-                var itemsWidth = 0;
-                $('#featureTabs>li').each(function () {
-                    var itemWidth = $(this).outerWidth();
-
-                    itemsWidth += itemWidth;
-                });
-                return itemsWidth;
-            };
-
-            $scope.autocollapse = function (initializeTabPosition) {
-                if (typeof initializeTabPosition === "undefined") { initializeTabPosition = false; }
-                //                console.log('autocollapse');
-                var tabs = $('#featureTabs');
-
-                //                console.log('#ft.ow(): ' + tabs.outerWidth());
-                //                console.log('wol: ' + widthOfList());
-                //                console.log('ml: ' + tabs.css('margin-left'));
-                if (tabs.outerWidth() < widthOfList() || parseFloat(tabs.css('margin-left')) < 0) {
-                    $('#leftArr').show();
-                    $('#rightArr').show();
-                    if (initializeTabPosition) {
-                        tabs.animate({ 'margin-left': '20px' }, 'slow');
-                    }
-                } else {
-                    $('#leftArr').hide();
-                    $('#rightArr').hide();
-                    if (initializeTabPosition) {
-                        tabs.animate({ 'margin-left': '0px' }, 'slow');
-                    }
-                }
-            };
-
-            $scope.autocollapse(true); // when document first loads
-            $scope.tabs = $('#featureTabs');
-            $scope.tabScrollDelta = $scope.tabs.outerWidth();
-
-            $('#leftArr').click(function () {
-                //console.log('leftArr');
-                //var tabs = $('#featureTabs');
-                var current = parseFloat($scope.tabs.css('margin-left'));
-                var min = 20;
-                var nextPos = $scope.tabScrollDelta;
-
-                if (current + nextPos > min) {
-                    nextPos = min - current;
-                }
-
-                $scope.tabs.animate({ 'margin-left': '+=' + nextPos + 'px' }, 'slow', function () {
-                    //                    console.log('rightarr hide');
-                    $('#rightArr').show();
-                    $('#leftArr').show();
-                    $scope.autocollapse(false);
-                });
-            });
-
-            $('#rightArr').click(function () {
-                //var tabs = $('#featureTabs');
-                var max = widthOfList() - $scope.tabs.outerWidth() + 30;
-                var current = Math.abs(parseFloat($scope.tabs.css('margin-left')));
-                var nextPos = $scope.tabScrollDelta;
-                nextPos = Math.min(max, nextPos);
-
-                $scope.tabs.animate({ 'margin-left': '-=' + nextPos + 'px' }, 'slow', function () {
-                    $('#leftArr').show();
-                    $('#rightArr').show();
-
-                    $scope.autocollapse(false);
-                });
-            });
-        }
-        FeaturePropsCtrl.prototype.toTrusted = function (html) {
-            try  {
-                return this.$sce.trustAsHtml(html.toString());
-            } catch (e) {
-                console.log(e + ': ' + html);
-                return '';
+        var TimeService = (function () {
+            function TimeService($messageBusService) {
+                this.$messageBusService = $messageBusService;
+                //this.map = L.map("map", {
+                //    zoomControl        : false,
+                //    attributionControl : true
+                //});
+                //this.activeBaseLayer;
+                this.baseLayers = {};
             }
-        };
-
-        FeaturePropsCtrl.prototype.displayFeature = function (feature) {
-            var featureType = this.$layerService.featureTypes[feature.featureTypeName];
-            this.$scope.callOut = new CallOut(featureType, feature, this.$layerService.metaInfoData);
-            // Probably not needed
-            //if (this.$scope.$root.$$phase != '$apply' && this.$scope.$root.$$phase != '$digest') {
-            //    this.$scope.$apply();
-            //}
-        };
-        FeaturePropsCtrl.$inject = [
-            '$scope',
-            '$location',
-            '$sce',
-            'mapService',
-            'layerService',
-            'messageBusService'
-        ];
-        return FeaturePropsCtrl;
-    })();
-    FeatureProps.FeaturePropsCtrl = FeaturePropsCtrl;
-})(FeatureProps || (FeatureProps = {}));
-var DataTable;
-(function (DataTable) {
-    /**
-    * Represents a field in the table.
-    * The value is the actual displayValue shown, the type is the metainfo type (e.g. number or text, useful when aligning the data), and the header is used for sorting.
-    */
-    var TableField = (function () {
-        function TableField(displayValue, originalValue, type, header) {
-            this.displayValue = displayValue;
-            this.originalValue = originalValue;
-            this.type = type;
-            this.header = header;
-        }
-        return TableField;
-    })();
-    DataTable.TableField = TableField;
-
-    var DataTableCtrl = (function () {
-        // dependencies are injected via AngularJS $injector
-        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
-        function DataTableCtrl($scope, $http, $sce, $translate, $layerService, $localStorageService, $messageBusService) {
-            var _this = this;
-            this.$scope = $scope;
-            this.$http = $http;
-            this.$sce = $sce;
-            this.$translate = $translate;
-            this.$layerService = $layerService;
-            this.$localStorageService = $localStorageService;
-            this.$messageBusService = $messageBusService;
-            this.mapLabel = "map";
-            this.numberOfItems = 10;
-            this.layerOptions = [];
-            this.metaInfos = [];
-            this.headers = [];
-            this.rows = [];
-            // 'vm' stands for 'view model'. We're adding a reference to the controller to the scope
-            // for its methods to be accessible from view / HTML
-            $scope.vm = this;
-
-            $translate('MAP_FEATURES').then(function (translation) {
-                _this.layerOptions[0].title = translation;
-            });
-
-            this.bindToStorage('vm.numberOfItems', 10);
-            this.numberOfItems = $localStorageService.get('vm.numberOfItems');
-            this.bindToStorage('vm.selectedLayerId', this.mapLabel);
-
-            if (this.$layerService.project == null || this.$layerService.project.groups == null)
-                return;
-            this.updateLayerOptions();
-            this.loadLayer();
-        }
-        /**
-        * Add a label to local storage and bind it to the scope.
-        */
-        DataTableCtrl.prototype.bindToStorage = function (label, defaultValue) {
-            if (this.$localStorageService.get(label) === null)
-                this.$localStorageService.set(label, defaultValue); // You first need to set the key
-            this.$localStorageService.bind(this.$scope, label);
-        };
-
-        /**
-        * Create a list of layer options and select the one used previously.
-        */
-        DataTableCtrl.prototype.updateLayerOptions = function () {
-            var _this = this;
-            this.layerOptions.push({
-                "group": '',
-                "id": this.mapLabel,
-                "title": this.mapFeatureTitle
-            });
-            if (this.$layerService.project == null || this.$layerService.project.groups == null)
-                return;
-            this.$layerService.project.groups.forEach(function (group) {
-                group.layers.forEach(function (layer) {
-                    _this.layerOptions.push({
-                        "group": group.title,
-                        "id": layer.id,
-                        "title": layer.title
-                    });
-                });
-            });
-            this.selectedLayerId = this.$localStorageService.get('vm.selectedLayerId');
-        };
-
-        DataTableCtrl.prototype.loadLayer = function () {
-            var _this = this;
-            if (!this.selectedLayerId || this.selectedLayerId === this.mapLabel)
-                return this.loadMapLayers();
-            var selectedLayer = this.findLayerById(this.selectedLayerId);
-            if (selectedLayer == null)
-                return this.loadMapLayers();
-            this.$http.get(selectedLayer.url).success(function (data) {
-                _this.dataset = data;
-                if (data.poiTypes == null)
-                    data.poiTypes = {};
-                data.features.forEach(function (f) {
-                    f.featureTypeName = f.properties['PoiTypeId'];
-                    if (!(f.featureTypeName in data.poiTypes))
-                        data.poiTypes[f.featureTypeName] = _this.$layerService.featureTypes[f.featureTypeName];
-                });
-
-                _this.updateMetaInfo(data);
-            }).error(function (data, status, headers, config) {
-                _this.$messageBusService.notify("ERROR opening " + selectedLayer.title, "Could not get the data.");
-            });
-        };
-
-        /**
-        * Load the features as visible on the map.
-        */
-        DataTableCtrl.prototype.loadMapLayers = function () {
-            var _this = this;
-            this.selectedLayerId = this.mapLabel;
-            var data = {
-                type: '',
-                features: [],
-                poiTypes: {}
-            };
-
-            // If we are filtering, load the filter results
-            this.$layerService.project.groups.forEach(function (group) {
-                if (group.filterResult != null)
-                    group.filterResult.forEach(function (f) {
-                        return data.features.push(f);
-                    });
-            });
-
-            // Otherwise, take all loaded features
-            if (data.features.length === 0)
-                data.features = this.$layerService.project.features;
-
-            data.features.forEach(function (f) {
-                if (!(f.featureTypeName in data.poiTypes))
-                    data.poiTypes[f.featureTypeName] = _this.$layerService.featureTypes[f.featureTypeName];
-            });
-
-            this.dataset = data;
-            this.updateMetaInfo(data);
-        };
-
-        DataTableCtrl.prototype.updateMetaInfo = function (data) {
-            var _this = this;
-            this.metaInfos = [];
-            this.headers = [];
-            this.rows = [];
-            var titles = [];
-            var mis = [];
-
-            // Push the Name, so it always appears on top.
-            mis.push({
-                label: "Name",
-                visibleInCallOut: true,
-                title: "Naam",
-                type: "text",
-                filterType: "text",
-                isSearchable: true
-            });
-            var featureType;
-            for (var key in data.poiTypes) {
-                featureType = data.poiTypes[key];
-                if (featureType.metaInfoKeys != null) {
-                    var keys = featureType.metaInfoKeys.split(';');
-                    keys.forEach(function (k) {
-                        if (k in _this.$layerService.metaInfoData)
-                            mis.push(_this.$layerService.metaInfoData[k]);
-                        else if (featureType.metaInfoData != null) {
-                            var result = $.grep(featureType.metaInfoData, function (e) {
-                                return e.label === k;
-                            });
-                            if (result.length >= 1)
-                                mis.push(result);
-                        }
-                    });
-                } else if (featureType.metaInfoData != null) {
-                    featureType.metaInfoData.forEach(function (mi) {
-                        return mis.push(mi);
-                    });
-                }
-                mis.forEach(function (mi) {
-                    if ((mi.visibleInCallOut || mi.label === "Name") && titles.indexOf(mi.title) < 0) {
-                        titles.push(mi.title);
-                        _this.metaInfos.push(mi);
-                    }
-                });
-            }
-
-            // Select the first couple of headers
-            var nmbrOfDefaultSelectedHeaders = 3;
-            for (var i = 0; i < nmbrOfDefaultSelectedHeaders; i++) {
-                this.headers.push(titles[i]);
-            }
-            this.rows = this.getRows();
-        };
-
-        DataTableCtrl.prototype.toggleSelection = function (metaInfoTitle) {
-            var idx = this.headers.indexOf(metaInfoTitle);
-
-            // is currently selected
-            if (idx > -1) {
-                this.headers.splice(idx, 1);
-            } else {
-                this.headers.push(metaInfoTitle);
-            }
-            this.rows = this.getRows();
-        };
-
-        DataTableCtrl.prototype.findLayerById = function (id) {
-            for (var i = 0; i < this.$layerService.project.groups.length; i++) {
-                var group = this.$layerService.project.groups[i];
-                for (var j = 0; j < group.layers.length; j++) {
-                    var layer = group.layers[j];
-                    if (layer.id != id)
-                        continue;
-                    return layer;
-                }
-            }
-            return null;
-        };
-
-        /**
-        * Returns the data rows that are relevant for the current selection.
-        */
-        DataTableCtrl.prototype.getRows = function () {
-            var _this = this;
-            var meta = [this.headers.length];
-            this.metaInfos.forEach(function (mi) {
-                // Keep headers and mi in the right order
-                var index = _this.headers.indexOf(mi.title);
-                if (index >= 0)
-                    meta[index] = mi;
-            });
-            var props = [];
-            var displayValue;
-            this.dataset.features.forEach(function (f) {
-                var row = [];
-                meta.forEach(function (mi) {
-                    var text = f.properties[mi.label];
-                    displayValue = csComp.Helpers.convertPropertyInfo(mi, text);
-
-                    //if (!text)
-                    //    text = ' ';
-                    //else if (!$.isNumeric(text))
-                    //    text = text.replace(/&amp;/g, '&');
-                    //switch (mi.type) {
-                    //    case "bbcode":
-                    //        displayValue = XBBCODE.process({ text: text }).html;
-                    //        break;
-                    //    case "number":
-                    //        if (!$.isNumeric(text)) displayValue ='??';
-                    //        else if (!mi.stringFormat)
-                    //            displayValue = text.toString();
-                    //        else
-                    //            displayValue = String.format(mi.stringFormat, parseFloat(text));
-                    //        break;
-                    //    default:
-                    //        displayValue = text;
-                    //        break;
-                    //}
-                    row.push(new TableField(displayValue, text, mi.type, mi.title));
-                });
-                props.push(row);
-            });
-            return props;
-        };
-
-        /**
-        * Generate a font awesome class based on the order.
-        */
-        DataTableCtrl.prototype.sortOrderClass = function (headerIndex, reverseOrder) {
-            var t;
-            if (reverseOrder != null && headerIndex == this.sortingColumn) {
-                t = ('fa fa-sort-' + ((reverseOrder) ? 'desc' : 'asc'));
-            } else {
-                t = 'fa fa-sort';
-            }
-            return t;
-        };
-
-        /**
-        * Order the rows based on the header index and the order.
-        */
-        DataTableCtrl.prototype.orderBy = function (headerIndex, reverseOrder) {
-            this.sortingColumn = headerIndex;
-            this.rows = this.rows.sort(function (a, b) {
-                var order;
-                if (a[headerIndex].type == 'number')
-                    order = a[headerIndex].originalValue > b[headerIndex].originalValue;
-                else
-                    order = a[headerIndex].originalValue.toLowerCase() > b[headerIndex].originalValue.toLowerCase();
-                if (order == reverseOrder)
-                    return 1;
-                else
-                    return -1;
-            });
-        };
-
-        DataTableCtrl.prototype.downloadCsv = function () {
-            var csvRows = [];
-
-            csvRows.push(this.headers.join(';'));
-
-            for (var i = 0; i < this.rows.length; i++) {
-                csvRows.push(this.rows[i].map(function (f) {
-                    return f.originalValue;
-                }).join(';'));
-            }
-
-            var csvString = csvRows.join('\r\n');
-
-            var filename = this.mapLabel;
-            if (this.selectedLayerId !== this.mapLabel) {
-                var layer = this.findLayerById(this.selectedLayerId);
-                if (layer)
-                    filename = layer.title.replace(' ', '_');
-            }
-            this.saveData(csvString, filename + '.csv');
-        };
-
-        DataTableCtrl.prototype.saveData = function (csvData, filename) {
-            if (navigator.msSaveBlob) {
-                // IE 10+
-                var link = document.createElement('a');
-                link.addEventListener("click", function (event) {
-                    var blob = new Blob([csvData], { "type": "text/csv;charset=utf-8;" });
-                    navigator.msSaveBlob(blob, filename);
-                }, false);
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            } else if (!csComp.Helpers.supportsDataUri()) {
-                // Older versions of IE: show the data in a new window
-                var popup = window.open('', 'csv', '');
-                popup.document.body.innerHTML = '<pre>' + csvData + '</pre>';
-            } else {
-                // Support for browsers that support the data uri.
-                var a = document.createElement('a');
-                document.body.appendChild(a);
-                a.href = 'data:text/csv;charset=utf-8,' + encodeURI(csvData);
-                a.target = '_blank';
-                a.download = filename;
-                a.click();
-                document.body.removeChild(a);
-            }
-        };
-
-        /**
-        * Convert to trusted html string.
-        */
-        DataTableCtrl.prototype.toTrusted = function (html) {
-            try  {
-                return this.$sce.trustAsHtml(html.toString());
-            } catch (e) {
-                console.log(e + ': ' + html);
-                return '';
-            }
-        };
-        DataTableCtrl.$inject = [
-            '$scope',
-            '$http',
-            '$sce',
-            '$translate',
-            'layerService',
-            'localStorageService',
-            'messageBusService'
-        ];
-        return DataTableCtrl;
-    })();
-    DataTable.DataTableCtrl = DataTableCtrl;
-})(DataTable || (DataTable = {}));
-var DataTable;
-(function (DataTable) {
-    DataTable.html = '<div>    <div style="width:100%; margin: 10px auto;">        <div style="float: left; width: 15%; margin: 0; padding: 1em">            <!-- Pull down of map layers -->            <select data-ng-model="vm.selectedLayerId"                    data-ng-change="vm.loadLayer()"                    data-ng-options="layer.id as layer.title group by layer.group for layer in vm.layerOptions"                    class="form-control tt-input"></select>            <!-- List of headers -->            <ul class="form-group" style="margin-top: 1em; margin-left: -2em; overflow-y: auto; overflow-x: hidden;"                resize resize-y="150">                <li ng-repeat="mi in vm.metaInfos" class="list-unstyled" style="white-space: nowrap; text-overflow: ellipsis">                    <label>                        <input type="checkbox" name="vm.selectedTitles[]" value="{{mi.title}}"                               data-ng-checked="vm.headers.indexOf(mi.title) > -1"                               data-ng-click="vm.toggleSelection(mi.title)">&nbsp;&nbsp;{{mi.title}}                    </label>                    <!--<div class="checkbox">                        <label>                            <input type="checkbox" name="vm.selectedTitles[]" value="{{mi.title}}"                                   data-ng-checked="vm.headers.indexOf(mi.title) > -1"                                   data-ng-click="vm.toggleSelection(mi.title)">&nbsp;&nbsp;{{mi.title}}                        </label>                    </div>-->                </li>            </ul>            <!--       <pre>{{vm.headers|json}}</pre>-->        </div>        <!-- Right side of the table view -->        <div style="margin-left: 16%; border-left: 1px solid gray; padding: 1em;" ng-init="poiTypeFilter">            <!-- Filter -->            <div class="has-feedback" style="margin-bottom: 1em; float: right; width: 16%; min-width: 200px;">                <span style="direction: ltr; position: static; display: block;">                    <input id="searchbox" data-ng-model="featureFilter" type="text"                           placeholder="Filter" autocomplete="off" spellcheck="false"                           style="position: relative; vertical-align: top;" class="form-control tt-input">                </span>                <span id="searchicon" class="fa form-control-feedback fa-filter" style="padding-top: 0px;"></span>            </div>            <!--Download to CSV option-->            <a href="" data-ng-click="vm.downloadCsv()" alt="Download CSV" style="margin-top: 5px; margin-right: 1em; float: right;"><i class="fa fa-download fa-2x"></i></a>            <!-- Specify how many items to show -->            <select data-ng-model="vm.numberOfItems" style="margin-bottom: 1em; margin-right: 10px; float: left; width: 16%; min-width: 200px;" class="form-control tt-input">                <option value="5" translate="SHOW5"></option>                <option value="10" translate="SHOW10"></option>                <option value="15" translate="SHOW15"></option>                <option value="20" translate="SHOW20"></option>                <option value="25" translate="SHOW25"></option>                <option value="30" translate="SHOW30"></option>                <option value="35" translate="SHOW35"></option>                <option value="40" translate="SHOW40"></option>            </select>            <!-- Data table -->            <table class="table table-striped table-condensed">                <tr>                    <th data-ng-repeat="header in vm.headers track by $index">                        {{header}}&nbsp;                        <a data-ng-click="reverseSort = !reverseSort; vm.orderBy($index, reverseSort);"><i data-ng-class="vm.sortOrderClass($index, reverseSort)">&nbsp;&nbsp;</i></a>                    </th>                </tr>                <tr dir-paginate="row in vm.rows | filter:featureFilter | itemsPerPage: vm.numberOfItems"                    style="cursor: pointer; vertical-align: central">                    <td data-ng-class="{\'text-right\': field.type == \'number\'}" data-ng-repeat="field in row track by $index" data-ng-bind-html="vm.toTrusted(field.displayValue)"></td>                </tr>            </table>            <dir-pagination-controls style="" max-size="10" boundary-links="true" direction-links="true"                                     template-url="bower_components/angular-utils-pagination/dirPagination.tpl.html"></dir-pagination-controls>        </div>    </div>    <div style="clear: both; margin: 0; padding: .5em"></div></div>';
-})(DataTable || (DataTable = {}));
-var DataTable;
-(function (DataTable) {
-    /**
-    * Config
-    */
-    var moduleName = 'csWeb.datatable';
-
-    /**
-    * Module
-    */
-    DataTable.myModule;
-    try  {
-        DataTable.myModule = angular.module(moduleName);
-    } catch (err) {
-        // named module does not exist, so create one
-        DataTable.myModule = angular.module(moduleName, []);
-    }
-
-    /**
-    * Directive to display a feature's properties in a panel.
-    *
-    * @seealso : http://www.youtube.com/watch?v=gjJ5vLRK8R8&list=UUGD_0i6L48hucTiiyhb5QzQ
-    * @seealso : http://plnkr.co/edit/HyBP9d?p=preview
-    */
-    DataTable.myModule.directive('datatable', [
-        '$compile',
-        function ($compile) {
-            return {
-                terminal: false,
-                restrict: 'E',
-                scope: {},
-                template: DataTable.html,
-                //compile   : el => {     // I need to explicitly compile it in order to use interpolation like {{xxx}}
-                //    var fn = $compile(el);
-                //    return scope => {
-                //        fn(scope);
-                //    };
-                //},
-                replace: true,
-                transclude: true,
-                controller: DataTable.DataTableCtrl
-            };
-        }
-    ]);
-})(DataTable || (DataTable = {}));
+            TimeService.$inject = [
+                'messageBusService'
+            ];
+            return TimeService;
+        })();
+        Services.TimeService = TimeService;
+    })(csComp.Services || (csComp.Services = {}));
+    var Services = csComp.Services;
+})(csComp || (csComp = {}));
 var Translations;
 (function (Translations) {
     var English = (function () {
