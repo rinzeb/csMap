@@ -1,7 +1,7 @@
 ﻿module App {
     'use strict';
 
-    import IFeature = csComp.GeoJson.IFeature;
+    import IFeature = csComp.Services.IFeature;
 
     export interface IAppLocationService extends ng.ILocationService {
         $$search: { layers: string };
