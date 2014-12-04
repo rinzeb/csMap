@@ -8,16 +8,20 @@
     }
 
     export interface IAppScope extends ng.IScope {
-        vm           : AppCtrl;
-        title        : string;
-        showMap      : boolean;
+        vm: AppCtrl;
+        title: string;
+        showMap: boolean;
         showMenuRight: boolean;
         featureSelected: boolean;
         // FeatureTypeCtrl - TODO: should be extracted to a directive
         featureTypes;
         updateFeatureTypes;
         editMode: boolean;
-        boolToStr;
+        filterProperty;
+        propertyTypes;
+        getSections;
+        addSection;
+        sections;
     }
 
     // TODO For setting the current culture for string formatting (note you need to include public/js/cs/stringformat.YOUR-CULTURE.js. See sffjs.1.09.zip for your culture.) 
@@ -81,7 +85,83 @@
                 });
             };
 
-            $scope.boolToStr = function (arg) {return arg ? 'Ja' : 'Nee' };
+            $scope.getSections = () => {
+                var propertyTypeData = this.$layerService.project.propertyTypeData;
+                var newSections = new Array();
+
+                for (var indexData in propertyTypeData) {
+                    var add = true;
+
+                    if (propertyTypeData[indexData].section != undefined) {
+                        if (newSections.length == 0) {
+                            newSections.push(propertyTypeData[indexData].section);
+                        }
+
+                        for (var indexNew in newSections) {
+                            if (propertyTypeData[indexData].section == newSections[indexNew]) {
+                                add = false;
+                            }
+                        }
+
+                        if (add) {
+                            newSections.push(propertyTypeData[indexData].section);
+                        }
+                    }
+                }
+
+                $scope.sections = newSections;
+            }
+
+            $scope.addSection = (name: String) => {
+                var sections = $scope.sections;
+                var add = true;
+
+                for (var index in sections) {
+                    if (name == sections[index]) {
+                        add = false;
+                    }
+                }
+
+                if (add) {
+                    $scope.sections.push(name);
+                }
+            }
+
+            // Uncomment below when in directive
+            // $scope.propertyTypes = this.$layerService.proejct.propertyTypeData;
+
+            $scope.filterProperty = (selectedData) => {
+                var allPropertyTypes = this.$layerService.project.propertyTypeData;
+                var propertyTypes = new Array();
+
+                if (selectedData == undefined) {
+                    // All property types are selected
+                    for (var index in allPropertyTypes) {
+                        propertyTypes.push(allPropertyTypes[index]);
+                    }
+
+                    $scope.propertyTypes = propertyTypes;
+                } else {
+                    // Property types of a feature is selected 
+                    var selectedPropertyTypes;
+
+                    if (selectedData.propertyTypeKeys !== undefined) {
+                        selectedPropertyTypes = selectedData.propertyTypeKeys.split(';');
+                    }
+
+                    for (var indexSelected in selectedPropertyTypes) {
+                        for (var indexAll in allPropertyTypes) {
+                            if (allPropertyTypes.hasOwnProperty(indexAll)) {
+                                if (selectedPropertyTypes[indexSelected] == allPropertyTypes[indexAll].label) {
+                                    propertyTypes.push(allPropertyTypes[indexAll]);
+                                }
+                            }
+                        }
+                    }
+
+                    $scope.propertyTypes = propertyTypes;
+                }
+            };
         }
 
         /**
@@ -401,5 +481,18 @@
                     });
                 }
             }
+        })
+        .directive('ngEnter', function () {
+            return function (scope, element, attrs) {
+                element.bind("keydown keypress", function (event) {
+                    if (event.which === 13) {
+                        scope.$apply(function () {
+                            scope.$eval(attrs.ngEnter);
+                        });
+
+                        event.preventDefault();
+                    }
+                });
+            };
         });
 }
