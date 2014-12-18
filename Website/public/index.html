@@ -105,8 +105,8 @@
 <!--                     <pre>Model: {{location | json}}</pre>-->
 
                     <!-- Edit button -->
-                    <button type="button" class="btn btn-primary" ng-click="vm.$layerService.editMode=!vm.$layerService.editMode" ng-show="!vm.$layerService.editMode"><i class="fa fa-pencil"></i> Edit mode</button>
-                    <button type="button" class="btn btn-danger" ng-click="vm.$layerService.editMode=!vm.$layerService.editMode" ng-show="vm.$layerService.editMode"><i class="fa fa-times"></i> Edit mode</button>
+                    <button type="button" class="btn btn-primary" ng-click="enableEditMode()" ng-show="!editMode"><i class="fa fa-pencil"></i> Edit mode</button>
+                    <button type="button" class="btn btn-danger" ng-click="disableEditMode()" ng-show="editMode"><i class="fa fa-times"></i> Edit mode</button>
 
                     <input data-ng-model="vm.searchText"
                            typeahead="address as address.shortName(25) for address in vm.getLocation($viewValue)"

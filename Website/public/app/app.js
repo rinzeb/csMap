@@ -71,6 +71,7 @@
             $scope.vm = this;
             $scope.showMenuRight = false;
             $scope.featureSelected = false;
+            $scope.editMode = false;
 
             $messageBusService.subscribe("project", function () {
                 // NOTE EV: You may run into problems here when calling this inside an angular apply cycle.
@@ -87,6 +88,16 @@
             $messageBusService.notify('Welcome to csMap', 'Your mapping solution.');
 
             this.showMap = this.$location.path() === "/map";
+
+            $scope.enableEditMode = function () {
+                $scope.editMode = true;
+                _this.$messageBusService.publish("editmode", "enable");
+            };
+
+            $scope.disableEditMode = function () {
+                $scope.editMode = false;
+                _this.$messageBusService.publish("editmode", "disable");
+            };
         }
         /**
         * Publish a toggle request.
@@ -134,13 +145,16 @@
         'csWeb.featureprops',
         'csWeb.layersDirective',
         'csWeb.featureList',
+        'csWeb.featureTypes',
+        'csWeb.propertyTypes',
         'csWeb.filterList',
         'csWeb.baseMapList',
         'csWeb.styleList',
         'csWeb.legendList',
         'csWeb.resize',
         'csWeb.datatable',
-        'ngCookies'
+        'ngCookies',
+        'angularSpectrumColorpicker'
     ]).config(function (localStorageServiceProvider) {
         localStorageServiceProvider.prefix = 'csMap';
     }).config(function ($translateProvider) {
