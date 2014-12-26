@@ -140,6 +140,7 @@
         'csWeb.legendList',
         'csWeb.resize',
         'csWeb.showModal',
+        'csWeb.voting',
         'csWeb.mca',
         'csWeb.datatable',
         'ngCookies'
@@ -240,7 +241,7 @@
     }).directive('ngModelOnblur', function () {
         return {
             restrict: 'A',
-            require: 'ngModel',
+            rict: 'A', require: 'ngModel',
             priority: 1,
             link: function (scope, elm, attr, ngModelCtrl) {
                 if (attr.type === 'radio' || attr.type === 'checkbox')

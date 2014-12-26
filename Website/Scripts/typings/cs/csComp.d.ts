@@ -80,17 +80,17 @@ declare module csComp.Services {
         public startDate: () => Date;
     }
     interface IFeature {
-        id: string;
+        id?: string;
         layerId: string;
-        type: string;
+        type?: string;
         geometry: IGeoJsonGeometry;
-        properties: IStringToString[];
-        isSelected: boolean;
-        htmlStyle: string;
-        featureTypeName: string;
-        fType: IFeatureType;
-        isInitialized: boolean;
-        sensors: {
+        properties?: IStringToAny;
+        isSelected?: boolean;
+        htmlStyle?: string;
+        featureTypeName?: string;
+        fType?: IFeatureType;
+        isInitialized?: boolean;
+        sensors?: {
             [id: string]: any[];
         };
     }
@@ -99,12 +99,12 @@ declare module csComp.Services {
     * Features are part of a layer and filtered and styled using group filters and styles
     *
     */
-    class Feature {
+    class Feature implements IFeature {
         public id: string;
         public layerId: string;
         public type: string;
         public geometry: IGeoJsonGeometry;
-        public properties: IStringToString[];
+        public properties: IStringToAny;
         public isSelected: boolean;
         public htmlStyle: string;
         public featureTypeName: string;
@@ -114,8 +114,8 @@ declare module csComp.Services {
             [id: string]: any[];
         };
     }
-    interface IStringToString {
-        [key: string]: string;
+    interface IStringToAny {
+        [key: string]: any;
     }
     interface IGeoJsonGeometry {
         type: string;
@@ -157,6 +157,9 @@ declare module csComp.Services {
         maxValue?: number;
         defaultValue?: number;
     }
+    interface IPropertyTypeData {
+        [key: string]: IPropertyType;
+    }
     interface IFeatureTypeStyle {
         nameLabel?: string;
         fillColor?: string;
@@ -184,7 +187,7 @@ declare module csComp.Services {
             [key: string]: IFeatureType;
         };
         type: string;
-        features: Feature[];
+        features: IFeature[];
     }
     class PropertyInfo {
         public max: number;
@@ -303,11 +306,18 @@ declare module csComp.Services {
         public title: string;
         public url: string;
     }
+    interface IPrivileges {
+        mca: {
+            expertMode: boolean;
+        };
+    }
     /** project configuration. */
     class Project implements ISerializable<Project> {
         public title: string;
         public description: string;
         public logo: string;
+        public url: string;
+        public baselayers: IBaseLayer[];
         public featureTypes: {
             [id: string]: IFeatureType;
         };
@@ -324,6 +334,7 @@ declare module csComp.Services {
         };
         public dataSets: DataSet[];
         public viewBounds: IBoundingBox;
+        public userPrivileges: IPrivileges;
         public markers: {};
         public deserialize(input: Project): Project;
     }
@@ -564,17 +575,20 @@ declare module FeatureProps {
         private feature;
         private propertyTypeData;
         public title: string;
+        public icon: string;
         public sections: {
             [title: string]: ICallOutSection;
         };
-        constructor(type: csComp.Services.IFeatureType, feature: csComp.Services.IFeature, propertyTypeData: {
-            [key: string]: csComp.Services.IPropertyType;
-        });
+        constructor(type: csComp.Services.IFeatureType, feature: csComp.Services.IFeature, propertyTypeData: csComp.Services.IPropertyTypeData);
+        public sectionCount(): number;
+        public firstSection(): ICallOutSection;
+        public lastSection(): ICallOutSection;
         private getOrCreateCallOutSection(sectionTitle);
         /**
         * Set the title of the callout to the title of the feature.
         */
         private setTitle();
+        private setIcon();
         static title(type: csComp.Services.IFeatureType, feature: csComp.Services.IFeature): string;
     }
     class FeaturePropsCtrl {
@@ -587,7 +601,7 @@ declare module FeatureProps {
         private scope;
         static $inject: string[];
         constructor($scope: IFeaturePropsScope, $location: ng.ILocationService, $sce: ng.ISCEService, $mapService: csComp.Services.MapService, $layerService: csComp.Services.LayerService, $messageBusService: csComp.Services.MessageBusService);
-        public toTrusted(html: string): any;
+        public toTrusted(html: string): string;
         /**
         * Callback function
         * @see {http://stackoverflow.com/questions/12756423/is-there-an-alias-for-this-in-typescript}
@@ -680,39 +694,50 @@ declare module Mca {
     /**
     * Module
     */
-    var myModule: any;
+    var myModule: ng.IModule;
 }
 declare module Mca {
     interface IMcaScope extends ng.IScope {
         vm: McaCtrl;
+        ratingStates: any;
     }
     class McaCtrl {
         private $scope;
         private $modal;
         private $translate;
+        private $timeout;
         private $localStorageService;
         private $layerService;
         private messageBusService;
+        private static mcaChartId;
         private static mcas;
         private static confirmationMsg1;
         private static confirmationMsg2;
+        public features: csComp.Services.IFeature[];
         public selectedFeature: csComp.Services.IFeature;
         public properties: FeatureProps.CallOutProperty[];
-        public showDialog: boolean;
         public showFeature: boolean;
         public showChart: boolean;
+        public featureIcon: string;
         public mca: Models.Mca;
         public selectedCriterion: Models.Criterion;
         public availableMcas: Models.Mca[];
+        public showAsterChart: boolean;
+        public showDialog: boolean;
+        public expertMode: boolean;
+        public showSparkline: boolean;
         private groupStyle;
         static $inject: string[];
-        constructor($scope: IMcaScope, $modal: any, $translate: ng.translate.ITranslateService, $localStorageService: ng.localStorage.ILocalStorageService, $layerService: csComp.Services.LayerService, messageBusService: csComp.Services.MessageBusService);
+        constructor($scope: IMcaScope, $modal: any, $translate: ng.translate.ITranslateService, $timeout: ng.ITimeoutService, $localStorageService: ng.localStorage.ILocalStorageService, $layerService: csComp.Services.LayerService, messageBusService: csComp.Services.MessageBusService);
+        private getVotingClass(criterion);
         private createDummyMca();
+        public toggleMcaChartType(): void;
+        public toggleSparkline(): void;
         public weightUpdated(criterion: Models.Criterion): void;
-        /** Add or delete the received MCA model. */
-        private mcaMessageReceived;
+        public updateMca(criterion?: Models.Criterion): void;
         public editMca(mca: Models.Mca): void;
         public createMca(): void;
+        private showMcaEditor(newMca);
         public removeMca(mca: Models.Mca): void;
         private getMcaIndex(mca);
         private addMca(mca);
@@ -720,19 +745,21 @@ declare module Mca {
         private addMcaToLocalStorage(mca);
         private removeMcaFromLocalStorage(mca);
         private featureMessageReceived;
-        private updateSelectedFeature(feature);
+        private scopeApply();
+        private updateSelectedFeature(feature, drawCharts?);
         public drawChart(criterion?: Models.Criterion): void;
         private getParentOfSelectedCriterion(criterion?);
+        private drawHistogram(criterion?);
         private drawAsterPlot(criterion?);
         private drawPieChart(criterion?);
         /** Based on the currently loaded features, which MCA can we use */
-        public updateAvailableMcas(): void;
+        public updateAvailableMcas(mca?: Models.Mca): void;
         public calculateMca(): void;
         private applyPropertyInfoToCriteria(mca, featureType);
         private addPropertyInfo(featureId, mca);
         public setStyle(item: FeatureProps.CallOutProperty): void;
-        private static createMetaInfo(mca);
-        private static createMetaInfoRank(mca);
+        private static createPropertyType(mca);
+        private static createRankPropertyType(mca);
     }
 }
 declare module Mca {
@@ -741,32 +768,41 @@ declare module Mca {
     }
     interface IExtendedPropertyInfo extends csComp.Services.IPropertyType {
         isSelected?: boolean;
-        hasCategory?: boolean;
         category?: string;
         scores?: string;
         scoringFunctionType?: Models.ScoringFunctionType;
+        /** The data is considered invalid when below this value */
+        minCutoffValue?: number;
+        /** The data is considered invalid when above this value */
+        maxCutoffValue?: number;
+        userWeight?: number;
     }
     class McaEditorCtrl {
         private $scope;
-        private $modal;
+        private $modalInstance;
         private $layerService;
+        private $translate;
         private messageBusService;
+        private mca;
         public dataset: csComp.Services.IGeoJsonFile;
         public propInfos: IExtendedPropertyInfo[];
         public headers: string[];
         public selectedFeatureType: csComp.Services.IFeatureType;
         public mcaTitle: string;
         public rankTitle: string;
-        public hasRank: boolean;
         public scoringFunctions: Models.ScoringFunction[];
+        public showItem: number;
+        public scaleMax: number;
+        public scaleMin: number;
         static $inject: string[];
-        constructor($scope: IMcaEditorScope, $modal: any, $layerService: csComp.Services.LayerService, messageBusService: csComp.Services.MessageBusService);
+        constructor($scope: IMcaEditorScope, $modalInstance: any, $layerService: csComp.Services.LayerService, $translate: ng.translate.ITranslateService, messageBusService: csComp.Services.MessageBusService, mca?: Models.Mca);
         private updatePropertyInfoUponEdit(criterion, category?);
         public loadPropertyTypes(): void;
         /**
         * Load the features as visible on the map.
         */
         private loadMapLayers();
+        private selectFirstFeatureType();
         private updatePropertyInfo(featureType);
         public toggleSelection(metaInfoTitle: string): void;
         public isDisabled(): boolean;
@@ -775,7 +811,11 @@ declare module Mca {
         */
         public save(): void;
         public cancel(): void;
+        public toggleItemDetails(index: number): void;
     }
+}
+declare module McaEditorView {
+    var html: string;
 }
 declare module Mca.Models {
     enum ScoringFunctionType {
@@ -791,6 +831,7 @@ declare module Mca.Models {
     * Scoring function creates a PLA of the scoring algorithm.
     */
     class ScoringFunction {
+        public title: string;
         public type: ScoringFunctionType;
         public scores: string;
         public cssClass : string;
@@ -824,13 +865,18 @@ declare module Mca.Models {
         * Format [x1,y1 x2,y2], and may contain special characters, such as min or max to define the minimum or maximum.
         */
         public scores: string;
+        public propValues: number[];
         public criteria: Criterion[];
         /** Piece-wise linear approximation of the scoring function by a set of x and y points */
         public isPlaUpdated: boolean;
         /** Piece-wise linear approximation must be scaled:x' = ax+b, where a=100/(8r) and b=-100(min+0.1r)/(8r) and r=max-min */
         public isPlaScaled: boolean;
-        private x;
-        private y;
+        public minValue: number;
+        public maxValue: number;
+        public minCutoffValue: number;
+        public maxCutoffValue: number;
+        public x: number[];
+        public y: number[];
         public deserialize(input: Criterion): Criterion;
         private requiresMinimum();
         private requiresMaximum();
@@ -839,8 +885,8 @@ declare module Mca.Models {
         * Update the piecewise linear approximation (PLA) of the scoring (a.k.a. user) function,
         * which translates a property value to a MCA value in the range [0,1] using all features.
         */
-        public updatePla(features: csComp.Services.Feature[]): void;
-        public getScore(feature: csComp.Services.Feature): number;
+        public updatePla(features: csComp.Services.IFeature[]): void;
+        public getScore(feature: csComp.Services.IFeature): number;
     }
     class Mca extends Criterion implements csComp.Services.ISerializable<Mca> {
         /** Section of the callout */
@@ -855,6 +901,9 @@ declare module Mca.Models {
         public userWeightMax: number;
         /** Applicable feature ids as a string[]. */
         public featureIds: string[];
+        public scaleMaxValue: number;
+        public scaleMinValue: number;
+        public rankLabel : string;
         constructor();
         public deserialize(input: Mca): Mca;
         /**
@@ -929,8 +978,23 @@ declare module Timeline {
         public updateFocusTime(): void;
     }
 }
+declare module Voting {
+    /**
+    * Module
+    */
+    var myModule: any;
+}
 declare module csComp.Helpers {
     function supportsDataUri(): boolean;
+    function standardDeviation(values: number[]): {
+        avg: number;
+        stdDev: number;
+    };
+    function average(data: number[]): number;
+    /**
+    * Collect all the property types that are referenced by a feature type.
+    */
+    function getPropertyTypes(type: Services.IFeatureType, propertyTypeData: Services.IPropertyTypeData): Services.IPropertyType[];
     /**
     * Convert a property value to a display value using the property info.
     */
@@ -1011,7 +1075,30 @@ declare module csComp.Helpers {
     class AsterPieData extends PieData {
         public score: number;
     }
+    interface IHistogramOptions {
+        id?: string;
+        numberOfBins?: number;
+        width?: number;
+        height?: number;
+        xLabel?: string;
+        selectedValue?: number;
+    }
+    interface IMcaPlotOptions extends IHistogramOptions {
+        /** Scoring function x,y points */
+        xy?: {
+            x: number[];
+            y: number[];
+        };
+        /** Value of the feature, i.e. the point that we wish to highlight */
+        featureValue?: number;
+    }
     class Plot {
+        /**
+        * Draw a histogram, and, if xy is specified, a line plot of x versus y (e.g. a scoring function).
+        */
+        static drawHistogram(values: number[], options?: IHistogramOptions): void;
+        static getScale(stepSize: number, max: number): number;
+        static drawMcaPlot(values: number[], options?: IMcaPlotOptions): void;
         static pieColors: string[];
         /**
         * Draw a Pie chart.
@@ -1022,7 +1109,7 @@ declare module csComp.Helpers {
         * See http://bl.ocks.org/bbest/2de0e25d4840c68f2db1
         */
         static drawAsterPlot(pieRadius: number, data?: AsterPieData[], parentId?: string, colorScale?: string, svgId?: string): void;
-        static clearSvg(svgId: string): void;
+        private static clearSvg(svgId);
     }
 }
 declare module csComp.StringExt {
@@ -1119,7 +1206,7 @@ declare module csComp.Services {
         /**
         * init feature (add to feature list, crossfilter)
         */
-        private initFeature(feature, layer);
+        public initFeature(feature: IFeature, layer: ProjectLayer): IFeatureType;
         public removeFeature(feature: IFeature, layer: ProjectLayer): void;
         /**
         * create icon based of feature style
@@ -1179,6 +1266,7 @@ declare module csComp.Services {
         * @params layers: Optionally provide a semi-colon separated list of layer IDs that should be opened.
         */
         public openProject(url: string, layers?: string): void;
+        public closeProject(): void;
         private zoom(data);
         /**
         * Calculate min/max/count for a specific property in a group

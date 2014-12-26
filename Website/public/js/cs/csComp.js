@@ -180,38 +180,44 @@ var csComp;
         var GroupStyle = (function () {
             function GroupStyle($translate) {
                 var _this = this;
-                this.availableAspects = ["strokeColor", "fillColor", "strokeWidth"];
+                this.availableAspects = ['strokeColor', 'fillColor', 'strokeWidth'];
                 this.colorScales = {};
 
                 $translate('WHITE_RED').then(function (translation) {
-                    _this.colorScales[translation] = ["white", "red"];
+                    _this.colorScales[translation] = ['white', 'red'];
                 });
                 $translate('RED_WHITE').then(function (translation) {
-                    _this.colorScales[translation] = ["red", "white"];
+                    _this.colorScales[translation] = ['red', 'white'];
                 });
                 $translate('GREEN_RED').then(function (translation) {
-                    _this.colorScales[translation] = ["green", "red"];
+                    _this.colorScales[translation] = ['green', 'red'];
                 });
                 $translate('RED_GREEN').then(function (translation) {
-                    _this.colorScales[translation] = ["red", "green"];
+                    _this.colorScales[translation] = ['red', 'green'];
+                });
+                $translate('BLUE_RED').then(function (translation) {
+                    _this.colorScales[translation] = ['#F04030', '#3040F0'];
+                });
+                $translate('RED_BLUE').then(function (translation) {
+                    _this.colorScales[translation] = ['#3040F0', '#F04030'];
                 });
                 $translate('WHITE_BLUE').then(function (translation) {
-                    _this.colorScales[translation] = ["white", "blue"];
+                    _this.colorScales[translation] = ['white', 'blue'];
                 });
                 $translate('BLUE_WHITE').then(function (translation) {
-                    _this.colorScales[translation] = ["blue", "white"];
+                    _this.colorScales[translation] = ['blue', 'white'];
                 });
                 $translate('WHITE_GREEN').then(function (translation) {
-                    _this.colorScales[translation] = ["white", "green"];
+                    _this.colorScales[translation] = ['white', 'green'];
                 });
                 $translate('GREEN_WHITE').then(function (translation) {
-                    _this.colorScales[translation] = ["green", "white"];
+                    _this.colorScales[translation] = ['green', 'white'];
                 });
                 $translate('WHITE_ORANGE').then(function (translation) {
-                    _this.colorScales[translation] = ["white", "orange"];
+                    _this.colorScales[translation] = ['white', 'orange'];
                 });
                 $translate('ORANGE_WHITE').then(function (translation) {
-                    _this.colorScales[translation] = ["orange", "white"];
+                    _this.colorScales[translation] = ['orange', 'white'];
                 });
             }
             return GroupStyle;
@@ -281,15 +287,20 @@ var csComp;
                 this.title = input.title;
                 this.description = input.description;
                 this.logo = input.logo;
+                this.url = input.url;
+                this.baselayers = input.baselayers;
                 this.markers = input.markers;
                 this.startposition = input.startposition;
                 this.features = input.features;
                 this.featureTypes = input.featureTypes;
                 this.propertyTypeData = input.propertyTypeData;
                 this.groups = input.groups;
+                this.userPrivileges = input.userPrivileges;
                 this.mcas = [];
                 for (var mca in input.mcas) {
-                    this.mcas.push(new Mca.Models.Mca().deserialize(mca));
+                    if (input.mcas.hasOwnProperty(mca)) {
+                        this.mcas.push(new Mca.Models.Mca().deserialize(mca));
+                    }
                 }
                 return this;
             };
@@ -803,6 +814,8 @@ var DataTable;
         */
         DataTableCtrl.prototype.toTrusted = function (html) {
             try  {
+                if (html === undefined || html === null)
+                    return this.$sce.trustAsHtml(html);
                 return this.$sce.trustAsHtml(html.toString());
             } catch (e) {
                 console.log(e + ': ' + html);
@@ -919,7 +932,7 @@ var FeatureList;
 })(FeatureList || (FeatureList = {}));
 var FeatureProps;
 (function (FeatureProps) {
-    FeatureProps.html = '<div data-ng-cloak data-ng-show="showMenu" >    <h4 class="rightpanel-header">        &nbsp;&nbsp;{{callOut.title}}    </h4>        <div class="container-fluid rightpanel-tabs" style="position: relative">            <div class="row" style="overflow:hidden">            <!-- Nav tabs -->            <span id="leftArr" style="display:block;padding:10px;margin-top:5px;position:absolute;background-color:transparent;z-index:2">                <i class="glyphicon glyphicon-chevron-left"></i>            </span>            <span id="rightArr" style="display:block;padding:10px;margin-top:5px;position:absolute;background-color:transparent;z-index:2">                <i class="glyphicon glyphicon-chevron-right"></i>            </span>            <ul class="nav nav-tabs" id="featureTabs" style="margin-left:10px">                <li data-toggle="tab" data-ng-class="{active : $first}" data-ng-repeat="(sectionTitle, section) in callOut.sections" ng-if="section.hasProperties()">                    <a ng-href="#rp-{{$index}}" data-toggle="tab" data-ng-if="section.showSectionIcon()" ng-click="featureTabActivated(sectionTitle, section)"><i class="fa {{section.sectionIcon}}"></i></a>                    <a ng-href="#rp-{{$index}}" data-toggle="tab" data-ng-if="!section.showSectionIcon()" ng-click="featureTabActivated(sectionTitle, section)">{{sectionTitle}}</a>                </li>            </ul>        </div>    </div>    <div class="tab-content" style="top:50px; width:355px; overflow-y: auto; overflow-x: hidden" resize resize-y="150">        <div data-ng-if="!$last" class="tab-pane" data-ng-class="{active : $first}" id="rp-{{$index}}" data-ng-repeat="(sectionTitle, section) in callOut.sections">            <table class="table table-condensed">                <tr popover="{{(item.description) ? item.description : \'\'}}"                    popover-placement="left"                    popover-trigger="mouseenter"                    popover-append-to-body="true"                    data-ng-repeat="item in section.properties">                    <td><a class="fa fa-filter makeNarrow" data-ng-show="item.canFilter" data-ng-click="vm.$layerService.setFilter(item)" style="cursor: pointer"></a></td>                    <td><a class="fa fa-eye makeNarrow" data-ng-show="item.canStyle" data-ng-click="vm.$layerService.setStyle(item)" style="cursor: pointer"></a></td>                    <td>{{item.key}}</td>                    <td class="text-right" data-ng-bind-html="vm.toTrusted(item.value)"></td>                </tr>            </table>        </div>        <!-- Treat last tab (filter) differently -->        <div data-ng-if="$last" class="tab-pane" data-ng-class="{active : $first}" id="rp-{{$index}}" data-ng-repeat="(sectionTitle, section) in callOut.sections">            <!-- Add filter panel to the last rendered element -->            <div class="has-feedback" style="padding:0 4px 4px 4px;">                <span style="direction: ltr; position: static; display: block;">                    <input id="searchbox" data-ng-model="search.key" type="text"                            placeholder="Filter" autocomplete="off" spellcheck="false"                            style="position: relative; vertical-align: top;" class="form-control tt-input">                </span>                <span id="searchicon" class="fa form-control-feedback fa-filter"></span>            </div>            <!--<input style="padding:4px;" class=" form-control" data-ng-model="search" placeholder="...">-->            <table id="searchTextResults" class="table table-condensed">                <tr popover="{{(item.description) ? item.description : \'\'}}"                    popover-placement="left"                    popover-trigger="mouseenter"                    popover-append-to-body="true"                    data-ng-repeat="item in section.properties | filter:search">                    <td><a class="fa fa-filter makeNarrow" data-ng-show="item.canFilter" data-ng-click="vm.$layerService.setFilter(item)"></a></td>                    <td><a class="fa fa-eye makeNarrow" data-ng-show="item.canStyle" data-ng-click="vm.$layerService.setStyle(item)"></a></td>                    <td>{{item.key}}</td>                    <td class="text-right" data-ng-bind-html="vm.toTrusted(item.value)"></td>                </tr>            </table>        </div>    </div></div>';
+    FeatureProps.html = '<div data-ng-cloak data-ng-show="showMenu" >    <h4 class="rightpanel-header">        <img data-ng-if="callOut.icon" data-ng-src="{{callOut.icon}}" width="24" height="24" style="margin-left:5px" alt="Icon" />        &nbsp;&nbsp;{{callOut.title}}    </h4>        <div class="container-fluid rightpanel-tabs" style="position: relative">        <div class="row" style="overflow:hidden" ng-if="callOut.sectionCount() <= 8">            <!-- Nav tabs -->            <span id="leftArr" style="display:block;padding:10px;margin-top:5px;position:absolute;background-color:transparent;z-index:2">                <i class="glyphicon glyphicon-chevron-left"></i>            </span>            <span id="rightArr" style="display:block;padding:10px;margin-top:5px;position:absolute;background-color:transparent;z-index:2">                <i class="glyphicon glyphicon-chevron-right"></i>            </span>            <ul class="nav nav-tabs" id="featureTabs" style="margin-left:10px">                <li data-toggle="tab" data-ng-class="{active : $first}" data-ng-repeat="(sectionTitle, section) in callOut.sections" ng-if="section.hasProperties()">                    <a ng-href="#rp-{{$index}}" data-toggle="tab" data-ng-if="section.showSectionIcon()" ng-click="featureTabActivated(sectionTitle, section)"><i class="fa {{section.sectionIcon}}"></i></a>                    <a ng-href="#rp-{{$index}}" data-toggle="tab" data-ng-if="!section.showSectionIcon()" ng-click="featureTabActivated(sectionTitle, section)">{{sectionTitle}}</a>                </li>            </ul>        </div>                        <div class="row" ng-if="callOut.sectionCount() > 8">            <ul class="nav nav-tabs" id="featureTabs" style="margin-left:10px">                <li data-toggle="tab" class="active" ng-init="firstCallOutsection=callOut.firstSection()">                    <a ng-href="#rp-0" data-toggle="tab" data-ng-if="firstCallOutsection.showSectionIcon()" ><i class="fa {{firstCallOutsection.sectionIcon}}"></i></a>                                    </li>                <li class="dropdown" ng-init="selectedSection.title=\'Kies een categorie\'">                    <a style="cursor:pointer" data-toggle="dropdown">{{selectedSection.title}} <span class="caret"/></a>                    <ul class="dropdown-menu">                        <li data-ng-repeat="(sectionTitle, section) in callOut.sections" ng-if="!$last && !$first"><a ng-href="#rp-{{$index}}" ng-click="selectedSection.title = sectionTitle" data-toggle="tab">{{sectionTitle}}</a></li>                    </ul>                </li>                <li data-toggle="tab" ng-init="lastCallOutsection=callOut.lastSection()">                    <a ng-href="#rp-{{callOut.sectionCount()-1}}" data-toggle="tab" data-ng-if="lastCallOutsection.showSectionIcon()"><i class="fa {{lastCallOutsection.sectionIcon}}"></i></a>                                    </li>                            </ul>        </div>    </div>        <div class="tab-content" style="top:50px; width:355px; overflow-y: auto; overflow-x: hidden" resize resize-y="150">        <div data-ng-if="!$last" class="tab-pane" data-ng-class="{active : $first}" id="rp-{{$index}}" data-ng-repeat="(sectionTitle, section) in callOut.sections">            <table class="table table-condensed">                <tr popover="{{(item.description) ? item.description : \'\'}}"                    popover-placement="left"                    popover-trigger="mouseenter"                    popover-append-to-body="true"                    data-ng-repeat="item in section.properties">                    <td><a class="fa fa-filter makeNarrow" data-ng-show="item.canFilter" data-ng-click="vm.$layerService.setFilter(item)" style="cursor: pointer"></a></td>                    <td><a class="fa fa-eye makeNarrow" data-ng-show="item.canStyle" data-ng-click="vm.$layerService.setStyle(item)" style="cursor: pointer"></a></td>                    <td>{{item.key}}</td>                    <td class="text-right" data-ng-bind-html="vm.toTrusted(item.value)"></td>                </tr>            </table>        </div>        <!-- Treat last tab (filter) differently -->        <div data-ng-if="$last" class="tab-pane" data-ng-class="{active : $first}" id="rp-{{$index}}" data-ng-repeat="(sectionTitle, section) in callOut.sections">            <!-- Add filter panel to the last rendered element -->            <div class="has-feedback" style="padding:0 4px 4px 4px;">                <span style="direction: ltr; position: static; display: block;">                    <input id="searchbox" data-ng-model="search.key" type="text"                            placeholder="Filter" autocomplete="off" spellcheck="false"                            style="position: relative; vertical-align: top;" class="form-control tt-input">                </span>                <span id="searchicon" class="fa form-control-feedback fa-filter"></span>            </div>            <!--<input style="padding:4px;" class=" form-control" data-ng-model="search" placeholder="...">-->            <table id="searchTextResults" class="table table-condensed">                <tr popover="{{(item.description) ? item.description : \'\'}}"                    popover-placement="left"                    popover-trigger="mouseenter"                    popover-append-to-body="true"                    data-ng-repeat="item in section.properties | filter:search">                    <td><a class="fa fa-filter makeNarrow" data-ng-show="item.canFilter" data-ng-click="vm.$layerService.setFilter(item)"></a></td>                    <td><a class="fa fa-eye makeNarrow" data-ng-show="item.canStyle" data-ng-click="vm.$layerService.setStyle(item)"></a></td>                    <td>{{item.key}}</td>                    <td class="text-right" data-ng-bind-html="vm.toTrusted(item.value)"></td>                </tr>            </table>        </div>    </div></div>';
 })(FeatureProps || (FeatureProps = {}));
 var FeatureProps;
 (function (FeatureProps) {
@@ -1027,28 +1040,27 @@ var FeatureProps;
 
             //if (type == null) this.createDefaultType();
             this.setTitle();
+            this.setIcon();
 
             var infoCallOutSection = new CallOutSection('fa-info');
             var searchCallOutSection = new CallOutSection('fa-filter');
             var displayValue;
             if (type != null) {
-                var propertyTypes = [];
-                if (type.propertyTypeKeys != null) {
-                    var keys = type.propertyTypeKeys.split(';');
-                    keys.forEach(function (key) {
-                        if (key in propertyTypeData)
-                            propertyTypes.push(propertyTypeData[key]);
-                        else if (type.propertyTypeData != null) {
-                            var result = $.grep(type.propertyTypeData, function (e) {
-                                return e.label === key;
-                            });
-                            if (result.length >= 1)
-                                propertyTypes.push(result);
-                        }
-                    });
-                } else if (type.propertyTypeData != null) {
-                    propertyTypes = type.propertyTypeData;
-                }
+                var propertyTypes = csComp.Helpers.getPropertyTypes(type, propertyTypeData);
+
+                //var propertyTypes: Array<IPropertyType> = [];
+                //if (type.propertyTypeKeys != null) {
+                //    var keys = type.propertyTypeKeys.split(';');
+                //    keys.forEach((key) => {
+                //        if (key in propertyTypeData) propertyTypes.push(propertyTypeData[key]);
+                //        else if (type.propertyTypeData != null) {
+                //            var result = $.grep(type.propertyTypeData, e => e.label === key);
+                //            if (result.length >= 1) propertyTypes.push(result);
+                //        }
+                //    });
+                //} else if (type.propertyTypeData != null) {
+                //    propertyTypes = type.propertyTypeData;
+                //}
                 propertyTypes.forEach(function (mi) {
                     var callOutSection = _this.getOrCreateCallOutSection(mi.section) || infoCallOutSection;
                     callOutSection.propertyTypes[mi.label] = mi;
@@ -1125,6 +1137,18 @@ var FeatureProps;
         //        this.type.propertyTypeData.push(propertyType);
         //    }
         //}
+        CallOut.prototype.sectionCount = function () {
+            return Object.keys(this.sections).length;
+        };
+
+        CallOut.prototype.firstSection = function () {
+            return this.sections[Object.keys(this.sections)[this.sectionCount() - 2]];
+        };
+
+        CallOut.prototype.lastSection = function () {
+            return this.sections[Object.keys(this.sections)[this.sectionCount() - 1]];
+        };
+
         CallOut.prototype.getOrCreateCallOutSection = function (sectionTitle) {
             if (!sectionTitle) {
                 return null;
@@ -1142,14 +1166,18 @@ var FeatureProps;
             this.title = CallOut.title(this.type, this.feature);
         };
 
+        CallOut.prototype.setIcon = function () {
+            this.icon = (this.type == null || this.type.style == null || !this.type.style.hasOwnProperty('iconUri') || this.type.style.iconUri.toLowerCase().indexOf('_media') >= 0) ? '' : this.type.style.iconUri;
+        };
+
         CallOut.title = function (type, feature) {
             var title = '';
             if (type != null && type.style != null && type.style.nameLabel)
                 title = feature.properties[type.style.nameLabel];
             else {
-                if (feature.hasOwnProperty('Name'))
+                if (feature.properties.hasOwnProperty('Name'))
                     title = feature.properties['Name'];
-                else if (feature.hasOwnProperty('name'))
+                else if (feature.properties.hasOwnProperty('name'))
                     title = feature.properties['name'];
             }
             if (!csComp.StringExt.isNullOrEmpty(title) && !$.isNumeric(title))
@@ -1299,6 +1327,8 @@ var FeatureProps;
         }
         FeaturePropsCtrl.prototype.toTrusted = function (html) {
             try  {
+                if (html === undefined || html === null)
+                    return this.$sce.trustAsHtml(html);
                 return this.$sce.trustAsHtml(html.toString());
             } catch (e) {
                 console.log(e + ': ' + html);
@@ -1418,7 +1448,7 @@ var FilterList;
 })(FilterList || (FilterList = {}));
 var LayersDirective;
 (function (LayersDirective) {
-    LayersDirective.html = '<div>    <h4 class="leftpanel-header" translate="LAYERS"></h4>    <div data-ng-repeat="group in vm.$layerService.project.groups" style="margin-left: 5px">        <div style="float: left; margin-left: -10px; margin-top: 5px" data-toggle="collapse" data-target="#layergroup_{{group.id}}"><i class="fa fa-chevron-down togglebutton toggle-arrow-down"></i><i class="fa fa-chevron-up togglebutton toggle-arrow-up"></i></div>        <div popover="{{(group.description) ? group.description : \'\'}}"             popover-placement="right"             popover-width="400"             popover-trigger="mouseenter"             class="group-title">{{group.title}}</div>        <div id="layergroup_{{group.id}}" class="collapse in">            <div popover="{{(layer.description) ? layer.description : \'\'}}"                 popover-placement="right"                 popover-trigger="mouseenter"                                  data-ng-repeat="layer in group.layers">                <!--bs-popover>-->                <div style="list-style-type: none; padding: 0;" data-ng-class="{indent: layer.isSublayer}">                    <!--<button type="button" class="btn btn-default" data-container="body" data-toggle="popover" data-placement="right" data-content="Vivamus sagittis lacus vel augue laoreet rutrum faucibus." data-original-title="" title="">Right</button>-->                    <div ng-hide="group.oneLayerActive" class="checkbox checkbox-primary" style="margin-left: 20px">                        <input type="checkbox" id="cblayer{{layer.id}}" ng-model="layer.enabled" data-ng-click="vm.toggleLayer(layer);">                        <label for="cblayer{{layer.id}}">                            {{layer.title}}                        </label>                    </div>                    <div ng-show="group.oneLayerActive" class="radio radio-primary" style="margin-left: 20px">                        <input type="radio" ng-value="true" id="rblayer{{layer.id}}" ng-model="layer.enabled" data-ng-click="vm.toggleLayer(layer);">                        <label for="rblayer{{layer.id}}">                            {{layer.title}}                        </label>                    </div>                </div>            </div>        </div>    </div></div>';
+    LayersDirective.html = '<div>    <h4 class="leftpanel-header" translate="LAYERS"></h4>    <div style="overflow-y: auto; overflow-x: hidden; margin-top: -10px" resize resize-y="95">        <div data-ng-repeat="group in vm.$layerService.project.groups" style="margin-left: 5px">            <div style="float: left; margin-left: -5px; margin-top: 5px" data-toggle="collapse" data-target="#layergroup_{{group.id}}"><i class="fa fa-chevron-down togglebutton toggle-arrow-down"></i><i class="fa fa-chevron-up togglebutton toggle-arrow-up"></i></div>            <div popover="{{(group.description) ? group.description : \'\'}}"                 popover-placement="right"                 popover-width="400"                 popover-trigger="mouseenter"                 class="group-title">{{group.title}}</div>            <div id="layergroup_{{group.id}}" class="collapse in">                <div popover="{{(layer.description) ? layer.description : \'\'}}"                     popover-placement="right"                     popover-trigger="mouseenter"                     data-ng-repeat="layer in group.layers">                    <!--bs-popover>-->                    <div style="list-style-type: none; padding: 0;" data-ng-class="{indent: layer.isSublayer}">                        <!--<button type="button" class="btn btn-default" data-container="body" data-toggle="popover" data-placement="right" data-content="Vivamus sagittis lacus vel augue laoreet rutrum faucibus." data-original-title="" title="">Right</button>-->                        <div ng-hide="group.oneLayerActive" class="checkbox checkbox-primary" style="margin-left: 20px">                            <input type="checkbox" id="cblayer{{layer.id}}" ng-model="layer.enabled" data-ng-click="vm.toggleLayer(layer);">                            <label for="cblayer{{layer.id}}">                                {{layer.title}}                            </label>                        </div>                        <div ng-show="group.oneLayerActive" class="radio radio-primary" style="margin-left: 20px">                            <input type="radio" ng-value="true" id="rblayer{{layer.id}}" ng-model="layer.enabled" data-ng-click="vm.toggleLayer(layer);">                            <label for="rblayer{{layer.id}}">                                {{layer.title}}                            </label>                        </div>                    </div>                </div>            </div>        </div>    </div></div>';
 })(LayersDirective || (LayersDirective = {}));
 var LayersDirective;
 (function (LayersDirective) {
@@ -1656,10 +1686,12 @@ var LegendList;
 })(LegendList || (LegendList = {}));
 var Mca;
 (function (Mca) {
-    Mca.html = '<div>    <h4 class="leftpanel-header">MCA</h4>    <div>        <select data-ng-model="vm.mca"                data-ng-options="mca.title for mca in vm.availableMcas"                style="width: 75%; margin-bottom:10px;"></select>        <a href="" data-ng-click="vm.createMca()" class="pull-right" style="margin-right:5px;"><i class="fa fa-plus"></i></a>        <a href="" data-ng-click="vm.removeMca(vm.mca)" class="pull-right" style="margin-right:5px;"><i class="fa fa-trash"></i></a>        <a href="" data-ng-click="vm.editMca(vm.mca)" class="pull-right" style="margin-right:5px;"><i class="fa fa-edit"></i></a>    </div>        <!--MCA EDITOR DIALOG-->    <div id="mcaEditorView">        <!--<input type="checkbox" ng-model="showDialog"> Show-->        <div show-modal="vm.showDialog" class="modal fade">            <div class="modal-dialog" data-ng-controller="mcaEditorCtrl">                <div class="modal-content">                    <div class="modal-header">                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>                        <h3 class="modal-title" translate>MCA.EDITOR_TITLE</h3>                    </div>                    <div class="modal-body">                        <input type="text" data-ng-model="vm.mcaTitle" placeholder="{{ \'MCA.TITLE\' | translate }}" />                        <span><input type="checkbox" data-ng-model="vm.hasRank" style="margin-left: 10px;" /><span translate>MCA.INCLUDE_RANK</span></span>                        <input type="text" data-ng-if="vm.hasRank" data-ng-model="vm.rankTitle" placeholder="{{ \'MCA.RANK_TITLE\' | translate }}" />                        <h4 translate>MCA.MAIN_FEATURE</h4>                        <select data-ng-model="vm.selectedFeatureType"                                data-ng-change="vm.loadPropertyTypes()"                                data-ng-options="item as item.name for (key, item) in vm.dataset.featureTypes"                                class="form-control"></select>                        <h4 translate>MCA.PROPERTIES</h4>                        <ul class="form-group" style="margin-top: 1em; margin-left: -2em; overflow-y: auto; overflow-x: hidden;"                            resize resize-y="450">                            <li ng-repeat="mi in vm.propInfos" class="list-unstyled" style="white-space: nowrap; -moz-text-overflow: ellipsis; text-overflow: ellipsis">                                <div>                                    <span>                                        <input type="checkbox" name="vm.selectedTitles[]" value="{{mi.title}}"                                               data-ng-checked="mi.isSelected"                                               data-ng-click="mi.isSelected = !mi.isSelected">&nbsp;&nbsp;{{mi.title}}                                        <span data-ng-if="mi.isSelected" style="margin-left: 10px;">                                            <input type="checkbox" data-ng-model="mi.hasCategory" /><span translate>MCA.HAS_CATEGORY</span>                                            <input type="text" data-ng-if="mi.hasCategory" data-ng-model="mi.category" placeholder="..." />                                        </span>                                    </span>                                    <form data-ng-if="mi.isSelected" name="myForm" style="margin-left: 20px;">                                        <label id="scoringFunctions" data-ng-repeat="sf in vm.scoringFunctions">                                            <input type="radio" data-ng-model="mi.scoringFunctionType" value="{{sf.type}}">                                            <a data-ng-href="" data-ng-class="sf.cssClass" data-ng-click="mi.isSelected = !mi.isSelected"></a>                                        </label>                                    </form>                                    <div data-ng-if="mi.scoringFunctionType == 0" style="margin-left: 20px;">                                        input -> score:&nbsp;<input type="text" data-ng-model="mi.scores" placeholder="[x0,y0 x1,y1 ...]" />                                    </div>                                </div>                            </li>                        </ul>                    </div>                    <div class="modal-footer">                        <button type="button" class="btn btn-warning" data-dismiss="modal" data-ng-click="vm.cancel()" translate>CANCEL_BTN</button>                        <button type="button" class="btn btn-primary" data-dismiss="modal" data-ng-disabled="vm.isDisabled()" data-ng-click="vm.save()" translate>OK_BTN</button>                    </div>                </div><!-- /.modal-content -->            </div><!-- /.modal-dialog -->        </div>    </div>    <div data-ng-if="vm.mca">        <ul class="list-unstyled">            <li data-ng-repeat="criterion in vm.mca.criteria">                <div data-ng-style="{\'display\': \'inline-block\', \'margin-bottom\': \'6px\', \'width\':\'10px\', \'height\':\'10px\', \'border\':\'solid 1px black\', \'background-color\': criterion.color}"></div>                <div class="truncate" style="display: inline-block; width: 170px;">{{criterion.getTitle()}}</div>                <div rating class="pull-right" style="margin:0 10px;" ng-model="criterion.userWeight" max="{{vm.mca.userWeightMax}}" readonly="isReadonly"                        state-on="\'fa fa-circle\'" state-off="\'fa fa-circle-o\'"                        data-ng-click="vm.weightUpdated(criterion)"                        on-hover="hoveringOver(value)" on-leave="overStar = null"></div>                <ul class="list-unstyled" style="margin-left: 10px;" data-ng-if="criterion.criteria.length > 0">                    <li data-ng-repeat="crit in criterion.criteria">                        <div data-ng-style="{\'display\': \'inline-block\', \'margin-bottom\': \'6px\', \'width\':\'10px\', \'height\':\'10px\', \'border\':\'solid 1px black\', \'background-color\': crit.color}">                        </div>                        <div class="truncate" style="display: inline-block; width: 150px;">{{crit.getTitle()}}</div>                        <div rating class="pull-right" style="margin:0 10px;" ng-model="crit.userWeight" max="{{vm.mca.userWeightMax}}" readonly="isReadonly"                             state-on="\'fa fa-circle\'" state-off="\'fa fa-circle-o\'"                             data-ng-click="vm.weightUpdated(crit)"                             on-hover="hoveringOver(value)" on-leave="overStar = null"></div>                    </li>                </ul>            </li>        </ul>        <!--<a href="" style="display: inline-block; width: 100%; text-transform: uppercase"           data-ng-click="vm.calculateMca()" translate="MCA.COMPUTE_MGS" translate-values="{ mcaTitle: vm.mca.title }"></a>-->        <h4 data-ng-if="vm.showChart">            <a href="" data-ng-click="vm.weightUpdated(vm.mca)" translate="MCA.TOTAL_RESULT"></a>            <a href="" data-ng-if="vm.selectedCriterion">&gt;&nbsp;{{vm.selectedCriterion.title}}</a>        </h4>        <div style="margin-top: 5px; margin-left: 70px;" id="mcaPieChart"></div>        <div data-ng-if="vm.showFeature">            <h4>{{vm.selectedFeature.properties[\'Name\']}}</h4>            <table class="table table-condensed">                <tr data-ng-repeat="item in vm.properties"                    popover="{{item.description}}"                    popover-placement="right"                    popover-trigger="mouseenter"                    popover-append-to-body="true">                    <td><a class="fa fa-filter makeNarrow" data-ng-if="item.canFilter" data-ng-click="vm.$layerService.setFilter(item)" style="cursor: pointer"></a></td>                    <td><a class="fa fa-eye makeNarrow" data-ng-if="item.canStyle" data-ng-click="vm.setStyle(item)" style="cursor: pointer"></a></td>                    <td>{{item.key}}</td>                    <td class="text-right">{{item.value}}</td>                </tr>            </table>        </div>        <i data-ng-if="!vm.showFeature"><div translate="MCA.SHOW_FEATURE_MSG"></div></i>    </div></div>';
+    Mca.html = '<div>    <div class="wide-tooltip">        <span class="pull-right fa fa-info-circle fa-2x"              tooltip-html-unsafe="{{\'MCA.DESCRIPTION\' | translate}}"              tooltip-placement="bottom"              tooltip-trigger="mouseenter"              tooltip-append-to-body="false"              style="margin-right: 5px;"></span>        <h4 class="leftpanel-header">MCA</h4>    </div>    <div>        <select data-ng-model="vm.mca"                data-ng-options="mca.title for mca in vm.availableMcas"                data-ng-change="vm.updateMca()"                style="width: 65%; margin-bottom: 10px;"></select>        <div data-ng-if="vm.expertMode" class="pull-right">            <a href="" data-ng-click="vm.createMca()" tooltip="{{\'MCA.ADD_MCA\' | translate}}" style="margin-right:5px;"><i class="fa fa-plus"></i></a>            <a href="" data-ng-click="vm.removeMca(vm.mca)" tooltip="{{\'MCA.DELETE_MCA\' | translate}}" style="margin-right:5px;"><i class="fa fa-trash"></i></a>            <a href="" data-ng-click="vm.editMca(vm.mca)" tooltip="{{\'MCA.EDIT_MCA\' | translate}}" tooltip-placement="right" style="margin-right:5px;"><i class="fa fa-edit"></i></a>        </div>        <a href=""           tooltip="{{\'MCA.TOGGLE_SPARKLINE\' | translate}}"           data-ng-init="sparkLineStyle = vm.showSparkline ? {} : {color:\'lightgray\'}"           data-ng-click="vm.toggleSparkline(); sparkLineStyle = vm.showSparkline ? {} : {color:\'lightgray\'}"           data-ng-style="sparkLineStyle"           class="pull-right" style="margin-right:5px;"><i class="fa fa-bar-chart"></i></a>    </div>        <div data-ng-if="!vm.mca">        <div data-ng-if="vm.expertMode"  translate>MCA.INFO_EXPERT</div>        <div data-ng-if="!vm.expertMode" translate>MCA.INFO</div>    </div>    <div data-ng-if="vm.mca" style="overflow-y: auto; overflow-x: hidden; margin-left: -5px;" resize resize-y="140">        <div data-ng-repeat="criterion in vm.mca.criteria" class="wide-tooltip">            <div data-ng-if="criterion.criteria.length > 0 && criterion.userWeight != 0" class="collapsed pull-left" style="margin: 0 5px 0 0" data-toggle="collapse" data-target="#criterion_{{$index}}"><i class="fa fa-chevron-down togglebutton toggle-arrow-down"></i><i class="fa fa-chevron-up togglebutton toggle-arrow-up"></i></div>            <div data-ng-style="{\'display\': \'inline-block\', \'margin-bottom\': \'6px\', \'width\':\'10px\', \'height\':\'10px\', \'border\':\'solid 1px black\', \'background-color\': criterion.color}"></div>            <div class="truncate" data-ng-class="{true: \'ignoredCriteria\'}[criterion.userWeight == 0]" style="display: inline-block; width: 150px; font-weight: bold">{{criterion.getTitle()}}</div>            <voting class="pull-right"                    data-ng-class="vm.getVotingClass(criterion)"                    data-ng-change="vm.weightUpdated(criterion)"                    min="-vm.mca.userWeightMax"                    max="vm.mca.userWeightMax"                    ng-model="criterion.userWeight"                    style="margin-right: 5px; margin-bottom: 3px;"></voting>            <div id="histogram_{{$index}}" data-ng-show="vm.showSparkline && criterion.criteria.length == 0" style="margin-top: 5px;"></div>            <div data-ng-if="criterion.criteria.length > 0" id="criterion_{{$parent.$index}}" class="collapse out" style="margin-left: 19px">                <div data-ng-repeat="crit in criterion.criteria">                    <div data-ng-style="{\'display\': \'inline-block\', \'margin-bottom\': \'6px\', \'width\':\'10px\', \'height\':\'10px\', \'border\':\'solid 1px black\', \'background-color\': crit.color}"></div>                    <div class="truncate" data-ng-class="{true: \'ignoredCriteria\'}[crit.userWeight == 0 || criterion.userWeight == 0]" style="display: inline-block; width: 150px;">{{crit.getTitle()}}</div>                    <div class="pull-right" style="margin-right: 15px;">{{Math.abs(crit.userWeight)}}</div>                    <voting class="pull-right"                            data-ng-class="vm.getVotingClass(criterion)"                            data-ng-change="vm.weightUpdated(crit)"                            min="0"                            max="vm.mca.userWeightMax"                            ng-model="crit.userWeight"                            style="margin-right: 5px;"></voting>                    <div id="histogram_{{$parent.$index}}_{{$index}}" data-ng-show="vm.showSparkline" style="margin-top: 5px;"></div>                </div>            </div>        </div>        <!--<a href="" style="display: inline-block; width: 100%; text-transform: uppercase"               data-ng-click="vm.calculateMca()" translate="MCA.COMPUTE_MGS" translate-values="{ mcaTitle: vm.mca.title }"></a>-->        <h4 data-ng-if="vm.showChart">            <a href="" data-ng-click="vm.weightUpdated(vm.mca)" translate="MCA.TOTAL_RESULT"></a>            <a href="" data-ng-if="vm.selectedCriterion">&gt;&nbsp;{{vm.selectedCriterion.title}}</a>        </h4>                <a href="" data-ng-if="vm.showFeature" class="pull-right" data-ng-click="vm.toggleMcaChartType();" style="margin-right: 10px">            <i class="fa" data-ng-class="{true: \'fa-bar-chart\', false: \'fa-pie-chart\'}[vm.showAsterChart]"></i>        </a>        <div style="margin-top: 5px; margin-left: auto; margin-right: auto; width: 95%;" id="mcaChart"></div>        <div data-ng-if="vm.showFeature">            <h4>                <img data-ng-if="vm.featureIcon" data-ng-src="{{vm.featureIcon}}" width="24" height="24" style="margin:0 5px" alt="Icon" />                {{vm.selectedFeature.properties[\'Name\']}}            </h4>            <table class="table table-condensed">                <tr data-ng-repeat="item in vm.properties"                    popover="{{item.description}}"                    popover-placement="right"                    popover-trigger="mouseenter"                    popover-append-to-body="true">                    <td><a class="fa fa-filter makeNarrow" data-ng-if="item.canFilter" data-ng-click="vm.$layerService.setFilter(item)" style="cursor: pointer"></a></td>                    <td><a class="fa fa-eye makeNarrow" data-ng-if="item.canStyle" data-ng-click="vm.setStyle(item)" style="cursor: pointer"></a></td>                    <td>{{item.key}}</td>                    <td class="text-right">{{item.value}}</td>                </tr>            </table>        </div>        <i data-ng-if="!vm.showFeature"><div translate="MCA.SHOW_FEATURE_MSG"></div></i>    </div>    <!--<div rating class="pull-right"             data-ng-style="{\'margin\': \'0 10px\', \'background\':\'rgba(0, 0, 0, 0.1)\', \'border-radius\': \'8px\', \'padding\': \'0 4px\', \'color\': criterion.color}"             ng-model="criterion.userWeight" max="11" readonly="isReadonly"             rating-states="ratingStates"             data-ng-click="vm.weightUpdated(criterion)"             on-hover="hoveringOver(value)" on-leave="overStar = null"></div>--></div>';
 })(Mca || (Mca = {}));
 var Mca;
 (function (Mca) {
+    'use strict';
+
     /**
     * Config
     */
@@ -1680,14 +1712,15 @@ var Mca;
     * Directive to display an MCA control.
     */
     Mca.myModule.directive('mca', [
-        '$window', '$compile',
-        function ($window, $compile) {
+        '$window', '$compile', '$templateCache',
+        function ($window, $compile, $templateCache) {
             return {
                 terminal: true,
                 restrict: 'EA',
                 scope: {},
                 template: Mca.html,
                 compile: function (el) {
+                    $templateCache.put('mcaEditorView.html', McaEditorView.html);
                     var fn = $compile(el);
                     return function (scope) {
                         fn(scope);
@@ -1698,65 +1731,52 @@ var Mca;
                 controller: Mca.McaCtrl
             };
         }
-    ]).directive('bsPopover', function () {
-        return function (scope, element, attrs) {
-            element.find("a[rel=popover]").popover({ placement: 'right', html: 'true' });
-        };
-    });
+    ]);
 })(Mca || (Mca = {}));
 var Mca;
 (function (Mca) {
+    'use strict';
+
     var McaCtrl = (function () {
-        function McaCtrl($scope, $modal, $translate, $localStorageService, $layerService, messageBusService) {
+        function McaCtrl($scope, $modal, $translate, $timeout, $localStorageService, $layerService, messageBusService) {
             var _this = this;
             this.$scope = $scope;
             this.$modal = $modal;
             this.$translate = $translate;
+            this.$timeout = $timeout;
             this.$localStorageService = $localStorageService;
             this.$layerService = $layerService;
             this.messageBusService = messageBusService;
-            this.showDialog = false;
+            this.features = [];
             this.availableMcas = [];
-            /** Add or delete the received MCA model. */
-            this.mcaMessageReceived = function (title, data) {
-                if (!data || !data.mca)
-                    return;
-                switch (title) {
-                    case "add":
-                        _this.addMca(data.mca);
-                        break;
-                    case "delete":
-                        _this.deleteMca(data.mca);
-                        break;
-                }
-            };
+            this.showAsterChart = false;
+            this.showDialog = false;
+            this.expertMode = false;
+            this.showSparkline = false;
             this.featureMessageReceived = function (title, feature) {
                 //console.log("MC: featureMessageReceived");
                 if (_this.mca == null)
                     return;
                 switch (title) {
-                    case "onFeatureSelect":
-                        _this.updateSelectedFeature(feature);
+                    case 'onFeatureSelect':
+                        _this.updateSelectedFeature(feature, true);
                         break;
-                    case "onFeatureDeselect":
+                    case 'onFeatureDeselect':
                         _this.showFeature = false;
                         _this.selectedFeature = null;
                         _this.drawChart();
                         break;
                     default:
-                        console.log(title);
                         break;
                 }
-                if (_this.$scope.$root.$$phase != '$apply' && _this.$scope.$root.$$phase != '$digest') {
-                    _this.$scope.$apply();
-                }
+                _this.scopeApply();
             };
             $scope.vm = this;
 
             messageBusService.subscribe('layer', function (title) {
                 switch (title) {
-                    case 'activated':
                     case 'deactivate':
+                    case 'activated':
                         _this.updateAvailableMcas();
                         _this.calculateMca();
                         break;
@@ -1766,6 +1786,8 @@ var Mca;
             messageBusService.subscribe('project', function (title) {
                 switch (title) {
                     case 'loaded':
+                        _this.expertMode = $layerService.project != null && $layerService.project.hasOwnProperty('userPrivileges') && $layerService.project.userPrivileges.hasOwnProperty('mca') && $layerService.project.userPrivileges.mca.hasOwnProperty('expertMode') && $layerService.project.userPrivileges.mca.expertMode;
+
                         if (typeof $layerService.project.mcas === 'undefined' || $layerService.project.mcas == null)
                             $layerService.project.mcas = [];
                         var mcas = _this.$localStorageService.get(McaCtrl.mcas);
@@ -1779,8 +1801,7 @@ var Mca;
                 }
             });
 
-            messageBusService.subscribe("feature", this.featureMessageReceived);
-            messageBusService.subscribe("mca", this.mcaMessageReceived);
+            messageBusService.subscribe('feature', this.featureMessageReceived);
 
             $translate('MCA.DELETE_MSG').then(function (translation) {
                 McaCtrl.confirmationMsg1 = translation;
@@ -1789,6 +1810,12 @@ var Mca;
                 McaCtrl.confirmationMsg2 = translation;
             });
         }
+        McaCtrl.prototype.getVotingClass = function (criterion) {
+            if (criterion == null || this.mca == null || criterion.userWeight === 0 || criterion.userWeight < -this.mca.userWeightMax || criterion.userWeight > this.mca.userWeightMax)
+                return 'disabledMca';
+            return criterion.userWeight > 0 ? 'prefer' : 'avoid';
+        };
+
         McaCtrl.prototype.createDummyMca = function () {
             var mca = new Mca.Models.Mca();
             mca.title = 'Mijn Zelfredzaamheid';
@@ -1843,20 +1870,57 @@ var Mca;
             this.$layerService.project.mcas.push(mca);
         };
 
+        McaCtrl.prototype.toggleMcaChartType = function () {
+            this.showAsterChart = !this.showAsterChart;
+            this.drawChart(this.mca.criteria[0]);
+        };
+
+        McaCtrl.prototype.toggleSparkline = function () {
+            this.showSparkline = !this.showSparkline;
+            if (this.showSparkline)
+                this.drawChart();
+        };
+
         McaCtrl.prototype.weightUpdated = function (criterion) {
+            this.selectedCriterion = criterion;
             this.addMca(this.mca);
+            this.updateMca(criterion);
+        };
+
+        McaCtrl.prototype.updateMca = function (criterion) {
+            this.selectedCriterion = criterion;
+            this.features = [];
             this.calculateMca();
             this.drawChart(criterion);
         };
 
         McaCtrl.prototype.editMca = function (mca) {
-            this.messageBusService.publish('mca', 'edit', { mca: mca });
-            this.showDialog = true;
+            this.showMcaEditor(mca);
         };
 
         McaCtrl.prototype.createMca = function () {
-            this.messageBusService.publish('mca', 'create');
-            this.showDialog = true;
+            this.showMcaEditor(new Mca.Models.Mca());
+        };
+
+        McaCtrl.prototype.showMcaEditor = function (newMca) {
+            var _this = this;
+            var modalInstance = this.$modal.open({
+                templateUrl: 'mcaEditorView.html',
+                controller: Mca.McaEditorCtrl,
+                resolve: {
+                    mca: function () {
+                        return newMca;
+                    }
+                }
+            });
+            modalInstance.result.then(function (mca) {
+                _this.showSparkline = false;
+                _this.addMca(mca);
+                _this.updateMca();
+                //console.log(JSON.stringify(mca, null, 2));
+            }, function () {
+                //console.log('Modal dismissed at: ' + new Date());
+            });
         };
 
         McaCtrl.prototype.removeMca = function (mca) {
@@ -1865,16 +1929,22 @@ var Mca;
                 return;
             var title = String.format(McaCtrl.confirmationMsg1, mca.title);
             this.messageBusService.confirm(title, McaCtrl.confirmationMsg2, function (result) {
-                if (result)
+                if (!result)
+                    return;
+                _this.$timeout(function () {
                     _this.deleteMca(mca);
+                    if (_this.mca)
+                        _this.updateMca();
+                }, 0);
             });
+            this.scopeApply();
         };
 
         McaCtrl.prototype.getMcaIndex = function (mca) {
             var mcaIndex = -1;
             var mcas = this.$layerService.project.mcas;
             for (var i = 0; i < mcas.length; i++) {
-                if (mcas[i].title != mca.title)
+                if (mcas[i].title !== mca.title)
                     continue;
                 mcaIndex = i;
                 break;
@@ -1888,26 +1958,20 @@ var Mca;
             this.deleteMca(mca);
             this.$layerService.project.mcas.push(mca);
             this.addMcaToLocalStorage(mca);
-            this.updateAvailableMcas();
-            this.mca = mca;
-            this.calculateMca();
-            this.drawPieChart();
+            this.updateAvailableMcas(mca);
         };
 
         McaCtrl.prototype.deleteMca = function (mca) {
             if (!mca)
                 return;
             var mcaIndex = this.getMcaIndex(mca);
+            if (mcaIndex < 0)
+                return;
             var mcas = this.$layerService.project.mcas;
             if (mcaIndex >= 0)
                 mcas.splice(mcaIndex, 1);
             this.removeMcaFromLocalStorage(mca);
             this.updateAvailableMcas();
-            if (this.availableMcas.length > 0) {
-                this.mca = this.availableMcas[0];
-                this.calculateMca();
-                this.drawPieChart();
-            }
         };
 
         McaCtrl.prototype.addMcaToLocalStorage = function (mca) {
@@ -1925,7 +1989,7 @@ var Mca;
                 return;
             var mcaIndex = -1;
             for (var i = 0; i < mcas.length; i++) {
-                if (mcas[i].title != mca.title)
+                if (mcas[i].title !== mca.title)
                     continue;
                 mcaIndex = i;
                 break;
@@ -1936,31 +2000,86 @@ var Mca;
             this.$localStorageService.set(McaCtrl.mcas, mcas); // You first need to set the key
         };
 
-        McaCtrl.prototype.updateSelectedFeature = function (feature) {
-            if (typeof feature === 'undefined' || feature == null)
-                return;
-            this.selectedFeature = feature;
-            if (this.mca.label in feature.properties) {
-                this.showFeature = true;
-                this.properties = [];
-                var mi = McaCtrl.createMetaInfo(this.mca);
-                var displayValue = csComp.Helpers.convertPropertyInfo(mi, feature.properties[mi.label]);
-                this.properties.push(new FeatureProps.CallOutProperty(mi.title, displayValue, mi.label, true, true, feature, false, mi.description));
-                if (this.mca.rankTitle) {
-                    mi = McaCtrl.createMetaInfoRank(this.mca);
-                    displayValue = csComp.Helpers.convertPropertyInfo(mi, feature.properties[mi.label]);
-                    this.properties.push(new FeatureProps.CallOutProperty(mi.title, displayValue, mi.label, false, false, feature, false, mi.description));
-                }
-                this.drawChart();
+        McaCtrl.prototype.scopeApply = function () {
+            if (this.$scope.$root.$$phase !== '$apply' && this.$scope.$root.$$phase !== '$digest') {
+                this.$scope.$apply();
             }
         };
 
+        McaCtrl.prototype.updateSelectedFeature = function (feature, drawCharts) {
+            if (typeof drawCharts === "undefined") { drawCharts = false; }
+            if (typeof feature === 'undefined' || feature == null) {
+                this.featureIcon = '';
+                return;
+            }
+            this.selectedFeature = feature;
+            this.featureIcon = this.selectedFeature.fType != null && this.selectedFeature.fType.style != null ? this.selectedFeature.fType.style.iconUri : '';
+            if (!feature.properties.hasOwnProperty(this.mca.label))
+                return;
+
+            this.showFeature = true;
+            this.properties = [];
+            var mi = McaCtrl.createPropertyType(this.mca);
+            var displayValue = csComp.Helpers.convertPropertyInfo(mi, feature.properties[mi.label]);
+            this.properties.push(new FeatureProps.CallOutProperty(mi.title, displayValue, mi.label, true, true, feature, false, mi.description, mi));
+            if (this.mca.rankTitle) {
+                mi = McaCtrl.createRankPropertyType(this.mca);
+                displayValue = csComp.Helpers.convertPropertyInfo(mi, feature.properties[mi.label]);
+                this.properties.push(new FeatureProps.CallOutProperty(mi.title, displayValue, mi.label, false, false, feature, false, mi.description, mi));
+            }
+            if (drawCharts)
+                this.drawChart();
+        };
+
         McaCtrl.prototype.drawChart = function (criterion) {
+            var _this = this;
+            this.selectedCriterion = criterion;
             this.showChart = true;
             if (this.showFeature)
-                this.drawAsterPlot(criterion);
+                if (this.showAsterChart)
+                    this.drawAsterPlot(criterion);
+                else
+                    this.drawHistogram(criterion);
             else
                 this.drawPieChart(criterion);
+
+            if (!this.showSparkline)
+                return;
+
+            var i = 0;
+            this.mca.criteria.forEach(function (crit) {
+                var id = 'histogram_' + i++;
+                if (crit.criteria.length === 0) {
+                    var y1 = crit.y;
+                    if (crit.userWeight < 0)
+                        y1 = y1.map(function (v) {
+                            return 1 - v;
+                        });
+                    csComp.Helpers.Plot.drawMcaPlot(crit.propValues, {
+                        id: id,
+                        width: 220,
+                        height: 70,
+                        xy: { x: crit.x, y: y1 },
+                        featureValue: _this.selectedFeature ? _this.selectedFeature.properties[crit.label] : null
+                    });
+                } else {
+                    var j = 0;
+                    crit.criteria.forEach(function (c) {
+                        var y2 = c.y;
+                        if (crit.userWeight < 0)
+                            y2 = y2.map(function (v) {
+                                return 1 - v;
+                            });
+                        csComp.Helpers.Plot.drawMcaPlot(c.propValues, {
+                            id: id + '_' + j++,
+                            width: 220,
+                            height: 70,
+                            xy: { x: c.x, y: y2 },
+                            featureValue: _this.selectedFeature ? _this.selectedFeature.properties[c.label] : null
+                        });
+                    });
+                }
+            });
         };
 
         McaCtrl.prototype.getParentOfSelectedCriterion = function (criterion) {
@@ -1981,6 +2100,34 @@ var Mca;
             return parent;
         };
 
+        McaCtrl.prototype.drawHistogram = function (criterion) {
+            var _this = this;
+            if (!this.mca || !this.selectedFeature)
+                return;
+
+            var currentLevel = this.getParentOfSelectedCriterion(criterion);
+            if (typeof currentLevel === 'undefined' || currentLevel == null)
+                return;
+            var data = [];
+            var options = {
+                id: McaCtrl.mcaChartId,
+                numberOfBins: 10,
+                width: 240,
+                height: 100,
+                selectedValue: this.selectedFeature.properties[this.mca.label]
+            };
+            this.features.forEach(function (feature) {
+                if (feature.properties.hasOwnProperty(_this.mca.label)) {
+                    // The property is available. I use the '+' to convert the string value to a number.
+                    var prop = feature.properties[_this.mca.label];
+                    if ($.isNumeric(prop))
+                        data.push(prop);
+                }
+            });
+
+            csComp.Helpers.Plot.drawHistogram(data, options);
+        };
+
         McaCtrl.prototype.drawAsterPlot = function (criterion) {
             var _this = this;
             if (!this.mca || !this.selectedFeature)
@@ -1991,15 +2138,16 @@ var Mca;
             var data = [];
             var i = 0;
             currentLevel.forEach(function (c) {
+                var rawScore = c.getScore(_this.selectedFeature);
                 var pieData = new csComp.Helpers.AsterPieData();
                 pieData.id = i++;
                 pieData.label = c.getTitle();
-                pieData.weight = c.weight;
+                pieData.weight = Math.abs(c.weight);
                 pieData.color = c.color;
-                pieData.score = c.getScore(_this.selectedFeature) * 100;
+                pieData.score = (c.weight > 0 ? rawScore : 1 - rawScore) * 100;
                 data.push(pieData);
             });
-            csComp.Helpers.Plot.drawAsterPlot(100, data, 'mcaPieChart');
+            csComp.Helpers.Plot.drawAsterPlot(100, data, McaCtrl.mcaChartId);
         };
 
         McaCtrl.prototype.drawPieChart = function (criterion) {
@@ -2014,32 +2162,31 @@ var Mca;
                 var pieData = new csComp.Helpers.PieData();
                 pieData.id = i++;
                 pieData.label = c.getTitle();
-                pieData.weight = c.weight;
+                pieData.weight = Math.abs(c.weight);
                 pieData.color = c.color;
                 data.push(pieData);
             });
-            csComp.Helpers.Plot.drawPie(100, data, 'mcaPieChart');
+            csComp.Helpers.Plot.drawPie(100, data, McaCtrl.mcaChartId);
         };
 
         /** Based on the currently loaded features, which MCA can we use */
-        McaCtrl.prototype.updateAvailableMcas = function () {
+        McaCtrl.prototype.updateAvailableMcas = function (mca) {
             var _this = this;
             this.showChart = false;
-            this.mca = null;
+            this.mca = mca;
             this.availableMcas = [];
 
             this.$layerService.project.mcas.forEach(function (m) {
                 m.featureIds.forEach(function (featureId) {
-                    if (_this.availableMcas.indexOf(m) < 0 && featureId in _this.$layerService.featureTypes) {
+                    if (_this.availableMcas.indexOf(m) < 0 && _this.$layerService.featureTypes.hasOwnProperty(featureId)) {
                         _this.availableMcas.push(m);
                         var featureType = _this.$layerService.featureTypes[featureId];
                         _this.applyPropertyInfoToCriteria(m, featureType);
                     }
                 });
             });
-            if (this.availableMcas.length > 0)
+            if (mca == null && this.availableMcas.length >= 0)
                 this.mca = this.availableMcas[0];
-            this.$scope.$apply();
         };
 
         McaCtrl.prototype.calculateMca = function () {
@@ -2048,18 +2195,20 @@ var Mca;
                 return;
             var mca = this.mca;
             mca.featureIds.forEach(function (featureId) {
-                if (!(featureId in _this.$layerService.featureTypes))
+                if (!(_this.$layerService.featureTypes.hasOwnProperty(featureId)))
+                    return;
+                _this.$layerService.project.features.forEach(function (feature) {
+                    if (feature.featureTypeName != null && feature.featureTypeName === featureId)
+                        _this.features.push(feature);
+                });
+                if (_this.features.length === 0)
                     return;
                 _this.addPropertyInfo(featureId, mca);
-                var features = [];
-                _this.$layerService.project.features.forEach(function (feature) {
-                    features.push(feature);
-                });
-                mca.updatePla(features);
+                mca.updatePla(_this.features);
                 mca.update();
                 var tempScores = [];
                 var index = 0;
-                _this.$layerService.project.features.forEach(function (feature) {
+                _this.features.forEach(function (feature) {
                     var score = mca.getScore(feature);
                     if (mca.rankTitle) {
                         var tempItem = { score: score, index: index++ };
@@ -2073,31 +2222,44 @@ var Mca;
                     tempScores.sort(function (a, b) {
                         return b.score - a.score;
                     });
-                    var length = _this.$layerService.project.features.length;
+                    var length = _this.features.length;
+                    var scaleRange = mca.scaleMinValue ? Math.abs(mca.scaleMaxValue - mca.scaleMinValue) + 1 : length;
+                    var scaleFactor = Math.ceil(length / scaleRange);
+                    var rankFunction = mca.scaleMinValue ? mca.scaleMaxValue > mca.scaleMinValue ? function (position) {
+                        return mca.scaleMaxValue - Math.round(position / scaleFactor);
+                    } : function (position) {
+                        return mca.scaleMinValue + Math.round(position / scaleFactor);
+                    } : function (position) {
+                        return position;
+                    };
                     var prevScore = -1;
                     var rank = 1;
                     for (var i = 0; i < length; i++) {
                         var item = tempScores[i];
 
                         // Assign items with the same value the same rank.
-                        if (item.score != prevScore)
+                        if (item.score !== prevScore)
                             rank = i + 1;
                         prevScore = item.score;
-                        _this.$layerService.project.features[item.index].properties[mca.label + '#'] = rank + ',' + length;
+                        _this.features[item.index].properties[mca.label + '#'] = rankFunction(rank) + ',' + scaleRange;
                     }
                 }
             });
-            this.updateSelectedFeature(this.selectedFeature);
-            if (this.selectedFeature)
+            this.updateSelectedFeature(this.selectedFeature, false);
+            if (this.selectedFeature) {
                 this.messageBusService.publish('feature', 'onFeatureSelect', this.selectedFeature);
+            }
             if (this.groupStyle)
                 this.$layerService.updateStyle(this.groupStyle);
         };
 
         McaCtrl.prototype.applyPropertyInfoToCriteria = function (mca, featureType) {
+            var propertyTypes = csComp.Helpers.getPropertyTypes(featureType, this.$layerService.propertyTypeData);
+            if (propertyTypes.length === 0)
+                return;
             mca.criteria.forEach(function (criterion) {
                 var label = criterion.label;
-                featureType.propertyTypeData.forEach(function (propInfo) {
+                propertyTypes.forEach(function (propInfo) {
                     if (propInfo.label === label) {
                         criterion.title = propInfo.title;
                         criterion.description = propInfo.description;
@@ -2108,31 +2270,42 @@ var Mca;
 
         McaCtrl.prototype.addPropertyInfo = function (featureId, mca) {
             var featureType = this.$layerService.featureTypes[featureId];
-            if (featureType.propertyTypeData.reduce(function (prevValue, curItem) {
+            var propertyTypes = featureType.propertyTypeData;
+
+            //var propertyTypes = csComp.Helpers.getPropertyTypes(featureType, this.$layerService.propertyTypeData);
+            if (propertyTypes.reduce(function (prevValue, curItem) {
                 return prevValue || (curItem.label === mca.label);
-            }, false))
-                return;
-
-            var mi = McaCtrl.createMetaInfo(mca);
-            featureType.propertyTypeData.push(mi);
-
+            }, false)) {
+                var pt = McaCtrl.createPropertyType(mca);
+                if (typeof featureType.propertyTypeData === 'undefined' || featureType.propertyTypeData == null)
+                    featureType.propertyTypeData = [];
+                featureType.propertyTypeData.push(pt);
+            }
             if (!mca.rankTitle)
                 return;
-            mi = McaCtrl.createMetaInfoRank(mca);
-            featureType.propertyTypeData.push(mi);
+            if (propertyTypes.reduce(function (prevValue, curItem) {
+                return prevValue || (curItem.label === mca.rankLabel);
+            }, false)) {
+                pt = McaCtrl.createRankPropertyType(mca);
+                featureType.propertyTypeData.push(pt);
+            }
         };
 
         McaCtrl.prototype.setStyle = function (item) {
-            if (this.groupStyle)
+            // If groupStyle has been set, we have called it before.
+            // However, make sure that not another filter has set the fillColor too, overwriting our label.
+            if (this.groupStyle && this.groupStyle.group != null && this.groupStyle.group.styles != null && this.groupStyle.group.styles.filter(function (s) {
+                return s.visualAspect === 'fillColor';
+            })[0].property === this.mca.label)
                 this.$layerService.updateStyle(this.groupStyle);
             else {
                 this.groupStyle = this.$layerService.setStyle(item, false);
-                this.groupStyle.colors = ['red', 'green'];
+                this.groupStyle.colors = ['#F04030', '#3040F0'];
                 this.$layerService.updateStyle(this.groupStyle);
             }
         };
 
-        McaCtrl.createMetaInfo = function (mca) {
+        McaCtrl.createPropertyType = function (mca) {
             var mi = {
                 title: mca.title,
                 label: mca.label,
@@ -2141,28 +2314,32 @@ var Mca;
                 minValue: 0,
                 description: mca.description,
                 stringFormat: mca.stringFormat,
+                visibleInCallOut: true,
                 section: mca.section || 'MCA'
             };
             return mi;
         };
 
-        McaCtrl.createMetaInfoRank = function (mca) {
+        McaCtrl.createRankPropertyType = function (mca) {
             var mi = {
                 title: mca.rankTitle,
-                label: mca.label + '#',
+                label: mca.rankLabel,
                 type: 'rank',
                 description: mca.rankDescription,
                 stringFormat: mca.rankFormat,
+                visibleInCallOut: true,
                 section: mca.section || 'MCA'
             };
             return mi;
         };
+        McaCtrl.mcaChartId = 'mcaChart';
         McaCtrl.mcas = 'MCAs';
 
         McaCtrl.$inject = [
             '$scope',
             '$modal',
             '$translate',
+            '$timeout',
             'localStorageService',
             'layerService',
             'messageBusService'
@@ -2176,66 +2353,71 @@ var Mca;
     'use strict';
 
     var McaEditorCtrl = (function () {
-        function McaEditorCtrl($scope, $modal, $layerService, messageBusService) {
+        function McaEditorCtrl($scope, $modalInstance, $layerService, $translate, messageBusService, mca) {
             var _this = this;
             this.$scope = $scope;
-            this.$modal = $modal;
+            this.$modalInstance = $modalInstance;
             this.$layerService = $layerService;
+            this.$translate = $translate;
             this.messageBusService = messageBusService;
+            this.mca = mca;
             this.propInfos = [];
             this.headers = [];
             this.scoringFunctions = [];
             $scope.vm = this;
 
             this.scoringFunctions.push(new Mca.Models.ScoringFunction(1 /* Ascending */));
-            this.scoringFunctions.push(new Mca.Models.ScoringFunction(2 /* Descending */));
+
+            //this.scoringFunctions.push(new Models.ScoringFunction(Models.ScoringFunctionType.Descending));
             this.scoringFunctions.push(new Mca.Models.ScoringFunction(3 /* AscendingSigmoid */));
-            this.scoringFunctions.push(new Mca.Models.ScoringFunction(4 /* DescendingSigmoid */));
+
+            //this.scoringFunctions.push(new Models.ScoringFunction(Models.ScoringFunctionType.DescendingSigmoid));
             this.scoringFunctions.push(new Mca.Models.ScoringFunction(5 /* GaussianPeak */));
-            this.scoringFunctions.push(new Mca.Models.ScoringFunction(6 /* GaussianValley */));
-            this.scoringFunctions.push(new Mca.Models.ScoringFunction(0 /* Manual */));
 
-            messageBusService.subscribe('layer', function (title) {
-                switch (title) {
-                    case 'activated':
-                    case 'deactivate':
-                        _this.loadMapLayers();
-                        break;
-                }
+            //this.scoringFunctions.push(new Models.ScoringFunction(Models.ScoringFunctionType.GaussianValley));
+            //this.scoringFunctions.push(new Models.ScoringFunction(Models.ScoringFunctionType.Manual));
+            $translate('MCA.LINEAR').then(function (translation) {
+                _this.scoringFunctions[0].title = translation;
+            });
+            $translate('MCA.SIGMOID').then(function (translation) {
+                _this.scoringFunctions[1].title = translation;
+            });
+            $translate('MCA.GAUSSIAN').then(function (translation) {
+                _this.scoringFunctions[2].title = translation;
             });
 
-            messageBusService.subscribe('mca', function (title, data) {
-                switch (title) {
-                    case 'edit':
-                        var mca = data.mca;
-                        _this.mcaTitle = mca.title;
-                        _this.rankTitle = mca.rankTitle;
-                        _this.hasRank = _this.rankTitle != '';
-                        _this.selectedFeatureType = _this.dataset.featureTypes[mca.featureIds[0]];
-                        _this.updatePropertyInfo(_this.selectedFeatureType);
-                        _this.updatePropertyInfoUponEdit(mca);
-                        break;
-                    case 'create':
-                        _this.mcaTitle = '';
-                        _this.rankTitle = '';
-                        _this.hasRank = false;
-                        _this.selectedFeatureType = null;
-                        _this.loadMapLayers();
-                        break;
-                }
-            });
+            this.loadMapLayers();
+
+            this.mcaTitle = mca.title;
+            this.rankTitle = mca.rankTitle;
+            this.scaleMin = mca.scaleMinValue;
+            this.scaleMax = mca.scaleMaxValue;
+            this.selectedFeatureType = mca.featureIds.length === 0 ? '' : this.dataset.featureTypes[mca.featureIds[0]];
+            if (this.selectedFeatureType) {
+                this.updatePropertyInfo(this.selectedFeatureType);
+                this.updatePropertyInfoUponEdit(mca);
+            } else {
+                this.selectFirstFeatureType();
+            }
         }
         McaEditorCtrl.prototype.updatePropertyInfoUponEdit = function (criterion, category) {
             var _this = this;
             criterion.criteria.forEach(function (c) {
                 if (c.label) {
-                    for (var i in _this.propInfos) {
-                        var mi = _this.propInfos[i];
-                        if (mi.label != c.label)
+                    var propInfos = _this.propInfos;
+                    for (var i in propInfos) {
+                        if (!propInfos.hasOwnProperty(i))
+                            continue;
+                        var mi = propInfos[i];
+                        if (mi.label !== c.label)
                             continue;
                         mi.isSelected = true;
+                        mi.minCutoffValue = c.minCutoffValue;
+                        mi.maxCutoffValue = c.maxCutoffValue;
+                        mi.minValue = c.minValue;
+                        mi.maxValue = c.maxValue;
+                        mi.userWeight = c.userWeight;
                         if (category) {
-                            mi.hasCategory = true;
                             mi.category = category;
                         }
                         break;
@@ -2247,7 +2429,7 @@ var Mca;
         };
 
         McaEditorCtrl.prototype.loadPropertyTypes = function () {
-            console.log("loadPropertyTypes");
+            console.log('loadPropertyTypes');
         };
 
         /**
@@ -2279,8 +2461,14 @@ var Mca;
             });
 
             this.dataset = data;
-            for (var key in data.featureTypes) {
-                this.selectedFeatureType = data.featureTypes[key];
+        };
+
+        McaEditorCtrl.prototype.selectFirstFeatureType = function () {
+            var featureTypes = this.dataset.featureTypes;
+            for (var key in featureTypes) {
+                if (!featureTypes.hasOwnProperty(key))
+                    continue;
+                this.selectedFeatureType = featureTypes[key];
                 this.updatePropertyInfo(this.selectedFeatureType);
                 return;
             }
@@ -2295,11 +2483,11 @@ var Mca;
 
             // Push the Name, so it always appears on top.
             pis.push({
-                label: "Name",
+                label: 'Name',
                 visibleInCallOut: true,
-                title: "Naam",
-                type: "text",
-                filterType: "text",
+                title: 'Naam',
+                type: 'text',
+                filterType: 'text',
                 isSelected: false,
                 scoringFunctionType: this.scoringFunctions[0].type
             });
@@ -2323,9 +2511,20 @@ var Mca;
             }
             pis.forEach(function (pi) {
                 // TODO Later, we could also include categories and not only numbers, where each category represents a certain value.
-                if (pi.visibleInCallOut && pi.type === 'number' && pi.label.indexOf("mca_") < 0 && titles.indexOf(pi.title) < 0) {
+                if (pi.visibleInCallOut && pi.type === 'number' && pi.label.indexOf('mca_') < 0 && titles.indexOf(pi.title) < 0) {
                     titles.push(pi.title);
-                    _this.propInfos.push(pi);
+
+                    // Clone object inline. See http://stackoverflow.com/a/122704/319711
+                    _this.propInfos.push({
+                        title: pi.title,
+                        label: pi.label,
+                        stringFormat: pi.stringFormat,
+                        isSelected: false,
+                        maxValue: pi.maxValue,
+                        minValue: pi.minValue,
+                        defaultValue: pi.defaultValue,
+                        description: pi.description
+                    });
                 }
             });
         };
@@ -2344,8 +2543,6 @@ var Mca;
         McaEditorCtrl.prototype.isDisabled = function () {
             if (typeof this.mcaTitle === 'undefined' || this.mcaTitle.length === 0)
                 return true;
-            if (this.hasRank && this.rankTitle && this.rankTitle.length === 0)
-                return true;
             if (this.propInfos.length === 0 || !this.propInfos.reduce(function (p, c) {
                 return p || c.isSelected;
             }))
@@ -2361,13 +2558,20 @@ var Mca;
             mca.title = this.mcaTitle || 'New MCA criterion';
             mca.label = 'mca_' + mca.title.replace(' ', '_');
             mca.stringFormat = '{0:0.0}';
-            if (this.hasRank) {
+            if (this.rankTitle) {
                 mca.rankTitle = this.rankTitle || 'Rank';
                 mca.rankFormat = '{0} / {1}';
             }
+            if (this.scaleMin && this.scaleMax) {
+                mca.scaleMinValue = this.scaleMin;
+                mca.scaleMaxValue = this.scaleMax;
+            }
             mca.userWeightMax = 5;
-            for (var key in this.dataset.featureTypes) {
-                if (this.dataset.featureTypes[key] === this.selectedFeatureType)
+            var featureTypes = this.dataset.featureTypes;
+            for (var key in featureTypes) {
+                if (!featureTypes.hasOwnProperty(key))
+                    continue;
+                if (featureTypes[key] === this.selectedFeatureType)
                     mca.featureIds = [key];
             }
 
@@ -2379,19 +2583,25 @@ var Mca;
                 criterion.title = mi.title;
                 criterion.isPlaScaled = true;
                 criterion.description = mi.description;
-                criterion.userWeight = 1;
+                criterion.userWeight = mi.userWeight || 1;
+
+                criterion.minCutoffValue = mi.minCutoffValue ? +mi.minCutoffValue : undefined;
+                criterion.maxCutoffValue = mi.maxCutoffValue ? +mi.maxCutoffValue : undefined;
+                criterion.minValue = mi.minValue ? +mi.minValue : undefined;
+                criterion.maxValue = mi.maxValue ? +mi.maxValue : undefined;
 
                 if (mi.scoringFunctionType === 0 /* Manual */) {
                     criterion.scores = mi.scores;
                 } else {
                     criterion.scores = Mca.Models.ScoringFunction.createScores(mi.scoringFunctionType);
-                    criterion.isPlaScaled = true;
                 }
                 if (mi.category) {
                     var parent;
                     for (var i in mca.criteria) {
+                        if (!mca.criteria.hasOwnProperty(i))
+                            continue;
                         var c = mca.criteria[i];
-                        if (c.title != mi.category)
+                        if (c.title !== mi.category)
                             continue;
                         parent = c;
                         break;
@@ -2407,25 +2617,35 @@ var Mca;
                     mca.criteria.push(criterion);
                 }
             });
-            this.messageBusService.publish('mca', 'add', { mca: mca });
+            this.$modalInstance.close(mca);
         };
 
         McaEditorCtrl.prototype.cancel = function () {
             this.mcaTitle = '';
-            this.hasRank = false;
             this.rankTitle = '';
             this.headers = [];
+            this.$modalInstance.dismiss('cancel');
+        };
+
+        McaEditorCtrl.prototype.toggleItemDetails = function (index) {
+            this.showItem = this.showItem == index ? -1 : index;
         };
         McaEditorCtrl.$inject = [
             '$scope',
-            '$modal',
+            '$modalInstance',
             'layerService',
-            'messageBusService'
+            '$translate',
+            'messageBusService',
+            'mca'
         ];
         return McaEditorCtrl;
     })();
     Mca.McaEditorCtrl = McaEditorCtrl;
 })(Mca || (Mca = {}));
+var McaEditorView;
+(function (McaEditorView) {
+    McaEditorView.html = '<div class="modal-content">    <div class="modal-header">        <button type="button" class="close" data-ng-click="vm.cancel()" aria-hidden="true">&times;</button>        <h3 class="modal-title" translate>MCA.EDITOR_TITLE</h3>    </div>    <div class="modal-body container-fluid">        <div class="row-fluid">            <input type="text" class="pull-left" data-ng-model="vm.mcaTitle" style="margin: 0 5px" placeholder="{{ \'MCA.TITLE\' | translate }}" />            <!-- <span><input type="checkbox" data-ng-model="vm.hasRank" style="margin-left: 10px;" /><span translate>MCA.INCLUDE_RANK</span></span>-->            <input type="text" class="pull-left" data-ng-model="vm.rankTitle" style="margin: 0 5px"  placeholder="{{ \'MCA.RANK_TITLE\' | translate }}" />            <input type="text" class="pull-left" data-ng-model="vm.scaleMin" style="width: 100px; margin: 0 5px" placeholder="{{ \'MCA.SCALE_MIN_TITLE\' | translate }}" />            <input type="text" class="pull-left" data-ng-model="vm.scaleMax" style="width: 100px; margin: 0 5px" placeholder="{{ \'MCA.SCALE_MAX_TITLE\' | translate }}" />        </div>        <h4 class="row-fluid" style="margin-top: 5px;" translate>MCA.MAIN_FEATURE</h4>        <select data-ng-model="vm.selectedFeatureType"                data-ng-change="vm.loadPropertyTypes()"                data-ng-options="item as item.name for (key, item) in vm.dataset.featureTypes"                class="form-control row-fluid"></select>        <h4 class="row-fluid" translate>MCA.PROPERTIES</h4>        <ul class="form-group row-fluid" style="margin-top: 1em; margin-left: -2em; overflow-y: auto; overflow-x: hidden;"            resize resize-y="450">            <li ng-repeat="mi in vm.propInfos"                class="row-fluid list-unstyled truncate">                <div style="padding: 5px 0;" class="row-fluid">                    <input type="checkbox" name="vm.selectedTitles[]" value="{{mi.title}}"                           data-ng-checked="mi.isSelected"                           data-ng-click="mi.isSelected = !mi.isSelected">&nbsp;&nbsp;{{mi.title}}                    <div data-ng-if="mi.isSelected" class="pull-right">                        <a href="" class="pull-right"                           style="margin-right: 5px;"                           data-ng-click="vm.toggleItemDetails($index)"><i class="fa fa-2x fa-edit"></i></a>                        <input type="text" class="pull-right"                               style="margin: -2px 5px -2px 0;"                               data-ng-model="mi.category"                               placeholder="{{\'MCA.CATEGORY_MSG\' | translate}}" />                    </div>                    <!--<form data-ng-if="mi.isSelected" name="myForm" style="margin-left: 20px;">                <label id="scoringFunctions" data-ng-repeat="sf in vm.scoringFunctions">                    <input type="radio" data-ng-model="mi.scoringFunctionType" value="{{sf.type}}">                    <a data-ng-href="" data-ng-class="sf.cssClass" data-ng-click="mi.isSelected = !mi.isSelected"></a>                </label>            </form>            <div data-ng-if="mi.scoringFunctionType == 0" style="margin-left: 20px;">                input -> score:&nbsp;<input type="text" data-ng-model="mi.scores" placeholder="[x0,y0 x1,y1 ...]"/>            </div>-->                </div>                <div class="row-fluid" data-ng-show="vm.showItem == {{$index}}" id="scoringFunctions">                    <select class="col-xs-10"                            style="margin-right: 5px; margin-bottom: 5px;"                            data-ng-init="mi.scoringFunctionType = mi.scoringFunctionType || vm.scoringFunctions[0]"                            data-ng-model="mi.scoringFunctionType"                            data-ng-options="sf as sf.title for sf in vm.scoringFunctions"></select>                    <div class="pull-right" data-ng-class="mi.scoringFunctionType.cssClass" style="width: 40px; height: 28px; margin-top: -5px;"></div>                    <div class="row-fluid">                        <input type="text" class="col-xs-3" style="padding: 0;" data-ng-model="mi.minValue" placeholder="{{ \'MCA.MIN_VALUE\' | translate }}" />                        <input type="text" class="col-xs-3" style="padding: 0;" data-ng-model="mi.maxValue" placeholder="{{ \'MCA.MAX_VALUE\' | translate }}" />                        <input type="text" class="col-xs-3" style="padding: 0;" data-ng-model="mi.minCutoffValue" placeholder="{{ \'MCA.MIN_CUTOFF_VALUE\' | translate }}" />                        <input type="text" class="col-xs-3" style="padding: 0;" data-ng-model="mi.maxCutoffValue" placeholder="{{ \'MCA.MAX_CUTOFF_VALUE\' | translate }}" />                    </div>                </div>            </li>        </ul>    </div>    <div class="modal-footer">        <button type="button" class="btn btn-warning" data-ng-click="vm.cancel()" translate>CANCEL_BTN</button>        <button type="button" class="btn btn-primary" data-ng-click="vm.save()" translate>OK_BTN</button>    </div></div>';
+})(McaEditorView || (McaEditorView = {}));
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -2456,6 +2676,7 @@ var Mca;
             function ScoringFunction(scoringFunctionType) {
                 if (typeof scoringFunctionType != 'undefined' && scoringFunctionType != null)
                     this.type = scoringFunctionType;
+                this.title = ScoringFunctionType[scoringFunctionType].toString();
             }
             Object.defineProperty(ScoringFunction.prototype, "cssClass", {
                 get: function () {
@@ -2518,6 +2739,7 @@ var Mca;
             function Criterion() {
                 /** Specified weight by the user */
                 this.userWeight = 1;
+                this.propValues = [];
                 this.criteria = [];
                 /** Piece-wise linear approximation of the scoring function by a set of x and y points */
                 this.isPlaUpdated = false;
@@ -2536,8 +2758,13 @@ var Mca;
                 this.weight = input.weight;
                 this.isPlaScaled = input.isPlaScaled;
                 this.scores = input.scores;
+                this.minCutoffValue = input.minCutoffValue;
+                this.maxCutoffValue = input.maxCutoffValue;
+                this.minValue = input.minValue;
+                this.maxValue = input.maxValue;
+
                 input.criteria.forEach(function (c) {
-                    _this.criteria.push(new Models.Criterion().deserialize(c));
+                    _this.criteria.push(new Criterion().deserialize(c));
                 });
                 return this;
             };
@@ -2573,24 +2800,33 @@ var Mca;
                 }
 
                 // Replace min and max by their values:
+                if (this.scores == null)
+                    return;
                 var scores = this.scores;
-                var propValues = [];
+                this.propValues = [];
                 if (this.requiresMaximum() || this.requiresMinimum() || this.isPlaScaled) {
                     features.forEach(function (feature) {
-                        if (_this.label in feature.properties) {
-                            // The property is available
-                            propValues.push(feature.properties[_this.label]);
+                        if (feature.properties.hasOwnProperty(_this.label)) {
+                            // The property is available. I use the '+' to convert the string value to a number.
+                            var prop = feature.properties[_this.label];
+                            if ($.isNumeric(prop))
+                                _this.propValues.push(prop);
                         }
                     });
                 }
-                var max = 0, min = 0;
+                var max = this.maxValue, min = this.minValue;
                 if (this.isPlaScaled || this.requiresMaximum()) {
-                    max = Math.max.apply(null, propValues);
+                    max = max || Math.max.apply(null, this.propValues);
                     scores.replace('max', max.toPrecision(3));
                 }
                 if (this.isPlaScaled || this.requiresMinimum()) {
-                    min = Math.min.apply(null, propValues);
+                    min = min || Math.min.apply(null, this.propValues);
                     scores.replace('min', min.toPrecision(3));
+                }
+                if (this.isPlaScaled) {
+                    var stats = csComp.Helpers.standardDeviation(this.propValues);
+                    max = max || Math.min(max, stats.avg + 2 * stats.stdDev);
+                    min = min || Math.max(min, stats.avg - 2 * stats.stdDev);
                 }
 
                 // Regex to split the scores: [^\d\.]+ and remove empty entries
@@ -2599,9 +2835,15 @@ var Mca;
                 });
 
                 // Test that we have an equal number of x and y,
-                var range = max - min, a = 0.08 * range, b = min + 0.1 * range;
+                var range = max - min, a, b;
+                if (this.minValue != null || this.maxValue != null) {
+                    a = range / 10;
+                    b = min;
+                } else {
+                    a = 0.08 * range, b = min + 0.1 * range;
+                }
 
-                if (pla.length % 2 != 0)
+                if (pla.length % 2 !== 0)
                     throw Error(this.label + ' does not have an even (x,y) pair in scores.');
                 for (var i = 0; i < pla.length / 2; i++) {
                     var x = parseFloat(pla[2 * i]);
@@ -2629,17 +2871,20 @@ var Mca;
             Criterion.prototype.getScore = function (feature) {
                 if (!this.isPlaUpdated)
                     throw ('Error: PLA must be updated for criterion ' + this.title + '!');
-                if (this.criteria.length == 0) {
+                if (this.criteria.length === 0) {
                     // End point: compute the score for each feature
-                    if (this.label in feature.properties) {
+                    if (feature.properties.hasOwnProperty(this.label)) {
                         // The property is available
                         var x = feature.properties[this.label];
+                        if (this.maxCutoffValue <= x || x <= this.minCutoffValue)
+                            return 0;
                         if (x < this.x[0])
                             return this.y[0];
                         var last = this.x.length - 1;
                         if (x > this.x[last])
                             return this.y[last];
-                        for (var k in this.x) {
+
+                        for (var k = 0; k < this.x.length; k++) {
                             if (x < this.x[k]) {
                                 // Found relative position of x in this.x
                                 var x0 = this.x[k - 1];
@@ -2658,9 +2903,9 @@ var Mca;
                     // Sum all the sub-criteria.
                     var finalScore = 0;
                     this.criteria.forEach(function (crit) {
-                        finalScore += crit.weight * crit.getScore(feature);
+                        finalScore += crit.weight > 0 ? crit.weight * crit.getScore(feature) : Math.abs(crit.weight) * (1 - crit.getScore(feature));
                     });
-                    return this.weight * finalScore;
+                    return this.weight > 0 ? this.weight * finalScore : Math.abs(this.weight) * (1 - finalScore);
                 }
                 return 0;
             };
@@ -2680,6 +2925,14 @@ var Mca;
                 this.weight = 1;
                 this.isPlaUpdated = false;
             }
+            Object.defineProperty(Mca.prototype, "rankLabel", {
+                get: function () {
+                    return this.label + '#';
+                },
+                enumerable: true,
+                configurable: true
+            });
+
             Mca.prototype.deserialize = function (input) {
                 this.section = input.section;
                 this.stringFormat = input.stringFormat;
@@ -2688,6 +2941,12 @@ var Mca;
                 this.rankFormat = input.rankFormat;
                 this.userWeightMax = input.userWeightMax;
                 this.featureIds = input.featureIds;
+                this.minCutoffValue = input.minCutoffValue;
+                this.maxCutoffValue = input.maxCutoffValue;
+                this.minValue = input.minValue;
+                this.maxValue = input.maxValue;
+                this.scaleMinValue = input.scaleMinValue;
+                this.scaleMaxValue = input.scaleMaxValue;
                 _super.prototype.deserialize.call(this, input);
                 return this;
             };
@@ -2705,13 +2964,17 @@ var Mca;
                     criteria = this.criteria;
                 var totalWeight = 0;
                 for (var k in criteria) {
+                    if (!criteria.hasOwnProperty(k))
+                        continue;
                     var crit = criteria[k];
                     if (crit.criteria.length > 0)
                         this.calculateWeights(crit.criteria);
-                    totalWeight += crit.userWeight;
+                    totalWeight += Math.abs(crit.userWeight);
                 }
                 if (totalWeight > 0) {
                     for (var j in criteria) {
+                        if (!criteria.hasOwnProperty(j))
+                            continue;
                         var critj = criteria[j];
                         critj.weight = critj.userWeight / totalWeight;
                     }
@@ -3077,6 +3340,58 @@ var Timeline;
     })();
     Timeline.TimelineCtrl = TimelineCtrl;
 })(Timeline || (Timeline = {}));
+var Voting;
+(function (Voting) {
+    /**
+    * Config
+    */
+    var moduleName = 'csWeb.voting';
+
+    /**
+    * Module
+    */
+    Voting.myModule;
+
+    try  {
+        Voting.myModule = angular.module(moduleName);
+    } catch (err) {
+        // named module does not exist, so create one
+        Voting.myModule = angular.module(moduleName, []);
+    }
+
+    /**
+    * Directive to display an MCA control.
+    */
+    Voting.myModule.directive('voting', [
+        '$timeout', function ($timeout) {
+            return {
+                restrict: 'EA',
+                require: '^ngModel',
+                scope: {
+                    min: '=',
+                    max: '=',
+                    ngModel: '=',
+                    ngChange: '&'
+                },
+                template: '<div style="line-height: 12px; vertical-align: top; margin: 0; background: rgba(0, 0, 0, 0.1); border-radius: 6px; padding: 4px 6px;">' + '<a href="" data-ng-click="decrement()" data-ng-disabled="ngModel <= min" style="float: left;"><i class="fa" data-ng-class="{true: \'fa-minus-square\', false: \'fa-minus-square-o\'}[ngModel > min]"></i></a>' + '<span style="float: left; width:28px; text-align: center;">{{ngModel}}</span>' + '<a href="" data-ng-click="increment()" data-ng-disabled="ngModel >= max"><i class="fa" data-ng-class="{true: \'fa-plus-square\' , false: \'fa-plus-square-o\' }[ngModel < max]"></i></a>' + '</div>',
+                link: function ($scope) {
+                    $scope.increment = function () {
+                        if ($scope.ngModel >= $scope.max)
+                            return;
+                        $scope.ngModel++;
+                        $timeout($scope.ngChange, 0);
+                    };
+                    $scope.decrement = function () {
+                        if ($scope.ngModel <= $scope.min)
+                            return;
+                        $scope.ngModel--;
+                        $timeout($scope.ngChange, 0);
+                    };
+                }
+            };
+        }
+    ]);
+})(Voting || (Voting = {}));
 var csComp;
 (function (csComp) {
     (function (Helpers) {
@@ -3087,6 +3402,62 @@ var csComp;
         }
         Helpers.supportsDataUri = supportsDataUri;
 
+        function standardDeviation(values) {
+            var avg = average(values);
+
+            var squareDiffs = values.map(function (value) {
+                var diff = value - avg;
+                var sqrDiff = diff * diff;
+                return sqrDiff;
+            });
+
+            var avgSquareDiff = average(squareDiffs);
+
+            var stdDev = Math.sqrt(avgSquareDiff);
+            return { avg: avg, stdDev: stdDev };
+        }
+        Helpers.standardDeviation = standardDeviation;
+
+        function average(data) {
+            var sum = data.reduce(function (accumulatedSum, value) {
+                return (accumulatedSum + value);
+            }, 0);
+            var avg = sum / data.length;
+            return avg;
+        }
+        Helpers.average = average;
+
+        /**
+        * Collect all the property types that are referenced by a feature type.
+        */
+        function getPropertyTypes(type, propertyTypeData) {
+            var propertyTypes = [];
+
+            if (type.propertyTypeKeys != null) {
+                var keys = type.propertyTypeKeys.split(';');
+                keys.forEach(function (key) {
+                    // First, lookup key in global propertyTypeData
+                    if (propertyTypeData.hasOwnProperty(key))
+                        propertyTypes.push(propertyTypeData[key]);
+                    else if (type.propertyTypeData != null) {
+                        var result = $.grep(type.propertyTypeData, function (e) {
+                            return e.label === key;
+                        });
+                        if (result.length >= 1)
+                            propertyTypes.push(result);
+                    }
+                });
+            }
+            if (type.propertyTypeData != null) {
+                type.propertyTypeData.forEach(function (pt) {
+                    propertyTypes.push(pt);
+                });
+            }
+
+            return propertyTypes;
+        }
+        Helpers.getPropertyTypes = getPropertyTypes;
+
         /**
         * Convert a property value to a display value using the property info.
         */
@@ -3095,7 +3466,7 @@ var csComp;
             if (!csComp.StringExt.isNullOrEmpty(text) && !$.isNumeric(text))
                 text = text.replace(/&amp;/g, '&');
             if (csComp.StringExt.isNullOrEmpty(text))
-                return '';
+                return text;
             switch (pt.type) {
                 case "bbcode":
                     if (!csComp.StringExt.isNullOrEmpty(pt.stringFormat))
@@ -3371,6 +3742,232 @@ var csComp;
             function Plot() {
             }
             /**
+            * Draw a histogram, and, if xy is specified, a line plot of x versus y (e.g. a scoring function).
+            */
+            Plot.drawHistogram = function (values, options) {
+                var id = (options != null && options.hasOwnProperty("id")) ? options.id : "myHistogram";
+                var numberOfBins = (options != null && options.hasOwnProperty("numberOfBins")) ? options.numberOfBins : 10;
+                var width = (options != null && options.hasOwnProperty("width")) ? options.width : 200;
+                var height = (options != null && options.hasOwnProperty("height")) ? options.height : 150;
+                var xLabel = (options != null && options.hasOwnProperty("xLabel")) ? options.xLabel : "";
+                var selectedValue = (options != null && options.hasOwnProperty("selectedValue")) ? options.selectedValue : null;
+
+                //var yLabel       = (options != null && options.hasOwnProperty('yLabel'))        ? options.yLabel        : '#';
+                var margin = { top: 0, right: 6, bottom: 24, left: 6 };
+                width -= margin.left + margin.right, height -= margin.top + margin.bottom;
+
+                var svgId = 'the_SVG_ID';
+
+                Plot.clearSvg(svgId);
+
+                if (values.length < numberOfBins)
+                    return;
+
+                // A formatter for counts.
+                var formatCount = d3.format(",.0f");
+
+                var max = Math.max.apply(null, values);
+                var min = Math.min.apply(null, values);
+                var range = max - min;
+
+                // Scale the x-range, so we don't have such long numbers
+                var scale = Plot.getScale(range / numberOfBins, max);
+
+                //var scale = range >= 10
+                //    ? Math.max(d3.round(range, 0), d3.round(max, 0)).toString().length - 2 // 100 -> 1
+                //    : -2;
+                var scaleFactor = 0;
+                if (Math.abs(scale) > 0) {
+                    xLabel += " (x10^" + scale + ")";
+                    scaleFactor = Math.pow(10, scale);
+                }
+                var tickFormatter = function (value) {
+                    return scaleFactor > 0 ? d3.round(value / scaleFactor, 0).toString() : d3.round(value, 0).toString();
+                };
+
+                var tempScale = d3.scale.linear().domain([0, numberOfBins]).range([min, max]);
+                var tickArray = d3.range(numberOfBins + 1).map(tempScale);
+                var x = d3.scale.linear().domain([min, max]).range([0, width]);
+
+                var xAxis = d3.svg.axis().scale(x).tickValues(tickArray).tickFormat(tickFormatter).orient("bottom");
+
+                // Generate a histogram using numberOfBins uniformly-spaced bins.
+                var data = d3.layout.histogram().bins(numberOfBins)(values);
+
+                var y = d3.scale.linear().domain([0, d3.max(data, function (d) {
+                        return d.y;
+                    })]).range([height, 0]);
+
+                var svg = d3.select("#" + id).append("svg").attr("id", svgId).attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom).attr("style", "display: block; margin: 0 auto;").append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+                var bar = svg.selectAll(".bar").data(data).enter().append("g").attr("class", function (d, i) {
+                    return selectedValue != null && (d.x < selectedValue && selectedValue < d.x + data[i].dx) ? "bar highlight" : "bar";
+                }).attr("transform", function (d) {
+                    return "translate(" + x(d.x) + "," + y(d.y) + ")";
+                });
+
+                bar.append("rect").attr("x", 1).attr("width", x(min + data[0].dx) - 1).attr("height", function (d) {
+                    return height - y(d.y);
+                });
+
+                var conditionalFormatCounter = function (value) {
+                    return (height - y(value) > 6) ? formatCount(value) : "";
+                };
+
+                // Text (count) inside the bins
+                bar.append("text").attr("dy", ".75em").attr("y", 6).attr("x", x(min + data[0].dx) / 2).attr("text-anchor", "middle").text(function (d) {
+                    return conditionalFormatCounter(d.y);
+                });
+
+                // x-label
+                svg.append("text").attr("class", "x label").attr("text-anchor", "end").attr("x", width).attr("y", height / 2 - 6).text(xLabel);
+
+                svg.append("g").attr("class", "x axis").attr("transform", "translate(0," + height + ")").call(xAxis);
+            };
+
+            Plot.getScale = function (stepSize, max) {
+                for (var sf = -5; sf < 5; sf++) {
+                    var scale = Math.pow(10, sf);
+                    var ls = d3.round(stepSize / scale, 0);
+                    var lm = d3.round(max / scale, 0);
+                    if (0 < ls && ls < 10 && 0 < lm && lm < 100)
+                        return sf;
+                }
+                return 0;
+            };
+
+            Plot.drawMcaPlot = function (values, options) {
+                var id = (options != null && options.hasOwnProperty("id")) ? options.id : "myHistogram";
+                var numberOfBins = (options != null && options.hasOwnProperty("numberOfBins")) ? options.numberOfBins : 10;
+                var width = (options != null && options.hasOwnProperty("width")) ? options.width : 200;
+                var height = (options != null && options.hasOwnProperty("height")) ? options.height : 150;
+                var xLabel = (options != null && options.hasOwnProperty("xLabel")) ? options.xLabel : "";
+                var xyData = (options != null && options.hasOwnProperty("xy")) ? options.xy : null;
+                var featureValue = (options != null && options.hasOwnProperty("featureValue")) ? options.featureValue : null;
+
+                //var yLabel       = (options != null && options.hasOwnProperty('yLabel'))       ? options.yLabel       : '#';
+                var margin = { top: 0, right: 6, bottom: 24, left: 6 };
+                width -= margin.left + margin.right, height -= margin.top + margin.bottom;
+
+                var svgId = id + "_histogram";
+
+                Plot.clearSvg(svgId);
+
+                // A formatter for counts.
+                var formatCount = d3.format(",.0f");
+
+                var max, min, range;
+                if (xyData != null) {
+                    max = xyData.x[xyData.x.length - 1];
+                    min = xyData.x[0];
+                    range = max - min;
+                    max += range / 10;
+                    min -= range / 10;
+                    range = max - min;
+                } else {
+                    max = Math.max.apply(null, values);
+                    min = Math.min.apply(null, values);
+                    range = max - min;
+                }
+
+                // Scale the x-range, so we don't have such long numbers
+                var scale = Plot.getScale(range / numberOfBins, max);
+
+                //var scale = range >= 10
+                //    ? Math.max(d3.round(range, 0), d3.round(max, 0)).toString().length - 2 // 100 -> 1
+                //    : -2;
+                var scaleFactor = 0;
+                xLabel += " (";
+                if (Math.abs(scale) > 0) {
+                    xLabel += "x10^" + scale;
+                    scaleFactor = Math.pow(10, scale);
+                }
+                var tickFormatter = function (value) {
+                    return scaleFactor > 0 ? d3.round(value / scaleFactor, 0).toString() : d3.round(value, 0).toString();
+                };
+
+                var tempScale = d3.scale.linear().domain([0, numberOfBins]).range([min, max]);
+                var tickArray = d3.range(numberOfBins + 1).map(tempScale);
+                var x = d3.scale.linear().domain([min, max]).range([0, width]);
+
+                var xAxis = d3.svg.axis().scale(x).tickValues(tickArray).tickFormat(tickFormatter).orient("bottom");
+
+                // Generate a histogram using numberOfBins uniformly-spaced bins.
+                var valuesInRange = values.filter(function (value) {
+                    return (min <= value && value <= max);
+                });
+                if (valuesInRange.length < 3) {
+                    var svg1 = d3.select("#" + id).append("svg").attr("id", svgId).attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom).append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+                    svg1.append("text").attr("class", "x label").attr("text-anchor", "center").attr("x", width / 2).attr("y", height / 2 + 6).text("\u03A7 NO DATA IN RANGE");
+                    return;
+                }
+                xLabel += " \u03A3" + valuesInRange.length;
+                var data = d3.layout.histogram().bins(numberOfBins)(valuesInRange);
+
+                var y = d3.scale.linear().domain([0, d3.max(data, function (d) {
+                        return d.y;
+                    })]).range([height, 0]);
+
+                var svg = d3.select("#" + id).append("svg").attr("id", svgId).attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom).attr("style", "display: block; margin: 0 auto;").append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+                var bar = svg.selectAll(".bar").data(data).enter().append("g").attr("class", "bar").attr("transform", function (d) {
+                    return "translate(" + x(d.x) + "," + y(d.y) + ")";
+                });
+
+                bar.append("rect").attr("x", 1).attr("width", x(min + data[0].dx) - 1).attr("height", function (d) {
+                    return height - y(d.y);
+                });
+
+                var conditionalFormatCounter = function (value) {
+                    return (height - y(value) > 6) ? formatCount(value) : "";
+                };
+
+                // Text (count) inside the bins
+                bar.append("text").attr("dy", ".75em").attr("y", 6).attr("x", x(min + data[0].dx) / 2).attr("text-anchor", "middle").text(function (d) {
+                    return conditionalFormatCounter(d.y);
+                });
+
+                // x-label
+                xLabel += ")";
+                svg.append("text").attr("class", "x label").attr("text-anchor", "end").attr("x", width).attr("y", height / 2 - 6).text(xLabel);
+
+                svg.append("g").attr("class", "x axis").attr("transform", "translate(0," + height + ")").call(xAxis);
+
+                if (xyData == null)
+                    return;
+
+                // Draw line chart
+                var xy = [];
+                xy.push({ x: min, y: xyData.y[0] });
+                for (var i = 0; i < xyData.x.length; i++) {
+                    xy.push({ x: xyData.x[i], y: xyData.y[i] });
+                }
+                xy.push({ x: max, y: xyData.y[xyData.y.length - 1] });
+
+                var y2 = d3.scale.linear().domain([0, d3.max(xy, function (d) {
+                        return d.y;
+                    })]).range([height - 1, 1]);
+
+                var lineFunc = d3.svg.line().x(function (d) {
+                    return x(d.x);
+                }).y(function (d) {
+                    return y2(d.y);
+                }).interpolate("linear");
+
+                svg.append("svg:path").attr("d", lineFunc(xy)).attr("stroke", "red").attr("stroke-width", 2).attr("fill", "none");
+
+                if (featureValue == null)
+                    return;
+
+                // Draw feature on the score
+                xy = [];
+                xy.push({ x: featureValue, y: 0 });
+                xy.push({ x: featureValue, y: height });
+
+                svg.append("svg:path").attr("d", lineFunc(xy)).attr("stroke", "blue").attr("stroke-width", 2).attr("fill", "none");
+            };
+
+            /**
             * Draw a Pie chart.
             */
             Plot.drawPie = function (pieRadius, data, parentId, colorScale, svgId) {
@@ -3396,7 +3993,7 @@ var csComp;
 
                 var outlineArc = d3.svg.arc().innerRadius(innerRadius).outerRadius(radius);
 
-                var svg = d3.select('#' + parentId).append("svg").attr("id", svgId).attr("width", width).attr("height", height).append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+                var svg = d3.select('#' + parentId).append("svg").attr("id", svgId).attr("width", width).attr("height", height).attr("style", "display: block; margin: 0 auto;").append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
                 svg.call(tip);
 
@@ -3439,7 +4036,7 @@ var csComp;
 
                 var outlineArc = d3.svg.arc().innerRadius(innerRadius).outerRadius(radius);
 
-                var svg = d3.select('#' + parentId).append("svg").attr("id", svgId).attr("width", width).attr("height", height).append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+                var svg = d3.select('#' + parentId).append("svg").attr("id", svgId).attr("width", width).attr("height", height).attr("style", "display: block; margin: 0 auto;").append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
                 try  {
                     svg.call(tip);
@@ -3556,17 +4153,17 @@ var csComp;
                 // NOTE EV: private props in constructor automatically become fields, so mb and map are superfluous.
                 this.mb = $messageBusService;
                 this.map = $mapService;
-                this.accentColor = "";
-                this.title = "";
+                this.accentColor = '';
+                this.title = '';
                 this.layerGroup = new L.LayerGroup();
                 this.featureTypes = {};
                 this.propertyTypeData = {};
                 this.map.map.addLayer(this.layerGroup);
                 this.noStyles = true;
 
-                this.$messageBusService.subscribe("timeline", function (trigger) {
+                this.$messageBusService.subscribe('timeline', function (trigger) {
                     switch (trigger) {
-                        case "focusChange":
+                        case 'focusChange':
                             _this.updateSensorData();
                             break;
                     }
@@ -3593,6 +4190,8 @@ var csComp;
 
                         if (f.sensors != null) {
                             for (var sensorTitle in f.sensors) {
+                                if (!f.sensors.hasOwnProperty(sensorTitle))
+                                    continue;
                                 var sensor = f.sensors[sensorTitle];
                                 var value = sensor[timepos[f.layerId]];
 
@@ -3603,7 +4202,7 @@ var csComp;
                         }
                     }
                 });
-                this.$messageBusService.publish("feature", "onFeatureUpdated");
+                this.$messageBusService.publish('feature', 'onFeatureUpdated');
             };
 
             /**
@@ -3613,13 +4212,13 @@ var csComp;
                 var _this = this;
                 var disableLayers = [];
                 switch (layer.type) {
-                    case "GeoJson":
+                    case 'GeoJson':
                         async.series([
                             function (callback) {
                                 // If oneLayerActive: close other group layer
                                 if (layer.group.oneLayerActive) {
                                     layer.group.layers.forEach(function (l) {
-                                        if (l != layer && l.enabled) {
+                                        if (l !== layer && l.enabled) {
                                             disableLayers.push(l);
                                         }
                                     });
@@ -3634,6 +4233,8 @@ var csComp;
                                         else {
                                             if (dta.featureTypes)
                                                 for (var featureTypeName in dta.featureTypes) {
+                                                    if (!dta.featureTypes.hasOwnProperty(featureTypeName))
+                                                        continue;
                                                     var featureType = dta.featureTypes[featureTypeName];
                                                     featureTypeName = layer.id + '_' + featureTypeName;
                                                     _this.featureTypes[featureTypeName] = featureType;
@@ -3663,18 +4264,20 @@ var csComp;
                                         }
 
                                         for (var featureTypeName in data.featureTypes) {
+                                            if (!data.featureTypes.hasOwnProperty(featureTypeName))
+                                                continue;
                                             var featureType = data.featureTypes[featureTypeName];
                                             featureTypeName = layer.id + '_' + featureTypeName;
                                             _this.featureTypes[featureTypeName] = featureType;
 
                                             //var pt = "." + featureTypeName;
                                             //var icon = featureType.style.iconUri;
-                                            var t = "{\".style" + featureTypeName + "\":";
+                                            var t = '{".style' + featureTypeName + '":';
                                             if (featureType.style.iconUri != null) {
-                                                t += " { \"background\": \"url(" + featureType.style.iconUri + ") no-repeat right center\",";
+                                                t += ' { "background": "url(' + featureType.style.iconUri + ') no-repeat right center",';
                                             }
                                             ;
-                                            t += " \"background-size\": \"100% 100%\",\"border-style\": \"none\"} }";
+                                            t += ' "background-size": "100% 100%","border-style": "none"} }';
                                             var json = $.parseJSON(t);
                                             $.injectCSS(json);
                                             //console.log(JSON.stringify(poiType, null, 2));
@@ -3735,7 +4338,7 @@ var csComp;
                                                 }
                                             });
                                             _this.project.features.forEach(function (f) {
-                                                if (f.layerId != layer.id)
+                                                if (f.layerId !== layer.id)
                                                     return;
                                                 var ft = _this.getFeatureType(f);
                                                 f.properties['Name'] = f.properties[ft.style.nameLabel];
@@ -3743,13 +4346,14 @@ var csComp;
                                             layer.mapLayer.addLayer(v);
                                         }
                                     }
-                                    _this.$messageBusService.publish("layer", "activated", layer);
+                                    _this.$messageBusService.publish('layer', 'activated', layer);
 
                                     callback(null, null);
                                     _this.updateFilters();
                                 });
                             },
-                            function (callback) {
+                            // Callback
+                            function () {
                                 disableLayers.forEach(function (l) {
                                     _this.removeLayer(l);
                                     l.enabled = false;
@@ -3783,22 +4387,22 @@ var csComp;
                 // add title
                 var title = layer.feature.properties.Name;
                 var rowLength = title.length;
-                var content = "<td colspan='3'>" + title + "</td></tr>";
+                var content = '<td colspan=\'3\'>' + title + '</td></tr>';
 
                 // add filter values
                 if (group.filters != null && group.filters.length > 0) {
                     group.filters.forEach(function (f) {
-                        if (feature.properties.hasOwnProperty(f.property)) {
-                            var value = feature.properties[f.property];
-                            var valueLength = value.toString().length;
-                            if (f.meta != null) {
-                                value = csComp.Helpers.convertPropertyInfo(f.meta, value);
-                                if (f.meta.type != 'bbcode')
-                                    valueLength = value.toString().length;
-                            }
-                            rowLength = Math.max(rowLength, valueLength + f.title.length);
-                            content += "<tr><td><div class='smallFilterIcon'></td><td>" + f.title + "</td><td>" + value + "</td></tr>";
+                        if (!feature.properties.hasOwnProperty(f.property))
+                            return;
+                        var value = feature.properties[f.property];
+                        var valueLength = value.toString().length;
+                        if (f.meta != null) {
+                            value = csComp.Helpers.convertPropertyInfo(f.meta, value);
+                            if (f.meta.type !== 'bbcode')
+                                valueLength = value.toString().length;
                         }
+                        rowLength = Math.max(rowLength, valueLength + f.title.length);
+                        content += '<tr><td><div class=\'smallFilterIcon\'></td><td>' + f.title + '</td><td>' + value + '</td></tr>';
                     });
                 }
 
@@ -3806,24 +4410,22 @@ var csComp;
                 if (group.styles != null && group.styles.length > 0) {
                     group.styles.forEach(function (s) {
                         if (group.filters != null && group.filters.filter(function (f) {
-                            return f.property == s.property;
-                        }).length == 0) {
-                            if (feature.properties.hasOwnProperty(s.property)) {
-                                var value = feature.properties[s.property];
-                                var valueLength = value.toString().length;
-                                if (s.meta != null) {
-                                    value = csComp.Helpers.convertPropertyInfo(s.meta, value);
-                                    if (s.meta.type != 'bbcode')
-                                        valueLength = value.toString().length;
-                                }
-                                rowLength = Math.max(rowLength, valueLength + s.title.length);
-                                content += "<tr><td><div class='smallStyleIcon'></td><td>" + s.title + "</td><td>" + value + "</td></tr>";
+                            return f.property === s.property;
+                        }).length === 0 && feature.properties.hasOwnProperty(s.property)) {
+                            var value = feature.properties[s.property];
+                            var valueLength = value.toString().length;
+                            if (s.meta != null) {
+                                value = csComp.Helpers.convertPropertyInfo(s.meta, value);
+                                if (s.meta.type !== 'bbcode')
+                                    valueLength = value.toString().length;
                             }
+                            rowLength = Math.max(rowLength, valueLength + s.title.length);
+                            content += '<tr><td><div class=\'smallStyleIcon\'></td><td>' + s.title + '</td><td>' + value + '</td></tr>';
                         }
                     });
                 }
-                var widthInPixels = Math.min(rowLength * 7 + 15, 250);
-                content = "<table style='width:" + widthInPixels + "px;'>" + content + "</table>";
+                var widthInPixels = Math.max(Math.min(rowLength * 7 + 15, 250), 130);
+                content = '<table style=\'width:' + widthInPixels + 'px;\'>' + content + '</table>';
 
                 this.popup = L.popup({
                     offset: new L.Point(-widthInPixels / 2 - 40, -5),
@@ -3880,7 +4482,7 @@ var csComp;
                 //console.log('update style ' + style.title);
                 var g = style.group;
                 g.styles = g.styles.filter(function (s) {
-                    return s.id != style.id;
+                    return s.id !== style.id;
                 });
 
                 this.updateGroupFeatures(g);
@@ -3898,7 +4500,7 @@ var csComp;
             };
 
             LayerService.prototype.updateFeature = function (feature, group) {
-                if (feature.geometry.type == "Point") {
+                if (feature.geometry.type === 'Point') {
                     var layer = this.findLayer(feature.layerId);
                     if (layer != null)
                         this.updateFeatureIcon(feature, layer);
@@ -3955,11 +4557,11 @@ var csComp;
                 var ft = this.getFeatureType(feature);
                 if (ft.style) {
                     if (ft.style.fillColor != null)
-                        s["fillColor"] = ft.style.fillColor;
+                        s['fillColor'] = ft.style.fillColor;
                     if (ft.style.strokeColor != null)
-                        s["strokeColor"] = ft.style.strokeColor;
+                        s['strokeColor'] = ft.style.strokeColor;
                     if (ft.style.strokeWidth != null)
-                        s["weight"] = ft.style.strokeWidth;
+                        s['weight'] = ft.style.strokeWidth;
                 }
 
                 //var layer = this.findLayer(feature.layerId);
@@ -3967,14 +4569,14 @@ var csComp;
                     if (gs.enabled && feature.properties.hasOwnProperty(gs.property)) {
                         var v = Number(feature.properties[gs.property]);
                         switch (gs.visualAspect) {
-                            case "strokeColor":
-                                s["color"] = _this.getColor(v, gs);
+                            case 'strokeColor':
+                                s['color'] = _this.getColor(v, gs);
                                 break;
-                            case "fillColor":
+                            case 'fillColor':
                                 s[gs.visualAspect] = _this.getColor(v, gs);
                                 break;
-                            case "strokeWidth":
-                                s["weight"] = ((v - gs.info.sdMin) / (gs.info.sdMax - gs.info.sdMin) * 10) + 1;
+                            case 'strokeWidth':
+                                s['weight'] = ((v - gs.info.sdMin) / (gs.info.sdMax - gs.info.sdMin) * 10) + 1;
                                 break;
                         }
                         //s.fillColor = this.getColor(feature.properties[layer.group.styleProperty], null);
@@ -3982,8 +4584,8 @@ var csComp;
                 });
 
                 if (feature.isSelected) {
-                    s["weight"] = 7;
-                    s["color"] = "blue";
+                    s['weight'] = 7;
+                    s['color'] = 'blue';
                 }
                 return s;
             };
@@ -3992,15 +4594,14 @@ var csComp;
             * init feature (add to feature list, crossfilter)
             */
             LayerService.prototype.initFeature = function (feature, layer) {
-                 {
-                    feature.isInitialized = true;
-                    if (feature.id == null)
-                        feature.id = csComp.Helpers.getGuid();
-                    feature.layerId = layer.id;
-                    this.project.features.push(feature); // list of features
-                    layer.group.ndx.add([feature]);
-                    feature.fType = this.getFeatureType(feature);
-                }
+                //if (!feature.isInitialized)
+                feature.isInitialized = true;
+                if (feature.id == null)
+                    feature.id = csComp.Helpers.getGuid();
+                feature.layerId = layer.id;
+                this.project.features.push(feature);
+                layer.group.ndx.add([feature]);
+                feature.fType = this.getFeatureType(feature);
                 return feature.type;
             };
 
@@ -4019,33 +4620,33 @@ var csComp;
                         html: feature.htmlStyle
                     });
                 } else {
-                    var html = "<div ";
+                    var html = '<div ';
                     var props = {};
                     var ft = this.getFeatureType(feature);
 
                     //if (feature.poiTypeName != null) html += "class='style" + feature.poiTypeName + "'";
                     if (ft.style.fillColor == null && ft.style.iconUri == null)
-                        ft.style.fillColor = "lightgray";
+                        ft.style.fillColor = 'lightgray';
 
-                    props["background"] = ft.style.fillColor;
-                    props["width"] = "32px";
-                    props["height"] = "32px";
-                    props["border-radius"] = "20%";
-                    props["border-style"] = "solid";
-                    props["border-color"] = "black";
-                    props["border-width"] = "0";
+                    props['background'] = ft.style.fillColor;
+                    props['width'] = '32px';
+                    props['height'] = '32px';
+                    props['border-radius'] = '20%';
+                    props['border-style'] = 'solid';
+                    props['border-color'] = 'black';
+                    props['border-width'] = '0';
 
                     layer.group.styles.forEach(function (gs) {
                         if (gs.enabled && feature.properties.hasOwnProperty(gs.property)) {
                             var v = feature.properties[gs.property];
 
                             switch (gs.visualAspect) {
-                                case "fillColor":
-                                    if (gs.meta.type == "color") {
-                                        props["background-color"] = v;
+                                case 'fillColor':
+                                    if (gs.meta.type === 'color') {
+                                        props['background-color'] = v;
                                     } else {
                                         var bezInterpolator = chroma.interpolate.bezier(gs.colors);
-                                        props["background-color"] = bezInterpolator((v - gs.info.sdMin) / (gs.info.sdMax - gs.info.sdMin)).hex();
+                                        props['background-color'] = bezInterpolator((v - gs.info.sdMin) / (gs.info.sdMax - gs.info.sdMin)).hex();
                                     }
 
                                     break;
@@ -4054,19 +4655,21 @@ var csComp;
                         }
                     });
                     if (feature.isSelected) {
-                        props["border-width"] = "3px";
+                        props['border-width'] = '3px';
                     }
 
-                    html += " style='display: inline-block;vertical-align: middle;text-align: center;";
+                    html += ' style=\'display: inline-block;vertical-align: middle;text-align: center;';
                     for (var key in props) {
-                        html += key + ":" + props[key] + ";";
+                        if (!props.hasOwnProperty(key))
+                            continue;
+                        html += key + ':' + props[key] + ';';
                     }
 
-                    html += "'>";
+                    html += '\'>';
                     if (ft.style.iconUri != null) {
-                        html += "<img src=" + ft.style.iconUri + " style='width:" + (ft.style.iconWidth - 2) + "px;height:" + (ft.style.iconHeight - 2) + "px' />";
+                        html += '<img src=' + ft.style.iconUri + ' style=\'width:' + (ft.style.iconWidth - 2) + 'px;height:' + (ft.style.iconHeight - 2) + 'px\' />';
                     }
-                    html += "</div>";
+                    html += '</div>';
 
                     icon = new L.DivIcon({
                         className: '',
@@ -4095,11 +4698,12 @@ var csComp;
             */
             LayerService.prototype.addFeature = function (feature, latlng, layer) {
                 var _this = this;
-                var type = this.initFeature(feature, layer);
-                var style = type.style;
+                this.initFeature(feature, layer);
+
+                //var style = type.style;
                 var marker;
                 switch (feature.geometry.type) {
-                    case "Point":
+                    case 'Point':
                         var icon = this.getPointIcon(feature, layer);
                         marker = new L.Marker(latlng, { icon: icon });
                         marker.on('click', function () {
@@ -4109,7 +4713,7 @@ var csComp;
                         break;
                     default:
                         var polyoptions = {
-                            fillColor: "Green"
+                            fillColor: 'Green'
                         };
                         marker = L.multiPolygon(latlng, polyoptions);
                         break;
@@ -4122,22 +4726,21 @@ var csComp;
             LayerService.prototype.selectFeature = function (feature) {
                 feature.isSelected = !feature.isSelected;
 
-                // hide sidebar when unselect item
                 this.updateFeature(feature);
 
                 // deselect last feature and also update
-                if (this.lastSelectedFeature != null && this.lastSelectedFeature != feature) {
+                if (this.lastSelectedFeature != null && this.lastSelectedFeature !== feature) {
                     this.lastSelectedFeature.isSelected = false;
                     this.updateFeature(this.lastSelectedFeature);
                 }
                 this.lastSelectedFeature = feature;
 
                 if (!feature.isSelected) {
-                    this.$messageBusService.publish("sidebar", "hide");
-                    this.$messageBusService.publish("feature", "onFeatureDeselect");
+                    this.$messageBusService.publish('sidebar', 'hide');
+                    this.$messageBusService.publish('feature', 'onFeatureDeselect');
                 } else {
-                    this.$messageBusService.publish("sidebar", "show");
-                    this.$messageBusService.publish("feature", "onFeatureSelect", feature);
+                    this.$messageBusService.publish('sidebar', 'show');
+                    this.$messageBusService.publish('feature', 'onFeatureSelect', feature);
                 }
             };
 
@@ -4148,7 +4751,7 @@ var csComp;
                 if (group.filters == null)
                     group.filters = [];
                 var r = group.filters.filter(function (f) {
-                    return f.property == property;
+                    return f.property === property;
                 });
                 if (r.length > 0)
                     return r[0];
@@ -4162,7 +4765,7 @@ var csComp;
                 var r;
                 this.project.groups.forEach(function (g) {
                     g.layers.forEach(function (l) {
-                        if (l.id == id)
+                        if (l.id === id)
                             r = l;
                     });
                 });
@@ -4180,7 +4783,7 @@ var csComp;
                     gs.id = csComp.Helpers.getGuid();
                     gs.title = property.key;
                     gs.meta = property.meta;
-                    gs.visualAspect = "fillColor";
+                    gs.visualAspect = 'fillColor';
                     gs.canSelectColor = gs.visualAspect.toLowerCase().indexOf('color') > -1;
 
                     gs.property = property.property;
@@ -4198,7 +4801,7 @@ var csComp;
                         gs.colors = ['white', 'orange'];
                     }
                     this.saveStyle(layer.group, gs);
-                    if (f.geometry.type.toLowerCase() == "point") {
+                    if (f.geometry.type.toLowerCase() === 'point') {
                         this.project.features.forEach(function (fe) {
                             if (layer.group.markers.hasOwnProperty(fe.id)) {
                                 _this.updateFeatureIcon(fe, layer);
@@ -4212,12 +4815,13 @@ var csComp;
                         $('#leftPanelTab a[href="#styles"]').tab('show'); // Select tab by name
                     return gs;
                 }
+                return null;
             };
 
             LayerService.prototype.saveStyle = function (group, style) {
                 // check if there are other styles that affect the same visual aspect, remove them
                 var oldStyles = group.styles.filter(function (s) {
-                    return s.visualAspect == style.visualAspect;
+                    return s.visualAspect === style.visualAspect;
                 });
 
                 if (oldStyles.length > 0) {
@@ -4240,7 +4844,7 @@ var csComp;
                     // add filter
                 } else {
                     var pos = group.filters.indexOf(filter);
-                    if (pos != -1)
+                    if (pos !== -1)
                         group.filters.slice(pos, 1);
                 }
                 this.updateFilters();
@@ -4261,17 +4865,17 @@ var csComp;
                             var gf = new Services.GroupFilter();
                             gf.property = prop;
                             gf.meta = property.meta;
-                            gf.filterType = "bar";
+                            gf.filterType = 'bar';
                             if (gf.meta != null) {
                                 if (gf.meta.filterType != null) {
                                     gf.filterType = gf.meta.filterType;
                                 } else {
                                     switch (gf.meta.type) {
-                                        case "number":
-                                            gf.filterType = "bar";
+                                        case 'number':
+                                            gf.filterType = 'bar';
                                             break;
                                         default:
-                                            gf.filterType = "text";
+                                            gf.filterType = 'text';
                                             gf.stringValue = property.value;
                                             gf.value = property.value;
                                             break;
@@ -4282,16 +4886,16 @@ var csComp;
                             gf.title = property.key;
                             gf.rangex = [0, 1];
 
-                            if (gf.filterType == "text") {
+                            if (gf.filterType === 'text') {
                                 var old = layer.group.filters.filter(function (f) {
-                                    return f.filterType == "text";
+                                    return f.filterType === 'text';
                                 });
                                 old.forEach(function (groupFilter) {
                                     groupFilter.dimension.filterAll();
                                     groupFilter.dimension.dispose();
                                 });
-                                layer.group.filters = layer.group.filters.filter(function (f) {
-                                    return f.filterType != "text";
+                                layer.group.filters = layer.group.filters.filter(function (groupFilter) {
+                                    return groupFilter.filterType !== 'text';
                                 });
                             }
 
@@ -4299,7 +4903,7 @@ var csComp;
                             layer.group.filters.push(gf);
                         } else {
                             var pos = layer.group.filters.indexOf(filter);
-                            if (pos != -1)
+                            if (pos !== -1)
                                 layer.group.filters.slice(pos, 1);
                         }
                     }
@@ -4314,7 +4918,7 @@ var csComp;
             * In case both fail, create a default feature type at the layer level.
             */
             LayerService.prototype.getFeatureType = function (feature) {
-                var projectFeatureTypeName = feature.properties['FeatureTypeId'] || "Default";
+                var projectFeatureTypeName = feature.properties['FeatureTypeId'] || 'Default';
                 var featureTypeName = feature.layerId + '_' + projectFeatureTypeName;
                 if (!(this.featureTypes.hasOwnProperty(featureTypeName))) {
                     if (this.featureTypes.hasOwnProperty(projectFeatureTypeName))
@@ -4331,25 +4935,27 @@ var csComp;
             */
             LayerService.prototype.createDefaultType = function (feature) {
                 var type = {};
-                type.style = { nameLabel: "Name" };
+                type.style = { nameLabel: 'Name' };
                 type.propertyTypeData = [];
 
                 for (var key in feature.properties) {
+                    if (!feature.properties.hasOwnProperty(key))
+                        continue;
                     var propertyType = [];
                     propertyType.label = key;
-                    propertyType.title = key.replace("_", " ");
+                    propertyType.title = key.replace('_', ' ');
                     propertyType.isSearchable = true;
                     propertyType.visibleInCallOut = true;
                     propertyType.canEdit = false;
                     var value = feature.properties[key];
                     if (csComp.StringExt.isNumber(value))
-                        propertyType.type = "number";
+                        propertyType.type = 'number';
                     else if (csComp.StringExt.isBoolean(value))
-                        propertyType.type = "boolean";
+                        propertyType.type = 'boolean';
                     else if (csComp.StringExt.isBbcode(value))
-                        propertyType.type = "bbcode";
+                        propertyType.type = 'bbcode';
                     else
-                        propertyType.type = "text";
+                        propertyType.type = 'text';
 
                     type.propertyTypeData.push(propertyType);
                 }
@@ -4392,22 +4998,20 @@ var csComp;
             * deactivate layer
             */
             LayerService.prototype.removeLayer = function (layer) {
-                this.$messageBusService.publish("layer", "deactivate", layer);
-
                 var m;
                 var g = layer.group;
 
-                if (this.lastSelectedFeature != null && this.lastSelectedFeature.layerId == layer.id) {
+                if (this.lastSelectedFeature != null && this.lastSelectedFeature.layerId === layer.id) {
                     this.lastSelectedFeature = null;
-                    this.$messageBusService.publish("sidebar", "hide");
-                    this.$messageBusService.publish("feature", "onFeatureDeselect");
+                    this.$messageBusService.publish('sidebar', 'hide');
+                    this.$messageBusService.publish('feature', 'onFeatureDeselect');
                 }
 
                 //m = layer.group.vectors;
                 if (g.clustering) {
                     m = g.cluster;
                     this.project.features.forEach(function (feature) {
-                        if (feature.layerId == layer.id) {
+                        if (feature.layerId === layer.id) {
                             try  {
                                 m.removeLayer(layer.group.markers[feature.id]);
                                 delete layer.group.markers[feature.id];
@@ -4420,28 +5024,31 @@ var csComp;
                 }
 
                 this.project.features = this.project.features.filter(function (k) {
-                    return k.layerId != layer.id;
+                    return k.layerId !== layer.id;
                 });
                 var layerName = layer.id + '_';
-                for (var poiTypeName in this.featureTypes) {
+                var featureTypes = this.featureTypes;
+                for (var poiTypeName in featureTypes) {
+                    if (!featureTypes.hasOwnProperty(poiTypeName))
+                        continue;
                     if (poiTypeName.lastIndexOf(layerName, 0) === 0)
-                        delete this.featureTypes[poiTypeName];
+                        delete featureTypes[poiTypeName];
                 }
 
                 // check if there are no more active layers in group and remove filters/styles
                 if (g.layers.filter(function (l) {
                     return (l.enabled);
-                }).length == 0) {
+                }).length === 0) {
                     g.filters.forEach(function (f) {
                         if (f.dimension != null)
                             f.dimension.dispose();
                     });
                     g.filters = [];
-
                     g.styles = [];
                 }
 
                 this.rebuildFilters(g);
+                this.$messageBusService.publish('layer', 'deactivate', layer);
             };
 
             /***
@@ -4466,10 +5073,10 @@ var csComp;
                     //$scope.projects = [];
                     solution.baselayers.forEach(function (b) {
                         var options = {};
-                        options["subtitle"] = b.subtitle;
-                        options["preview"] = b.preview;
+                        options['subtitle'] = b.subtitle;
+                        options['preview'] = b.preview;
                         if (b.subdomains != null)
-                            options["subdomains"] = b.subdomains;
+                            options['subdomains'] = b.subdomains;
                         if (b.maxZoom != null)
                             options.maxZoom = b.maxZoom;
                         if (b.minZoom != null)
@@ -4477,7 +5084,7 @@ var csComp;
                         if (b.attribution != null)
                             options.attribution = b.attribution;
                         if (b.id != null)
-                            options["id"] = b.id;
+                            options['id'] = b.id;
                         var layer = L.tileLayer(b.url, options);
                         _this.$mapService.baseLayers[b.title] = layer;
                         if (b.isDefault)
@@ -4487,7 +5094,7 @@ var csComp;
                     //$scope.projects = projects.projects;
                     if (solution.projects.length > 0) {
                         var p = solution.projects.filter(function (aProject) {
-                            return aProject.title == initialProject;
+                            return aProject.title === initialProject;
                         })[0];
                         if (p != null) {
                             _this.openProject(p.url, layers);
@@ -4508,8 +5115,7 @@ var csComp;
             LayerService.prototype.openProject = function (url, layers) {
                 var _this = this;
                 //console.log('layers (openProject): ' + JSON.stringify(layers));
-                var layerIds;
-                layerIds = [];
+                var layerIds = [];
                 if (layers) {
                     layers.split(';').forEach(function (layerId) {
                         layerIds.push(layerId.toLowerCase());
@@ -4530,24 +5136,28 @@ var csComp;
                     if (_this.project.viewBounds) {
                         _this.$mapService.map.fitBounds(new L.LatLngBounds(_this.project.viewBounds.southWest, _this.project.viewBounds.northEast));
                     }
-
-                    if (_this.project.featureTypes) {
-                        for (var typeName in _this.project.featureTypes) {
-                            var featureType = _this.project.featureTypes[typeName];
+                    var featureTypes = _this.project.featureTypes;
+                    if (featureTypes) {
+                        for (var typeName in featureTypes) {
+                            if (!featureTypes.hasOwnProperty(typeName))
+                                continue;
+                            var featureType = featureTypes[typeName];
                             _this.featureTypes[typeName] = featureType;
                         }
                     }
-
-                    if (_this.project.propertyTypeData) {
-                        for (var key in _this.project.propertyTypeData) {
-                            var propertyType = _this.project.propertyTypeData[key];
+                    var propertyTypeData = _this.project.propertyTypeData;
+                    if (propertyTypeData) {
+                        for (var key in propertyTypeData) {
+                            if (!propertyTypeData.hasOwnProperty(key))
+                                continue;
+                            var propertyType = propertyTypeData[key];
                             _this.propertyTypeData[key] = propertyType;
                         }
                     }
 
                     if (!_this.project.dashboards) {
                         _this.project.dashboards = {};
-                        var d = new csComp.Services.Dashboard("1", _this.project.title);
+                        var d = new Services.Dashboard('1', _this.project.title);
                         d.widgets = [];
                         _this.project.dashboards[_this.project.title] = d;
                     }
@@ -4603,7 +5213,20 @@ var csComp;
                         _this.updateFilters();
                     });
 
-                    _this.$messageBusService.publish("project", "loaded");
+                    _this.$messageBusService.publish('project', 'loaded');
+                });
+            };
+
+            LayerService.prototype.closeProject = function () {
+                var _this = this;
+                if (this.project == null)
+                    return;
+                this.project.groups.forEach(function (group) {
+                    group.layers.forEach(function (layer) {
+                        if (layer.enabled) {
+                            _this.removeLayer(layer);
+                        }
+                    });
                 });
             };
 
@@ -4624,10 +5247,10 @@ var csComp;
                 group.layers.forEach(function (l) {
                     if (l.enabled) {
                         _this.project.features.forEach(function (f) {
-                            if (f.layerId == l.id && f.properties.hasOwnProperty(property)) {
+                            if (f.layerId === l.id && f.properties.hasOwnProperty(property)) {
                                 var s = f.properties[property];
                                 var v = Number(s);
-                                if (v != NaN) {
+                                if (v !== NaN) {
                                     r.count += 1;
                                     sum = sum + v;
                                     sumsq = sumsq + v * v;
@@ -4649,9 +5272,9 @@ var csComp;
                     r.sdMin = r.min;
                 if (r.max < r.sdMax)
                     r.sdMax = r.max;
-                if (r.sdMin == NaN)
+                if (r.sdMin === NaN)
                     r.sdMin = r.min;
-                if (r.sdMax == NaN)
+                if (r.sdMax === NaN)
                     r.sdMax = r.max;
                 if (this.propertyTypeData.hasOwnProperty(property)) {
                     var mid = this.propertyTypeData[property];
@@ -4665,22 +5288,22 @@ var csComp;
 
             LayerService.prototype.updateFilters = function () {
                 var _this = this;
-                var fmain = $("#filterChart");
+                var fmain = $('#filterChart');
                 fmain.empty();
                 this.noFilters = true;
 
                 this.project.groups.forEach(function (group) {
                     if (group.filters != null && group.filters.length > 0) {
-                        $("<div style='float:left;margin-left: -10px; margin-top: 5px' data-toggle='collapse' data-target='#filters_" + group.id + "'><i class='fa fa-chevron-down togglebutton toggle-arrow-down'></i><i class='fa fa-chevron-up togglebutton toggle-arrow-up'></i></div><div class='group-title' >" + group.title + "</div><div id='filtergroupcount_" + group.id + "'  class='filter-group-count' /><div class='collapse in' id='filters_" + group.id + "'></div>").appendTo("#filterChart");
+                        $('<div style=\'float:left;margin-left: -10px; margin-top: 5px\' data-toggle=\'collapse\' data-target=\'#filters_' + group.id + '\'><i class=\'fa fa-chevron-down togglebutton toggle-arrow-down\'></i><i class=\'fa fa-chevron-up togglebutton toggle-arrow-up\'></i></div><div class=\'group-title\' >' + group.title + '</div><div id=\'filtergroupcount_' + group.id + '\'  class=\'filter-group-count\' /><div class=\'collapse in\' id=\'filters_' + group.id + '\'></div>').appendTo('#filterChart');
                         group.filters.forEach(function (filter) {
                             if (filter.dimension != null)
                                 filter.dimension.dispose();
                             _this.noFilters = false;
                             switch (filter.filterType) {
-                                case "text":
+                                case 'text':
                                     _this.addTextFilter(group, filter);
                                     break;
-                                case "bar":
+                                case 'bar':
                                     _this.addBarFilter(group, filter);
                                     break;
                             }
@@ -4693,7 +5316,7 @@ var csComp;
             };
 
             LayerService.prototype.updateTextFilter = function (group, dcDim, value) {
-                if (value == null || value == '') {
+                if (value == null || value === '') {
                     dcDim.filterAll();
                 } else {
                     dcDim.filterFunction(function (d) {
@@ -4710,7 +5333,7 @@ var csComp;
 
             LayerService.prototype.updateFilterGroupCount = function (group) {
                 if (group.filterResult != null)
-                    $("#filtergroupcount_" + group.id).text(group.filterResult.length + " objecten geselecteerd");
+                    $('#filtergroupcount_' + group.id).text(group.filterResult.length + ' objecten geselecteerd');
             };
 
             /***
@@ -4719,8 +5342,8 @@ var csComp;
             LayerService.prototype.addTextFilter = function (group, filter) {
                 var _this = this;
                 filter.id = csComp.Helpers.getGuid();
-                var divid = "filter_" + filter.id;
 
+                //var divid = 'filter_' + filter.id;
                 var dcDim = group.ndx.dimension(function (d) {
                     if (d.properties.hasOwnProperty(filter.property)) {
                         return d.properties[filter.property];
@@ -4735,23 +5358,23 @@ var csComp;
                 });
 
                 this.updateTextFilter(group, dcDim, filter.stringValue);
-                var fid = "filtertext" + filter.id;
-                $("<h4>" + filter.title + "</h4><input type='text' value='" + filter.stringValue + "' class='filter-text' id='" + fid + "'/><a class='btn' value=" + filter.value + " id='remove" + filter.id + "'><i class='fa fa-times'></i></a>").appendTo("#filters_" + group.id);
+                var fid = 'filtertext' + filter.id;
+                $('<h4>' + filter.title + '</h4><input type=\'text\' value=\'' + filter.stringValue + '\' class=\'filter-text\' id=\'' + fid + '\'/><a class=\'btn\' value=' + filter.value + ' id=\'remove' + filter.id + '\'><i class=\'fa fa-times\'></i></a>').appendTo('#filters_' + group.id);
 
                 //$("<h4>" + filter.title + "</h4><input type='text' class='filter-text' id='" + fid + "'/></div><a class='btn btn-filter-delete' value=" + filter.value + " id='remove" + filter.id + "'><i class='fa fa-remove'></i></a>").appendTo("#filterChart");
-                $("#" + fid).keyup(function () {
-                    filter.stringValue = $("#" + fid).val();
+                $('#' + fid).keyup(function () {
+                    filter.stringValue = $('#' + fid).val();
                     _this.updateTextFilter(group, dcDim, filter.stringValue);
                     _this.updateFilterGroupCount(group);
                     //alert('text change');
                 });
-                $("#remove" + filter.id).on('click', function () {
+                $('#remove' + filter.id).on('click', function () {
                     var pos = group.filters.indexOf(filter);
 
                     filter.dimension.filterAll();
                     filter.dimension.dispose();
                     filter.dimension = null;
-                    if (pos != -1)
+                    if (pos !== -1)
                         group.filters = group.filters.slice(pos - 1, pos);
                     dc.filterAll();
 
@@ -4761,11 +5384,11 @@ var csComp;
             };
 
             LayerService.prototype.updateChartRange = function (chart, filter) {
-                var filterFrom = $("#fsfrom_" + filter.id);
-                var filterTo = $("#fsto_" + filter.id);
+                var filterFrom = $('#fsfrom_' + filter.id);
+                var filterTo = $('#fsto_' + filter.id);
                 var extent = chart.brush().extent();
-                if (extent != null && extent.length == 2) {
-                    if (extent[0] != extent[1]) {
+                if (extent != null && extent.length === 2) {
+                    if (extent[0] !== extent[1]) {
                         console.log(extent);
 
                         //if (extent.length == 2) {
@@ -4773,8 +5396,8 @@ var csComp;
                         filterTo.val(extent[1]);
                     }
                 } else {
-                    filterFrom.val("0");
-                    filterTo.val("1");
+                    filterFrom.val('0');
+                    filterTo.val('1');
                 }
             };
 
@@ -4786,17 +5409,17 @@ var csComp;
                 filter.id = csComp.Helpers.getGuid();
                 var info = this.calculatePropertyInfo(group, filter.property);
 
-                var divid = "filter_" + filter.id;
+                var divid = 'filter_' + filter.id;
 
                 //$("<h4>" + filter.title + "</h4><div id='" + divid + "'></div><a class='btn' id='remove" + filter.id + "'>remove</a>").appendTo("#filters_" + group.id);
                 //$("<h4>" + filter.title + "</h4><div id='" + divid + "'></div><div style='display:none' id='fdrange_" + filter.id + "'>from <input type='text' style='width:75px' id='fsfrom_" + filter.id + "'> to <input type='text' style='width:75px' id='fsto_" + filter.id + "'></div><a class='btn' id='remove" + filter.id + "'>remove</a>").appendTo("#filterChart");
-                $("<h4>" + filter.title + "</h4><div id='" + divid + "'></div><div style='display:none' id='fdrange_" + filter.id + "'>from <span id='fsfrom_" + filter.id + "'/> to <span id='fsto_" + filter.id + "'/></div><a class='btn' id='remove" + filter.id + "'>remove</a>").appendTo("#filterChart");
-                var filterFrom = $("#fsfrom_" + filter.id);
-                var filterTo = $("#fsto_" + filter.id);
-                var filterRange = $("#fdrange_" + filter.id);
-                $("#remove" + filter.id).on('click', function () {
+                $('<h4>' + filter.title + '</h4><div id=\'' + divid + '\'></div><div style=\'display:none\' id=\'fdrange_' + filter.id + '\'>from <span id=\'fsfrom_' + filter.id + '\'/> to <span id=\'fsto_' + filter.id + '\'/></div><a class=\'btn\' id=\'remove' + filter.id + '\'>remove</a>').appendTo('#filterChart');
+                var filterFrom = $('#fsfrom_' + filter.id);
+                var filterTo = $('#fsto_' + filter.id);
+                var filterRange = $('#fdrange_' + filter.id);
+                $('#remove' + filter.id).on('click', function () {
                     var pos = group.filters.indexOf(filter);
-                    if (pos != -1)
+                    if (pos !== -1)
                         group.filters.splice(pos, 1);
                     filter.dimension.dispose();
                     _this.updateFilters();
@@ -4804,14 +5427,16 @@ var csComp;
                     _this.resetMapFilter(group);
                 });
 
-                var dcChart = dc.barChart("#" + divid);
+                var dcChart = dc.barChart('#' + divid);
 
-                var n_bins = 20;
+                var nBins = 20;
 
-                var binWidth = (info.sdMax - info.sdMin) / n_bins;
+                var binWidth = (info.sdMax - info.sdMin) / nBins;
 
                 var dcDim = group.ndx.dimension(function (d) {
-                    if (d.properties.hasOwnProperty(filter.property)) {
+                    if (!d.properties.hasOwnProperty(filter.property))
+                        return null;
+                    else {
                         if (d.properties[filter.property] != null) {
                             var a = parseInt(d.properties[filter.property]);
                             if (a >= info.sdMin && a <= info.sdMax) {
@@ -4820,25 +5445,25 @@ var csComp;
                                 return null;
                             }
                         }
-                        //return a;
-                    } else
                         return null;
+                        //return a;
+                    }
                 });
                 filter.dimension = dcDim;
                 var dcGroup = dcDim.group();
 
-                var scale = dcChart.width(275).height(90).dimension(dcDim).group(dcGroup).transitionDuration(100).centerBar(true).gap(5).elasticY(true).x(d3.scale.linear().domain([info.sdMin, info.sdMax]).range([-1, n_bins + 1])).filterPrinter(function (filters) {
-                    var s = "";
+                //var scale =
+                dcChart.width(275).height(90).dimension(dcDim).group(dcGroup).transitionDuration(100).centerBar(true).gap(5).elasticY(true).x(d3.scale.linear().domain([info.sdMin, info.sdMax]).range([-1, nBins + 1])).filterPrinter(function (filters) {
+                    var s = '';
                     if (filters.length > 0) {
-                        var filter = filters[0];
-
-                        filterFrom.text(filter[0].toFixed(2));
-                        filterTo.text(filter[1].toFixed(2));
-                        s += filter[0];
+                        var localFilter = filters[0];
+                        filterFrom.text(localFilter[0].toFixed(2));
+                        filterTo.text(localFilter[1].toFixed(2));
+                        s += localFilter[0];
                     }
 
                     return s;
-                }).on("filtered", function (e) {
+                }).on('filtered', function (e) {
                     var fil = e.hasFilter();
                     if (fil) {
                         filterRange.show();
@@ -4908,7 +5533,7 @@ var csComp;
             LayerService.prototype.updateMapFilter = function (group) {
                 $.each(group.markers, function (key, marker) {
                     var included = group.filterResult.filter(function (f) {
-                        return f.id == key;
+                        return f.id === key;
                     }).length > 0;
                     if (group.clustering) {
                         var incluster = group.cluster.hasLayer(marker);
@@ -4977,12 +5602,12 @@ var csComp;
 
                 // Zoom in/out layer control (above, I've turned it off, as the default location is top left).
                 L.control.zoom({
-                    position: "bottomright"
+                    position: "bottomleft"
                 }).addTo(map);
 
                 // GPS enabled geolocation control set to follow the user's location
                 L.control.locate({
-                    position: "bottomright",
+                    position: "bottomleft",
                     drawCircle: true,
                     follow: true,
                     setView: true,
@@ -5210,6 +5835,8 @@ var Translations;
             RED_WHITE: 'red - white',
             GREEN_RED: 'green - red',
             RED_GREEN: 'red - green',
+            BLUE_RED: 'blue - red',
+            RED_BLUE: 'red - blue',
             WHITE_BLUE: 'white - blue',
             BLUE_WHITE: 'blue - white',
             WHITE_GREEN: 'white - green',
@@ -5217,6 +5844,9 @@ var Translations;
             WHITE_ORANGE: 'white - orange',
             ORANGE_WHITE: 'orange - white',
             MCA: {
+                DESCRIPTION: '<h4>Multi-Criteria Analysis</h4><p  style="text-align: left; margin-left:5px;">MCA, is a method that combines multiple properties of a feature on the map into a new property. It achieves this by:<ol><li>Scaling each property to a range between 0 (no value) and 1 (maximum value).</li><li>Weighing each property relative to the others, where a weight less than 0 indicates you wish to avoid it, 0 is ignored, and a value greater than 0 is prefered.</li></ol> In fact, it is a kind of linear regression.',
+                INFO: 'At the moment, no map layers are loaded that contain a multi-criteria analysis. Open another map layer to see it.',
+                INFO_EXPERT: 'At the moment, no map layers are loaded that contain a multi-criteria analysis. Open another map layer to use it, or create a new MCA using the wizard.',
                 SHOW_FEATURE_MSG: 'Select a feature on the map to see the effects of the Multi-Criteria Analysis (MCA).',
                 TOTAL_RESULT: 'Combined result',
                 DELETE_MSG: 'Delete "{0}"',
@@ -5227,8 +5857,22 @@ var Translations;
                 MAIN_FEATURE: 'Select the main feature',
                 PROPERTIES: 'Select the properties',
                 INCLUDE_RANK: '  Show rank? ',
-                RANK_TITLE: 'Rank title...',
-                TITLE: 'Title...'
+                RANK_TITLE: '[Rank title...]',
+                TITLE: 'Title... *',
+                CATEGORY_MSG: '[Category...]',
+                TOGGLE_SPARKLINE: 'Show or hide bar charts and scoring function.',
+                SCALE_MIN_TITLE: '[Min. scale]',
+                SCALE_MAX_TITLE: '[Max. scale]',
+                MIN_VALUE: '[Minimum (\u03BC-2\u03C3)]',
+                MAX_VALUE: '[Maximum (\u03BC+2\u03C3)]',
+                MIN_CUTOFF_VALUE: '[Ignore when below this value]',
+                MAX_CUTOFF_VALUE: '[Ignore when above this value]',
+                LINEAR: 'Linearly increasing function between min and max.',
+                SIGMOID: 'Tangentially increasing function between min and max',
+                GAUSSIAN: 'Normal distribution increasing function between min and max.',
+                ADD_MCA: 'Add a new MCA.',
+                DELETE_MCA: 'Delete the MCA.',
+                EDIT_MCA: 'Edit the MCA.'
             },
             SHOW5: 'Show 5 items',
             SHOW10: 'Show 10 items',
@@ -5267,6 +5911,8 @@ var Translations;
             RED_WHITE: 'rood - wit',
             GREEN_RED: 'groen - rood',
             RED_GREEN: 'rood - groen',
+            BLUE_RED: 'blauw - rood',
+            RED_BLUE: 'rood - blauw',
             WHITE_BLUE: 'wit - blauw',
             BLUE_WHITE: 'wit - groen',
             WHITE_GREEN: 'wit - groen',
@@ -5274,6 +5920,9 @@ var Translations;
             WHITE_ORANGE: 'wit - oranje',
             ORANGE_WHITE: 'oranje - wit',
             MCA: {
+                DESCRIPTION: '<h4>Toelichting MCA</h4><div style="text-align: left; margin-left:5px;"><p>Multi-Criteria Analysis (MCA) is een methode die verschillende eigenschappen van een locatie of gebied op de kaart combineerd tot een nieuwe eigenschap. Dit gaat als volgt: <ol><li>Schaal iedere eigenschap tussen 0 (geen waarde) en 1 (maximum waarde).</li><li>Weeg iedere eigenschap relatief t.o.v. de andere gekozen eigenschappen, waar een gewicht onder 0 betekent dat je de eigenschap wil vermijden, 0 wordt genegeerd, en een waarde groter dan 0 betekent dat je dit wil bereiken.</li></ol>Met andere woorden, het is een vorm van lineare regressie.</p></div>',
+                INFO: 'Momenteel zijn er geen kaartlagen geopend die multi-criteria analyses bevatten. Open hiervoor een andere kaartlaag.',
+                INFO_EXPERT: 'Momenteel zijn er geen kaartlagen geopend die multi-criteria analyses bevatten. Open een kaartlaag en maak een nieuwe MCA aan met behulp van de wizard.',
                 SHOW_FEATURE_MSG: 'Selecteer een feature op de kaart om de Multi-Criteria Analyse (MCA) resultaten in detail te bekijken.',
                 TOTAL_RESULT: 'Gecombineerd resultaat',
                 DELETE_MSG: 'Verwijder "{0}"',
@@ -5283,8 +5932,22 @@ var Translations;
                 MAIN_FEATURE: 'Selecteer het type feature',
                 PROPERTIES: 'Selecteer de eigenschappen',
                 INCLUDE_RANK: '  Toon een rangorde? ',
-                RANK_TITLE: 'Titel voor de rangorde...',
-                TITLE: 'Titel...'
+                RANK_TITLE: '[Titel voor de rangorde]',
+                TITLE: 'Titel... *',
+                CATEGORY_MSG: '[Categorie...]',
+                TOGGLE_SPARKLINE: 'Toon of verberg de histogram en score functie.',
+                SCALE_MIN_TITLE: '[Schaal max]',
+                SCALE_MAX_TITLE: '[Schaal min]',
+                MIN_VALUE: '[Ondergrens (\u03BC-2\u03C3)]',
+                MAX_VALUE: '[Bovengrens (\u03BC+2\u03C3)]',
+                MIN_CUTOFF_VALUE: '[Niet meewegen onder]',
+                MAX_CUTOFF_VALUE: '[Niet meewegen boven]',
+                LINEAR: 'Linear toenemende functie tussen onder- en bovengrens.',
+                SIGMOID: 'Tangentieel toenemende functie tussen onder- en bovengrens.',
+                GAUSSIAN: 'Normale verdeling tussen onder- en bovengrens.',
+                ADD_MCA: 'Maak een nieuwe MCA.',
+                DELETE_MCA: 'Verwijder de MCA.',
+                EDIT_MCA: 'Bewerk de MCA.'
             },
             SHOW5: 'Toon 5 regels',
             SHOW10: 'Toon 10 regels',

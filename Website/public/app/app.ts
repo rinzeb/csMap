@@ -165,6 +165,7 @@
             'csWeb.legendList',
             'csWeb.resize',
             'csWeb.showModal',
+            'csWeb.voting',
             'csWeb.mca',
             'csWeb.datatable',
             'ngCookies'

@@ -3,6 +3,9 @@
   "description": "csMap is developed by the Dutch Research Organisation TNO, in first instance for the Dutch Ministry of Health (VWS).",
   "url": "https://github.com/TNOCS/csMap",
   "logo": "images/CommonSenseRound.png",
+  "userPrivileges": {
+      "mca" : { "expertMode": true }
+  },
   "accentColor": "Green",
   "propertyTypeData": {
     "aant_gem": {
