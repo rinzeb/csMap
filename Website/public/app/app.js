@@ -87,6 +87,7 @@
             $messageBusService.notify('Welcome to csMap', 'Your mapping solution.');
 
             this.showMap = this.$location.path() === "/map";
+            //omnivore.topojson('data/projects/20141104_csMap/gemeente.topo.json').addTo(this.$mapService.map);
         }
         /**
         * Publish a toggle request.
@@ -241,7 +242,7 @@
     }).directive('ngModelOnblur', function () {
         return {
             restrict: 'A',
-            rict: 'A', require: 'ngModel',
+            require: 'ngModel',
             priority: 1,
             link: function (scope, elm, attr, ngModelCtrl) {
                 if (attr.type === 'radio' || attr.type === 'checkbox')

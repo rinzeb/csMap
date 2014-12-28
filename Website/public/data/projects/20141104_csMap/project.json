@@ -2650,6 +2650,16 @@
       "url": "data/projects/20141104_csMap/gemeente.json",
       "enabled": false,
       "opacity": 100
+    },
+    {
+      "id": "topo_cities",
+      "reference": "topo_cities",
+      "title": "TopoJSON Cities",
+      "description": "Statistical data per city. (Source: CBS, BAG, TNO, DigiMV. Geactualiseerd: 1 november 2014.)",
+      "type": "TopoJson",
+      "url": "data/projects/20141104_csMap/gemeente.topo.json",
+      "enabled": false,
+      "opacity": 100
     }]
   }]
 }

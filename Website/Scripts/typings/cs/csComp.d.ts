@@ -1176,6 +1176,7 @@ declare module csComp.Services {
         * Add a layer
         */
         public addLayer(layer: ProjectLayer): void;
+        private convertTopoToGeoJson(data);
         /***
         * get list of properties that are part of the filter collection
         */

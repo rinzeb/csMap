@@ -45,6 +45,7 @@
     "dcjs": "~1.7.1",
     "chroma-js": "~0.5.8",
     "pnotify": "~2.0.1",
-    "d3-tip": "~0.6.6"
+    "d3-tip": "~0.6.6",
+    "leaflet-omnivore": "~0.3.1"
   }
 }

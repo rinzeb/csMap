@@ -4212,6 +4212,7 @@ var csComp;
                 var _this = this;
                 var disableLayers = [];
                 switch (layer.type) {
+                    case 'TopoJson':
                     case 'GeoJson':
                         async.series([
                             function (callback) {
@@ -4226,6 +4227,7 @@ var csComp;
                                 callback(null, null);
                             },
                             function (callback) {
+                                // Open a style file
                                 if (layer.styleurl) {
                                     d3.json(layer.styleurl, function (err, dta) {
                                         if (err)
@@ -4244,11 +4246,15 @@ var csComp;
                                     });
                                 } else
                                     callback(null, null);
-                            }, function (callback) {
+                            },
+                            function (callback) {
+                                // Open a layer URL
                                 d3.json(layer.url, function (error, data) {
                                     if (error)
                                         _this.$messageBusService.notify('ERROR loading' + layer.title, error);
                                     else {
+                                        if (layer.type === 'TopoJson')
+                                            data = _this.convertTopoToGeoJson(data);
                                         if (data.events && _this.timeline) {
                                             layer.events = data.events;
                                             var devents = [];
@@ -4262,7 +4268,6 @@ var csComp;
                                             });
                                             _this.timeline.draw(devents);
                                         }
-
                                         for (var featureTypeName in data.featureTypes) {
                                             if (!data.featureTypes.hasOwnProperty(featureTypeName))
                                                 continue;
@@ -4361,6 +4366,18 @@ var csComp;
                             }
                         ]);
                 }
+            };
+
+            LayerService.prototype.convertTopoToGeoJson = function (data) {
+                // Convert topojson to geojson format
+                var topo = omnivore.topojson.parse(data);
+                var newData = {};
+                newData.featureTypes = data.featureTypes;
+                newData.features = [];
+                topo.eachLayer(function (l) {
+                    newData.features.push(l.feature);
+                });
+                return newData;
             };
 
             /***

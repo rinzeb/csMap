@@ -18,6 +18,7 @@
     // TODO For setting the current culture for string formatting (note you need to include public/js/cs/stringformat.YOUR-CULTURE.js. See sffjs.1.09.zip for your culture.) 
     declare var sffjs;  
     declare var String;
+    declare var omnivore;
 
     export class AppCtrl {
         public showMap: boolean = true;
@@ -26,7 +27,7 @@
         // It provides $injector with information about dependencies to be injected into constructor
         // it is better to have it close to the constructor, because the parameters must match in count and type.
         // See http://docs.angularjs.org/guide/di
-        public static $inject = [
+        static $inject = [
             '$scope',
             '$location',
             'mapService',
@@ -68,12 +69,14 @@
             $messageBusService.notify('Welcome to csMap', 'Your mapping solution.');
 
             this.showMap = this.$location.path() === "/map";
+
+            //omnivore.topojson('data/projects/20141104_csMap/gemeente.topo.json').addTo(this.$mapService.map);            
         }
 
         /**
          * Publish a toggle request.
          */
-        public toggleMenuRight() {
+        toggleMenuRight() {
             this.$messageBusService.publish("sidebar", "toggle");
         }
 
@@ -128,20 +131,20 @@
             }
         }
 
-        public toggleMenu(): void {
+        toggleMenu(): void {
             this.$mapService.invalidate();
         }
 
-        public toggleSidebar(): void {
+        toggleSidebar(): void {
             this.$messageBusService.publish("sidebar", "toggle");
             window.console.log("Publish toggle sidebar");
         }
 
-        public showTable() {
+        showTable() {
             this.$scope.showMap = false;
         }
 
-        public isActive(viewLocation: string) {
+        isActive(viewLocation: string) {
             return viewLocation === this.$location.path();
         }
     }
