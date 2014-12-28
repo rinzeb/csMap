@@ -4211,9 +4211,21 @@ var csComp;
             LayerService.prototype.addLayer = function (layer) {
                 var _this = this;
                 var disableLayers = [];
-                switch (layer.type) {
-                    case 'TopoJson':
-                    case 'GeoJson':
+                switch (layer.type.toLowerCase()) {
+                    case 'wms':
+                        var wms = L.tileLayer.wms(layer.url, {
+                            layers: layer.wmsLayers,
+                            opacity: layer.opacity / 100,
+                            format: 'image/png',
+                            transparent: true,
+                            attribution: layer.description
+                        });
+                        layer.mapLayer = new L.LayerGroup();
+                        this.map.map.addLayer(layer.mapLayer);
+                        layer.mapLayer.addLayer(wms);
+                        break;
+                    case 'topojson':
+                    case 'geojson':
                         async.series([
                             function (callback) {
                                 // If oneLayerActive: close other group layer
@@ -4253,7 +4265,7 @@ var csComp;
                                     if (error)
                                         _this.$messageBusService.notify('ERROR loading' + layer.title, error);
                                     else {
-                                        if (layer.type === 'TopoJson')
+                                        if (layer.type.toLowerCase() === 'topojson')
                                             data = _this.convertTopoToGeoJson(data);
                                         if (data.events && _this.timeline) {
                                             layer.events = data.events;

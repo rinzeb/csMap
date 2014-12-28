@@ -350,6 +350,7 @@ declare module csComp.Services {
         public type: string;
         public url: string;
         public styleurl: string;
+        public wmsLayers: string;
         public enabled: boolean;
         public opacity: number;
         public isLoading: boolean;
