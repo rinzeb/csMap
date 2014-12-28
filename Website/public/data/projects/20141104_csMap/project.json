@@ -2641,10 +2641,65 @@
                     "id": "bag",
                     "reference": "bag",
                     "title": "BAG (Cadastre)",
-                    "description": "Dutch Cadastre's Basis Administratie Gebouwen. (Source: Cadastre.)",
+                    "description": "Dutch Cadastre's Basis Administratie Gebouwen. (Source: PDOK.nl.)",
                     "type": "wms",
                     "wmsLayers": "pand,ligplaats,standplaats,verblijfsobject",
                     "url": "http://geodata.nationaalgeoregister.nl/bagviewer/wms?",
+                    "enabled": false,
+                    "opacity": 50
+                },
+                {
+                    "id": "cbs",
+                    "reference": "cbs",
+                    "title": "CBS Provinces",
+                    "description": "Dutch Provinces. (Source: PDOK.nl.)",
+                    "type": "wms",
+                    "wmsLayers": "cbsprovincies2012",
+                    "url": "http://geodata.nationaalgeoregister.nl/cbsprovincies/wms?",
+                    "enabled": false,
+                    "opacity": 50
+                },
+                {
+                    "id": "aan",
+                    "reference": "aan",
+                    "title": "Agricultural areas",
+                    "description": "Agrarisch Areaal Nederland (AAN). Geografische afbakening van landbouwgrond in Nederland (grond die wordt gebruikt als bouwland, blijvend grasland of de teelt van blijvende gewassen). (Source: PDOK.nl.)",
+                    "type": "wms",
+                    "wmsLayers": "aan",
+                    "url": "http://geodata.nationaalgeoregister.nl/aan/wms?",
+                    "enabled": false,
+                    "opacity": 50
+                },
+                {
+                    "id": "ahn",
+                    "reference": "ahn",
+                    "title": "AHN2",
+                    "description": "Dutch height map, 0.5m, ruw. (Source: PDOK.nl.)",
+                    "type": "wms",
+                    "wmsLayers": "ahn2_05m_ruw",
+                    "url": "http://geodata.nationaalgeoregister.nl/ahn2/wms?",
+                    "enabled": false,
+                    "opacity": 50
+                },
+                {
+                    "id": "buurten",
+                    "reference": "buurten",
+                    "title": "Boroughs",
+                    "description": "Het Bestand Wijk- en Buurtkaart 2013 bevat de geometrie van alle buurten in Nederland (Source: PDOK.nl.)",
+                    "type": "wms",
+                    "wmsLayers": "cbs_buurten_2013",
+                    "url": "http://geodata.nationaalgeoregister.nl/wijkenbuurten2013/wms?",
+                    "enabled": false,
+                    "opacity": 50
+                },
+                {
+                    "id": "top10terreinen",
+                    "reference": "top10terreinen",
+                    "title": "TOP10NL Terrains",
+                    "description": "Terreinen (Source: PDOK.nl.)",
+                    "type": "wms",
+                    "wmsLayers": "terreinen",
+                    "url": "http://geodata.nationaalgeoregister.nl/top10nl/wms?",
                     "enabled": false,
                     "opacity": 50
                 }
