@@ -1007,3 +1007,7 @@ margin-top: -10px;
 .indent {
     margin-left: 20px;
 }
+
+.selectedFeature {
+    color: #0097cf;
+}
