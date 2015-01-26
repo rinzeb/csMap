@@ -7,10 +7,11 @@
     var AppCtrl = (function () {
         // dependencies are injected via AngularJS $injector
         // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
-        function AppCtrl($scope, $location, $mapService, $layerService, $messageBusService) {
+        function AppCtrl($scope, $location, $http, $mapService, $layerService, $messageBusService) {
             var _this = this;
             this.$scope = $scope;
             this.$location = $location;
+            this.$http = $http;
             this.$mapService = $mapService;
             this.$layerService = $layerService;
             this.$messageBusService = $messageBusService;
@@ -28,8 +29,9 @@
                 }
             };
             this.featureMessageReceived = function (title) {
+                var onfeatureselect = "onFeatureSelect";
                 switch (title) {
-                    case "onFeatureSelect":
+                    case onfeatureselect:
                         _this.$scope.featureSelected = true;
                         break;
                     case "onFeatureDeselect":
@@ -87,6 +89,47 @@
             $messageBusService.notify('Welcome to csMap', 'Your mapping solution.');
 
             this.showMap = this.$location.path() === "/map";
+
+            var url = 'http://geodata.nationaalgeoregister.nl/top10nl/wms?SERVICE=WMS&SRS=EPSG%3A4326&STYLES=&TRANSPARENT=true&VERSION=1.1.1&FORMAT=image%2Fpng&BBOX=4.3441808223724365%2C52.06609591866709%2C4.351986050605774%2C52.06844058355581&HEIGHT=711&WIDTH=1455&LAYERS=terreinen&QUERY_LAYERS=terreinen&INFO_FORMAT=text%2Fhtml&X=1169&Y=543';
+            var httpOptions = {
+                params: {
+                    REQUEST: 'GetFeatureInfo',
+                    format_options: 'callback: JSON_CALLBACK'
+                }
+            };
+
+            //$http.jsonp(url, { params: { REQUEST: 'GetFeatureInfo' } });
+            $http.jsonp(url, httpOptions).success(function (data, status) {
+                console.log('Success: ' + data + ', ' + status);
+            }).error(function (data, status) {
+                console.log('Error: ' + data + ', ' + status);
+            });
+            //$http.jsonp(url, httpOptions)
+            //      .success(function(data, status) {
+            //          console.log('Success: ' + data + ', ' + status);
+            //      })
+            //      .error(function(data, status) {
+            //          console.log('Error: ' + data + ', ' + status);
+            //      });
+            //  $http.jsonp('http://geodata.nationaalgeoregister.nl/top10nl/wms?REQUEST=GetFeatureInfo&SERVICE=WMS&SRS=EPSG%3A4326&STYLES=&TRANSPARENT=true&VERSION=1.1.1&FORMAT=image%2Fpng&BBOX=4.3441808223724365%2C52.06609591866709%2C4.351986050605774%2C52.06844058355581&HEIGHT=711&WIDTH=1455&LAYERS=terreinen&QUERY_LAYERS=terreinen&INFO_FORMAT=text%2Fhtml&X=1169&Y=543')
+            //      .success(function(data, status) {
+            //          console.log('Success: ' + data + ', ' + status);
+            //      })
+            //      .error(function(data, status) {
+            //          console.log('Error: ' + data + ', ' + status);
+            //      });
+            //  var url = 'http://geodata.nationaalgeoregister.nl/top10nl/wms?REQUEST=GetFeatureInfo&SERVICE=WMS&SRS=EPSG%3A4326&STYLES=&TRANSPARENT=true&VERSION=1.1.1&FORMAT=image%2Fpng&BBOX=4.3441808223724365%2C52.06609591866709%2C4.351986050605774%2C52.06844058355581&HEIGHT=711&WIDTH=1455&LAYERS=terreinen&QUERY_LAYERS=terreinen&INFO_FORMAT=text%2Fhtml&X=1169&Y=543';
+            //  $.ajax({
+            //      url: url,
+            //      dataType: 'jsonp',
+            //      jsonp: 'callback',
+            //      jsonpCallback: 'jsonpCallback',
+            //      success: function (data, status) {
+            //          alert("success");
+            //          console.log(data);
+            //          console.log(status);
+            //      }
+            //  });
             //omnivore.topojson('data/projects/20141104_csMap/gemeente.topo.json').addTo(this.$mapService.map);
         }
         /**
@@ -115,6 +158,7 @@
         AppCtrl.$inject = [
             '$scope',
             '$location',
+            '$http',
             'mapService',
             'layerService',
             'messageBusService'
@@ -145,7 +189,10 @@
         'csWeb.mca',
         'csWeb.datatable',
         'ngCookies'
-    ]).config(function (localStorageServiceProvider) {
+    ]).config(function ($httpProvider) {
+        //Enable cross domain calls
+        $httpProvider.defaults.useXDomain = true;
+    }).config(function (localStorageServiceProvider) {
         localStorageServiceProvider.prefix = 'csMap';
     }).config(function ($translateProvider) {
         // TODO ADD YOUR LOCAL TRANSLATIONS HERE, OR ALTERNATIVELY, CHECK OUT

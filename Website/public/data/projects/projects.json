@@ -62,8 +62,8 @@
     ],
     "projects" :  [
         {
-            "title" :  "csMap",
-            "url"   :  "data/projects/20141104_csMap/project.json"
+            "title": "csMap",
+            "url": "data/projects/20141104_csMap/project.json"
         }
     ]
 }

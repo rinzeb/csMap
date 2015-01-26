@@ -4,6 +4,10 @@ var path = require('path');
 
 var server = express();
 
+//server.all('*', (req, res, next) => {
+//    res.header('Access-Control-Allow-Origin', '*');
+//    return next();
+//});
 // all environments
 server.set('port', process.env.PORT || 3000);
 server.set('views', path.join(__dirname, 'views'));
@@ -21,7 +25,7 @@ server.use(server.router);
 server.use(express.static(path.join(__dirname, 'public')));
 
 // development only
-if ('development' == server.get('env')) {
+if ('development' === server.get('env')) {
     server.use(express.errorHandler());
 }
 
