@@ -88,7 +88,7 @@
             <ul class="nav navbar-nav">
                 <!--Start project dropdown-->
                 <li class="dropdown">
-                    <a data-ng-href="{{vm.$layerService.project.url}}" class="pull-left" style="padding: 10px;">
+                    <a data-ng-href="{{vm.$layerService.project.url}}" class="pull-left" style="padding: 10px; padding-bottom: 0">
                         <img data-ng-src="{{vm.$layerService.project.logo}}" alt="{{vm.$layerService.project.title}}" width="32" height="32" />
                     </a>
                     <a href=""
@@ -107,8 +107,11 @@
 
                 <li data-ng-class="{ active: vm.isActive('/map')}"><a href="#/map" data-ng-click="showMap=true" translate="MAP_LABEL"></a></li>
                 <li data-ng-class="{ active: vm.isActive('/table')}"><a href="#/table" data-ng-click="vm.showTable()" translate="TABLE_LABEL"></a></li>
+                <!--<li><language-switch></language-switch></li>-->
             </ul>
 
+            <!-- Language switch -->
+            <language-switch class="navbar-form navbar-right" style="margin-top: 0; margin-bottom: 0"></language-switch>
             <!-- Search form -->
             <form class="navbar-form navbar-right" style="margin-right:0" role="search" data-ng-controller="searchCtrl">
                 <div id="scrollable-dropdown-menu" class="form-group has-feedback navbar-right">

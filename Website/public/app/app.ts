@@ -171,6 +171,8 @@
             'csWeb.voting',
             'csWeb.mca',
             'csWeb.datatable',
+            'csWeb.languageSwitch',
+            'csWeb.projectSettings',
             'ngCookies'
         ])
         .config(localStorageServiceProvider => {
@@ -183,11 +185,6 @@
             $translateProvider.translations('en', Translations.English.locale);
             $translateProvider.translations('nl', Translations.Dutch.locale);
             $translateProvider.preferredLanguage('en');
-        })
-        .controller('Ctrl', ($scope, $translate) => {
-            $scope.changeLanguage = key => {
-                $translate.use(key);
-            };
         })
         .filter('unique', function () {
             // See https://github.com/angular-ui/angular-ui-OLDREPO/blob/master/modules/filters/unique/unique.js
