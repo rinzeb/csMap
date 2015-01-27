@@ -1,7 +1,6 @@
-﻿var Search;
+var Search;
 (function (Search) {
     'use strict';
-
     var LookupAddress = (function () {
         function LookupAddress(name, source) {
             this.name = name;
@@ -15,7 +14,6 @@
         return LookupAddress;
     })();
     Search.LookupAddress = LookupAddress;
-
     //declare var google;
     var SearchCtrl = (function () {
         // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
@@ -51,7 +49,6 @@
                     var address = new LookupAddress(item.name + ", " + item.adminName1, "GeoNames");
                     address.lat = item.lat;
                     address.lng = item.lng;
-
                     //{
                     //    name   : item.name + ", " + item.adminName1,
                     //    lat    : item.lat,
@@ -69,20 +66,21 @@
                         addresses.push(lookupAddress);
                     });
                 }
-
                 return addresses;
             });
         };
-
         SearchCtrl.prototype.onSelect = function ($item) {
             if ($item.feature) {
                 this.$layerService.selectFeature($item.feature);
                 this.$mapService.zoomTo($item.feature);
-            } else {
+            }
+            else {
                 this.$mapService.zoomToLocation(new L.LatLng($item.lat, $item.lng), 12);
             }
             console.log($item);
         };
+        // $inject annotation.
+        // See http://docs.angularjs.org/guide/di
         SearchCtrl.$inject = [
             '$scope',
             '$http',
