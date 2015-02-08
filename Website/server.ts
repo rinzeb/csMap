@@ -3,9 +3,8 @@ import http    = require('http');
 import path    = require('path');
 
 var server = express();
-
 // all environments
-server.set('port', process.env.PORT || 3000);
+server.set('port', '3003');
 server.set('views', path.join(__dirname, 'views'));
 server.set('view engine', 'jade');
 //server.set('view engine', 'html');
@@ -18,6 +17,7 @@ server.use(express.methodOverride());
 server.use(server.router);
 
 server.use(express.static(path.join(__dirname, 'public')));
+console.log("started");
 
 // development only
 if ('development' == server.get('env')) {

@@ -10,18 +10,17 @@
     export interface IAppScope extends ng.IScope {
         vm           : AppCtrl;
         title        : string;
-        showMap      : boolean;
         showMenuRight: boolean;
         featureSelected: boolean;
     }
 
-    // TODO For setting the current culture for string formatting (note you need to include public/js/cs/stringformat.YOUR-CULTURE.js. See sffjs.1.09.zip for your culture.) 
-    declare var sffjs;  
+    // TODO For setting the current culture for string formatting (note you need to include public/js/cs/stringformat.YOUR-CULTURE.js. See sffjs.1.09.zip for your culture.)
+    declare var sffjs;
     declare var String;
     declare var omnivore;
 
     export class AppCtrl {
-        public showMap: boolean = true;
+
 
         // $inject annotation.
         // It provides $injector with information about dependencies to be injected into constructor
@@ -68,9 +67,9 @@
             this.$layerService.openSolution("data/projects/projects.json", $location.$$search.layers);
             $messageBusService.notify('Welcome to csMap', 'Your mapping solution.');
 
-            this.showMap = this.$location.path() === "/map";
+            this.$mapService.isVisible = this.$location.path() === "/map";
 
-            //omnivore.topojson('data/projects/20141104_csMap/gemeente.topo.json').addTo(this.$mapService.map);            
+            //omnivore.topojson('data/projects/20141104_csMap/gemeente.topo.json').addTo(this.$mapService.map);
         }
 
         /**
@@ -110,7 +109,7 @@
             }
         }
 
-        /** 
+        /**
          * Callback function
          * @see {http://stackoverflow.com/questions/12756423/is-there-an-alias-for-this-in-typescript}
          * @see {http://stackoverflow.com/questions/20627138/typescript-this-scoping-issue-when-called-in-jquery-callback}
@@ -141,7 +140,7 @@
         }
 
         showTable() {
-            this.$scope.showMap = false;
+          this.$mapService.isVisible = false;
         }
 
         isActive(viewLocation: string) {
@@ -173,13 +172,14 @@
             'csWeb.datatable',
             'csWeb.languageSwitch',
             'csWeb.projectSettings',
-            'ngCookies'
+            'ngCookies',
+            'csWeb.timeline'
         ])
         .config(localStorageServiceProvider => {
             localStorageServiceProvider.prefix = 'csMap';
         })
         .config($translateProvider => {
-            // TODO ADD YOUR LOCAL TRANSLATIONS HERE, OR ALTERNATIVELY, CHECK OUT 
+            // TODO ADD YOUR LOCAL TRANSLATIONS HERE, OR ALTERNATIVELY, CHECK OUT
             // http://angular-translate.github.io/docs/#/guide/12_asynchronous-loading
             // Translations.English.locale['MAP_LABEL'] = 'MY AWESOME MAP';
             $translateProvider.translations('en', Translations.English.locale);

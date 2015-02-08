@@ -20,7 +20,7 @@ $1$ Right side panel #1#
         <!--<div id="rightPanelToggle">
                 <i class="fa fa-2x fa-chevron-right" style="margin-left: 10px;margin-top: 108px;"></i>
             </div>-->
-        
+
         <ul id="rightpanelTabs" class="nav nav-tabs" style="margin-right:0px; margin-top:100px; display:inline-block">
             <li class="rightPanelTab rightPanelTabAnimated active" ng-show="featureSelected"><a href="#info" style="" data-toggle="tab"><span class="fa fa-info fa-lg"></span></a></li>
         </ul>
@@ -29,15 +29,15 @@ $1$ Right side panel #1#
                 <featureprops class="rightpanel-content"></featureprops>
             </div>
         </div>
-        
+
     </div>
 
 </div>
 
 <script>
-    
-        
-        
+
+
+
 
     $('#rightpanelTabs a').click(function (e) {
         var tab = $(this);
@@ -66,7 +66,7 @@ $1$ Right side panel #1#
 
 </script>
 
-<div class="leftpanel" ng-cloak>
+<div class="leftpanel" ng-cloak style="pointer-events: all">
     <div class="col-xs-3 leftpanel-tab">
         <!-- required for floating -->
         <!-- Nav tabs -->
@@ -93,7 +93,7 @@ $1$ Right side panel #1#
             <filter-list class="tab-pane" id="filters"></filter-list>
 
             <style-list class="tab-pane" id="styles"></style-list>
-            
+
             <mca class="tab-pane" id="mca"></mca>
 
             <feature-list class="tab-pane" id="features"></feature-list>

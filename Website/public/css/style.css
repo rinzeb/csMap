@@ -213,7 +213,7 @@ input[type="checkbox"] { margin: 0; }
 .preview-base-layer {
 	float: left;
 	height: 50px;
-	width: 50px;    
+	width: 50px;
 }
 
 .menutoggle {
@@ -224,7 +224,7 @@ input[type="checkbox"] { margin: 0; }
 	cursor: pointer;
 	float: left;
 	font-size: 22px;
-	
+
 	height: 50px;
 	padding-left: 22px;
 	padding-top: 10px;
@@ -232,7 +232,7 @@ input[type="checkbox"] { margin: 0; }
 	width: 70px;
 }
 
-		  
+
 
 .menutoggle-right {
 	-moz-transition: all 0.2s ease-out 0s;
@@ -242,7 +242,7 @@ input[type="checkbox"] { margin: 0; }
 	cursor: pointer;
 	float: right;
 	font-size: 22px;
-	
+
 	height: 50px;
 	padding-left: 15px;
 	padding-top: 10px;
@@ -250,16 +250,16 @@ input[type="checkbox"] { margin: 0; }
 	width: 50px;
 }
 
-.leftpanel {			 
+.leftpanel {
 	background: white;
 	height: 100%;
 	left: 0;
 	position: absolute;
-	top: 50px;
+	top: 0px;
 	z-index: 100;
 }
 
-		 
+
 
 .rightpanel {
     pointer-events:none;
@@ -268,7 +268,7 @@ input[type="checkbox"] { margin: 0; }
 	height: 100%;
 	position: absolute;
 	right: 0;
-	top: 50px;
+	top: 0px;
 }
 
 #rightpanelTabs {
@@ -291,30 +291,30 @@ input[type="checkbox"] { margin: 0; }
 
 /*TODO Specify the color for the navigation bar: default black */
 .navbar {
-    background: black; 
+    background: black;
     left: 0;
 }
 
 /*TODO Specify the color for the menu bars: default #CCC */
 .leftpanel-tab {
-    background-color: #CCC;  
-    height:100%; 
+    background-color: #CCC;
+    height:100%;
     width: 70px;
 }
 
 #rightPanelToggle {
     display: none;
-    margin-left: 3px; 
-    margin-top:25px; 
+    margin-left: 3px;
+    margin-top:25px;
     top:0;
     width: 52px;
-    height: 43px;     
+    height: 43px;
     background: #CCC;
     position: absolute;
     border-radius: 4px 0 0 4px;
 }
 
-.table-condensed>tbody>tr>td {  
+.table-condensed>tbody>tr>td {
     border-bottom: 1px;
     border-bottom-style: groove;
     border-top-style: none;
@@ -323,13 +323,13 @@ input[type="checkbox"] { margin: 0; }
 .rightpanel-header {
     width: 100%;
     padding-bottom: 10px;
-    background: #CCC; 
-    height:35px; 
-    padding-top: 5px; 
-    margin-top: 1px; 
-    width: 100%; 
-    white-space: nowrap; 
-    overflow: hidden; 
+    background: #CCC;
+    height:35px;
+    padding-top: 5px;
+    margin-top: 1px;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
     text-overflow: ellipsis;
     color: black;
     font-weight: bold;
@@ -349,7 +349,7 @@ input[type="checkbox"] { margin: 0; }
 .leftpanel-collapsed .navbar { left: 0; }
 
 .leftpanel-content {
-    border-top: solid 40px #CCC;    
+    border-top: solid 40px #CCC;
     width: 280px;
 }
 /* Header bar should be overwritten by children, so if you increase the border-top height above, you should match it here */
@@ -369,7 +369,7 @@ input[type="checkbox"] { margin: 0; }
 }
 
 .leftpanel-collapsed .leaflet-container { margin-left: 0; }
- 
+
 .leftpanel-collapsed .leftpanelinner { padding: 0; }
 
 .leftpanel-collapsed .leftpanelinner .sidebartitle { display: none; }
@@ -396,7 +396,7 @@ input[type="checkbox"] { margin: 0; }
 .nav-bracket > li > a:active,
 .nav-bracket > li > a:focus {
 	background-color: #649EC9;
-	color: #1d2939;  
+	color: #1d2939;
 }
 
 .nav-bracket > li.nav-parent > a { background: transparent url(../images/plus-white.png) no-repeat 96% center; }
@@ -421,7 +421,7 @@ input[type="checkbox"] { margin: 0; }
 	-webkit-box-shadow: 0 3px 0 rgba(0, 0, 0, 0.2);
 	background-color: #649EC9;
 	background-image: url(../images/minus.png);
-	color: #1d2939;    
+	color: #1d2939;
 }
 
 .nav-bracket > li.nav-active > a:hover {
@@ -672,7 +672,7 @@ input[type="checkbox"] { margin: 0; }
 
 .tabs-left, .tabs-right {
 	border-bottom: none;
-	padding-top: 2px; 
+	padding-top: 2px;
 }
 
 .tabs-left > li > a {
@@ -701,13 +701,13 @@ input[type="checkbox"] { margin: 0; }
 .tabs-left > li.active > a:hover,
 .tabs-left > li.active > a:focus {
 	background-color: white;
-	
+
 	border-right-color: transparent;
 }
 
 .tabs-right > li.active > a,
 .tabs-right > li.active > a:hover,
-.tabs-right > li.active > a:focus {	
+.tabs-right > li.active > a:focus {
 	border-left-color: transparent;
 }
 
@@ -770,7 +770,7 @@ input[type="checkbox"] { margin: 0; }
 
 .my-div-icon {
     background : url(/images/verzorgingstehuis.png) no-repeat right center;
-    background-size: 100% 100%;	
+    background-size: 100% 100%;
     /*background: #f00;*/
 	border: 1px solid #666;
 }
@@ -831,7 +831,7 @@ margin-top: -10px;
 #rightpanelTabContainer.tabs-below > .nav-tabs > li {
   margin-top: -1px;
   margin-bottom: 0;
-    
+
 }
 
 #rightpanelTabContainer.tabs-below > .nav-tabs > li > a {
@@ -921,7 +921,7 @@ margin-top: -10px;
 }
 
 .rightPanelTab {
-    
+
 }
 
 .rightPanelTabAnimated {

@@ -15,7 +15,7 @@
 		<meta name="description" content="csMap, your mapping solution.">
 		<meta name="author" content="Arnoud de Jong, Erik Vullings">
 		<meta name="color:Accent" content="#a98e2e" />
-        
+
         <!--TODO Add your title here-->
 	    <title>csMap</title>
 
@@ -33,7 +33,7 @@
         <link rel="stylesheet" href="css/xbbcode.css">
         <link rel="stylesheet" href="css/csStyles.css" />
         <link rel="stylesheet" href="css/style.css">
-        
+
         <link rel="shortcut icon" href="favicon.ico">
 	</head>
 <body data-ng-controller="appCtrl" data-ng-cloak data-ng-init="showMap=true">
@@ -58,6 +58,10 @@
     <script src="bower_components/crossfilter/crossfilter.min.js"></script>
     <script src="bower_components/dcjs/dc.min.js"></script>
     <script src="bower_components/async/lib/async.js"></script>
+		<script src="bower_components/jquery-ui/jquery-ui.min.js"></script>
+		<script src="bower_components/underscore/underscore-min.js"></script>
+		<script src="bower_components/moment/min/moment.min.js"></script>
+
 
     <script src="js/cs/csComp.js"></script>
     <script src="views/map/MapViewCtrl.js"></script>
@@ -72,6 +76,10 @@
     <script src="js/cs/jquery.cookies.min.js"></script>
     <script src="js/cs/pnotify.custom.min.js"></script>
     <script src="js/cs/jqueryinjectCSS.min.js"></script>
+    <script src="js/cs/timeline.min.js"></script>
+
+
+    <link rel="stylesheet" href="css/timeline.css" />
 
     <div role="navigation" class="navbar navbar-inverse navbar-fixed-top">
 
@@ -147,9 +155,18 @@
         </div>
     </div>
 
-    <div id="map" data-ng-show="showMap" data-ng-controller="mapLayersCtrl" tabindex="0" class="leaflet-container leaflet-touch leaflet-fade-anim"></div>
 
-    <div data-ui-view style="margin: 10px"></div>
+		<div id="map" data-ng-show="vm.$mapService.isVisible" data-ng-controller="mapLayersCtrl" tabindex="0" class="leaflet-container leaflet-touch leaflet-fade-anim"></div>
+
+		<div data-ui-view style="position: absolute;
+top: 50px;
+width: 100%;
+height: 100%;pointer-events: none"></div>
+
+
+		<timeline data-ng-show="vm.$mapService.timelineVisible" style="height: 100vh;"></timeline>
+
+
 
 </body>
 </html>
