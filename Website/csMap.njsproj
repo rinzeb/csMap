@@ -63,6 +63,7 @@
     <Content Include="public\css\pnotify.custom.min.css" />
     <Content Include="public\css\style.css" />
     <Content Include="public\css\xbbcode.css" />
+    <Content Include="public\data\projects\AHTI\1stelijns_praktijken.json" />
     <Content Include="public\data\projects\projects.json">
       <Publish>True</Publish>
     </Content>
@@ -82,6 +83,7 @@
     <Folder Include="public\app\" />
     <Folder Include="public\data\" />
     <Folder Include="public\data\projects\" />
+    <Folder Include="public\data\projects\AHTI\" />
     <Folder Include="public\images\" />
     <Folder Include="public\includes\" />
     <Folder Include="public\js\" />

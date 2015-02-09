@@ -20,9 +20,6 @@
     declare var omnivore;
 
     export class AppCtrl {
-
-
-        // $inject annotation.
         // It provides $injector with information about dependencies to be injected into constructor
         // it is better to have it close to the constructor, because the parameters must match in count and type.
         // See http://docs.angularjs.org/guide/di
@@ -42,6 +39,7 @@
             private $mapService       : csComp.Services.MapService,
             private $layerService     : csComp.Services.LayerService,
             private $messageBusService: csComp.Services.MessageBusService
+        // $inject annotation.
         ) {
             //console.log('$location: ' + JSON.stringify($location));
             //console.log('$$search : ' + JSON.stringify($location.$$search));
@@ -62,14 +60,12 @@
 
             $messageBusService.subscribe("sidebar", this.sidebarMessageReceived);
             $messageBusService.subscribe("feature", this.featureMessageReceived);
-            $messageBusService.subscribe("layer", this.layerMessageReceived);
+            $messageBusService.subscribe("layer"  , this.layerMessageReceived  );
 
             this.$layerService.openSolution("data/projects/projects.json", $location.$$search.layers);
             $messageBusService.notify('Welcome to csMap', 'Your mapping solution.');
 
             this.$mapService.isVisible = this.$location.path() === "/map";
-
-            //omnivore.topojson('data/projects/20141104_csMap/gemeente.topo.json').addTo(this.$mapService.map);
         }
 
         /**

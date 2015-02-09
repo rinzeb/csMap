@@ -14,7 +14,6 @@ var App;
             this.$mapService = $mapService;
             this.$layerService = $layerService;
             this.$messageBusService = $messageBusService;
-            this.showMap = true;
             this.layerMessageReceived = function (title, layer) {
                 switch (title) {
                     case "deactivate":
@@ -76,8 +75,8 @@ var App;
             $messageBusService.subscribe("layer", this.layerMessageReceived);
             this.$layerService.openSolution("data/projects/projects.json", $location.$$search.layers);
             $messageBusService.notify('Welcome to csMap', 'Your mapping solution.');
-            this.showMap = this.$location.path() === "/map";
-            //omnivore.topojson('data/projects/20141104_csMap/gemeente.topo.json').addTo(this.$mapService.map);            
+            this.$mapService.isVisible = this.$location.path() === "/map";
+            //omnivore.topojson('data/projects/20141104_csMap/gemeente.topo.json').addTo(this.$mapService.map);
         }
         /**
          * Publish a toggle request.
@@ -93,7 +92,7 @@ var App;
             window.console.log("Publish toggle sidebar");
         };
         AppCtrl.prototype.showTable = function () {
-            this.$scope.showMap = false;
+            this.$mapService.isVisible = false;
         };
         AppCtrl.prototype.isActive = function (viewLocation) {
             return viewLocation === this.$location.path();
@@ -133,11 +132,12 @@ var App;
         'csWeb.datatable',
         'csWeb.languageSwitch',
         'csWeb.projectSettings',
-        'ngCookies'
+        'ngCookies',
+        'csWeb.timeline'
     ]).config(function (localStorageServiceProvider) {
         localStorageServiceProvider.prefix = 'csMap';
     }).config(function ($translateProvider) {
-        // TODO ADD YOUR LOCAL TRANSLATIONS HERE, OR ALTERNATIVELY, CHECK OUT 
+        // TODO ADD YOUR LOCAL TRANSLATIONS HERE, OR ALTERNATIVELY, CHECK OUT
         // http://angular-translate.github.io/docs/#/guide/12_asynchronous-loading
         // Translations.English.locale['MAP_LABEL'] = 'MY AWESOME MAP';
         $translateProvider.translations('en', Translations.English.locale);
