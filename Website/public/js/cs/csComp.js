@@ -3201,26 +3201,32 @@ var csComp;
                 this.map = $mapService;
                 this.accentColor = '';
                 this.title = '';
-                this.layerGroup = new L.LayerGroup();
+                //this.layerGroup       = new L.LayerGroup<L.ILayer>();
                 this.featureTypes = {};
                 this.propertyTypeData = {};
-                this.map.map.addLayer(this.layerGroup);
+                //this.map.map.addLayer(this.layerGroup);
                 this.noStyles = true;
-                this.$messageBusService.subscribe('timeline', function (trigger) {
+                $messageBusService.subscribe('timeline', function (trigger) {
                     switch (trigger) {
                         case 'focusChange':
                             _this.updateSensorData();
                             break;
                     }
                 });
-                this.$messageBusService.subscribe('language', function (title, language) {
+                $messageBusService.subscribe('language', function (title, language) {
                     switch (title) {
                         case 'newLanguage':
                             _this.currentLocale = language;
+                            $messageBusService.notify('Reloading...', 'A new language is selected');
+                            _this.openProject(_this.projectUrl);
                             break;
                     }
                 });
             }
+            LayerService.prototype.selectDashboard = function (dashboard) {
+                this.project.activeDashboard = dashboard;
+                this.$messageBusService.publish("dashboard", "activated", dashboard);
+            };
             LayerService.prototype.updateSensorData = function () {
                 var _this = this;
                 if (this.project == null || this.project.timeLine == null)
@@ -3230,7 +3236,9 @@ var csComp;
                 this.project.features.forEach(function (f) {
                     var l = _this.findLayer(f.layerId);
                     if (l != null) {
-                        if (!timepos.hasOwnProperty(f.layerId)) {
+                        if (!l.timestamps)
+                            l.timestamps = [];
+                        if (!timepos.hasOwnProperty(f.layerId) && l.timestamps != null) {
                             for (var i = 1; i < l.timestamps.length; i++) {
                                 if (l.timestamps[i] > date) {
                                     timepos[f.layerId] = i;
@@ -3240,18 +3248,15 @@ var csComp;
                         }
                         if (f.sensors != null) {
                             for (var sensorTitle in f.sensors) {
-                                if (!f.sensors.hasOwnProperty(sensorTitle))
-                                    continue;
                                 var sensor = f.sensors[sensorTitle];
                                 var value = sensor[timepos[f.layerId]];
-                                //console.log(sensorTitle + ":" + value);
                                 f.properties[sensorTitle] = value;
                             }
                             _this.updateFeatureIcon(f, l);
                         }
                     }
                 });
-                this.$messageBusService.publish('feature', 'onFeatureUpdated');
+                this.$messageBusService.publish("feature", "onFeatureUpdated");
             };
             /**
              * Add a layer
@@ -3390,8 +3395,7 @@ var csComp;
                                                     lay.on({
                                                         mouseover: function (a) { return _this.showFeatureTooltip(a, layer.group); },
                                                         mouseout: function (s) { return _this.hideFeatureTooltip(s); },
-                                                        mousemove: function (d) { return _this.updateFeatureTooltip(d); },
-                                                        click: function () { return _this.selectFeature(feature); }
+                                                        mousemove: function (d) { return _this.updateFeatureTooltip(d); }
                                                     });
                                                 },
                                                 style: function (f, m) {
@@ -3457,7 +3461,7 @@ var csComp;
                 var feature = layer.feature;
                 // add title
                 var title = layer.feature.properties.Name;
-                var rowLength = title.length;
+                var rowLength = (title) ? title.length : 1;
                 var content = '<td colspan=\'3\'>' + title + '</td></tr>';
                 // add filter values
                 if (group.filters != null && group.filters.length > 0) {
@@ -3660,24 +3664,32 @@ var csComp;
                 this.project.features.push(feature);
                 layer.group.ndx.add([feature]);
                 feature.fType = this.getFeatureType(feature);
-                this.initPropertyTypes(feature.fType);
+                this.initFeatureType(feature.fType);
                 // Do we have a name?
                 if (!feature.properties.hasOwnProperty('Name'))
                     csComp.Helpers.setFeatureName(feature);
                 return feature.type;
             };
             /**
-            * Initialize the property type by setting default property values, and by localizing it.
+            * Initialize the feature type and its property types by setting default property values, and by localizing it.
             */
-            LayerService.prototype.initPropertyTypes = function (ft) {
+            LayerService.prototype.initFeatureType = function (ft) {
                 var _this = this;
-                if (ft.propertyTypeData.length == 0)
+                if (ft.languages != null && this.currentLocale in ft.languages) {
+                    var locale = ft.languages[this.currentLocale];
+                    if (locale.name)
+                        ft.name = locale.name;
+                }
+                if (ft.propertyTypeData == null || ft.propertyTypeData.length == 0)
                     return;
                 ft.propertyTypeData.forEach(function (pt) {
-                    _this.setDefaultPropertyType(pt);
-                    if (pt.languages != null)
-                        _this.localizePropertyType(pt);
+                    _this.initPropertyType(pt);
                 });
+            };
+            LayerService.prototype.initPropertyType = function (pt) {
+                this.setDefaultPropertyType(pt);
+                if (pt.languages != null)
+                    this.localizePropertyType(pt);
             };
             LayerService.prototype.setDefaultPropertyType = function (pt) {
                 if (typeof pt.visibleInCallOut == 'undefined')
@@ -3701,8 +3713,8 @@ var csComp;
                 }
                 ;
             };
-            LayerService.prototype.removeFeature = function (feature, layer) {
-            };
+            //removeFeature(feature: IFeature, layer: ProjectLayer) {
+            //}
             /**
              * create icon based of feature style
              */
@@ -4154,6 +4166,7 @@ var csComp;
              */
             LayerService.prototype.openProject = function (url, layers) {
                 var _this = this;
+                this.projectUrl = url;
                 //console.log('layers (openProject): ' + JSON.stringify(layers));
                 var layerIds = [];
                 if (layers) {
@@ -4162,7 +4175,17 @@ var csComp;
                     });
                 }
                 //console.log('layerIds (openProject): ' + JSON.stringify(layerIds));
-                this.layerGroup.clearLayers();
+                if (this.project != null && this.project.groups != null) {
+                    this.project.groups.forEach(function (group) {
+                        group.layers.forEach(function (layer) {
+                            if (layer.enabled) {
+                                _this.removeLayer(layer);
+                                layer.enabled = false;
+                            }
+                        });
+                    });
+                }
+                //this.layerGroup.clearLayers();
                 this.featureTypes = {};
                 $.getJSON(url, function (data) {
                     _this.project = data;
@@ -4178,15 +4201,20 @@ var csComp;
                             if (!featureTypes.hasOwnProperty(typeName))
                                 continue;
                             var featureType = featureTypes[typeName];
+                            _this.initFeatureType(featureType);
                             _this.featureTypes[typeName] = featureType;
                         }
                     }
-                    var propertyTypeData = _this.project.propertyTypeData;
-                    if (propertyTypeData) {
-                        for (var key in propertyTypeData) {
-                            if (!propertyTypeData.hasOwnProperty(key))
-                                continue;
-                            var propertyType = propertyTypeData[key];
+                    if (_this.project.propertyTypeData) {
+                        for (var key in _this.project.propertyTypeData) {
+                            var propertyType = _this.project.propertyTypeData[key];
+                            _this.initPropertyType(propertyType);
+                            if (!propertyType.visibleInCallOut)
+                                propertyType.visibleInCallOut = true;
+                            if (!propertyType.label)
+                                propertyType.label = key;
+                            if (!propertyType.type)
+                                propertyType.type = "text";
                             _this.propertyTypeData[key] = propertyType;
                         }
                     }
@@ -4255,9 +4283,9 @@ var csComp;
                     });
                 });
             };
-            LayerService.prototype.zoom = function (data) {
-                //var a = data;
-            };
+            //private zoom(data: any) {
+            //    //var a = data;
+            //}
             /**
              * Calculate min/max/count for a specific property in a group
              */
@@ -4328,7 +4356,6 @@ var csComp;
                                     _this.addBarFilter(group, filter);
                                     break;
                             }
-                            //var datas = sterrenGroup.top(Infinity);
                         });
                     }
                     _this.updateFilterGroupCount(group);

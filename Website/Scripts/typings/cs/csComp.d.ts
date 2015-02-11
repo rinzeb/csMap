@@ -186,6 +186,9 @@ declare module csComp.Services {
         sensors?: {
             [id: string]: any[];
         };
+        languages?: {
+            [key: string]: ILocalisedData;
+        };
     }
     /**
      * A feature is a single object that is show on a map (e.g. point, polyline, etc)
@@ -253,10 +256,11 @@ declare module csComp.Services {
         target?: string;
         options?: string[];
         languages?: {
-            [key: string]: ILocalisedPropertyTypeData;
+            [key: string]: ILocalisedData;
         };
     }
-    interface ILocalisedPropertyTypeData {
+    interface ILocalisedData {
+        name?: string;
         title?: string;
         description?: string;
         section?: string;
@@ -286,6 +290,9 @@ declare module csComp.Services {
          * The keys can be resolved in the project's propertyTypeData dictionary, or in the local propertyTypeData.
          */
         propertyTypeKeys?: string;
+        languages?: {
+            [key: string]: ILocalisedData;
+        };
     }
     interface IGeoJsonFile {
         featureTypes?: {
@@ -426,6 +433,7 @@ declare module csComp.Services {
         description: string;
         logo: string;
         url: string;
+        activeDashboard: Dashboard;
         baselayers: IBaseLayer[];
         featureTypes: {
             [id: string]: IFeatureType;
@@ -1038,6 +1046,7 @@ declare module csComp.Services {
             [key: string]: IPropertyType;
         };
         project: Project;
+        projectUrl: string;
         solution: Solution;
         dimension: any;
         noFilters: boolean;
@@ -1050,6 +1059,7 @@ declare module csComp.Services {
         currentLocale: string;
         static $inject: string[];
         constructor($location: ng.ILocationService, $translate: ng.translate.ITranslateService, $messageBusService: Services.MessageBusService, $mapService: Services.MapService, $rootScope: any);
+        selectDashboard(dashboard: csComp.Services.Dashboard): void;
         updateSensorData(): void;
         /**
          * Add a layer
@@ -1092,12 +1102,12 @@ declare module csComp.Services {
          */
         initFeature(feature: IFeature, layer: ProjectLayer): IFeatureType;
         /**
-        * Initialize the property type by setting default property values, and by localizing it.
+        * Initialize the feature type and its property types by setting default property values, and by localizing it.
         */
-        private initPropertyTypes(ft);
+        private initFeatureType(ft);
+        private initPropertyType(pt);
         private setDefaultPropertyType(pt);
         private localizePropertyType(pt);
-        removeFeature(feature: IFeature, layer: ProjectLayer): void;
         /**
          * create icon based of feature style
          */
@@ -1157,7 +1167,6 @@ declare module csComp.Services {
          */
         openProject(url: string, layers?: string): void;
         closeProject(): void;
-        private zoom(data);
         /**
          * Calculate min/max/count for a specific property in a group
          */
