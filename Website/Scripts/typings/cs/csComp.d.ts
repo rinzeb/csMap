@@ -1,5 +1,98 @@
 /// <reference path="../crossfilter/crossfilter.d.ts" />
 /// <reference path="../leaflet/leaflet.d.ts" />
+declare module LanguageSwitch {
+    var html: string;
+}
+declare module LanguageSwitch {
+    /**
+      * Module
+      */
+    var myModule: any;
+}
+declare module LanguageSwitch {
+    interface ILanguageSwitchScope extends ng.IScope {
+        vm: LanguageSwitchCtrl;
+    }
+    interface ILanguage {
+        key: string;
+        img: string;
+        name: string;
+    }
+    class LanguageSwitchCtrl {
+        private $scope;
+        private $translate;
+        private $languages;
+        private $messageBus;
+        private scope;
+        language: ILanguage;
+        static $inject: string[];
+        constructor($scope: ILanguageSwitchScope, $translate: any, $languages: ILanguage[], $messageBus: csComp.Services.MessageBusService);
+        switchLanguage(language: ILanguage): void;
+    }
+}
+declare module Mca {
+    var html: string;
+}
+declare module Mca {
+    /**
+     * Module
+     */
+    var myModule: ng.IModule;
+}
+declare module Mca {
+    import IFeatureType = csComp.Services.IFeatureType;
+    import IGeoJsonFile = csComp.Services.IGeoJsonFile;
+    interface IMcaEditorScope extends ng.IScope {
+        vm: McaEditorCtrl;
+    }
+    interface IExtendedPropertyInfo extends csComp.Services.IPropertyType {
+        isSelected?: boolean;
+        category?: string;
+        scores?: string;
+        scoringFunctionType?: Models.ScoringFunctionType;
+        /** The data is considered invalid when below this value */
+        minCutoffValue?: number;
+        /** The data is considered invalid when above this value */
+        maxCutoffValue?: number;
+        userWeight?: number;
+    }
+    class McaEditorCtrl {
+        private $scope;
+        private $modalInstance;
+        private $layerService;
+        private $translate;
+        private messageBusService;
+        private mca;
+        dataset: IGeoJsonFile;
+        propInfos: Array<IExtendedPropertyInfo>;
+        headers: Array<string>;
+        selectedFeatureType: IFeatureType;
+        mcaTitle: string;
+        rankTitle: string;
+        scoringFunctions: Models.ScoringFunction[];
+        showItem: number;
+        scaleMax: number;
+        scaleMin: number;
+        static $inject: string[];
+        constructor($scope: IMcaEditorScope, $modalInstance: any, $layerService: csComp.Services.LayerService, $translate: ng.translate.ITranslateService, messageBusService: csComp.Services.MessageBusService, mca?: Models.Mca);
+        private updatePropertyInfoUponEdit(criterion, category?);
+        loadPropertyTypes(): void;
+        /**
+         * Load the features as visible on the map.
+         */
+        private loadMapLayers();
+        private selectFirstFeatureType();
+        private updatePropertyInfo(featureType);
+        toggleSelection(metaInfoTitle: string): void;
+        isDisabled(): boolean;
+        /**
+         * Create a new MCA criterion
+         */
+        save(): void;
+        cancel(): void;
+        toggleItemDetails(index: number): void;
+    }
+}
 declare module csComp.Services {
     class Widget {
         content: Function;
@@ -158,6 +251,15 @@ declare module csComp.Services {
         defaultValue?: number;
         subject?: string;
         target?: string;
+        options?: string[];
+        languages?: {
+            [key: string]: ILocalisedPropertyTypeData;
+        };
+    }
+    interface ILocalisedPropertyTypeData {
+        title?: string;
+        description?: string;
+        section?: string;
         options?: string[];
     }
     interface IPropertyTypeData {
@@ -389,581 +491,8 @@ declare module csComp.Services {
         test: string;
     }
 }
-declare module BaseMapList {
-    var html: string;
-}
-declare module BaseMapList {
-    /**
-      * Module
-      */
-    var myModule: any;
-}
-declare module BaseMapList {
-    interface IBaseMapScope extends ng.IScope {
-        vm: BaseMapListCtrl;
-    }
-    class BaseMapListCtrl {
-        private $scope;
-        private $mapService;
-        private scope;
-        static $inject: string[];
-        constructor($scope: IBaseMapScope, $mapService: csComp.Services.MapService);
-        selectBaseLayer(key: any): void;
-    }
-}
-declare module DataTable {
-    var html: string;
-}
-declare module DataTable {
-    /**
-      * Module
-      */
-    var myModule: any;
-}
-declare module DataTable {
-    import IGeoJsonFile = csComp.Services.IGeoJsonFile;
-    import IPropertyType = csComp.Services.IPropertyType;
-    interface IDataTableViewScope extends ng.IScope {
-        vm: DataTableCtrl;
-    }
-    /**
-     * Represents a field in the table.
-     * The value is the actual displayValue shown, the type is the propertyType type (e.g. number or text, useful when aligning the data), and the header is used for sorting.
-     */
-    class TableField {
-        displayValue: string;
-        originalValue: any;
-        type: string;
-        header: string;
-        constructor(displayValue: string, originalValue: any, type: string, header: string);
-    }
-    class DataTableCtrl {
-        private $scope;
-        private $http;
-        private $sce;
-        private $translate;
-        private $layerService;
-        private $localStorageService;
-        private $messageBusService;
-        mapLabel: string;
-        dataset: IGeoJsonFile;
-        selectedType: csComp.Services.IFeatureType;
-        numberOfItems: number;
-        selectedLayerId: string;
-        layerOptions: Array<any>;
-        propertyTypes: Array<IPropertyType>;
-        headers: Array<string>;
-        sortingColumn: number;
-        rows: Array<Array<TableField>>;
-        private mapFeatureTitle;
-        static $inject: string[];
-        constructor($scope: IDataTableViewScope, $http: ng.IHttpService, $sce: ng.ISCEService, $translate: ng.translate.ITranslateService, $layerService: csComp.Services.LayerService, $localStorageService: ng.localStorage.ILocalStorageService, $messageBusService: csComp.Services.MessageBusService);
-        /**
-         * Add a label to local storage and bind it to the scope.
-         */
-        private bindToStorage(label, defaultValue);
-        /**
-         * Create a list of layer options and select the one used previously.
-         */
-        private updateLayerOptions();
-        private loadLayer();
-        /**
-         * Load the features as visible on the map.
-         */
-        private loadMapLayers();
-        private updatepropertyType(data);
-        toggleSelection(propertyTypeTitle: string): void;
-        private findLayerById(id);
-        /**
-         * Returns the data rows that are relevant for the current selection.
-         */
-        getRows(): Array<Array<TableField>>;
-        /**
-         * Generate a font awesome class based on the order.
-         */
-        sortOrderClass(headerIndex: number, reverseOrder: boolean): string;
-        /**
-         * Order the rows based on the header index and the order.
-         */
-        orderBy(headerIndex: number, reverseOrder: boolean): void;
-        downloadCsv(): void;
-        private saveData(csvData, filename);
-        /**
-         * Convert to trusted html string.
-         */
-        toTrusted(html: string): any;
-    }
-}
-declare module FeatureList {
-    var html: string;
-}
-declare module FeatureList {
-    /**
-      * Module
-      */
-    var myModule: any;
-}
-declare module FeatureList {
-    interface IFeatureListScope extends ng.IScope {
-        vm: FeatureListCtrl;
-        numberOfItems: number;
-    }
-    class FeatureListCtrl {
-        private $scope;
-        private $layerService;
-        private $mapService;
-        private scope;
-        static $inject: string[];
-        constructor($scope: IFeatureListScope, $layerService: csComp.Services.LayerService, $mapService: csComp.Services.MapService);
-    }
-}
-declare module FeatureProps {
-    var html: string;
-}
-declare module FeatureProps {
-    /**
-      * Module
-      */
-    var myModule: any;
-}
-declare module FeatureProps {
-    import IFeature = csComp.Services.IFeature;
-    import IFeatureType = csComp.Services.IFeatureType;
-    import IPropertyType = csComp.Services.IPropertyType;
-    import IPropertyTypeData = csComp.Services.IPropertyTypeData;
-    interface IFeaturePropsScope extends ng.IScope {
-        vm: FeaturePropsCtrl;
-        showMenu: boolean;
-        poi: IFeature;
-        callOut: CallOut;
-        tabs: JQuery;
-        tabScrollDelta: number;
-        featureTabActivated(sectionTitle: string, section: CallOutSection): any;
-        autocollapse(init: boolean): void;
-    }
-    interface ICallOutProperty {
-        key: string;
-        value: string;
-        property: string;
-        canFilter: boolean;
-        canStyle: boolean;
-        feature: IFeature;
-        description?: string;
-        meta?: IPropertyType;
-        isFilter: boolean;
-    }
-    class CallOutProperty implements ICallOutProperty {
-        key: string;
-        value: string;
-        property: string;
-        canFilter: boolean;
-        canStyle: boolean;
-        feature: IFeature;
-        isFilter: boolean;
-        description: string;
-        meta: IPropertyType;
-        constructor(key: string, value: string, property: string, canFilter: boolean, canStyle: boolean, feature: IFeature, isFilter: boolean, description?: string, meta?: IPropertyType);
-    }
-    interface ICallOutSection {
-        propertyTypes: {
-            [label: string]: IPropertyType;
-        };
-        properties: Array<ICallOutProperty>;
-        sectionIcon: string;
-        addProperty(key: string, value: string, property: string, canFilter: boolean, canStyle: boolean, feature: IFeature, isFilter: boolean, description?: string, meta?: IPropertyType): void;
-        hasProperties(): boolean;
-    }
-    class CallOutSection implements ICallOutSection {
-        propertyTypes: {
-            [label: string]: IPropertyType;
-        };
-        properties: Array<ICallOutProperty>;
-        sectionIcon: string;
-        constructor(sectionIcon?: string);
-        showSectionIcon(): boolean;
-        addProperty(key: string, value: string, property: string, canFilter: boolean, canStyle: boolean, feature: IFeature, isFilter: boolean, description?: string, meta?: IPropertyType): void;
-        hasProperties(): boolean;
-    }
-    class CallOut {
-        private type;
-        private feature;
-        private propertyTypeData;
-        title: string;
-        icon: string;
-        sections: {
-            [title: string]: ICallOutSection;
-        };
-        constructor(type: IFeatureType, feature: IFeature, propertyTypeData: IPropertyTypeData);
-        sectionCount(): number;
-        firstSection(): ICallOutSection;
-        lastSection(): ICallOutSection;
-        private getOrCreateCallOutSection(sectionTitle);
-        /**
-         * Set the title of the callout to the title of the feature.
-         */
-        private setTitle();
-        private setIcon(feature);
-        static title(type: IFeatureType, feature: IFeature): string;
-    }
-    class FeaturePropsCtrl {
-        private $scope;
-        private $location;
-        private $sce;
-        private $mapService;
-        private $layerService;
-        private $messageBusService;
-        private scope;
-        static $inject: string[];
-        constructor($scope: IFeaturePropsScope, $location: ng.ILocationService, $sce: ng.ISCEService, $mapService: csComp.Services.MapService, $layerService: csComp.Services.LayerService, $messageBusService: csComp.Services.MessageBusService);
-        toTrusted(html: string): string;
-        /**
-         * Callback function
-         * @see {http://stackoverflow.com/questions/12756423/is-there-an-alias-for-this-in-typescript}
-         * @see {http://stackoverflow.com/questions/20627138/typescript-this-scoping-issue-when-called-in-jquery-callback}
-         * @todo {notice the strange syntax using a fat arrow =>, which is to preserve the this reference in a callback!}
-         */
-        private sidebarMessageReceived;
-        private featureMessageReceived;
-        private displayFeature(feature);
-    }
-}
-declare module FilterList {
-    var html: string;
-}
-declare module FilterList {
-    /**
-      * Module
-      */
-    var myModule: any;
-}
-declare module FilterList {
-    interface IFilterListScope extends ng.IScope {
-        vm: FilterListCtrl;
-    }
-    class FilterListCtrl {
-        private $scope;
-        private $layerService;
-        private scope;
-        static $inject: string[];
-        constructor($scope: IFilterListScope, $layerService: csComp.Services.LayerService);
-    }
-}
-declare module LanguageSwitch {
-    var html: string;
-}
-declare module LanguageSwitch {
-    /**
-      * Module
-      */
-    var myModule: any;
-}
-declare module LanguageSwitch {
-    interface ILanguageSwitchScope extends ng.IScope {
-        vm: LanguageSwitchCtrl;
-    }
-    interface ILanguage {
-        key: string;
-        img: string;
-        name: string;
-    }
-    class LanguageSwitchCtrl {
-        private $scope;
-        private $translate;
-        private $languages;
-        private $messageBus;
-        private scope;
-        language: ILanguage;
-        static $inject: string[];
-        constructor($scope: ILanguageSwitchScope, $translate: any, $languages: ILanguage[], $messageBus: csComp.Services.MessageBusService);
-        switchLanguage(language: ILanguage): void;
-    }
-}
-declare module LayersDirective {
-    var html: string;
-}
-declare module LayersDirective {
-    /**
-      * Module
-      */
-    var myModule: any;
-}
-declare module LayersDirective {
-    interface ILayersDirectiveScope extends ng.IScope {
-        vm: LayersDirectiveCtrl;
-    }
-    class LayersDirectiveCtrl {
-        private $scope;
-        private $layerService;
-        private scope;
-        static $inject: string[];
-        constructor($scope: ILayersDirectiveScope, $layerService: csComp.Services.LayerService);
-        toggleLayer(layer: csComp.Services.ProjectLayer): void;
-    }
-}
-declare module LegendList {
-    var html: string;
-}
-declare module LegendList {
-    /**
-      * Module
-      */
-    var myModule: any;
-}
-declare module LegendList {
-    interface ILegendItem {
-        title: string;
-        uri: string;
-    }
-    interface ILegendListScope extends ng.IScope {
-        vm: LegendListCtrl;
-        numberOfItems: number;
-        legendItems: ILegendItem[];
-    }
-    class LegendListCtrl {
-        private $scope;
-        private $layerService;
-        private $mapService;
-        private $messageBusService;
-        static $inject: string[];
-        constructor($scope: ILegendListScope, $layerService: csComp.Services.LayerService, $mapService: csComp.Services.MapService, $messageBusService: csComp.Services.MessageBusService);
-        private updateLegendItems();
-        private getImageUri(ft);
-        private getName(key, ft);
-    }
-}
-declare module Mca {
-    var html: string;
-}
-declare module Mca {
-    /**
-     * Module
-     */
-    var myModule: ng.IModule;
-}
-declare module Mca {
-    import IFeature = csComp.Services.IFeature;
-    interface IMcaScope extends ng.IScope {
-        vm: McaCtrl;
-        ratingStates: any;
-    }
-    class McaCtrl {
-        private $scope;
-        private $modal;
-        private $translate;
-        private $timeout;
-        private $localStorageService;
-        private $layerService;
-        private messageBusService;
-        private static mcaChartId;
-        private static mcas;
-        private static confirmationMsg1;
-        private static confirmationMsg2;
-        features: IFeature[];
-        selectedFeature: IFeature;
-        properties: FeatureProps.CallOutProperty[];
-        showFeature: boolean;
-        showChart: boolean;
-        featureIcon: string;
-        mca: Models.Mca;
-        selectedCriterion: Models.Criterion;
-        availableMcas: Models.Mca[];
-        showAsterChart: boolean;
-        showDialog: boolean;
-        expertMode: boolean;
-        showSparkline: boolean;
-        private groupStyle;
-        static $inject: string[];
-        constructor($scope: IMcaScope, $modal: any, $translate: ng.translate.ITranslateService, $timeout: ng.ITimeoutService, $localStorageService: ng.localStorage.ILocalStorageService, $layerService: csComp.Services.LayerService, messageBusService: csComp.Services.MessageBusService);
-        private getVotingClass(criterion);
-        private createDummyMca();
-        toggleMcaChartType(): void;
-        toggleSparkline(): void;
-        weightUpdated(criterion: Models.Criterion): void;
-        updateMca(criterion?: Models.Criterion): void;
-        editMca(mca: Models.Mca): void;
-        createMca(): void;
-        private showMcaEditor(newMca);
-        removeMca(mca: Models.Mca): void;
-        private getMcaIndex(mca);
-        private addMca(mca);
-        private deleteMca(mca);
-        private addMcaToLocalStorage(mca);
-        private removeMcaFromLocalStorage(mca);
-        private featureMessageReceived;
-        private scopeApply();
-        private updateSelectedFeature(feature, drawCharts?);
-        drawChart(criterion?: Models.Criterion): void;
-        private getParentOfSelectedCriterion(criterion?);
-        private drawHistogram(criterion?);
-        private drawAsterPlot(criterion?);
-        private drawPieChart(criterion?);
-        /**
-        * Based on the currently loaded features, which MCA can we use
-        */
-        updateAvailableMcas(mca?: Models.Mca): void;
-        calculateMca(): void;
-        private applyPropertyInfoToCriteria(mca, featureType);
-        private addPropertyInfo(featureId, mca, forceUpdate?);
-        setStyle(item: FeatureProps.CallOutProperty): void;
-        private static createPropertyType(mca);
-        private static createRankPropertyType(mca);
-    }
-}
-declare module Mca {
-    import IFeatureType = csComp.Services.IFeatureType;
-    import IGeoJsonFile = csComp.Services.IGeoJsonFile;
-    interface IMcaEditorScope extends ng.IScope {
-        vm: McaEditorCtrl;
-    }
-    interface IExtendedPropertyInfo extends csComp.Services.IPropertyType {
-        isSelected?: boolean;
-        category?: string;
-        scores?: string;
-        scoringFunctionType?: Models.ScoringFunctionType;
-        /** The data is considered invalid when below this value */
-        minCutoffValue?: number;
-        /** The data is considered invalid when above this value */
-        maxCutoffValue?: number;
-        userWeight?: number;
-    }
-    class McaEditorCtrl {
-        private $scope;
-        private $modalInstance;
-        private $layerService;
-        private $translate;
-        private messageBusService;
-        private mca;
-        dataset: IGeoJsonFile;
-        propInfos: Array<IExtendedPropertyInfo>;
-        headers: Array<string>;
-        selectedFeatureType: IFeatureType;
-        mcaTitle: string;
-        rankTitle: string;
-        scoringFunctions: Models.ScoringFunction[];
-        showItem: number;
-        scaleMax: number;
-        scaleMin: number;
-        static $inject: string[];
-        constructor($scope: IMcaEditorScope, $modalInstance: any, $layerService: csComp.Services.LayerService, $translate: ng.translate.ITranslateService, messageBusService: csComp.Services.MessageBusService, mca?: Models.Mca);
-        private updatePropertyInfoUponEdit(criterion, category?);
-        loadPropertyTypes(): void;
-        /**
-         * Load the features as visible on the map.
-         */
-        private loadMapLayers();
-        private selectFirstFeatureType();
-        private updatePropertyInfo(featureType);
-        toggleSelection(metaInfoTitle: string): void;
-        isDisabled(): boolean;
-        /**
-         * Create a new MCA criterion
-         */
-        save(): void;
-        cancel(): void;
-        toggleItemDetails(index: number): void;
-    }
-}
 declare module McaEditorView {
     var html: string;
-}
-declare module Mca.Models {
-    import IFeature = csComp.Services.IFeature;
-    enum ScoringFunctionType {
-        Manual = 0,
-        Ascending = 1,
-        Descending = 2,
-        AscendingSigmoid = 3,
-        DescendingSigmoid = 4,
-        GaussianPeak = 5,
-        GaussianValley = 6,
-    }
-    /**
-    * Scoring function creates a PLA of the scoring algorithm.
-    */
-    class ScoringFunction {
-        title: string;
-        type: ScoringFunctionType;
-        scores: string;
-        cssClass: string;
-        constructor(scoringFunctionType?: ScoringFunctionType);
-        /**
-         * Create a score based on the type, in which x in [0,10] and y in [0.1].
-         * Before applying it, you need to scale the x-axis based on your actual range.
-         * Typically, you would map x=0 to the min(x)+0.1*range(x) and x(10)-0.1*range(x) to max(x),
-         * i.e. x' = ax+b, where a=100/(8r) and b=-100(min+0.1r)/(8r) and r=max-min
-         */
-        static createScores(type: ScoringFunctionType): string;
-    }
-    class ScoringFunctions {
-        static scoringFunctions: ScoringFunctions[];
-    }
-    class Criterion {
-        title: string;
-        description: string;
-        /**
-        * Top level label will be used to add a property to a feature, mca_LABELNAME, with the MCA value.
-        * Lower level children will be used to obtain the property value.
-        */
-        label: string;
-        /** Color of the pie chart */
-        color: string;
-        /** Specified weight by the user */
-        userWeight: number;
-        /** Derived weight based on the fact that the sum of weights in a group of criteria needs to be 1. */
-        weight: number;
-        /** Scoring function y = f(x), which translates a specified measurement x to a value y, where y in [0,1].
-         * Format [x1,y1 x2,y2], and may contain special characters, such as min or max to define the minimum or maximum.
-         */
-        scores: string;
-        propValues: number[];
-        criteria: Criterion[];
-        /** Piece-wise linear approximation of the scoring function by a set of x and y points */
-        isPlaUpdated: boolean;
-        /** Piece-wise linear approximation must be scaled:x' = ax+b, where a=100/(8r) and b=-100(min+0.1r)/(8r) and r=max-min */
-        isPlaScaled: boolean;
-        minValue: number;
-        maxValue: number;
-        minCutoffValue: number;
-        maxCutoffValue: number;
-        x: number[];
-        y: number[];
-        deserialize(input: Criterion): Criterion;
-        private requiresMinimum();
-        private requiresMaximum();
-        getTitle(): string;
-        /**
-         * Update the piecewise linear approximation (PLA) of the scoring (a.k.a. user) function,
-         * which translates a property value to a MCA value in the range [0,1] using all features.
-         */
-        updatePla(features: IFeature[]): void;
-        getScore(feature: IFeature): number;
-    }
-    class Mca extends Criterion implements csComp.Services.ISerializable<Mca> {
-        /** Section of the callout */
-        section: string;
-        stringFormat: string;
-        /** Optionally, export the result also as a rank */
-        rankTitle: string;
-        rankDescription: string;
-        /** Optionally, stringFormat for the ranked result */
-        rankFormat: string;
-        /** Maximum number of star ratings to use to set the weight */
-        userWeightMax: number;
-        /** Applicable feature ids as a string[]. */
-        featureIds: string[];
-        scaleMaxValue: number;
-        scaleMinValue: number;
-        rankLabel: string;
-        constructor();
-        deserialize(input: Mca): Mca;
-        /**
-        * Update the MCA by calculating the weights and setting the colors.
-        */
-        update(): void;
-        private calculateWeights(criteria?);
-        /** Set the colors of all criteria and sub-criteria */
-        private setColors();
-    }
 }
 declare module ProjectSettings {
     var html: string;
@@ -987,39 +516,6 @@ declare module ProjectSettings {
         constructor($scope: IProjectSettingsScope, $modal: any, $layerService: csComp.Services.LayerService);
     }
 }
-declare module Helpers.Resize {
-    /**
-      * Module
-      */
-    var myModule: any;
-}
-declare module ShowModal {
-    /**
-      * Module
-      */
-    var myModule: any;
-}
-declare module StyleList {
-    var html: string;
-}
-declare module StyleList {
-    /**
-      * Module
-      */
-    var myModule: any;
-}
-declare module StyleList {
-    interface IStyleListScope extends ng.IScope {
-        vm: StyleListCtrl;
-    }
-    class StyleListCtrl {
-        private $scope;
-        private $layerService;
-        private scope;
-        static $inject: string[];
-        constructor($scope: IStyleListScope, $layerService: csComp.Services.LayerService);
-    }
-}
 declare module Timeline {
     var html: string;
 }
@@ -1041,6 +537,7 @@ declare module Timeline {
         private $mapService;
         private $messageBusService;
         private scope;
+        private locale;
         static $inject: string[];
         focusDate: Date;
         line1: string;
@@ -1215,6 +712,283 @@ declare module csComp.Helpers {
         private static clearSvg(svgId);
     }
 }
+declare module Helpers.Resize {
+    /**
+      * Module
+      */
+    var myModule: any;
+}
+declare module LegendList {
+    var html: string;
+}
+declare module LegendList {
+    /**
+      * Module
+      */
+    var myModule: any;
+}
+declare module LegendList {
+    interface ILegendItem {
+        title: string;
+        uri: string;
+    }
+    interface ILegendListScope extends ng.IScope {
+        vm: LegendListCtrl;
+        numberOfItems: number;
+        legendItems: ILegendItem[];
+    }
+    class LegendListCtrl {
+        private $scope;
+        private $layerService;
+        private $mapService;
+        private $messageBusService;
+        static $inject: string[];
+        constructor($scope: ILegendListScope, $layerService: csComp.Services.LayerService, $mapService: csComp.Services.MapService, $messageBusService: csComp.Services.MessageBusService);
+        private updateLegendItems();
+        private getImageUri(ft);
+        private getName(key, ft);
+    }
+}
+declare module FeatureList {
+    var html: string;
+}
+declare module FeatureList {
+    /**
+      * Module
+      */
+    var myModule: any;
+}
+declare module FeatureList {
+    interface IFeatureListScope extends ng.IScope {
+        vm: FeatureListCtrl;
+        numberOfItems: number;
+    }
+    class FeatureListCtrl {
+        private $scope;
+        private $layerService;
+        private $mapService;
+        private scope;
+        static $inject: string[];
+        constructor($scope: IFeatureListScope, $layerService: csComp.Services.LayerService, $mapService: csComp.Services.MapService);
+    }
+}
+declare module FilterList {
+    var html: string;
+}
+declare module FilterList {
+    /**
+      * Module
+      */
+    var myModule: any;
+}
+declare module FilterList {
+    interface IFilterListScope extends ng.IScope {
+        vm: FilterListCtrl;
+    }
+    class FilterListCtrl {
+        private $scope;
+        private $layerService;
+        private scope;
+        static $inject: string[];
+        constructor($scope: IFilterListScope, $layerService: csComp.Services.LayerService);
+    }
+}
+declare module Mca {
+    import IFeature = csComp.Services.IFeature;
+    interface IMcaScope extends ng.IScope {
+        vm: McaCtrl;
+        ratingStates: any;
+    }
+    class McaCtrl {
+        private $scope;
+        private $modal;
+        private $translate;
+        private $timeout;
+        private $localStorageService;
+        private $layerService;
+        private messageBusService;
+        private static mcaChartId;
+        private static mcas;
+        private static confirmationMsg1;
+        private static confirmationMsg2;
+        features: IFeature[];
+        selectedFeature: IFeature;
+        properties: FeatureProps.CallOutProperty[];
+        showFeature: boolean;
+        showChart: boolean;
+        featureIcon: string;
+        mca: Models.Mca;
+        selectedCriterion: Models.Criterion;
+        availableMcas: Models.Mca[];
+        showAsterChart: boolean;
+        showDialog: boolean;
+        expertMode: boolean;
+        showSparkline: boolean;
+        private groupStyle;
+        static $inject: string[];
+        constructor($scope: IMcaScope, $modal: any, $translate: ng.translate.ITranslateService, $timeout: ng.ITimeoutService, $localStorageService: ng.localStorage.ILocalStorageService, $layerService: csComp.Services.LayerService, messageBusService: csComp.Services.MessageBusService);
+        private getVotingClass(criterion);
+        private createDummyMca();
+        toggleMcaChartType(): void;
+        toggleSparkline(): void;
+        weightUpdated(criterion: Models.Criterion): void;
+        updateMca(criterion?: Models.Criterion): void;
+        editMca(mca: Models.Mca): void;
+        createMca(): void;
+        private showMcaEditor(newMca);
+        removeMca(mca: Models.Mca): void;
+        private getMcaIndex(mca);
+        private addMca(mca);
+        private deleteMca(mca);
+        private addMcaToLocalStorage(mca);
+        private removeMcaFromLocalStorage(mca);
+        featureMessageReceived: (title: string, feature: IFeature) => void;
+        private scopeApply();
+        private updateSelectedFeature(feature, drawCharts?);
+        drawChart(criterion?: Models.Criterion): void;
+        private getParentOfSelectedCriterion(criterion?);
+        private drawHistogram(criterion?);
+        private drawAsterPlot(criterion?);
+        private drawPieChart(criterion?);
+        /**
+        * Based on the currently loaded features, which MCA can we use
+        */
+        updateAvailableMcas(mca?: Models.Mca): void;
+        calculateMca(): void;
+        private applyPropertyInfoToCriteria(mca, featureType);
+        private addPropertyInfo(featureId, mca, forceUpdate?);
+        setStyle(item: FeatureProps.CallOutProperty): void;
+        private static createPropertyType(mca);
+        private static createRankPropertyType(mca);
+    }
+}
+declare module Mca.Models {
+    import IFeature = csComp.Services.IFeature;
+    enum ScoringFunctionType {
+        Manual = 0,
+        Ascending = 1,
+        Descending = 2,
+        AscendingSigmoid = 3,
+        DescendingSigmoid = 4,
+        GaussianPeak = 5,
+        GaussianValley = 6,
+    }
+    /**
+    * Scoring function creates a PLA of the scoring algorithm.
+    */
+    class ScoringFunction {
+        title: string;
+        type: ScoringFunctionType;
+        scores: string;
+        cssClass: string;
+        constructor(scoringFunctionType?: ScoringFunctionType);
+        /**
+         * Create a score based on the type, in which x in [0,10] and y in [0.1].
+         * Before applying it, you need to scale the x-axis based on your actual range.
+         * Typically, you would map x=0 to the min(x)+0.1*range(x) and x(10)-0.1*range(x) to max(x),
+         * i.e. x' = ax+b, where a=100/(8r) and b=-100(min+0.1r)/(8r) and r=max-min
+         */
+        static createScores(type: ScoringFunctionType): string;
+    }
+    class ScoringFunctions {
+        static scoringFunctions: ScoringFunctions[];
+    }
+    class Criterion {
+        title: string;
+        description: string;
+        /**
+        * Top level label will be used to add a property to a feature, mca_LABELNAME, with the MCA value.
+        * Lower level children will be used to obtain the property value.
+        */
+        label: string;
+        /** Color of the pie chart */
+        color: string;
+        /** Specified weight by the user */
+        userWeight: number;
+        /** Derived weight based on the fact that the sum of weights in a group of criteria needs to be 1. */
+        weight: number;
+        /** Scoring function y = f(x), which translates a specified measurement x to a value y, where y in [0,1].
+         * Format [x1,y1 x2,y2], and may contain special characters, such as min or max to define the minimum or maximum.
+         */
+        scores: string;
+        propValues: number[];
+        criteria: Criterion[];
+        /** Piece-wise linear approximation of the scoring function by a set of x and y points */
+        isPlaUpdated: boolean;
+        /** Piece-wise linear approximation must be scaled:x' = ax+b, where a=100/(8r) and b=-100(min+0.1r)/(8r) and r=max-min */
+        isPlaScaled: boolean;
+        minValue: number;
+        maxValue: number;
+        minCutoffValue: number;
+        maxCutoffValue: number;
+        x: number[];
+        y: number[];
+        deserialize(input: Criterion): Criterion;
+        private requiresMinimum();
+        private requiresMaximum();
+        getTitle(): string;
+        /**
+         * Update the piecewise linear approximation (PLA) of the scoring (a.k.a. user) function,
+         * which translates a property value to a MCA value in the range [0,1] using all features.
+         */
+        updatePla(features: IFeature[]): void;
+        getScore(feature: IFeature): number;
+    }
+    class Mca extends Criterion implements csComp.Services.ISerializable<Mca> {
+        /** Section of the callout */
+        section: string;
+        stringFormat: string;
+        /** Optionally, export the result also as a rank */
+        rankTitle: string;
+        rankDescription: string;
+        /** Optionally, stringFormat for the ranked result */
+        rankFormat: string;
+        /** Maximum number of star ratings to use to set the weight */
+        userWeightMax: number;
+        /** Applicable feature ids as a string[]. */
+        featureIds: string[];
+        scaleMaxValue: number;
+        scaleMinValue: number;
+        rankLabel: string;
+        constructor();
+        deserialize(input: Mca): Mca;
+        /**
+        * Update the MCA by calculating the weights and setting the colors.
+        */
+        update(): void;
+        private calculateWeights(criteria?);
+        /** Set the colors of all criteria and sub-criteria */
+        private setColors();
+    }
+}
+declare module ShowModal {
+    /**
+      * Module
+      */
+    var myModule: any;
+}
+declare module LayersDirective {
+    var html: string;
+}
+declare module LayersDirective {
+    /**
+      * Module
+      */
+    var myModule: any;
+}
+declare module LayersDirective {
+    interface ILayersDirectiveScope extends ng.IScope {
+        vm: LayersDirectiveCtrl;
+    }
+    class LayersDirectiveCtrl {
+        private $scope;
+        private $layerService;
+        private scope;
+        static $inject: string[];
+        constructor($scope: ILayersDirectiveScope, $layerService: csComp.Services.LayerService);
+        toggleLayer(layer: csComp.Services.ProjectLayer): void;
+    }
+}
 declare module csComp.StringExt {
     function isNullOrEmpty(s: string): boolean;
     /**
@@ -1253,7 +1027,6 @@ declare module csComp.Services {
         private $mapService;
         private $rootScope;
         maxBounds: IBoundingBox;
-        static $inject: string[];
         title: string;
         accentColor: string;
         mb: Services.MessageBusService;
@@ -1274,6 +1047,8 @@ declare module csComp.Services {
         timeline: any;
         layerGroup: L.LayerGroup<L.ILayer>;
         info: L.Control;
+        currentLocale: string;
+        static $inject: string[];
         constructor($location: ng.ILocationService, $translate: ng.translate.ITranslateService, $messageBusService: Services.MessageBusService, $mapService: Services.MapService, $rootScope: any);
         updateSensorData(): void;
         /**
@@ -1316,6 +1091,12 @@ declare module csComp.Services {
          * init feature (add to feature list, crossfilter)
          */
         initFeature(feature: IFeature, layer: ProjectLayer): IFeatureType;
+        /**
+        * Initialize the property type by setting default property values, and by localizing it.
+        */
+        private initPropertyTypes(ft);
+        private setDefaultPropertyType(pt);
+        private localizePropertyType(pt);
         removeFeature(feature: IFeature, layer: ProjectLayer): void;
         /**
          * create icon based of feature style
@@ -1400,6 +1181,28 @@ declare module csComp.Services {
         private resetMapFilter(group);
     }
 }
+declare module BaseMapList {
+    var html: string;
+}
+declare module BaseMapList {
+    /**
+      * Module
+      */
+    var myModule: any;
+}
+declare module BaseMapList {
+    interface IBaseMapScope extends ng.IScope {
+        vm: BaseMapListCtrl;
+    }
+    class BaseMapListCtrl {
+        private $scope;
+        private $mapService;
+        private scope;
+        static $inject: string[];
+        constructor($scope: IBaseMapScope, $mapService: csComp.Services.MapService);
+        selectBaseLayer(key: any): void;
+    }
+}
 declare module csComp.Services {
     interface IMapLayersScope extends ng.IScope {
         map: L.Map;
@@ -1442,6 +1245,27 @@ declare module csComp.Services {
         getMap(): L.Map;
     }
 }
+declare module StyleList {
+    var html: string;
+}
+declare module StyleList {
+    /**
+      * Module
+      */
+    var myModule: any;
+}
+declare module StyleList {
+    interface IStyleListScope extends ng.IScope {
+        vm: StyleListCtrl;
+    }
+    class StyleListCtrl {
+        private $scope;
+        private $layerService;
+        private scope;
+        static $inject: string[];
+        constructor($scope: IStyleListScope, $layerService: csComp.Services.LayerService);
+    }
+}
 declare module csComp.Search {
     interface ISearchFormScope extends ng.IScope {
         vm: SearchFormCtrl;
@@ -1454,6 +1278,199 @@ declare module csComp.Search {
         constructor($scope: ISearchFormScope, $mapService: csComp.Services.MapService);
         doSearch(): void;
     }
+}
+declare module FeatureProps {
+    var html: string;
+}
+declare module FeatureProps {
+    /**
+      * Module
+      */
+    var myModule: any;
+}
+declare module FeatureProps {
+    import IFeature = csComp.Services.IFeature;
+    import IFeatureType = csComp.Services.IFeatureType;
+    import IPropertyType = csComp.Services.IPropertyType;
+    import IPropertyTypeData = csComp.Services.IPropertyTypeData;
+    interface IFeaturePropsScope extends ng.IScope {
+        vm: FeaturePropsCtrl;
+        showMenu: boolean;
+        poi: IFeature;
+        callOut: CallOut;
+        tabs: JQuery;
+        tabScrollDelta: number;
+        featureTabActivated(sectionTitle: string, section: CallOutSection): any;
+        autocollapse(init: boolean): void;
+    }
+    interface ICallOutProperty {
+        key: string;
+        value: string;
+        property: string;
+        canFilter: boolean;
+        canStyle: boolean;
+        feature: IFeature;
+        description?: string;
+        meta?: IPropertyType;
+        isFilter: boolean;
+    }
+    class CallOutProperty implements ICallOutProperty {
+        key: string;
+        value: string;
+        property: string;
+        canFilter: boolean;
+        canStyle: boolean;
+        feature: IFeature;
+        isFilter: boolean;
+        description: string;
+        meta: IPropertyType;
+        constructor(key: string, value: string, property: string, canFilter: boolean, canStyle: boolean, feature: IFeature, isFilter: boolean, description?: string, meta?: IPropertyType);
+    }
+    interface ICallOutSection {
+        propertyTypes: {
+            [label: string]: IPropertyType;
+        };
+        properties: Array<ICallOutProperty>;
+        sectionIcon: string;
+        addProperty(key: string, value: string, property: string, canFilter: boolean, canStyle: boolean, feature: IFeature, isFilter: boolean, description?: string, meta?: IPropertyType): void;
+        hasProperties(): boolean;
+    }
+    class CallOutSection implements ICallOutSection {
+        propertyTypes: {
+            [label: string]: IPropertyType;
+        };
+        properties: Array<ICallOutProperty>;
+        sectionIcon: string;
+        constructor(sectionIcon?: string);
+        showSectionIcon(): boolean;
+        addProperty(key: string, value: string, property: string, canFilter: boolean, canStyle: boolean, feature: IFeature, isFilter: boolean, description?: string, meta?: IPropertyType): void;
+        hasProperties(): boolean;
+    }
+    class CallOut {
+        private type;
+        private feature;
+        private propertyTypeData;
+        title: string;
+        icon: string;
+        sections: {
+            [title: string]: ICallOutSection;
+        };
+        constructor(type: IFeatureType, feature: IFeature, propertyTypeData: IPropertyTypeData);
+        sectionCount(): number;
+        firstSection(): ICallOutSection;
+        lastSection(): ICallOutSection;
+        private getOrCreateCallOutSection(sectionTitle);
+        /**
+         * Set the title of the callout to the title of the feature.
+         */
+        private setTitle();
+        private setIcon(feature);
+        static title(type: IFeatureType, feature: IFeature): string;
+    }
+    class FeaturePropsCtrl {
+        private $scope;
+        private $location;
+        private $sce;
+        private $mapService;
+        private $layerService;
+        private $messageBusService;
+        private scope;
+        static $inject: string[];
+        constructor($scope: IFeaturePropsScope, $location: ng.ILocationService, $sce: ng.ISCEService, $mapService: csComp.Services.MapService, $layerService: csComp.Services.LayerService, $messageBusService: csComp.Services.MessageBusService);
+        toTrusted(html: string): string;
+        /**
+         * Callback function
+         * @see {http://stackoverflow.com/questions/12756423/is-there-an-alias-for-this-in-typescript}
+         * @see {http://stackoverflow.com/questions/20627138/typescript-this-scoping-issue-when-called-in-jquery-callback}
+         * @todo {notice the strange syntax using a fat arrow =>, which is to preserve the this reference in a callback!}
+         */
+        private sidebarMessageReceived;
+        private featureMessageReceived;
+        private displayFeature(feature);
+    }
+}
+declare module DataTable {
+    import IGeoJsonFile = csComp.Services.IGeoJsonFile;
+    import IPropertyType = csComp.Services.IPropertyType;
+    interface IDataTableViewScope extends ng.IScope {
+        vm: DataTableCtrl;
+    }
+    /**
+     * Represents a field in the table.
+     * The value is the actual displayValue shown, the type is the propertyType type (e.g. number or text, useful when aligning the data), and the header is used for sorting.
+     */
+    class TableField {
+        displayValue: string;
+        originalValue: any;
+        type: string;
+        header: string;
+        constructor(displayValue: string, originalValue: any, type: string, header: string);
+    }
+    class DataTableCtrl {
+        private $scope;
+        private $http;
+        private $sce;
+        private $translate;
+        private $layerService;
+        private $localStorageService;
+        private $messageBusService;
+        mapLabel: string;
+        dataset: IGeoJsonFile;
+        selectedType: csComp.Services.IFeatureType;
+        numberOfItems: number;
+        selectedLayerId: string;
+        layerOptions: Array<any>;
+        propertyTypes: Array<IPropertyType>;
+        headers: Array<string>;
+        sortingColumn: number;
+        rows: Array<Array<TableField>>;
+        private mapFeatureTitle;
+        static $inject: string[];
+        constructor($scope: IDataTableViewScope, $http: ng.IHttpService, $sce: ng.ISCEService, $translate: ng.translate.ITranslateService, $layerService: csComp.Services.LayerService, $localStorageService: ng.localStorage.ILocalStorageService, $messageBusService: csComp.Services.MessageBusService);
+        /**
+         * Add a label to local storage and bind it to the scope.
+         */
+        private bindToStorage(label, defaultValue);
+        /**
+         * Create a list of layer options and select the one used previously.
+         */
+        private updateLayerOptions();
+        private loadLayer();
+        /**
+         * Load the features as visible on the map.
+         */
+        private loadMapLayers();
+        private updatepropertyType(data);
+        toggleSelection(propertyTypeTitle: string): void;
+        private findLayerById(id);
+        /**
+         * Returns the data rows that are relevant for the current selection.
+         */
+        getRows(): Array<Array<TableField>>;
+        /**
+         * Generate a font awesome class based on the order.
+         */
+        sortOrderClass(headerIndex: number, reverseOrder: boolean): string;
+        /**
+         * Order the rows based on the header index and the order.
+         */
+        orderBy(headerIndex: number, reverseOrder: boolean): void;
+        downloadCsv(): void;
+        private saveData(csvData, filename);
+        /**
+         * Convert to trusted html string.
+         */
+        toTrusted(html: string): any;
+    }
+}
+declare module DataTable {
+    var html: string;
+}
+declare module DataTable {
+    /**
+      * Module
+      */
+    var myModule: any;
 }
 declare module csComp.Services {
     class TimeService {

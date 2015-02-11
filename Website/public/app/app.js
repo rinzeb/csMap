@@ -76,7 +76,6 @@ var App;
             this.$layerService.openSolution("data/projects/projects.json", $location.$$search.layers);
             $messageBusService.notify('Welcome to csMap', 'Your mapping solution.');
             this.$mapService.isVisible = this.$location.path() === "/map";
-            //omnivore.topojson('data/projects/20141104_csMap/gemeente.topo.json').addTo(this.$mapService.map);
         }
         /**
          * Publish a toggle request.
@@ -97,7 +96,6 @@ var App;
         AppCtrl.prototype.isActive = function (viewLocation) {
             return viewLocation === this.$location.path();
         };
-        // $inject annotation.
         // It provides $injector with information about dependencies to be injected into constructor
         // it is better to have it close to the constructor, because the parameters must match in count and type.
         // See http://docs.angularjs.org/guide/di

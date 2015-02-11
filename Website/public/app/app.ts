@@ -46,6 +46,7 @@
             //console.log('layers   : ' + JSON.stringify($location.$$search.layers));
 
             sffjs.setCulture("nl-NL");
+            
 
             $scope.vm = this;
             $scope.showMenuRight = false;

@@ -152,11 +152,9 @@
 
         </div>
     </div>
+    <div id="map" data-ng-show="vm.$mapService.isVisible" data-ng-controller="mapLayersCtrl" tabindex="0" class="leaflet-container leaflet-touch leaflet-fade-anim"></div>
 
-		<div id="map" data-ng-show="vm.$mapService.isVisible" data-ng-controller="mapLayersCtrl" tabindex="0" class="leaflet-container leaflet-touch leaflet-fade-anim"></div>
-
-		<div data-ui-view style="position: absolute; top: 50px; width: 100%; height: 100%;pointer-events: none"></div>
-
-	    <timeline data-ng-show="vm.$mapService.timelineVisible" style="height: 100vh;"></timeline> 
+    <div data-ui-view style="margin: 10px"></div>
+	<timeline data-ng-show="vm.$mapService.timelineVisible" style="height: 100vh;"></timeline> 
 </body>
 </html>
