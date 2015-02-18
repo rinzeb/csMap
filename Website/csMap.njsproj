@@ -5,8 +5,7 @@
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
     <Name>ExpressApp7</Name>
     <RootNamespace>ExpressApp7</RootNamespace>
-    <LaunchUrl>
-    </LaunchUrl>
+    <LaunchUrl>http://localhost:3003</LaunchUrl>
     <NameOfLastUsedPublishProfile>commonsensetest</NameOfLastUsedPublishProfile>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
@@ -62,6 +61,7 @@
     <Content Include="public\css\markers.css" />
     <Content Include="public\css\pnotify.custom.min.css" />
     <Content Include="public\css\style.css" />
+    <Content Include="public\css\timeline.css" />
     <Content Include="public\css\xbbcode.css" />
     <Content Include="public\data\projects\AHTI\1stelijns_praktijken.json" />
     <Content Include="public\data\projects\projects.json">
