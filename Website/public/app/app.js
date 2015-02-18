@@ -75,7 +75,7 @@ var App;
             $messageBusService.subscribe("layer", this.layerMessageReceived);
             this.$layerService.openSolution("data/projects/projects.json", $location.$$search.layers);
             $messageBusService.notify('Welcome to csMap', 'Your mapping solution.');
-            this.$mapService.isVisible = this.$location.path() === "/map";
+            this.$mapService.mapVisible = this.$location.path() === "/map";
         }
         /**
          * Publish a toggle request.
@@ -91,7 +91,7 @@ var App;
             window.console.log("Publish toggle sidebar");
         };
         AppCtrl.prototype.showTable = function () {
-            this.$mapService.isVisible = false;
+            this.$mapService.mapVisible = false;
         };
         AppCtrl.prototype.isActive = function (viewLocation) {
             return viewLocation === this.$location.path();

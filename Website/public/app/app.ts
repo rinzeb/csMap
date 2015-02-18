@@ -46,7 +46,7 @@
             //console.log('layers   : ' + JSON.stringify($location.$$search.layers));
 
             sffjs.setCulture("nl-NL");
-            
+
 
             $scope.vm = this;
             $scope.showMenuRight = false;
@@ -66,7 +66,7 @@
             this.$layerService.openSolution("data/projects/projects.json", $location.$$search.layers);
             $messageBusService.notify('Welcome to csMap', 'Your mapping solution.');
 
-            this.$mapService.isVisible = this.$location.path() === "/map";
+            this.$mapService.mapVisible = this.$location.path() === "/map";
         }
 
         /**
@@ -137,7 +137,7 @@
         }
 
         showTable() {
-          this.$mapService.isVisible = false;
+          this.$mapService.mapVisible = false;
         }
 
         isActive(viewLocation: string) {
@@ -170,7 +170,8 @@
             'csWeb.languageSwitch',
             'csWeb.projectSettings',
             'ngCookies',
-            'csWeb.timeline'
+            'csWeb.timeline'//,
+            //'csWeb.heatmap'
         ])
         .config(localStorageServiceProvider => {
             localStorageServiceProvider.prefix = 'csMap';
