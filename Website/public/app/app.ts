@@ -136,8 +136,8 @@
             window.console.log("Publish toggle sidebar");
         }
 
-        showTable() {
-          this.$mapService.mapVisible = false;
+        public showTable(tableVisible: boolean) {
+            this.$mapService.mapVisible = !tableVisible;
         }
 
         isActive(viewLocation: string) {
@@ -169,12 +169,23 @@
             'csWeb.datatable',
             'csWeb.languageSwitch',
             'csWeb.projectSettings',
+            'csWeb.charts',
+            'csWeb.expertMode',
             'ngCookies',
-            'csWeb.timeline'//,
-            //'csWeb.heatmap'
+            'csWeb.timeline',
+            'csWeb.heatmap'
         ])
         .config(localStorageServiceProvider => {
             localStorageServiceProvider.prefix = 'csMap';
+        })
+        .config(TimelineServiceProvider => {
+            TimelineServiceProvider.setTimelineOptions({
+                'width': '100%',
+                "eventMargin": 0,
+                "eventMarginAxis": 0,
+                'editable': false,
+                'layout': 'box'
+            });
         })
         .config($translateProvider => {
             // TODO ADD YOUR LOCAL TRANSLATIONS HERE, OR ALTERNATIVELY, CHECK OUT

@@ -10,10 +10,30 @@
     },
     "baselayers" :  [
         {
+            "title"       :  "OpenStreetMap HOT",     
+            "subtitle"    :  "Road",
+            "url"         :  "http://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
+            "isDefault"   :  true,
+            "minZoom"     :  7,
+            "maxZoom"     :  19,
+            "subdomains"  :  ["a", "b", "c"],
+            "attribution" :  "Tiles courtesy of <a href='http://hot.openstreetmap.org/' target='_blank'>Humanitarian OpenStreetMap Team</a>",
+            "preview"     :  "http://b.tile.openstreetmap.fr/hot/11/1048/675.png"
+        },
+        {
+            "title"       :  "World Imagery",     
+            "subtitle"    :  "ESRI",
+            "url"         :  "http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+            "minZoom"     :  7,
+            "maxZoom"     :  19,
+            "attribution" :  "Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community",
+            "preview"     :  "http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/15/10806/16773"
+        },
+        {
             "title"       :  "OpenStreetMap",     
             "subtitle"    :  "Road",
             "url"         :  "http://{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png",
-            "isDefault"   :  true,
+            "isDefault"   :  false,
             "minZoom"     :  7,
             "maxZoom"     :  19,
             "subdomains"  :  ["otile1", "otile2", "otile3", "otile4"],

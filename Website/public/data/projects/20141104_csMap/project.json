@@ -3,6 +3,14 @@
     "description": "csMap is developed by the Dutch Research Organisation TNO, in first instance for the Dutch Ministry of Health (VWS).",
     "url": "https://github.com/TNOCS/csMap",
     "logo": "images/CommonSenseRound.png",
+    "timeLine": {
+        "start": 1375315200000,
+        "end": 1425168000000,
+        "range": 34128000000,
+        "zoomLevelName": "years",
+        "isLive": false
+    },
+    "expertMode": 3,
     "userPrivileges": {
         "mca": { "expertMode": true }
     },
@@ -2455,70 +2463,115 @@
                 {
                     "label": "naam",
                     "type": "text",
-                    "title": "Naam",
-                    "visibleInCallOut": true,
-                    "canEdit": false,
+                    "languages": {
+                        "nl": {
+                            "title": "Naam"
+                        },
+                        "en": {
+                            "title": "Name"
+                        }
+                    },
                     "isSearchable": true
                 },
                 {
                     "label": "locatie",
                     "type": "text",
-                    "title": "Locatie",
-                    "visibleInCallOut": true,
-                    "canEdit": false,
+                    "languages": {
+                        "nl": {
+                            "title": "Locatie"
+                        },
+                        "en": {
+                            "title": "Location"
+                        }
+                    },
                     "isSearchable": true
                 },
                 {
                     "label": "adres",
                     "type": "text",
-                    "title": "Adres",
-                    "section": "Contact",
-                    "visibleInCallOut": true,
-                    "canEdit": false,
+                    "languages": {
+                        "nl": {
+                            "title": "Adres",
+                            "section": "Contact"
+                        },
+                        "en": {
+                            "title": "Address",
+                            "section": "Contact"
+                        }
+                    },
                     "isSearchable": true
                 },
                 {
                     "label": "postcode",
                     "type": "text",
-                    "title": "Postcode",
-                    "section": "Contact",
-                    "visibleInCallOut": true,
-                    "canEdit": false,
+                    "languages": {
+                        "nl": {
+                            "title": "Postcode",
+                            "section": "Contact"
+                        },
+                        "en": {
+                            "title": "Zip code",
+                            "section": "Contact"
+                        }
+                    },
                     "isSearchable": true
                 },
                 {
                     "label": "plaats",
                     "type": "text",
-                    "title": "Plaats",
-                    "section": "Contact",
-                    "visibleInCallOut": true,
-                    "canEdit": false,
+                    "languages": {
+                        "nl": {
+                            "title": "Plaats",
+                            "section": "Contact"
+                        },
+                        "en": {
+                            "title": "Location",
+                            "section": "Contact"
+                        }
+                    },
                     "isSearchable": true
                 },
                 {
                     "label": "telefoonalgemeen",
                     "type": "text",
-                    "title": "Telefoon algemeen",
-                    "section": "Contact",
-                    "visibleInCallOut": false,
-                    "canEdit": false,
+                    "languages": {
+                        "nl": {
+                            "title": "Telefoon algemeen",
+                            "section": "Contact"
+                        },
+                        "en": {
+                            "title": "Telephone general",
+                            "section": "Contact"
+                        }
+                    },
                     "isSearchable": false
                 },
                 {
                     "label": "telefoonSEH",
                     "type": "text",
-                    "title": "Telefoon SEH",
-                    "section": "Contact",
-                    "visibleInCallOut": false,
-                    "canEdit": false,
+                    "languages": {
+                        "nl": {
+                            "title": "Telefoon SEH",
+                            "section": "Contact"
+                        },
+                        "en": {
+                            "title": "Telephone ER",
+                            "section": "Contact"
+                        }
+                    },
                     "isSearchable": false
                 },
                 {
                     "label": "bedden",
                     "type": "number",
-                    "title": "Aantal bedden",
-                    "visibleInCallOut": true,
-                    "canEdit": false,
+                    "languages": {
+                        "nl": {
+                            "title": "Aantal bedden"
+                        },
+                        "en": {
+                            "title": "Number of beds"
+                        }
+                    },
                     "isSearchable": false
                 }
             ]
@@ -2594,16 +2647,32 @@
     },
     "groups": [
         {
-            "title": "Features",
-            "description": "Demonstrates layers based on points",
+            "languages": {
+                "nl": {
+                    "title": "Locaties",
+                    "description": "Demonstreert kaartlagen gebaseerd op specifieke locaties"
+                },
+                "en": {
+                    "title": "Features",
+                    "description": "Demonstrates layers based on points"
+                }
+            },
             "clustering": true,
             "clusterLevel": 12,
             "layers": [
                 {
                     "id": "Hospitals",
                     "reference": "Hospitals",
-                    "title": "Hospitals",
-                    "description": "These are the locations of the Dutch hospitals.",
+                    "languages": {
+                        "nl": {
+                            "title": "Ziekenhuizen",
+                            "description": "De locaties van de Nederlandse ziekenhuizen."
+                        },
+                        "en": {
+                            "title": "Hospitals",
+                            "description": "These are the locations of the Dutch hospitals."
+                        }
+                    },
                     "type": "GeoJson",
                     "url": "data/projects/20141104_csMap/Ziekenhuizen.json",
                     "enabled": false,
@@ -2612,8 +2681,16 @@
                 {
                     "id": "firestation",
                     "reference": "firestation",
-                    "title": "Fire stations",
-                    "description": "These are the locations of the fire station. (Source: IFV, BAG. Geactualiseerd: 1 november 2014.)",
+                    "languages": {
+                        "nl": {
+                            "title": "Brandweerkazernes",
+                            "description": "De locaties van de Nederlandse brandweerkazernes en opleidingscentra (Bron: IFV, BAG, 1 november 2014)."
+                        },
+                        "en": {
+                            "title": "Fire stations",
+                            "description": "These are the locations of the fire station. (Source: IFV, BAG, 1 november 2014.)"
+                        }
+                    },
                     "type": "GeoJson",
                     "url": "data/projects/20141104_csMap/brandweerposten.json",
                     "enabled": false,
@@ -2622,8 +2699,16 @@
                 {
                     "id": "traveltimes",
                     "reference": "traveltimes",
-                    "title": "Travel times",
-                    "description": "This is the travel time from the nearest fire station to a care institute. (Bron: IFV, BAG. Geactualiseerd: 1 november 2014.)",
+                    "languages": {
+                        "nl": {
+                            "title": "Reistijd",
+                            "description": "De reistijd van een brandweerkazerne naar de zorginstelling (Bron: IFV, BAG: 1 november 2014)."
+                        },
+                        "en": {
+                            "title": "Travel times",
+                            "description": "This is the travel time from the nearest fire station to a care institute. (Bron: IFV, BAG: 1 november 2014.)"
+                        }
+                    },
                     "type": "GeoJson",
                     "url": "data/projects/20141104_csMap/aanrijtijden.json",
                     "enabled": false,
@@ -2640,8 +2725,16 @@
                 {
                     "id": "bag",
                     "reference": "bag",
-                    "title": "BAG (Cadastre)",
-                    "description": "Dutch Cadastre's Basis Administratie Gebouwen. (Source: PDOK.nl.)",
+                    "languages": {
+                        "nl": {
+                            "title": "BAG",
+                            "description": "Basis Administratie Gebouwen (Bron: Kadaster, via PDOK.nl)."
+                        },
+                        "en": {
+                            "title": "BAG (Cadastre)",
+                            "description": "Dutch Cadastre's Basis Administratie Gebouwen. (Source: PDOK.nl.)"
+                        }
+                    },
                     "type": "wms",
                     "wmsLayers": "pand,ligplaats,standplaats,verblijfsobject",
                     "url": "http://geodata.nationaalgeoregister.nl/bagviewer/wms?",
@@ -2651,8 +2744,16 @@
                 {
                     "id": "cbs",
                     "reference": "cbs",
-                    "title": "CBS Provinces",
-                    "description": "Dutch Provinces. (Source: PDOK.nl.)",
+                    "languages": {
+                        "nl": {
+                            "title": "CBS provincie data",
+                            "description": "(Bron: CBS, via PDOK.nl)."
+                        },
+                        "en": {
+                            "title": "CBS Provinces",
+                            "description": "Dutch Provinces. (Source: PDOK.nl.)"
+                        }
+                    },
                     "type": "wms",
                     "wmsLayers": "cbsprovincies2012",
                     "url": "http://geodata.nationaalgeoregister.nl/cbsprovincies/wms?",
@@ -2662,8 +2763,16 @@
                 {
                     "id": "aan",
                     "reference": "aan",
-                    "title": "Agricultural areas",
-                    "description": "Agrarisch Areaal Nederland (AAN). Geografische afbakening van landbouwgrond in Nederland (grond die wordt gebruikt als bouwland, blijvend grasland of de teelt van blijvende gewassen). (Source: PDOK.nl.)",
+                    "languages": {
+                        "nl": {
+                            "title": "Agrarisch gebied",
+                            "description": "Agrarisch Areaal Nederland (AAN). Geografische afbakening van landbouwgrond in Nederland (grond die wordt gebruikt als bouwland, blijvend grasland of de teelt van blijvende gewassen). (Source: PDOK.nl.)"
+                        },
+                        "en": {
+                            "title": "Agricultural areas",
+                            "description": "Agrarisch Areaal Nederland (AAN). Geografische afbakening van landbouwgrond in Nederland (grond die wordt gebruikt als bouwland, blijvend grasland of de teelt van blijvende gewassen). (Source: PDOK.nl.)"
+                        }
+                    },
                     "type": "wms",
                     "wmsLayers": "aan",
                     "url": "http://geodata.nationaalgeoregister.nl/aan/wms?",
@@ -2673,8 +2782,16 @@
                 {
                     "id": "ahn",
                     "reference": "ahn",
-                    "title": "AHN2",
-                    "description": "Dutch height map, 0.5m, ruw. (Source: PDOK.nl.)",
+                    "languages": {
+                        "nl": {
+                            "title": "AHN",
+                            "description": "Actuele Hoogtekaart Nederland (Source: PDOK.nl.)"
+                        },
+                        "en": {
+                            "title": "AHN2",
+                            "description": "Dutch height map, 0.5m, ruw. (Source: PDOK.nl.)"
+                        }
+                    },
                     "type": "wms",
                     "wmsLayers": "ahn2_05m_ruw",
                     "url": "http://geodata.nationaalgeoregister.nl/ahn2/wms?",
@@ -2684,8 +2801,16 @@
                 {
                     "id": "buurten",
                     "reference": "buurten",
-                    "title": "Boroughs",
-                    "description": "Het Bestand Wijk- en Buurtkaart 2013 bevat de geometrie van alle buurten in Nederland (Source: PDOK.nl.)",
+                    "languages": {
+                        "nl": {
+                            "title": "Buurten",
+                            "description": "Het Bestand Wijk- en Buurtkaart 2013 bevat de geometrie van alle buurten in Nederland (Source: PDOK.nl.)"
+                        },
+                        "en": {
+                            "title": "Boroughs",
+                            "description": "From the Dutch Census, CBS (Source: PDOK.nl.)"
+                        }
+                    },
                     "type": "wms",
                     "wmsLayers": "cbs_buurten_2013",
                     "url": "http://geodata.nationaalgeoregister.nl/wijkenbuurten2013/wms?",
@@ -2695,8 +2820,16 @@
                 {
                     "id": "top10terreinen",
                     "reference": "top10terreinen",
-                    "title": "TOP10NL Terrains",
-                    "description": "Terreinen (Source: PDOK.nl.)",
+                    "languages": {
+                        "nl": {
+                            "title": "TOP10NL Terreinen",
+                            "description": "Terreinen (Source: PDOK.nl.)"
+                        },
+                        "en": {
+                            "title": "TOP10NL Terrains",
+                            "description": "Terreinen (Source: PDOK.nl.)"
+                        }
+                    },
                     "type": "wms",
                     "wmsLayers": "terreinen",
                     "url": "http://geodata.nationaalgeoregister.nl/top10nl/wms?",
@@ -2706,28 +2839,80 @@
             ]
         },
         {
-            "title": "Areas",
-            "description": "Demonstrates layers based on regions.",
+            "languages": {
+                "nl": {
+                    "title": "Gebieden",
+                    "description": "Demonstreert lagen gebaseerd op gebieden."
+                },
+                "en": {
+                    "title": "Areas",
+                    "description": "Demonstrates layers based on regions."
+                }
+            },
             "clustering": false,
             "oneLayerActive": true,
             "layers": [
                 {
+                  "id"               : "9d1dc210f8f5474f977c9d0f24df2ff8",
+                  "reference"        : "zorgkantoor",
+                  "title"            : "Health regions",
+                  "description"      : "Data at the health office regions. (Source: CBS, BAG, TNO, DigiMV.)",
+                  "type"             : "GeoJson",
+                  "url"              : "data/projects/20141104_csMap/Regio ZK ZZP CBS.json",
+                  "enabled"          : false,
+                  "opacity"          : 100
+                },
+                {
                     "id": "veiligheidsregio",
                     "reference": "veiligheidsregio",
-                    "title": "Safety region",
-                    "description": "Statistical data per safety region. (Source: CBS, Regioatlas. Geactualiseerd: 1 november 2014.)",
+                    "languages": {
+                        "nl": {
+                            "title": "Veiligheidsregios",
+                            "description": "Statistische data per veiligheidsregio. (Bron: CBS, Regioatlas. Geactualiseerd: 1 november 2014.)"
+                        },
+                        "en": {
+                            "title": "Safety region",
+                            "description": "Statistical data per safety region. (Source: CBS, Regioatlas: 1 november 2014.)"
+                        }
+                    },
                     "type": "GeoJson",
                     "url": "data/projects/20141104_csMap/veiligheidsregios.json",
                     "enabled": false,
                     "opacity": 100
                 },
                 {
-                    "id": "cities",
-                    "reference": "cities",
-                    "title": "Cities",
-                    "description": "Statistical data per city. (Source: CBS, BAG, TNO, DigiMV. Geactualiseerd: 1 november 2014.)",
+                    "id": "gemeentes",
+                    "reference": "gemeentes",
+                    "languages": {
+                        "nl": {
+                            "title": "Gemeentes",
+                            "description": "Statistische data per gemeente. (Bron: CBS, BAG, TNO, DigiMV. Geactualiseerd: 1 november 2014.)"
+                        },
+                        "en": {
+                            "title": "Towns",
+                            "description": "Statistical data per city in Dutch. (Source: CBS, BAG, TNO, DigiMV. Geactualiseerd: 1 november 2014.)"
+                        }
+                    },
                     "type": "GeoJson",
                     "url": "data/projects/20141104_csMap/gemeente.json",
+                    "enabled": false,
+                    "opacity": 100
+                },
+                {
+                    "id": "cities2",
+                    "reference": "cities2",
+                    "languages": {
+                        "nl": {
+                            "title": "Gemeentes (vertaald)",
+                            "description": "Statistische data per gemeente. (Bron: CBS, BAG, TNO, DigiMV. Geactualiseerd: 1 november 2014.)"
+                        },
+                        "en": {
+                            "title": "Towns (localised)",
+                            "description": "Statistical data per city. (Source: CBS, BAG, TNO, DigiMV. Geactualiseerd: 1 november 2014.)"
+                        }
+                    },
+                    "type": "GeoJson",
+                    "url": "data/projects/20141104_csMap/localized_city_data.json",
                     "enabled": false,
                     "opacity": 100
                 },
@@ -2738,6 +2923,26 @@
                     "description": "Statistical data per city. (Source: CBS, BAG, TNO, DigiMV. Geactualiseerd: 1 november 2014.)",
                     "type": "TopoJson",
                     "url": "data/projects/20141104_csMap/gemeente.topo.json",
+                    "enabled": false,
+                    "opacity": 100
+                },
+                {
+                    "id": "p4",
+                    "reference": "p4",
+                    "title": "P4 topojson",
+                    "description": "Statistical data per city. (Source: CBS, BAG, TNO, DigiMV. Geactualiseerd: 1 november 2014.)",
+                    "type": "TopoJson",
+                    "url": "data/projects/20141104_csMap/postcode4-nl.topo.json",
+                    "enabled": false,
+                    "opacity": 100
+                },
+                {
+                    "id": "p4geo",
+                    "reference": "p4geo",
+                    "title": "P4 geojson",
+                    "description": "Statistical data per city. (Source: CBS, BAG, TNO, DigiMV. Geactualiseerd: 1 november 2014.)",
+                    "type": "TopoJson",
+                    "url": "data/projects/20141104_csMap/postcode4-nl.geo.json",
                     "enabled": false,
                     "opacity": 100
                 }

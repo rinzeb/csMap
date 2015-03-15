@@ -1,5 +1,57 @@
 /// <reference path="../crossfilter/crossfilter.d.ts" />
 /// <reference path="../leaflet/leaflet.d.ts" />
+declare module Charts {
+    class ChartHelpers {
+        /**
+        * Returns the index and value of the maximum.
+        */
+        static max(arr: number[]): {
+            maxIndex: number;
+            max: number;
+        };
+        /**
+        * Returns the index and value of the minimum.
+        */
+        static min(arr: number[]): {
+            minIndex: number;
+            min: number;
+        };
+        /**
+        * Convert a timestamp to string.
+        */
+        static timestampToString(ts: number): any;
+        static windowResize(fun: any): void;
+        static initializeMargin(scope: any, attrs: any): void;
+        static getD3Selector(attrs: any, element: any): string;
+        static initializeLegendMargin(scope: any, attrs: any): void;
+        static defaultColor(): (d: any, i: any) => any;
+        static configureLegend(chart: any, scope: any, attrs: any): void;
+        static checkElementID(scope: any, attrs: any, element: any, chart: any, data: any): void;
+        static updateDimensions(scope: any, attrs: any, element: any, chart: any): void;
+    }
+}
+declare module Charts {
+    /**
+      * Module
+      */
+    var myModule: any;
+    interface ISparklineScope extends ng.IScope {
+        timestamps: number[];
+        sensor: number[];
+        width?: number;
+        height?: number;
+        margin?: {
+            top: number;
+            right: number;
+            bottom: number;
+            left: number;
+        };
+        showaxis?: boolean;
+    }
+    interface IBarchartScope extends ng.IScope {
+        data: number[];
+    }
+}
 declare module DashboardSelection {
     var html: string;
 }
@@ -34,8 +86,6 @@ declare module DashboardSelection {
         toggleTimeline(): void;
         toggleMap(): void;
         checkTimeline(): void;
-        checkLayers(): void;
-        checkViewbound(): void;
         /** publish a message that a new dashboard was selected */
         private publishDashboardUpdate();
         /** Select an active dashboard */
@@ -75,8 +125,365 @@ declare module Dashboard {
         toggleWidget(widget: csComp.Services.IWidget): void;
         updateWidget(w: csComp.Services.IWidget): void;
         checkMap(): void;
+        checkLayers(): void;
+        checkViewbound(): void;
         checkTimeline(): void;
         updateDashboard(): void;
+    }
+}
+declare module ExpertMode {
+    /**
+      * Module
+      */
+    var myModule: any;
+}
+declare module ExpertMode {
+    import Expertise = csComp.Services.Expertise;
+    interface IExpertModeScope extends ng.IScope {
+        vm: ExpertModeCtrl;
+        expertMode: Expertise;
+    }
+    class ExpertModeCtrl {
+        private $scope;
+        private $localStorageService;
+        private $layerService;
+        private $mapService;
+        private $messageBus;
+        static $inject: string[];
+        constructor($scope: IExpertModeScope, $localStorageService: ng.localStorage.ILocalStorageService, $layerService: csComp.Services.LayerService, $mapService: csComp.Services.MapService, $messageBus: csComp.Services.MessageBusService);
+        /**
+        * Set the expert mode: although we assume that each directive is responsible for managing it by listening
+        * to the expertMode.newExpertise message, we already set some common options here.
+        * This is to reduce the dependency on this directive.
+        */
+        private setExpertMode(expertMode);
+    }
+}
+declare module FeatureRelations {
+    var html: string;
+}
+declare module FeatureRelations {
+    /**
+      * Module
+      */
+    var myModule: any;
+}
+declare module FeatureRelations {
+    import IFeature = csComp.Services.IFeature;
+    interface IFeatureRelationsScope extends ng.IScope {
+        vm: FeatureRelationsCtrl;
+        showMenu: boolean;
+        poi: IFeature;
+    }
+    class RelationGroup {
+        title: string;
+        id: string;
+        property: csComp.Services.IPropertyType;
+        relations: Relation[];
+    }
+    class Relation {
+        title: string;
+        icon: string;
+        subject: csComp.Services.IFeature;
+        target: csComp.Services.IFeature;
+    }
+    class FeatureRelationsCtrl {
+        private $scope;
+        private $location;
+        private $sce;
+        private $mapService;
+        private $layerService;
+        private $messageBusService;
+        private scope;
+        relations: RelationGroup[];
+        showRelations: boolean;
+        static $inject: string[];
+        selectRelation(relation: Relation): void;
+        initRelations(): void;
+        constructor($scope: IFeatureRelationsScope, $location: ng.ILocationService, $sce: ng.ISCEService, $mapService: csComp.Services.MapService, $layerService: csComp.Services.LayerService, $messageBusService: csComp.Services.MessageBusService);
+        private featureMessageReceived;
+    }
+}
+declare module Heatmap {
+    /**
+     * A heat spot represents an indexed point on the map with a certain intensity.
+     */
+    interface IHeatspot {
+        i: number;
+        j: number;
+        intensity: number;
+    }
+    /**
+     * A heat spot represents a point on the map with a certain intensity.
+     */
+    class Heatspot implements IHeatspot {
+        i: number;
+        j: number;
+        intensity: number;
+        constructor(i: number, j: number, intensity: number);
+    }
+}
+declare module Heatmap {
+    /**
+    * A simple interface to describe a heat map.
+    */
+    interface IHeatmapModel {
+        title: string;
+        heatmapItems: IHeatmapItem[];
+    }
+    class HeatmapModel implements IHeatmapModel {
+        title: string;
+        heatmapItems: IHeatmapItem[];
+        constructor(title: string);
+        /**
+         * Calculate the heatmap.
+         */
+        calculate(layerService: csComp.Services.LayerService, heatmap: any): void;
+        /**
+         * Update the weights of all heatmap items.
+         */
+        updateWeights(): void;
+        /**
+        * Add a heatmap item to the list of items only in case we don't have it yet.
+        */
+        addHeatmapItem(heatmapItem: IHeatmapItem): void;
+    }
+}
+declare module Heatmap {
+    import IFeature = csComp.Services.IFeature;
+    interface IMcaScope extends ng.IScope {
+        vm: HeatmapCtrl;
+        ratingStates: any;
+    }
+    class HeatmapCtrl {
+        private $scope;
+        private $modal;
+        private $translate;
+        private $timeout;
+        private $localStorageService;
+        private $layerService;
+        private $mapService;
+        private messageBusService;
+        private static confirmationMsg1;
+        private static confirmationMsg2;
+        heatmap: L.TileLayer.WebGLHeatMap;
+        heatmapModel: HeatmapModel;
+        heatmapModels: HeatmapModel[];
+        expertMode: boolean;
+        selectedFeature: IFeature;
+        properties: FeatureProps.CallOutProperty[];
+        showFeature: boolean;
+        showChart: boolean;
+        featureIcon: string;
+        static $inject: string[];
+        constructor($scope: IMcaScope, $modal: any, $translate: ng.translate.ITranslateService, $timeout: ng.ITimeoutService, $localStorageService: ng.localStorage.ILocalStorageService, $layerService: csComp.Services.LayerService, $mapService: csComp.Services.MapService, messageBusService: csComp.Services.MessageBusService);
+        createHeatmap(): void;
+        editHeatmap(heatmap: HeatmapModel): void;
+        removeHeatmap(heatmap: HeatmapModel): void;
+        private deleteHeatmap(heatmap);
+        /**
+         * Show the heat map editor in a modal.
+         */
+        private showHeatmapEditor(heatmap);
+        private scopeApply();
+        getVotingClass(hi: IHeatmapItem): string;
+        weightUpdated(): void;
+        /**
+         * Update the available pre-set heatmaps.
+         */
+        private updateHeatmap();
+        /**
+        * Add a WebGL heatmap layer to the map.
+        */
+        private initializeHeatmap();
+    }
+}
+declare module Heatmap {
+    /**
+    * A simple interface to describe an item that can be used in a heatmap.
+    * We either accept a FeatureType (e.g. Hospital or Shop), or a property that
+    * is of type options (e.g. shop, magazine).
+    */
+    interface IHeatmapItem {
+        title: string;
+        featureType: csComp.Services.IFeatureType;
+        /**
+         * In case we are not interested in the feature type itself, but in a certain property,
+         * e.g. the property that determines what it represents like buildingFunction.
+         * @type {string}
+         */
+        propertyTitle?: string;
+        propertyLabel: string;
+        /**
+         * When we are using an options property type, such as buildingFunction, we need
+         * to indicate the particular option that we will evaluate.
+         * @type {number}
+         */
+        optionIndex?: number;
+        /**
+         * The user weight specifies how much you like this item, e.g. the maximum value.
+         * @type {number}, range [-5..5].
+         */
+        userWeight: number;
+        /**
+         * The weight specifies how much you like this item, relative to others.
+         * @type {number}, range [0..1].
+         */
+        weight: number;
+        /**
+         * The ideality measure specifies how much you like this item with respect to its
+         * distance.
+         * @type {IIdealityMeasure}
+         */
+        idealityMeasure: IIdealityMeasure;
+        isSelected: boolean;
+        reset(): void;
+        setScale(latitude: number, longitude: number): void;
+        calculateHeatspots(feature: csComp.Services.IFeature, deltaLatDegree: number, deltaLonDegree: number): IHeatspot[];
+    }
+    class HeatmapItem implements IHeatmapItem {
+        title: string;
+        featureType: csComp.Services.IFeatureType;
+        /**
+        * 1 meter represents meterToLatDegree degrees in vertical direction.
+        */
+        private static meterToLatDegree;
+        /**
+        * 1 meter represents meterToLonDegree degrees in horizontal direction.
+        */
+        private static meterToLonDegree;
+        /**
+         * In case we are not interested in the feature type itself, but in a certain property,
+         * e.g. the property that determines what it represents like buildingFunction.
+         * @type {string}
+         */
+        propertyTitle: string;
+        propertyLabel: string;
+        /**
+         * When we are using an options property type, such as buildingFunction, we need
+         * to indicate the particular option that we will evaluate.
+         * @type {number}
+         */
+        optionIndex: number;
+        /**
+         * The user weight specifies how much you like this item, e.g. the maximum value.
+         * @type {number}, range [-5..5].
+         */
+        userWeight: number;
+        /**
+         * The weight specifies how much you like this item, relative to others.
+         * @type {number}, range [0..1].
+         */
+        weight: number;
+        /**
+         * The ideality measure specifies how much you like this item with respect to its
+         * distance.
+         * @type {IIdealityMeasure}
+         */
+        idealityMeasure: IIdealityMeasure;
+        heatspots: IHeatspot[];
+        /** Represents the number of items that are needed to obtain an ideal location. */
+        isSelected: boolean;
+        private intensityScale;
+        private static twoPi;
+        constructor(title: string, featureType: csComp.Services.IFeatureType);
+        calculateHeatspots(feature: csComp.Services.Feature, cellSize: number): IHeatspot[];
+        /**
+        * Calculate the intensity around the location.
+        * NOTE We are performing a relative computation around location (0,0) in a rectangular grid.
+        */
+        private calculateHeatspot(cellSize);
+        /**
+        * Translate the heatspot (at (0,0)) to the actual location.
+        */
+        private pinHeatspotToLocation(feature);
+        /**
+        * Set the scale to convert a 1x1 meter grid cell to the appropriate number of degrees
+        * in vertical and horizontal direction.
+        */
+        setScale(latitude: number): void;
+        select(): void;
+        reset(): void;
+        toString(): string;
+    }
+}
+declare module Heatmap {
+    var html: string;
+}
+declare module Heatmap {
+    /**
+     * Module
+     */
+    var myModule: ng.IModule;
+}
+declare module Heatmap {
+    import IGeoJsonFile = csComp.Services.IGeoJsonFile;
+    interface IHeatmapEditorScope extends ng.IScope {
+        vm: HeatmapEditorCtrl;
+    }
+    class HeatmapEditorCtrl {
+        private $scope;
+        private $modalInstance;
+        private $layerService;
+        private $translate;
+        private messageBusService;
+        heatmap: HeatmapModel;
+        /**
+         * A virtual geojson file that represents all useable data for creating a heatmap.
+         * @type {IGeoJsonFile}
+         */
+        dataset: IGeoJsonFile;
+        static $inject: string[];
+        constructor($scope: IHeatmapEditorScope, $modalInstance: any, $layerService: csComp.Services.LayerService, $translate: ng.translate.ITranslateService, messageBusService: csComp.Services.MessageBusService, heatmap?: HeatmapModel);
+        save(): void;
+        cancel(): void;
+    }
+}
+declare module HeatmapEditorView {
+    var html: string;
+}
+declare module Heatmap {
+    /**
+     * The ideality measure specifies how much you like this item with respect to its
+     * distance. For example, if I like a shop to be ideally at 200m of my house, it
+     * also means that there is a zone around the shop with a radius of 200m where
+     * I would ideally live.
+     */
+    interface IIdealityMeasure {
+        /**
+        * The distance with respect to my location where I would like to find the item.
+        * @type {number}, in meters
+        */
+        idealDistance: number;
+        /**
+        * How happy would I be if the item would be at my location.
+        * @type {number}, range [0..1]
+        */
+        atLocation: number;
+        /**
+         * At what distance would the item no longer be of value to me.
+         * @type {number}, range in meters
+         */
+        lostInterestDistance: number;
+        computeIdealityAtDistance(distance: number): number;
+    }
+    class IdealityMeasure implements IIdealityMeasure {
+        /**
+        * The distance with respect to my location where I would like to find the item.
+        * @type {number}, in meters
+        */
+        idealDistance: number;
+        /**
+        * How happy would I be if the item would be at my location.
+        * @type {number}, range [0..1]
+        */
+        atLocation: number;
+        /**
+         * At what distance would the item no longer be of value to me.
+         * @type {number}, range in meters
+         */
+        lostInterestDistance: number;
+        computeIdealityAtDistance(distance: number): number;
     }
 }
 declare module LanguageSwitch {
@@ -101,11 +508,12 @@ declare module LanguageSwitch {
         private $scope;
         private $translate;
         private $languages;
+        private $layerService;
         private $messageBus;
         private scope;
         language: ILanguage;
         static $inject: string[];
-        constructor($scope: ILanguageSwitchScope, $translate: any, $languages: ILanguage[], $messageBus: csComp.Services.MessageBusService);
+        constructor($scope: ILanguageSwitchScope, $translate: ng.translate.ITranslateService, $languages: ILanguage[], $layerService: csComp.Services.LayerService, $messageBus: csComp.Services.MessageBusService);
         switchLanguage(language: ILanguage): void;
     }
 }
@@ -156,10 +564,6 @@ declare module Mca {
         constructor($scope: IMcaEditorScope, $modalInstance: any, $layerService: csComp.Services.LayerService, $translate: ng.translate.ITranslateService, messageBusService: csComp.Services.MessageBusService, mca?: Models.Mca);
         private updatePropertyInfoUponEdit(criterion, category?);
         loadPropertyTypes(): void;
-        /**
-         * Load the features as visible on the map.
-         */
-        private loadMapLayers();
         private selectFirstFeatureType();
         private updatePropertyInfo(featureType);
         toggleSelection(metaInfoTitle: string): void;
@@ -246,6 +650,7 @@ declare module csComp.Services {
         showMap: boolean;
         showTimeline: boolean;
         showLeftmenu: boolean;
+        showRightmenu: boolean;
         draggable: boolean;
         resizable: boolean;
         background: string;
@@ -302,9 +707,20 @@ declare module csComp.Services {
         featureTypeName?: string;
         fType?: IFeatureType;
         isInitialized?: boolean;
+        /**
+        * An optional dictionary of sensors, where each sensor or measurement represents the value of the sensor
+        * at a certain point in time. Is often used with the layer's timestamp property in case all sensors have the same
+        * number of measurements.
+        */
         sensors?: {
             [id: string]: any[];
         };
+        timestamps: number[];
+        coordinates?: IGeoJsonGeometry[];
+        /**
+        * An optional language dictionary, where each key, e.g. 'en' for English, represents a localised data set. Each locale can overwrite
+        * the value of the title, description etc. of a feature.
+        */
         languages?: {
             [key: string]: ILocalisedData;
         };
@@ -328,6 +744,8 @@ declare module csComp.Services {
         sensors: {
             [id: string]: any[];
         };
+        timestamps: number[];
+        coordinates: IGeoJsonGeometry[];
     }
     interface IStringToAny {
         [key: string]: any;
@@ -475,6 +893,7 @@ declare module csComp.Services {
         enabled: boolean;
         filterType: string;
         property: string;
+        property2: string;
         criteria: string;
         dimension: any;
         value: any;
@@ -504,6 +923,14 @@ declare module csComp.Services {
 }
 declare module csComp.Services {
     /**
+    * Expert level for determining what options to show to the user.
+    */
+    enum Expertise {
+        Beginner = 1,
+        Intermediate = 2,
+        Expert = 3,
+    }
+    /**
     * Implement this interface to make your object serializable
     * @see http://stackoverflow.com/a/22886730/319711
     */
@@ -518,8 +945,11 @@ declare module csComp.Services {
         zoomLevel: number;
         zoomLevelName: string;
         isLive: boolean;
+        static deserialize(input: DateRange): DateRange;
+        /**
+        * Set the focus time of the timeline, optionally including start and end time.
+        */
         setFocus(d: Date, s?: Date, e?: Date): void;
-        constructor();
         startDate: () => Date;
         focusDate: () => Date;
         endDate: () => Date;
@@ -527,7 +957,7 @@ declare module csComp.Services {
     /**
      * Represents to the overall solution class. A solution can contain multiple project.
      * This can be usefull when you want to have the same website, but with different content.
-     * e.g. you could make it so that you can switch between different regions
+     * e.g. you could make it so that you can switch between different regions or different domains of interest.
      */
     class Solution {
         title: string;
@@ -536,11 +966,14 @@ declare module csComp.Services {
         baselayers: IBaseLayer[];
         projects: SolutionProject[];
     }
-    /** project within a solution file, refers to a project url*/
+    /** Project within a solution file, refers to a project url*/
     class SolutionProject {
         title: string;
         url: string;
     }
+    /**
+    * Simple class to hold the user privileges.
+    */
     interface IPrivileges {
         mca: {
             expertMode: boolean;
@@ -550,6 +983,17 @@ declare module csComp.Services {
     interface IBoundingBox {
         southWest: L.LatLng;
         northEast: L.LatLng;
+    }
+    interface ITimelineOptions {
+        width?: string;
+        height?: string;
+        eventMargin?: number;
+        eventMarginAxis?: number;
+        editable?: boolean;
+        layout?: string;
+        /** NOTE: For internal use only. Do not set it, as it will be overwritten by the $layerService.currentLocale. */
+        locale?: string;
+        timeLine?: DateRange;
     }
     /** project configuration. */
     class Project implements ISerializable<Project> {
@@ -575,29 +1019,50 @@ declare module csComp.Services {
         viewBounds: IBoundingBox;
         userPrivileges: IPrivileges;
         languages: ILanguageData;
+        expertMode: Expertise;
         markers: {};
         deserialize(input: Project): Project;
     }
     /** layer information. a layer is described in a project file and is always part of a group */
     class ProjectLayer {
+        /** Title as displayed in the menu */
         title: string;
+        /** Description as displayed in the menu */
         description: string;
+        /** Type of layer, e.g. GeoJSON, TopoJSON, or WMS */
         type: string;
+        /** Data source */
         url: string;
+        /** In case we keep the style information in a separate file */
         styleurl: string;
+        /** WMS sublayers that must be loaded */
         wmsLayers: string;
+        /** If enabled, load the layer */
         enabled: boolean;
+        /** Layer opacity */
         opacity: number;
+        /** When loading the data, the isLoading variable is true (e.g. used for the spinner control) */
         isLoading: boolean;
+        /** Indent the layer, so it seems to be a sublayer. */
         isSublayer: boolean;
         mapLayer: L.LayerGroup<L.ILayer>;
+        /** Group of layers */
         group: ProjectGroup;
-        timestamps: any[];
+        /**
+        * A list of UNIX timestamp, or the UTC time in milliseconds since 1/1/1970, which define the time a sensor value
+        * was taken. So in case we have 10 timestamps, each feature's sensor (key) in the feature's sensors dictionary should
+        * also have a lnegth of 10.
+        * Note that this value is optional, and can be omitted if the sensor already contains a timestamp too. This is mainly intended
+        * when all 'sensor measurements' are taken on the same moment. For example, the CENSUS date.
+        * In Excel, you can use the formula =24*(A4-$B$1)*3600*1000 to convert a date to a UNIX time stamp.
+        */
+        timestamps: number[];
         /** Internal ID, e.g. for the Excel service */
         id: string;
         /** Reference for URL params: if the URL contains layers=REFERENCE1;REFERENCE2, the two layers will be turned on.  */
         reference: string;
         events: Event[];
+        /** Language information that can be used to localize the title and description */
         languages: ILanguageData;
     }
     /**
@@ -610,10 +1075,14 @@ declare module csComp.Services {
         isDefault: boolean;
         subtitle: string;
         preview: string;
+        /** URL pointing to the basemap source. */
         url: string;
+        /** Maximum zoom level */
         maxZoom: number;
+        /** Minimum zoom level */
         minZoom: number;
         subdomains: string[];
+        /** String that is shown on the map, attributing the source of the basemap */
         attribution: string;
         test: string;
     }
@@ -647,6 +1116,10 @@ declare module Timeline {
     var html: string;
 }
 declare module Timeline {
+    interface ITimelineService {
+        getTimelineOptions(): csComp.Services.ITimelineOptions;
+        setTimelineOptions(options: csComp.Services.ITimelineOptions): void;
+    }
     /**
       * Module
       */
@@ -663,6 +1136,7 @@ declare module Timeline {
         private $layerService;
         private $mapService;
         private $messageBusService;
+        private TimelineService;
         private scope;
         private locale;
         static $inject: string[];
@@ -675,7 +1149,8 @@ declare module Timeline {
         isPlaying: boolean;
         showControl: boolean;
         isPinned: boolean;
-        constructor($scope: ITimelineScope, $layerService: csComp.Services.LayerService, $mapService: csComp.Services.MapService, $messageBusService: csComp.Services.MessageBusService);
+        constructor($scope: ITimelineScope, $layerService: csComp.Services.LayerService, $mapService: csComp.Services.MapService, $messageBusService: csComp.Services.MessageBusService, TimelineService: Timeline.ITimelineService);
+        private initTimeline();
         updateDragging(): void;
         onRangeChanged(properties: any): void;
         start(): void;
@@ -686,6 +1161,12 @@ declare module Timeline {
         pinToNow(): void;
         stop(): void;
         updateFocusTime(): void;
+        /**
+        * Load the locales: instead of loading them from the original timeline-locales.js distribution,
+        * add them here so you don't need to add another js dependency.
+        * @seealso: http://almende.github.io/chap-links-library/downloads.html
+        */
+        loadLocales(): void;
     }
 }
 declare module Voting {
@@ -693,6 +1174,52 @@ declare module Voting {
       * Module
       */
     var myModule: any;
+}
+declare module csComp.Helpers {
+    interface IDictionary<T> {
+        add(key: string, value: T): void;
+        remove(key: string): void;
+        containsKey(key: string): boolean;
+        keys(): string[];
+        clear(): void;
+        count(): number;
+        values(): Array<T>;
+    }
+    class Dictionary<T> implements IDictionary<T> {
+        private theKeys;
+        private theValues;
+        constructor();
+        initialize(init: {
+            key: string;
+            value: T;
+        }[]): void;
+        add(key: string, value: any): void;
+        remove(key: string): void;
+        clear(): void;
+        count(): number;
+        keys(): string[];
+        values(): Array<T>;
+        containsKey(key: string): boolean;
+        toLookup(): IDictionary<T>;
+    }
+}
+declare module csComp.Helpers {
+    /**
+    * A set of static geo tools
+    * Source: http://www.csgnetwork.com/degreelenllavcalc.html
+    */
+    class GeoExtensions {
+        static deg2rad(degree: number): number;
+        static rad2deg(rad: number): number;
+        /**
+        * Calculate the log base 10 of val
+        */
+        static log10(val: any): number;
+        static convertDegreesToMeters(latitudeDegrees: number): {
+            latitudeLength: number;
+            longitudeLength: number;
+        };
+    }
 }
 declare module csComp.Helpers {
     function supportsDataUri(): boolean;
@@ -728,6 +1255,26 @@ declare module csComp.Helpers {
     function indexes(source: string, find: string): number[];
     function getGuid(): string;
     function S4(): string;
+    /**
+     * Load the features as visible on the map, effectively creating a virtual
+     * GeoJSON file that represents all visible items.
+     * Also loads the keys into the featuretype's propertyTypeData collection.
+     */
+    function loadMapLayers(layerService: Services.LayerService): Services.IGeoJsonFile;
+}
+declare module csComp {
+    enum FileType {
+        Js = 0,
+        Css = 1,
+    }
+    class Utils {
+        static loadedFiles: string[];
+        /**
+        * Load a JavaScript or CSS file dynamically by adding it to the end of the HEAD section in your document.
+        * See also: http://www.javascriptkit.com/javatutors/loadjavascriptcss.shtml
+        */
+        static loadJsCssfile(filename: string, filetype: FileType, callback?: Function): void;
+    }
 }
 declare module csComp.Services {
     interface IMessageBusCallback {
@@ -1153,6 +1700,7 @@ declare module csComp.Services {
         maxBounds: IBoundingBox;
         findLayer(id: string): ProjectLayer;
         selectFeature(feature: Services.IFeature): any;
+        currentLocale: string;
         mb: Services.MessageBusService;
         map: Services.MapService;
         layerGroup: L.LayerGroup<L.ILayer>;
@@ -1190,9 +1738,10 @@ declare module csComp.Services {
         lastSelectedFeature: IFeature;
         selectedLayerId: string;
         timeline: any;
+        currentLocale: string;
+        loadedLayers: Helpers.Dictionary<L.ILayer>;
         layerGroup: L.LayerGroup<L.ILayer>;
         info: L.Control;
-        currentLocale: string;
         static $inject: string[];
         constructor($location: ng.ILocationService, $translate: ng.translate.ITranslateService, $messageBusService: Services.MessageBusService, $mapService: Services.MapService, $rootScope: any);
         selectDashboard(dashboard: csComp.Services.Dashboard, container: string): void;
@@ -1264,7 +1813,7 @@ declare module csComp.Services {
         /**
          * Update icon for features
          */
-        updateFeatureIcon(feature: IFeature, layer: ProjectLayer): any;
+        updateFeatureIcon(feature: IFeature, layer: ProjectLayer): void;
         /**
          * add a feature
          */
@@ -1275,16 +1824,20 @@ declare module csComp.Services {
          */
         private findFilter(group, property);
         /**
-         * find a layer with a specific id
+         * Find a layer with a specific id
          */
         findLayer(id: string): ProjectLayer;
         setStyle(property: any, openStyleTab?: boolean): GroupStyle;
         private saveStyle(group, style);
         addFilter(group: ProjectGroup, prop: string): void;
         /**
+         * enable a filter for a specific property
+         */
+        setFilter(filter: GroupFilter, group: csComp.Services.ProjectGroup): void;
+        /**
         * enable a filter for a specific property
         */
-        setFilter(property: FeatureProps.CallOutProperty): void;
+        setPropertyFilter(property: FeatureProps.CallOutProperty): void;
         /**
          * Return the feature style for a specific feature.
          * First, look for a layer specific feature type, otherwise, look for a project-specific feature type.
@@ -1332,6 +1885,7 @@ declare module csComp.Services {
          */
         private addTextFilter(group, filter);
         private updateChartRange(chart, filter);
+        private addScatterFilter(group, filter);
         /***
          * Add bar chart filter for filter number values
          */
@@ -1380,14 +1934,29 @@ declare module csComp.Services {
 }
 declare module csComp.Services {
     class MapService {
-        private $messageBusService;
+        private $localStorageService;
+        private $timeout;
+        private $messageBus;
+        private static expertModeKey;
+        private activeBaseLayer;
         static $inject: string[];
         map: L.Map;
         baseLayers: any;
-        private activeBaseLayer;
         mapVisible: boolean;
         timelineVisible: boolean;
-        constructor($messageBusService: csComp.Services.MessageBusService);
+        rightMenuVisible: boolean;
+        expertMode: Expertise;
+        constructor($localStorageService: ng.localStorage.ILocalStorageService, $timeout: ng.ITimeoutService, $messageBus: csComp.Services.MessageBusService);
+        /**
+        * The expert mode can either be set manually, e.g. using this directive, or by setting the expertMode property in the
+        * project.json file. In neither are set, we assume that we are dealing with an expert, so all features should be enabled.
+        *
+        * Precedence:
+        * - when a declaration is absent, assume Expert.
+        * - when the mode is set in local storage, take that value.
+        * - when the mode is set in the project.json file, take that value.
+        */
+        private initExpertMode();
         initMap(): void;
         changeBaseLayer(layerObj: L.ILayer): void;
         invalidate(): void;
@@ -1398,7 +1967,7 @@ declare module csComp.Services {
         /**
          * Zoom to a feature on the map.
          */
-        zoomTo(feature: IFeature): void;
+        zoomTo(feature: IFeature, zoomLevel?: number): void;
         /**
          * Compute the bounding box.
          * Returns [min_x, max_x, min_y, max_y]
@@ -1484,9 +2053,12 @@ declare module FeatureProps {
         canStyle: boolean;
         feature: IFeature;
         isFilter: boolean;
+        isSensor: boolean;
         description: string;
         meta: IPropertyType;
-        constructor(key: string, value: string, property: string, canFilter: boolean, canStyle: boolean, feature: IFeature, isFilter: boolean, description?: string, meta?: IPropertyType);
+        timestamps: number[];
+        sensor: number[];
+        constructor(key: string, value: string, property: string, canFilter: boolean, canStyle: boolean, feature: IFeature, isFilter: boolean, isSensor: boolean, description?: string, meta?: IPropertyType, timestamps?: number[], sensor?: number[]);
     }
     interface ICallOutSection {
         propertyTypes: {
@@ -1540,6 +2112,7 @@ declare module FeatureProps {
         static $inject: string[];
         constructor($scope: IFeaturePropsScope, $location: ng.ILocationService, $sce: ng.ISCEService, $mapService: csComp.Services.MapService, $layerService: csComp.Services.LayerService, $messageBusService: csComp.Services.MessageBusService);
         toTrusted(html: string): string;
+        createScatter(property: FeatureProps.CallOutProperty): void;
         /**
          * Callback function
          * @see {http://stackoverflow.com/questions/12756423/is-there-an-alias-for-this-in-typescript}
@@ -1549,6 +2122,22 @@ declare module FeatureProps {
         private sidebarMessageReceived;
         private featureMessageReceived;
         private displayFeature(feature);
+        showSensorData(property: ICallOutProperty): void;
+        timestamps: {
+            title: string;
+            timestamp: number;
+        }[];
+        showSimpleTimeline: boolean;
+        focusTime: string;
+        setShowSimpleTimeline(): void;
+        setTimestamps(): {
+            title: string;
+            timestamp: number;
+        }[];
+        setTime(time: {
+            title: string;
+            timestamp: number;
+        }): void;
     }
 }
 declare module DataTable {

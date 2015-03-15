@@ -8,7 +8,7 @@ var gulp      = require('gulp'),
     rename    = require('gulp-rename'),
     cache     = require('gulp-cached'),
     concat    = require('gulp-concat'),
-    plumber   = require('gulp-plumber'),    
+    plumber   = require('gulp-plumber'),
     watch     = require('gulp-watch');
 
 // gulp.task('minify', function () {
@@ -86,12 +86,12 @@ gulp.task('include_js', function() {
 gulp.task('include_css', function () {
     gulp.src('../../../csWeb/csComp/includes/*.css')
         .pipe(plumber())
-        //.pipe(concat('includes.js'))    
+        //.pipe(concat('includes.js'))
         .pipe(gulp.dest('./public/css'));
 });
 
 gulp.task('include_images', function () {
-    gulp.src('../../../csWeb/csComp/includes/images/*.*')    
+    gulp.src('../../../csWeb/csComp/includes/images/*.*')
     .pipe(plumber())
     .pipe(gulp.dest('./public/includes/images/'));
 });
