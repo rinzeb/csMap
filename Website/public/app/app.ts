@@ -14,7 +14,7 @@
         featureSelected: boolean;
     }
 
-    // TODO For setting the current culture for string formatting (note you need to include public/js/cs/stringformat.YOUR-CULTURE.js. See sffjs.1.09.zip for your culture.)
+    // TODO For setting the curre\nt culture for string formatting (note you need to include public/js/cs/stringformat.YOUR-CULTURE.js. See sffjs.1.09.zip for your culture.)
     declare var sffjs;
     declare var String;
     declare var omnivore;
@@ -136,8 +136,8 @@
             window.console.log("Publish toggle sidebar");
         }
 
-        public showTable(tableVisible: boolean) {
-            this.$mapService.mapVisible = !tableVisible;
+        showTable() {
+          this.$mapService.mapVisible = false;
         }
 
         isActive(viewLocation: string) {
@@ -155,7 +155,9 @@
             'LocalStorageModule',
             'angularUtils.directives.dirPagination',
             'pascalprecht.translate',
+            'csWeb.mapElement',
             'csWeb.featureprops',
+            'csWeb.featurerelations',
             'csWeb.layersDirective',
             'csWeb.featureList',
             'csWeb.filterList',
@@ -169,23 +171,12 @@
             'csWeb.datatable',
             'csWeb.languageSwitch',
             'csWeb.projectSettings',
-            'csWeb.charts',
-            'csWeb.expertMode',
             'ngCookies',
-            'csWeb.timeline',
-            'csWeb.heatmap'
+            'csWeb.timeline'//,
+            //'csWeb.heatmap'
         ])
         .config(localStorageServiceProvider => {
             localStorageServiceProvider.prefix = 'csMap';
-        })
-        .config(TimelineServiceProvider => {
-            TimelineServiceProvider.setTimelineOptions({
-                'width': '100%',
-                "eventMargin": 0,
-                "eventMarginAxis": 0,
-                'editable': false,
-                'layout': 'box'
-            });
         })
         .config($translateProvider => {
             // TODO ADD YOUR LOCAL TRANSLATIONS HERE, OR ALTERNATIVELY, CHECK OUT

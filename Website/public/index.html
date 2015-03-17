@@ -1,86 +1,105 @@
 ﻿<!DOCTYPE html>
 <html ng-app="csWebApp">
-<head>
-    <!--[if lt IE 9]>
-        <script>
-            alert("This application does not work on IE8 or below! Please obtain a newer browser, or try a portable version of Firefox.");
-            window.location = "https://github.com/TNOCS/csMap";
-        </script>
-    <![endif]-->
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="description" content="csMap, your mapping solution.">
-    <meta name="author" content="Arnoud de Jong, Erik Vullings">
-    <meta name="color:Accent" content="#a98e2e" />
+	<head>
+	    <!--[if lt IE 9]>
+	        <script>
+			    alert("This application does not work on IE8 or below! Please obtain a newer browser, or try a portable version of Firefox.");
+                window.location = "https://github.com/TNOCS/csMap";
+	        </script>
+		<![endif]-->
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+		<meta name="mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="description" content="csMap, your mapping solution.">
+		<meta name="author" content="Arnoud de Jong, Erik Vullings">
+		<meta name="color:Accent" content="#a98e2e" />
 
-    <!--TODO Add your title here-->
-    <title>csMap</title>
+        <!--TODO Add your title here-->
+	    <title>csMap</title>
 
-    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap-theme.min.css" />
-    <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.min.css" />
-    <link rel="stylesheet" href="bower_components/leaflet/dist/leaflet.css" />
-    <link rel="stylesheet" href="bower_components/dcjs/dc.css" />
-    <link rel="stylesheet" href="bower_components/leaflet.markercluster/dist/MarkerCluster.css" />
-    <link rel="stylesheet" href="bower_components/leaflet.markercluster/dist/MarkerCluster.Default.css" />
-    <link rel="stylesheet" href="bower_components/leaflet.locatecontrol/src/L.Control.Locate.css" />
-    <link rel="stylesheet" href="bower_components/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" />
+        <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap-theme.min.css" />
+        <link rel="stylesheet" href="bower_components/Font-Awesome/css/font-awesome.min.css" />
+        <link rel="stylesheet" href="bower_components/leaflet/dist/leaflet.css" />
+        <link rel="stylesheet" href="bower_components/dcjs/dc.css" />
+        <link rel="stylesheet" href="bower_components/leaflet.markercluster/dist/MarkerCluster.css" />
+        <link rel="stylesheet" href="bower_components/leaflet.markercluster/dist/MarkerCluster.Default.css" />
+        <link rel="stylesheet" href="bower_components/leaflet.locatecontrol/src/L.Control.Locate.css" />
+	    <link rel="stylesheet" href="bower_components/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" />
 
 
-    <link rel="stylesheet" href="css/timeline.css" />
-    <link rel="stylesheet" href="css/pnotify.custom.min.css" />
-    <link rel="stylesheet" href="css/xbbcode.css">
-    <link rel="stylesheet" href="css/csStyles.css" />
-    <link rel="stylesheet" href="css/style.css">
+	    <link rel="stylesheet" href="css/pnotify.custom.min.css" />
+        <link rel="stylesheet" href="css/xbbcode.css">
+        <link rel="stylesheet" href="css/csStyles.css" />
+        <link rel="stylesheet" href="css/style.css">
 
-    <link rel="shortcut icon" href="favicon.ico">
-</head>
+        <link rel="shortcut icon" href="favicon.ico">
+	</head>
 <body data-ng-controller="appCtrl" data-ng-cloak data-ng-init="showMap=true">
     <script src="bower_components/jquery/dist/jquery.min.js"></script>
     <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
     <script src="bower_components/angular/angular.min.js"></script>
     <script src="bower_components/angular-cookies/angular-cookies.min.js"></script>
     <script src="bower_components/angular-ui-router/release/angular-ui-router.min.js"></script>
-    <script src="bower_components/angular-translate/angular-translate.min.js"></script>
     <script src="bower_components/leaflet/dist/leaflet.js"></script>
     <script src="bower_components/leaflet.locatecontrol/src/L.Control.Locate.js"></script>
     <script src="bower_components/leaflet-ajax/dist/leaflet.ajax.min.js"></script>
+    <script src="bower_components/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
+    <script src="bower_components/leaflet-omnivore/leaflet-omnivore.min.js"></script>
     <script src="bower_components/angular-bootstrap/ui-bootstrap.min.js"></script>
     <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
     <script src="bower_components/angular-utils-pagination/dirPagination.js"></script>
     <script src="bower_components/angular-local-storage/dist/angular-local-storage.min.js"></script>
+    <script src="bower_components/angular-translate/angular-translate.min.js"></script>
+
+    <script src="bower_components/chroma-js/chroma.min.js"></script>
+    <script src="bower_components/d3/d3.min.js"></script>
+    <script src="bower_components/d3-tip/index.js"></script>
+    <script src="bower_components/crossfilter/crossfilter.min.js"></script>
+    <script src="bower_components/dcjs/dc.min.js"></script>
+    <script src="bower_components/async/lib/async.js"></script>
+	<script src="bower_components/jquery-ui/jquery-ui.min.js"></script>
+	<script src="bower_components/underscore/underscore-min.js"></script>
+	<script src="bower_components/moment/min/moment.min.js"></script>
+
+    <script src="js/cs/csComp.js"></script>
+    <script src="views/map/MapViewCtrl.js"></script>
+
+    <script src="app/search/SearchCtrl.js"></script>
+    <script src="app/app.js"></script>
 
     <script src="js/cs/dashboard.min.js"></script>
     <script src="js/cs/stringformat-1.09.min.min.js"></script>
     <script src="js/cs/stringformat.nl-NL.min.js"></script>
     <script src="js/cs/xbbcode.min.js"></script>
     <script src="js/cs/jquery.cookies.min.js"></script>
-    <script src="bower_components/chroma-js/chroma.min.js"></script>
-    <script src="bower_components/d3/d3.min.js"></script>
-    <script src="bower_components/d3-tip/index.js"></script>
-    <script src="bower_components/crossfilter/crossfilter.min.js"></script>
-    <script src="bower_components/dcjs/dc.min.js"></script>
-    <script src="bower_components/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
-    <script src="bower_components/async/lib/async.js"></script>
     <script src="js/cs/pnotify.custom.min.js"></script>
     <script src="js/cs/jqueryinjectCSS.min.js"></script>
-    <script src="bower_components/jquery-ui/jquery-ui.min.js"></script>
-    <script src="bower_components/underscore/underscore-min.js"></script>
-    <script src="bower_components/moment/min/moment.min.js"></script>
     <script src="js/cs/timeline.min.js"></script>
+		<script src="http://cesiumjs.org/Cesium/Build/Cesium/Cesium.js"></script>
 
-    <script src="js/cs/csComp.js"></script>
-    <script src="views/map/MapViewCtrl.js"></script>
-    <script src="app/search/SearchCtrl.js"></script>
-    <script src="app/app.js"></script>
+    <link rel="stylesheet" href="css/timeline.css" />
+		<link rel="stylesheet" href="http://cesiumjs.org/Cesium/Build/Cesium/Widgets/widgets.css" />
+
+		<style>
+
+      #cesiumContainer {
+          width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden;
+      }
+  </style>
+
+
 
     <div role="navigation" class="navbar navbar-inverse navbar-fixed-top">
 
         <div class="navbar-header" data-ng-cloak>
             <a class="menutoggle"><i class="fa fa-bars"></i></a>
+            <!--<a class="navbar-brand" style="margin-top: -5px;" href="{{vm.$layerService.project.url}}" target="_blank">
+                <img data-ng-src="{{vm.$layerService.project.logo}}" alt="{{vm.$layerService.project.title}}" width="32" height="32" />
+                {{vm.$layerService.project.title}}
+            </a>-->
         </div>
 
         <!-- Link to views -->
@@ -88,12 +107,12 @@
             <ul class="nav navbar-nav">
                 <!--Start project dropdown-->
                 <li class="dropdown">
-                    <a href=""
-                       class="navbar-brand dropdown-toggle"
-                       data-toggle="dropdown"
-                       style="color:white; margin-left:-5px; padding: 10px; padding-bottom: 0"
-                       aria-haspopup="true" aria-expanded="false">
+                    <a data-ng-href="{{vm.$layerService.project.url}}" class="pull-left" style="padding: 10px; padding-bottom: 0">
                         <img data-ng-src="{{vm.$layerService.project.logo}}" alt="{{vm.$layerService.project.title}}" width="32" height="32" />
+                    </a>
+                    <a href=""
+                       class="navbar-brand dropdown-toggle pull-left"
+                       style="color:white; margin-left:-10px;">
                         {{vm.$layerService.project.title}}
                         <span class="caret" data-ng-if="vm.$layerService.solution.projects.length > 1"></span>
                     </a>
@@ -105,14 +124,28 @@
                 </li>
                 <!--End project dropdown-->
 
-                <li data-ng-class="{ active: vm.isActive('/map')}"><a href="#/map" data-ng-click="vm.showTable(false)" translate>MAP_LABEL</a></li>
-                <li data-ng-class="{ active: vm.isActive('/table')}"><a href="#/table" data-ng-click="vm.showTable(true)" translate>TABLE_LABEL</a></li>
+                <li data-ng-class="{ active: vm.isActive('/map')}"><a href="#/map" data-ng-click="showMap=true" translate>MAP_LABEL</a></li>
+                <li data-ng-class="{ active: vm.isActive('/table')}"><a href="#/table" data-ng-click="vm.showTable()" translate>TABLE_LABEL</a></li>
+
+
+
                 <!--<li><language-switch></language-switch></li>-->
+
             </ul>
 
+						<ul class="nav navbar-nav" style="float:right">
+							<li  data-ng-if="vm.$layerService.activeMapRenderer.title!='leaflet'"><a data-ng-click="vm.$layerService.selectRenderer('leaflet')">2D</a></li>
+							<li  data-ng-if="vm.$layerService.activeMapRenderer.title!='cesium'"><a data-ng-click="vm.$layerService.selectRenderer('cesium')">3D</a></li>
+						</ul>
+
+
+            <!-- Language switch -->
+            <language-switch class="navbar-form navbar-right" style="margin-top: 0; margin-bottom: 0"></language-switch>
             <!-- Search form -->
             <form class="navbar-form navbar-right" style="margin-right:0" role="search" data-ng-controller="searchCtrl">
                 <div id="scrollable-dropdown-menu" class="form-group has-feedback navbar-right">
+                    <!--                     <pre>Model: {{location | json}}</pre>-->
+
                     <input data-ng-model="vm.searchText"
                            typeahead="address as address.shortName(25) for address in vm.getLocation($viewValue)"
                            typeahead-loading="loadingLocations"
@@ -121,21 +154,33 @@
                            typeahead-on-select="vm.onSelect($item, $model, $label)"
                            id="searchbox"
                            type="text"
-                           placeholder="Zoek in kaartlagen"
+                           placeholder="Search"
                            class="typeahead form-control">
                     <!--                    <span ng-if="loadingLocations"  id="searchicon" class="fa fa-refresh fa-spin"></span>-->
                     <span id="searchicon" class="fa fa-search form-control-feedback"></span>
                 </div>
             </form>
-            <!-- Language switch -->
-            <language-switch class="navbar-form navbar-right" style="margin: 0 -5px 0 8px;"></language-switch>
-            <!-- Expert mode switch -->
-            <expert-mode class="navbar-form navbar-right" style="outline:none; margin: 15px 5px 0 0; color: white"></expert-mode>
+
+            <!--<form role="search" _lpchecked="1" class="navbar-form navbar-right">
+                <div class="form-group has-feedback navbar-right" ng-controller="searchFormCtrl">
+                    <span style="direction: ltr; display: block; position: static;" class="twitter-typeahead">
+                        <google-places location=location></google-places>
+                        <button ng-click="vm.doSearch()" class="btn btn-primary">
+                            &nbsp;<span id="searchicon" class="fa form-control-feedback fa-search"></span>
+                            &nbsp;
+                        </button>
+                    </span>
+                </div>
+            </form>-->
 
         </div>
     </div>
-    <div id="map" data-ng-show="vm.$mapService.mapVisible" data-ng-controller="mapLayersCtrl" tabindex="0"
-         class="leaflet-container leaflet-touch leaflet-fade-anim"></div>
-    <div data-ui-view style="margin: 10px"></div>
+
+		<map mapid="main" style="width:50%"></map>
+		<!-- <map style="float:right;width:50%" mapId="right"></map> -->
+
+
+    <div data-ui-view style="position: absolute;top: 50px;width: 100%;height:100%;pointer-events: none"></div>
+	<timeline data-ng-show="vm.$mapService.timelineVisible" style="height: 100vh;"></timeline>
 </body>
 </html>
