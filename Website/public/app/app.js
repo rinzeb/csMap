@@ -90,8 +90,8 @@ var App;
             this.$messageBusService.publish("sidebar", "toggle");
             window.console.log("Publish toggle sidebar");
         };
-        AppCtrl.prototype.showTable = function (tableVisible) {
-            this.$mapService.mapVisible = !tableVisible;
+        AppCtrl.prototype.showTable = function () {
+            this.$mapService.mapVisible = false;
         };
         AppCtrl.prototype.isActive = function (viewLocation) {
             return viewLocation === this.$location.path();
@@ -116,7 +116,9 @@ var App;
         'LocalStorageModule',
         'angularUtils.directives.dirPagination',
         'pascalprecht.translate',
+        'csWeb.mapElement',
         'csWeb.featureprops',
+        'csWeb.featurerelations',
         'csWeb.layersDirective',
         'csWeb.featureList',
         'csWeb.filterList',
@@ -130,21 +132,11 @@ var App;
         'csWeb.datatable',
         'csWeb.languageSwitch',
         'csWeb.projectSettings',
-        'csWeb.charts',
         'csWeb.expertMode',
         'ngCookies',
-        'csWeb.timeline',
-        'csWeb.heatmap'
+        'csWeb.timeline'
     ]).config(function (localStorageServiceProvider) {
         localStorageServiceProvider.prefix = 'csMap';
-    }).config(function (TimelineServiceProvider) {
-        TimelineServiceProvider.setTimelineOptions({
-            'width': '100%',
-            "eventMargin": 0,
-            "eventMarginAxis": 0,
-            'editable': false,
-            'layout': 'box'
-        });
     }).config(function ($translateProvider) {
         // TODO ADD YOUR LOCAL TRANSLATIONS HERE, OR ALTERNATIVELY, CHECK OUT
         // http://angular-translate.github.io/docs/#/guide/12_asynchronous-loading
@@ -258,4 +250,3 @@ var App;
         };
     });
 })(App || (App = {}));
-//# sourceMappingURL=app.js.map

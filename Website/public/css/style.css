@@ -239,7 +239,7 @@ input[type="checkbox"] { margin: 0; }
     cursor: pointer;
     float: left;
     font-size: 22px;
-	
+
     height: 50px;
     padding-left: 22px;
     padding-top: 10px;
@@ -247,7 +247,7 @@ input[type="checkbox"] { margin: 0; }
     width: 70px;
 }
 
-		  
+
 
 .menutoggle-right {
     -moz-transition: all 0.2s ease-out 0s;
@@ -257,7 +257,7 @@ input[type="checkbox"] { margin: 0; }
     cursor: pointer;
     float: right;
     font-size: 22px;
-	
+
     height: 50px;
     padding-left: 15px;
     padding-top: 10px;
@@ -270,18 +270,20 @@ input[type="checkbox"] { margin: 0; }
     height: 100%;
     left: 0;
     position: absolute;
-    top: 50px;
+    pointer-events: all;
+    top: 0;
     z-index: 100;
 }
 
-		 
+
 
 .rightpanel {
     background: white;
     height: 100%;
     position: absolute;
+    pointer-events: all;
     right: 0;
-    top: 50px;
+    top: 0px;
 }
 
 #rightpanelTabs { }
@@ -710,7 +712,7 @@ input[type="checkbox"] { margin: 0; }
 .tabs-left > li.active > a:hover,
 .tabs-left > li.active > a:focus {
     background-color: white;
-	
+
     border-right-color: transparent;
 }
 
@@ -825,7 +827,7 @@ input[type="checkbox"] { margin: 0; }
 
 #rightpanelTabContainer.tabs-below > .nav-tabs > li {
     margin-bottom: 0;
-    margin-top: -1px;    
+    margin-top: -1px;
 }
 
 #rightpanelTabContainer.tabs-below > .nav-tabs > li > a {
@@ -916,7 +918,7 @@ input[type="checkbox"] { margin: 0; }
 .rightPanelTabAnimated.ng-hide {
     display: block !important;
     left: 50px;
-    opacity: 0;    
+    opacity: 0;
 }
 
 .tab-pane {

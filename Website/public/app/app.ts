@@ -14,7 +14,7 @@
         featureSelected: boolean;
     }
 
-    // TODO For setting the curre\nt culture for string formatting (note you need to include public/js/cs/stringformat.YOUR-CULTURE.js. See sffjs.1.09.zip for your culture.)
+    // TODO For setting the current culture for string formatting (note you need to include public/js/cs/stringformat.YOUR-CULTURE.js. See sffjs.1.09.zip for your culture.)
     declare var sffjs;
     declare var String;
     declare var omnivore;
@@ -171,8 +171,10 @@
             'csWeb.datatable',
             'csWeb.languageSwitch',
             'csWeb.projectSettings',
+            'csWeb.expertMode',
             'ngCookies',
-            'csWeb.timeline'//,
+            //'csWeb.charts',
+            'csWeb.timeline'//, 
             //'csWeb.heatmap'
         ])
         .config(localStorageServiceProvider => {

@@ -141,6 +141,9 @@
 
             <!-- Language switch -->
             <language-switch class="navbar-form navbar-right" style="margin-top: 0; margin-bottom: 0"></language-switch>
+
+						<expert-mode class="navbar-form navbar-right" style="outline:none; margin: 15px 5px 0 0; color: white"></expert-mode>
+						
             <!-- Search form -->
             <form class="navbar-form navbar-right" style="margin-right:0" role="search" data-ng-controller="searchCtrl">
                 <div id="scrollable-dropdown-menu" class="form-group has-feedback navbar-right">
@@ -180,7 +183,7 @@
 		<!-- <map style="float:right;width:50%" mapId="right"></map> -->
 
 
-    <div data-ui-view style="position: absolute;top: 50px;width: 100%;height:100%;pointer-events: none"></div>
+    <div data-ui-view style="position: absolute;width: 100%;height:100%;pointer-events: none"></div>
 	<timeline data-ng-show="vm.$mapService.timelineVisible" style="height: 100vh;"></timeline>
 </body>
 </html>
