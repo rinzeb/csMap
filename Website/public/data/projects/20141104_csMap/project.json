@@ -2947,6 +2947,35 @@
                     "opacity": 100
                 }
             ]
+        },
+		{
+            "languages": {
+                "nl": {
+                    "title": "Heatmaps",
+                    "description": "Demonstreert heatmap lagen gebaseerd op features."
+                },
+                "en": {
+                    "title": "Heatmaps",
+                    "description": "Demonstrates heatmap layers based on features."
+                }
+            },
+            "clustering": false,
+            "oneLayerActive": true,
+            "layers": [
+                {
+                  "id"               : "heatmaptest",
+                  "reference"        : "heatmaptest",
+                  "title"            : "Heatmap test",
+                  "description"      : "Test of a heatmap(Source: thumb.)",
+                  "type"             : "Heatmap",
+                  "referenceList"    : [ 
+										"Hospitals",
+										"firestation"
+										],
+                  "enabled"          : false,
+                  "opacity"          : 100
+                }
+            ]
         }
     ]
 }
