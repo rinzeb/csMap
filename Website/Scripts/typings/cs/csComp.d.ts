@@ -569,6 +569,8 @@ declare module csComp.Services {
         url: string;
         /** In case we keep the style information in a separate file */
         styleurl: string;
+        /** how should the layer be renderer, default (can also be null), webgl, heatmap, isolines, etc. */
+        layerRenderer: string;
         /** WMS sublayers that must be loaded */
         wmsLayers: string;
         /** If enabled, load the layer */
@@ -600,6 +602,7 @@ declare module csComp.Services {
         languages: ILanguageData;
         /** layer original source */
         data: JSON;
+        cesiumDatasource: any;
     }
     /**
      * Baselayers are background maps (e.g. openstreetmap, nokia here, etc).
@@ -1036,6 +1039,317 @@ declare module FilterList {
         private scope;
         static $inject: string[];
         constructor($scope: IFilterListScope, $layerService: csComp.Services.LayerService);
+    }
+}
+declare module Heatmap {
+    var html: string;
+}
+declare module Heatmap {
+    /**
+     * Module
+     */
+    var myModule: ng.IModule;
+}
+declare module Heatmap {
+    import IFeature = csComp.Services.IFeature;
+    interface IHeatmapScope extends ng.IScope {
+        vm: HeatmapCtrl;
+        ratingStates: any;
+    }
+    class HeatmapCtrl {
+        private $scope;
+        private $modal;
+        private $translate;
+        private $timeout;
+        private $localStorageService;
+        private $layerService;
+        private $mapService;
+        private messageBusService;
+        private static confirmationMsg1;
+        private static confirmationMsg2;
+        heatmap: L.GeoJSON;
+        heatmapModel: HeatmapModel;
+        heatmapModels: HeatmapModel[];
+        expertMode: boolean;
+        static MAX_HEATMAP_CELLS: number;
+        selectedFeature: IFeature;
+        properties: FeatureProps.CallOutProperty[];
+        showFeature: boolean;
+        showChart: boolean;
+        featureIcon: string;
+        static $inject: string[];
+        constructor($scope: IHeatmapScope, $modal: any, $translate: ng.translate.ITranslateService, $timeout: ng.ITimeoutService, $localStorageService: ng.localStorage.ILocalStorageService, $layerService: csComp.Services.LayerService, $mapService: csComp.Services.MapService, messageBusService: csComp.Services.MessageBusService);
+        createHeatmap(): void;
+        editHeatmap(heatmap: HeatmapModel): void;
+        removeHeatmap(heatmap: HeatmapModel): void;
+        private deleteHeatmap(heatmap);
+        /**
+         * Show the heat map editor in a modal.
+         */
+        private showHeatmapEditor(heatmap);
+        private scopeApply();
+        getVotingClass(hi: IHeatmapItem): string;
+        weightUpdated(): void;
+        intensityScaleUpdated(): void;
+        /**
+         * Update the available pre-set heatmaps.
+         */
+        private updateHeatmap();
+        private initializeHeatmap();
+        static intensityToHex(intensity: number): string;
+    }
+}
+declare module Heatmap {
+    import IGeoJsonFile = csComp.Services.IGeoJsonFile;
+    interface IHeatmapEditorScope extends ng.IScope {
+        vm: HeatmapEditorCtrl;
+    }
+    class HeatmapEditorCtrl {
+        private $scope;
+        private $modalInstance;
+        private $layerService;
+        private $translate;
+        private messageBusService;
+        heatmap: HeatmapModel;
+        /**
+         * A virtual geojson file that represents all useable data for creating a heatmap.
+         * @type {IGeoJsonFile}
+         */
+        dataset: IGeoJsonFile;
+        scoringFunctions: ScoringFunction[];
+        showItem: number;
+        idealDistance: number;
+        distanceMaxValue: number;
+        lostInterestDistance: number;
+        static $inject: string[];
+        constructor($scope: IHeatmapEditorScope, $modalInstance: any, $layerService: csComp.Services.LayerService, $translate: ng.translate.ITranslateService, messageBusService: csComp.Services.MessageBusService, heatmap?: HeatmapModel);
+        save(): void;
+        cancel(): void;
+        toggleItemDetails(index: number): void;
+    }
+}
+declare module HeatmapEditorView {
+    var html: string;
+}
+declare module Heatmap {
+    /**
+    * A simple interface to describe an item that can be used in a heatmap.
+    * We either accept a FeatureType (e.g. Hospital or Shop), or a property that
+    * is of type options (e.g. shop, magazine).
+    */
+    interface IHeatmapItem {
+        title: string;
+        featureType: csComp.Services.IFeatureType;
+        /**
+         * In case we are not interested in the feature type itself, but in a certain property,
+         * e.g. the property that determines what it represents like buildingFunction.
+         * @type {string}
+         */
+        propertyTitle?: string;
+        propertyLabel: string;
+        /**
+         * When we are using an options property type, such as buildingFunction, we need
+         * to indicate the particular option that we will evaluate.
+         * @type {number}
+         */
+        optionIndex?: number;
+        /**
+         * The user weight specifies how much you like this item, e.g. the maximum value.
+         * @type {number}, range [-5..5].
+         */
+        userWeight: number;
+        /**
+         * The weight specifies how much you like this item, relative to others.
+         * @type {number}, range [-1..1].
+         */
+        weight: number;
+        /**
+         * The ideality measure specifies how much you like this item with respect to its
+         * distance.
+         * @type {IIdealityMeasure}
+         */
+        idealityMeasure: IIdealityMeasure;
+        isSelected: boolean;
+        intensityScale: number;
+        reset(): void;
+        setScale(latitude: number, longitude: number): void;
+        calculateHeatspots(feature: csComp.Services.IFeature, cellWidth: number, cellHeight: number, horizCells: number, vertCells: number, mapBounds: L.LatLngBounds): IHeatspot[];
+    }
+    class HeatmapItem implements IHeatmapItem {
+        title: string;
+        featureType: csComp.Services.IFeatureType;
+        /**
+        * 1 meter represents meterToLatDegree degrees in vertical direction.
+        */
+        private static meterToLatDegree;
+        /**
+        * 1 meter represents meterToLonDegree degrees in horizontal direction.
+        */
+        private static meterToLonDegree;
+        /**
+         * In case we are not interested in the feature type itself, but in a certain property,
+         * e.g. the property that determines what it represents like buildingFunction.
+         * @type {string}
+         */
+        propertyTitle: string;
+        propertyLabel: string;
+        /**
+         * When we are using an options property type, such as buildingFunction, we need
+         * to indicate the particular option that we will evaluate.
+         * @type {number}
+         */
+        optionIndex: number;
+        /**
+         * The user weight specifies how much you like this item, e.g. the maximum value.
+         * @type {number}, range [-5..5].
+         */
+        userWeight: number;
+        /**
+         * The weight specifies how much you like this item, relative to others.
+         * @type {number}, range [-1..1].
+         */
+        weight: number;
+        /**
+         * The ideality measure specifies how much you like this item with respect to its
+         * distance.
+         * @type {IIdealityMeasure}
+         */
+        idealityMeasure: IIdealityMeasure;
+        heatspots: IHeatspot[];
+        /** Represents the number of items that are needed to obtain an ideal location. */
+        isSelected: boolean;
+        intensityScale: number;
+        private static twoPi;
+        constructor(title: string, featureType: csComp.Services.IFeatureType);
+        calculateHeatspots(feature: csComp.Services.Feature, cellWidth: number, cellHeight: number, horizCells: number, vertCells: number, mapBounds: L.LatLngBounds): IHeatspot[];
+        /**
+        * Calculate the intensity around the location.
+        * NOTE We are performing a relative computation around location (0,0) in a rectangular grid.
+        */
+        private calculateHeatspot(cellWidth, cellHeight);
+        /**
+        * Translate the heatspot (at (0,0)) to the actual location.
+        */
+        private pinHeatspotToGrid(feature, horizCells, vertCells, mapBounds);
+        /**
+        * Set the scale to convert a 1x1 meter grid cell to the appropriate number of degrees
+        * in vertical and horizontal direction.
+        */
+        setScale(latitude: number): void;
+        select(): void;
+        reset(): void;
+        toString(): string;
+    }
+}
+declare module Heatmap {
+    /**
+    * A simple interface to describe a heat map.
+    */
+    interface IHeatmapModel {
+        title: string;
+        heatmapItems: IHeatmapItem[];
+    }
+    class HeatmapModel implements IHeatmapModel {
+        title: string;
+        heatmapItems: IHeatmapItem[];
+        scaleMaxValue: number;
+        scaleMinValue: number;
+        intensityScale: number;
+        constructor(title: string);
+        /**
+         * Calculate the heatmap.
+         */
+        calculate(layerService: csComp.Services.LayerService, mapService: csComp.Services.MapService, heatmap: L.GeoJSON): void;
+        /**
+         * Update the weights of all heatmap items.
+         */
+        updateWeights(): void;
+        /**
+        * Update the intensity scale of all heatmap items.
+        */
+        updateIntensityScale(): void;
+        /**
+        * Add a heatmap item to the list of items only in case we don't have it yet.
+        */
+        addHeatmapItem(heatmapItem: IHeatmapItem): void;
+    }
+}
+declare module Heatmap {
+    /**
+     * A heat spot represents an lat-lon-point on the map with a certain intensity.
+     */
+    interface IHeatspot {
+        i: number;
+        j: number;
+        intensity: number;
+        AddLocation(i: any, j: any): IHeatspot;
+    }
+    /**
+     * A heat spot represents a point on the map with a certain intensity.
+     */
+    class Heatspot implements IHeatspot {
+        i: number;
+        j: number;
+        intensity: number;
+        constructor(i: number, j: number, intensity: number);
+        AddLocation(i: any, j: any): Heatspot;
+    }
+}
+declare module Heatmap {
+    /**
+     * The ideality measure specifies how much you like this item with respect to its
+     * distance. For example, if I like a shop to be ideally at 200m of my house, it
+     * also means that there is a zone around the shop with a radius of 200m where
+     * I would ideally live.
+     */
+    interface IIdealityMeasure {
+        /**
+        * The distance with respect to my location where I would like to find the item.
+        * @type {number}, in meters
+        */
+        idealDistance: number;
+        /**
+        * How happy would I be if the item would be at my location.
+        * @type {number}, range [0..1]
+        */
+        atLocation: number;
+        /**
+         * At what distance would the item no longer be of value to me.
+         * @type {number}, range in meters
+         */
+        lostInterestDistance: number;
+        computeIdealityAtDistance(distance: number): number;
+    }
+    enum ScoringFunctionType {
+        LinearAscendingDescending = 0,
+    }
+    class ScoringFunction {
+        title: string;
+        type: ScoringFunctionType;
+        scores: string;
+        cssClass: string;
+        constructor(scoringFunctionType?: ScoringFunctionType);
+    }
+    class ScoringFunctions {
+        static scoringFunctions: ScoringFunctions[];
+    }
+    class IdealityMeasure implements IIdealityMeasure {
+        /**
+        * The distance with respect to my location where I would like to find the item.
+        * @type {number}, in meters
+        */
+        idealDistance: number;
+        /**
+        * How happy would I be if the item would be at my location.
+        * @type {number}, range [0..1]
+        */
+        atLocation: number;
+        /**
+         * At what distance would the item no longer be of value to me.
+         * @type {number}, range in meters
+         */
+        lostInterestDistance: number;
+        computeIdealityAtDistance(distance: number): number;
     }
 }
 declare module LanguageSwitch {
@@ -1514,6 +1828,24 @@ declare module csComp.Helpers {
 }
 declare module csComp.Helpers {
     /**
+    * A set of static geo tools
+    * Source: http://www.csgnetwork.com/degreelenllavcalc.html
+    */
+    class GeoExtensions {
+        static deg2rad(degree: number): number;
+        static rad2deg(rad: number): number;
+        /**
+        * Calculate the log base 10 of val
+        */
+        static log10(val: any): number;
+        static convertDegreesToMeters(latitudeDegrees: number): {
+            latitudeLength: number;
+            longitudeLength: number;
+        };
+    }
+}
+declare module csComp.Helpers {
+    /**
     * Convert topojson data to geojson data.
     */
     function convertTopoToGeoJson(data: any): any;
@@ -1779,6 +2111,7 @@ declare module csComp.Services {
         activeMapRenderer: IMapRenderer;
         static $inject: string[];
         constructor($location: ng.ILocationService, $translate: ng.translate.ITranslateService, $messageBusService: Services.MessageBusService, $mapService: Services.MapService, $rootScope: any);
+        private initLayerSources();
         addLayer(layer: ProjectLayer): void;
         removeStyle(style: GroupStyle): void;
         updateStyle(style: GroupStyle): void;
@@ -1901,6 +2234,15 @@ declare module csComp.Services {
     }
 }
 declare module csComp.Services {
+    class TileLayerSource implements ILayerSource {
+        title: string;
+        service: LayerService;
+        init(service: LayerService): void;
+        addLayer(layer: ProjectLayer, callback: Function): void;
+        removeLayer(layer: ProjectLayer): void;
+    }
+}
+declare module csComp.Services {
     class WmsSource implements ILayerSource {
         title: string;
         service: LayerService;
@@ -1947,6 +2289,8 @@ declare module csComp.Services {
       * - when the mode is set in the project.json file, take that value.
       */
         private initExpertMode();
+        isExpert: boolean;
+        isIntermediate: boolean;
         initMap(): void;
         changeBaseLayer(layerObj: L.ILayer): void;
         invalidate(): void;
@@ -1971,6 +2315,7 @@ declare module csComp.Services {
         title: string;
         service: LayerService;
         viewer: any;
+        camera: any;
         init(service: LayerService): void;
         enable(): void;
         disable(): void;

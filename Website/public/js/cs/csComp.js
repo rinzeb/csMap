@@ -1542,7 +1542,7 @@ var FeatureList;
 })(FeatureList || (FeatureList = {}));
 var FeatureProps;
 (function (FeatureProps) {
-    FeatureProps.html = '<div data-ng-cloak data-ng-show="showMenu" >    <h4 class="rightpanel-header">        <img data-ng-if="callOut.icon" data-ng-src="{{callOut.icon}}" width="24" height="24" style="margin-left:5px" alt="Icon" />        &nbsp;&nbsp;{{callOut.title}}    </h4>    <div class="container-fluid rightpanel-tabs" style="position: relative">        <div class="row" style="overflow:hidden" ng-if="callOut.sectionCount() < 4">            <!-- Nav tabs -->            <span id="leftArr" style="display:block;padding:10px;margin-top:5px;position:absolute;background-color:transparent;z-index:2">                <i class="glyphicon glyphicon-chevron-left"></i>            </span>            <span id="rightArr" style="display:block;padding:10px;margin-top:5px;position:absolute;background-color:transparent;z-index:2">                <i class="glyphicon glyphicon-chevron-right"></i>            </span>            <ul class="nav nav-tabs" id="featureTabs" style="margin-left:10px">                <li data-toggle="tab" data-ng-class="{active : $first}" data-ng-repeat="(sectionTitle, section) in callOut.sections" ng-if="section.hasProperties()">                    <a ng-href="#rp-{{$index}}" data-toggle="tab" data-ng-if="section.showSectionIcon()" ng-click="featureTabActivated(sectionTitle, section)"><i class="fa {{section.sectionIcon}}"></i></a>                    <a ng-href="#rp-{{$index}}" data-toggle="tab" data-ng-if="!section.showSectionIcon()" ng-click="featureTabActivated(sectionTitle, section)">{{sectionTitle}}</a>                </li>            </ul>        </div>        <div class="row" ng-if="callOut.sectionCount() >= 4">            <ul class="nav nav-tabs" id="featureTabs" style="margin-left:10px">                <li data-toggle="tab" class="active" ng-init="firstCallOutsection=callOut.firstSection()">                    <a ng-href="#rp-0" data-toggle="tab" data-ng-if="firstCallOutsection.showSectionIcon()" ><i class="fa {{firstCallOutsection.sectionIcon}}"></i></a>                </li>                <li class="dropdown" ng-init="selectedSection.title=\'Kies een categorie\'">                    <a style="cursor:pointer" data-toggle="dropdown">{{selectedSection.title}} <span class="caret"/></a>                    <ul class="dropdown-menu">                        <li data-ng-repeat="(sectionTitle, section) in callOut.sections" ng-if="!$last && !$first"><a ng-href="#rp-{{$index}}" ng-click="selectedSection.title = sectionTitle" data-toggle="tab">{{sectionTitle}}</a></li>                    </ul>                </li>                <li data-toggle="tab" ng-init="lastCallOutsection=callOut.lastSection()">                    <a ng-href="#rp-{{callOut.sectionCount()-1}}" data-toggle="tab" data-ng-if="lastCallOutsection.showSectionIcon()"><i class="fa {{lastCallOutsection.sectionIcon}}"></i></a>                </li>            </ul>        </div>    </div>    <div class="tab-content" style="top:50px; width:355px; overflow-y: auto; overflow-x: hidden" resize resize-y="150">        <div data-ng-if="!$last" class="tab-pane" data-ng-class="{active : $first}" id="rp-{{$index}}" data-ng-repeat="(sectionTitle, section) in callOut.sections">            <table class="table table-condensed">                <tr popover="{{(item.description) ? item.description : \'\'}}"                    popover-placement="left"                    popover-trigger="mouseenter"                    popover-append-to-body="true"                    data-ng-repeat="item in section.properties">                    <!--<td>                        <span class="dropdown">                            <a href class="fa fa-circle-o makeNarrow dropdown-toggle"></a>                            <ul class="dropdown-menu">                                <li><a data-ng-click="vm.$layerService.createScatter(item)">scatter plot</a></li>                                <li><a>add to dashboard</a></li>                            </ul>                        </span>                    </td>-->                    <td><a class="fa fa-filter makeNarrow" data-ng-show="item.canFilter" data-ng-click="vm.$layerService.setPropertyFilter(item)" style="cursor: pointer"></a></td>                    <td><a class="fa fa-eyedropper makeNarrow" data-ng-show="item.canStyle" data-ng-click="vm.$layerService.setStyle(item)" style="cursor: pointer"></a></td>                    <td>                         {{item.key}}                    </td>                    <td class="text-right" data-ng-bind-html="vm.toTrusted(item.value)"></td>                </tr>            </table>        </div>        <!-- Treat last tab (filter) differently -->        <div data-ng-if="$last" class="tab-pane" data-ng-class="{active : $first}" id="rp-{{$index}}" data-ng-repeat="(sectionTitle, section) in callOut.sections">            <!-- Add filter panel to the last rendered element -->            <div class="has-feedback" style="padding:0 4px 4px 4px;">                <span style="direction: ltr; position: static; display: block;">                    <input id="searchbox" data-ng-model="search.key" type="text"                            placeholder="Filter" autocomplete="off" spellcheck="false"                            style="position: relative; vertical-align: top;" class="form-control tt-input">                </span>                <span id="searchicon" class="fa form-control-feedback fa-filter"></span>            </div>            <!--<input style="padding:4px;" class=" form-control" data-ng-model="search" placeholder="...">-->            <table id="searchTextResults" class="table table-condensed">                <tr popover="{{(item.description) ? item.description : \'\'}}"                    popover-placement="left"                    popover-trigger="mouseenter"                    popover-append-to-body="true"                    data-ng-repeat="item in section.properties | filter:search">                    <td><a class="fa fa-filter makeNarrow" data-ng-show="item.canFilter" data-ng-click="vm.$layerService.setFilter(item)"></a></td>                    <td><a class="fa fa-eye makeNarrow" data-ng-show="item.canStyle" data-ng-click="vm.$layerService.setStyle(item)"></a></td>                    <td>{{item.key}}</td>                    <td class="text-right" data-ng-bind-html="vm.toTrusted(item.value)"></td>                </tr>            </table>        </div>    </div></div>';
+    FeatureProps.html = '<div data-ng-cloak data-ng-show="showMenu" >    <h4 class="rightpanel-header">        <img data-ng-if="callOut.icon" data-ng-src="{{callOut.icon}}" width="24" height="24" style="margin-left:5px" alt="Icon" />        &nbsp;&nbsp;{{callOut.title}}    </h4>    <div class="container-fluid rightpanel-tabs" style="position: relative">        <div class="row" style="overflow:hidden" ng-if="callOut.sectionCount() < 4">            <!-- Nav tabs -->            <span id="leftArr" style="display:block;padding:10px;margin-top:5px;position:absolute;background-color:transparent;z-index:2">                <i class="glyphicon glyphicon-chevron-left"></i>            </span>            <span id="rightArr" style="display:block;padding:10px;margin-top:5px;position:absolute;background-color:transparent;z-index:2">                <i class="glyphicon glyphicon-chevron-right"></i>            </span>            <ul class="nav nav-tabs" id="featureTabs" style="margin-left:10px">                <li data-toggle="tab" data-ng-class="{active : $first}" data-ng-repeat="(sectionTitle, section) in callOut.sections" ng-if="section.hasProperties()">                    <a ng-href="#rp-{{$index}}" data-toggle="tab" data-ng-if="section.showSectionIcon()" ng-click="featureTabActivated(sectionTitle, section)"><i class="fa {{section.sectionIcon}}"></i></a>                    <a ng-href="#rp-{{$index}}" data-toggle="tab" data-ng-if="!section.showSectionIcon()" ng-click="featureTabActivated(sectionTitle, section)">{{sectionTitle}}</a>                </li>            </ul>        </div>        <div class="row" ng-if="callOut.sectionCount() >= 4">            <ul class="nav nav-tabs" id="featureTabs" style="margin-left:10px">                <li data-toggle="tab" class="active" ng-init="firstCallOutsection=callOut.firstSection()">                    <a ng-href="#rp-0" data-toggle="tab" data-ng-if="firstCallOutsection.showSectionIcon()" ><i class="fa {{firstCallOutsection.sectionIcon}}"></i></a>                </li>                <li class="dropdown" ng-init="selectedSection.title=\'Kies een categorie\'">                    <a style="cursor:pointer" data-toggle="dropdown">{{selectedSection.title}} <span class="caret"/></a>                    <ul class="dropdown-menu">                        <li data-ng-repeat="(sectionTitle, section) in callOut.sections" ng-if="!$last && !$first"><a ng-href="#rp-{{$index}}" ng-click="selectedSection.title = sectionTitle" data-toggle="tab">{{sectionTitle}}</a></li>                    </ul>                </li>                <li data-toggle="tab" ng-init="lastCallOutsection=callOut.lastSection()">                    <a ng-href="#rp-{{callOut.sectionCount()-1}}" data-toggle="tab" data-ng-if="lastCallOutsection.showSectionIcon()"><i class="fa {{lastCallOutsection.sectionIcon}}"></i></a>                </li>            </ul>        </div>    </div>    <div class="tab-content" style="top:50px; width:355px; overflow-y: auto; overflow-x: hidden" resize resize-y="150">        <div data-ng-if="!$last" class="tab-pane" data-ng-class="{active : $first}" id="rp-{{$index}}" data-ng-repeat="(sectionTitle, section) in callOut.sections">            <table class="table table-condensed">                <tr popover="{{(item.description) ? item.description : \'\'}}"                    popover-placement="left"                    popover-trigger="mouseenter"                    popover-append-to-body="true"                    data-ng-repeat="item in section.properties">                    <!--<td>                        <span class="dropdown">                            <a href class="fa fa-circle-o makeNarrow dropdown-toggle"></a>                            <ul class="dropdown-menu">                                <li><a data-ng-click="vm.$layerService.createScatter(item)">scatter plot</a></li>                                <li><a>add to dashboard</a></li>                            </ul>                        </span>                    </td>-->                    <td><a class="fa fa-filter makeNarrow" data-ng-show="item.canFilter" data-ng-click="vm.$layerService.setPropertyFilter(item)" style="cursor: pointer"></a></td>                    <td><a class="fa fa-eyedropper makeNarrow" data-ng-show="item.canStyle" data-ng-click="vm.$layerService.setStyle(item)" style="cursor: pointer"></a></td>                    <td>                        {{item.key}}                    </td>                    <td class="text-right" data-ng-bind-html="vm.toTrusted(item.value)"></td>                </tr>            </table>        </div>        <!-- Treat last tab (filter) differently -->        <div data-ng-if="$last" class="tab-pane" data-ng-class="{active : $first}" id="rp-{{$index}}" data-ng-repeat="(sectionTitle, section) in callOut.sections">            <!-- Add filter panel to the last rendered element -->            <div class="has-feedback" style="padding:0 4px 4px 4px;">                <span style="direction: ltr; position: static; display: block;">                    <input id="searchbox" data-ng-model="search.key" type="text"                            placeholder="Filter" autocomplete="off" spellcheck="false"                            style="position: relative; vertical-align: top;" class="form-control tt-input">                </span>                <span id="searchicon" class="fa form-control-feedback fa-filter"></span>            </div>            <!--<input style="padding:4px;" class=" form-control" data-ng-model="search" placeholder="...">-->            <table id="searchTextResults" class="table table-condensed">                <tr popover="{{(item.description) ? item.description : \'\'}}"                    popover-placement="left"                    popover-trigger="mouseenter"                    popover-append-to-body="true"                    data-ng-repeat="item in section.properties | filter:search">                    <td><a class="fa fa-filter makeNarrow" data-ng-show="item.canFilter" data-ng-click="vm.$layerService.setPropertyFilter(item)"></a></td>                    <td><a class="fa fa-eye makeNarrow" data-ng-show="item.canStyle" data-ng-click="vm.$layerService.setStyle(item)"></a></td>                    <td>{{item.key}}</td>                    <td class="text-right" data-ng-bind-html="vm.toTrusted(item.value)"></td>                </tr>            </table>        </div>    </div></div>';
 })(FeatureProps || (FeatureProps = {}));
 var FeatureProps;
 (function (FeatureProps) {
@@ -2130,6 +2130,727 @@ var FilterList;
     })();
     FilterList.FilterListCtrl = FilterListCtrl;
 })(FilterList || (FilterList = {}));
+var Heatmap;
+(function (Heatmap) {
+    Heatmap.html = '<div>    <div class="wide-tooltip">        <span class="pull-right fa fa-info-circle fa-2x"              tooltip-html-unsafe="{{\'HEATMAP.DESCRIPTION\' | translate}}"              tooltip-placement="bottom"              tooltip-trigger="mouseenter"              tooltip-append-to-body="false"              style="margin-right: 5px;"></span>        <h4 class="leftpanel-header" translate>HEATMAP</h4>    </div>    <div>        <select data-ng-model="vm.heatmapModel"                data-ng-options="heatmap.title for heatmap in vm.heatmapModels"                data-ng-change="vm.updateHeatmap()"                style="width: 65%; margin-bottom: 10px;"></select>        <div data-ng-if="vm.expertMode" class="pull-right">            <a href="" data-ng-click="vm.createHeatmap()" tooltip="{{\'HEATMAP.ADD_HEATMAP\' | translate}}" style="margin-right:5px;"><i class="fa fa-plus"></i></a>            <a href="" data-ng-click="vm.removeHeatmap(vm.heatmapModel)" tooltip="{{\'HEATMAP.DELETE_HEATMAP\' | translate}}" style="margin-right:5px;"><i class="fa fa-trash"></i></a>            <a href="" data-ng-click="vm.editHeatmap(vm.heatmapModel)" tooltip="{{\'HEATMAP.EDIT_HEATMAP\' | translate}}" tooltip-placement="right" style="margin-right:5px;"><i class="fa fa-edit"></i></a>        </div>    </div>        <div data-ng-if="vm.heatmapModel" style="margin-bottom: 20px; margin-left: -5px">            <div style="display: inline; font-weight: bold" translate>HEATMAP.INTENSITY_SCALE</div>            <voting class="pull-right"                    data-ng-change="vm.intensityScaleUpdated()"                    min="0"                    max="5"                    ng-model="vm.heatmapModel.intensityScale"                    style="margin-bottom: 3px; margin-right: 5px"></voting>        </div>    <div data-ng-if="vm.heatmapModel" style="overflow-y: auto; overflow-x: hidden; margin-left: -5px;" resize resize-y="140">        <div data-ng-repeat="hi in vm.heatmapModel.heatmapItems" class="wide-tooltip">            <div data-ng-if="hi.isSelected">                <div class="truncate" data-ng-class="{true: \'ignoredCriteria\'}[hi.userWeight == 0]" style="display: inline-block; width: 180px; font-weight: bold">{{hi.toString()}}</div>                <voting class="pull-right"                        data-ng-class="vm.getVotingClass(hi)"                        data-ng-change="vm.weightUpdated()"                        min="-5"                        max="5"                        ng-model="hi.userWeight"                        style="margin-right: 5px; margin-bottom: 3px;"></voting>            </div>        </div>    </div>    <div data-ng-if="!vm.heatmapModel">        <div data-ng-if="vm.expertMode" translate>HEATMAP.INFO_EXPERT</div>        <div data-ng-if="!vm.expertMode" translate>HEATMAP.INFO</div>    </div></div>';
+})(Heatmap || (Heatmap = {}));
+var Heatmap;
+(function (Heatmap) {
+    'use strict';
+    /**
+     * Config
+     */
+    var moduleName = 'csWeb.heatmap';
+    /**
+     * Module
+     */
+    Heatmap.myModule;
+    try {
+        Heatmap.myModule = angular.module(moduleName);
+    }
+    catch (err) {
+        // named module does not exist, so create one
+        Heatmap.myModule = angular.module(moduleName, []);
+    }
+    /**
+     * Directive to display a heatmap control.
+     */
+    Heatmap.myModule.directive('heatmap', [
+        '$window',
+        '$compile',
+        '$templateCache',
+        function ($window, $compile, $templateCache) {
+            return {
+                terminal: true,
+                restrict: 'EA',
+                scope: {},
+                template: Heatmap.html,
+                compile: function (el) {
+                    $templateCache.put('heatmapEditorView.html', HeatmapEditorView.html);
+                    var fn = $compile(el);
+                    return function (scope) {
+                        fn(scope);
+                    };
+                },
+                replace: true,
+                transclude: true,
+                controller: Heatmap.HeatmapCtrl
+            };
+        }
+    ]);
+})(Heatmap || (Heatmap = {}));
+var Heatmap;
+(function (Heatmap) {
+    'use strict';
+    var HeatmapCtrl = (function () {
+        function HeatmapCtrl($scope, $modal, $translate, $timeout, $localStorageService, $layerService, $mapService, messageBusService) {
+            this.$scope = $scope;
+            this.$modal = $modal;
+            this.$translate = $translate;
+            this.$timeout = $timeout;
+            this.$localStorageService = $localStorageService;
+            this.$layerService = $layerService;
+            this.$mapService = $mapService;
+            this.messageBusService = messageBusService;
+            this.heatmapModels = [];
+            this.expertMode = true;
+            $scope.vm = this;
+            messageBusService.subscribe('layer', function (title) {
+                switch (title) {
+                    case 'deactivate':
+                    case 'activated':
+                        break;
+                }
+            });
+            messageBusService.subscribe('project', function (title) {
+                switch (title) {
+                    case 'loaded':
+                        break;
+                }
+            });
+            /*messageBusService.subscribe('feature', this.featureMessageReceived);*/
+            $translate('HEATMAP.DELETE_MSG').then(function (translation) {
+                HeatmapCtrl.confirmationMsg1 = translation;
+            });
+            $translate('HEATMAP.DELETE_MSG2').then(function (translation) {
+                HeatmapCtrl.confirmationMsg2 = translation;
+            });
+            this.initializeHeatmap();
+        }
+        HeatmapCtrl.prototype.createHeatmap = function () {
+            var heatmap = new Heatmap.HeatmapModel('Heatmap');
+            this.showHeatmapEditor(heatmap);
+        };
+        HeatmapCtrl.prototype.editHeatmap = function (heatmap) {
+            this.showHeatmapEditor(heatmap);
+        };
+        HeatmapCtrl.prototype.removeHeatmap = function (heatmap) {
+            var _this = this;
+            if (!heatmap)
+                return;
+            var title = String.format(HeatmapCtrl.confirmationMsg1, heatmap.title);
+            this.messageBusService.confirm(title, HeatmapCtrl.confirmationMsg2, function (result) {
+                if (!result)
+                    return;
+                _this.$timeout(function () {
+                    _this.deleteHeatmap(heatmap);
+                    if (_this.heatmap)
+                        _this.updateHeatmap();
+                    //if (this.heatmap) this.$mapService.map.removeLayer(this.heatmap);
+                }, 0);
+            });
+            this.scopeApply();
+        };
+        HeatmapCtrl.prototype.deleteHeatmap = function (heatmap) {
+            if (!heatmap)
+                return;
+            var index = this.heatmapModels.indexOf(heatmap);
+            if (index >= 0)
+                this.heatmapModels.splice(index, 1);
+            this.$mapService.map.removeLayer(this.heatmap);
+            //var mcaIndex = this.getMcaIndex(mca);
+            //if (mcaIndex < 0) return;
+            //var mcas = this.$layerService.project.mcas;
+            //if (mcaIndex >= 0)
+            //    mcas.splice(mcaIndex, 1);
+            //this.removeMcaFromLocalStorage(mca);
+            //this.updateAvailableMcas();
+        };
+        /**
+         * Show the heat map editor in a modal.
+         */
+        HeatmapCtrl.prototype.showHeatmapEditor = function (heatmap) {
+            var _this = this;
+            var modalInstance = this.$modal.open({
+                templateUrl: 'heatmapEditorView.html',
+                controller: Heatmap.HeatmapEditorCtrl,
+                resolve: {
+                    heatmap: function () { return heatmap; }
+                }
+            });
+            modalInstance.result.then(function (heatmap) {
+                _this.heatmapModel = heatmap;
+                var i = _this.heatmapModels.indexOf(heatmap);
+                if (i >= 0)
+                    _this.heatmapModels.splice(i, 1);
+                _this.heatmapModels.push(heatmap);
+                _this.updateHeatmap();
+                console.log('Updated heatmap');
+            }, function () {
+                //console.log('Modal dismissed at: ' + new Date());
+            });
+        };
+        HeatmapCtrl.prototype.scopeApply = function () {
+            if (this.$scope.$root.$$phase !== '$apply' && this.$scope.$root.$$phase !== '$digest') {
+                this.$scope.$apply();
+            }
+        };
+        HeatmapCtrl.prototype.getVotingClass = function (hi) {
+            if (hi == null || this.heatmapModel == null || hi.userWeight === 0 || hi.userWeight < -5 || hi.userWeight > 5)
+                return 'disabledHeatmap';
+            return hi.userWeight > 0 ? 'prefer' : 'avoid';
+        };
+        HeatmapCtrl.prototype.weightUpdated = function () {
+            if (!this.heatmapModel)
+                return;
+            this.updateHeatmap();
+        };
+        HeatmapCtrl.prototype.intensityScaleUpdated = function () {
+            if (!this.heatmapModel)
+                return;
+            this.heatmapModel.updateIntensityScale();
+            this.updateHeatmap();
+        };
+        /**
+         * Update the available pre-set heatmaps.
+         */
+        HeatmapCtrl.prototype.updateHeatmap = function () {
+            if (this.heatmapModel) {
+                var currentZoom = this.$mapService.getMap().getZoom();
+                if (currentZoom >= this.heatmapModel.scaleMinValue && currentZoom <= this.heatmapModel.scaleMaxValue) {
+                    this.heatmapModel.updateWeights();
+                    this.heatmapModel.calculate(this.$layerService, this.$mapService, this.heatmap);
+                }
+                else {
+                    console.log("Heatmap is not supported for the current zoom level.");
+                }
+            }
+        };
+        ///**
+        //* Add a heatmap layer to the map.
+        //*/
+        HeatmapCtrl.prototype.initializeHeatmap = function () {
+            var _this = this;
+            this.heatmap = L.geoJson([], {
+                style: function (feature) {
+                    if (feature.properties.intensity <= 0) {
+                        var hexString = Heatmap.HeatmapCtrl.intensityToHex(feature.properties.intensity);
+                        return { color: "#FF" + hexString + hexString };
+                    }
+                    else if (feature.properties.intensity > 0) {
+                        var hexString = Heatmap.HeatmapCtrl.intensityToHex(feature.properties.intensity);
+                        return { color: "#" + hexString + hexString + "FF" };
+                    }
+                    else {
+                        return { color: "#ffffff" };
+                    }
+                    //if (feature.properties.intensity < -0.10) {
+                    //    return { color: "#ff0000" };
+                    //} else if (feature.properties.intensity < 0.10) {
+                    //    return { color: "#ffffff" };
+                    //} else {
+                    //    return { color: "#0000ff" };
+                    //}
+                }
+            });
+            this.$mapService.map.setView(new L.LatLng(52.1095, 4.3275), 14);
+            this.$mapService.map.addLayer(this.heatmap);
+            //TODO: remove when deleting heatmap layer
+            this.$mapService.getMap().on('moveend', function () {
+                _this.updateHeatmap();
+            });
+        };
+        HeatmapCtrl.intensityToHex = function (intensity) {
+            var decreaseOverlap = 20;
+            intensity = Math.floor(Math.abs(intensity) * 255);
+            if (intensity < 0) {
+                intensity = 0;
+            }
+            else if (intensity > 255 - decreaseOverlap) {
+                intensity = 255 - decreaseOverlap;
+            }
+            var hexString = (255 - decreaseOverlap - intensity).toString(16);
+            if (hexString.length == 1) {
+                hexString = "0" + hexString;
+            }
+            return hexString;
+        };
+        HeatmapCtrl.MAX_HEATMAP_CELLS = 2500;
+        HeatmapCtrl.$inject = [
+            '$scope',
+            '$modal',
+            '$translate',
+            '$timeout',
+            'localStorageService',
+            'layerService',
+            'mapService',
+            'messageBusService'
+        ];
+        return HeatmapCtrl;
+    })();
+    Heatmap.HeatmapCtrl = HeatmapCtrl;
+})(Heatmap || (Heatmap = {}));
+var Heatmap;
+(function (Heatmap) {
+    'use strict';
+    var HeatmapEditorCtrl = (function () {
+        function HeatmapEditorCtrl($scope, $modalInstance, $layerService, $translate, messageBusService, heatmap) {
+            var _this = this;
+            this.$scope = $scope;
+            this.$modalInstance = $modalInstance;
+            this.$layerService = $layerService;
+            this.$translate = $translate;
+            this.messageBusService = messageBusService;
+            this.heatmap = heatmap;
+            this.scoringFunctions = [];
+            $scope.vm = this;
+            this.scoringFunctions.push(new Heatmap.ScoringFunction(0 /* LinearAscendingDescending */));
+            $translate('HEATMAP.LINEAR_ASC_DESC').then(function (translation) {
+                _this.scoringFunctions[0].title = translation;
+            });
+            this.dataset = csComp.Helpers.loadMapLayers($layerService);
+            if (!heatmap)
+                heatmap = new Heatmap.HeatmapModel('Heatmap');
+            for (var k in this.dataset.featureTypes) {
+                if (this.dataset.featureTypes.hasOwnProperty(k)) {
+                    var ft = this.dataset.featureTypes[k];
+                    heatmap.addHeatmapItem(new Heatmap.HeatmapItem(ft.name, ft));
+                    var propertyTypeData;
+                    if (!ft.propertyTypeData)
+                        return;
+                    ft.propertyTypeData.forEach(function (pt) {
+                        if (pt.type == 'options') {
+                            var i = 0;
+                            pt.options.forEach(function (o) {
+                                var hi = new Heatmap.HeatmapItem(o, ft);
+                                hi.propertyLabel = pt.label;
+                                hi.propertyTitle = pt.title;
+                                hi.optionIndex = i++;
+                                heatmap.addHeatmapItem(hi);
+                            });
+                        }
+                    });
+                }
+            }
+        }
+        HeatmapEditorCtrl.prototype.save = function () {
+            this.$modalInstance.close(this.heatmap);
+        };
+        HeatmapEditorCtrl.prototype.cancel = function () {
+            this.$modalInstance.dismiss('cancel');
+        };
+        HeatmapEditorCtrl.prototype.toggleItemDetails = function (index) {
+            this.showItem = this.showItem == index ? -1 : index;
+            console.log("Toggle item");
+        };
+        HeatmapEditorCtrl.$inject = [
+            '$scope',
+            '$modalInstance',
+            'layerService',
+            '$translate',
+            'messageBusService',
+            'heatmap'
+        ];
+        return HeatmapEditorCtrl;
+    })();
+    Heatmap.HeatmapEditorCtrl = HeatmapEditorCtrl;
+})(Heatmap || (Heatmap = {}));
+var HeatmapEditorView;
+(function (HeatmapEditorView) {
+    HeatmapEditorView.html = '<div class="modal-content">    <div class="modal-header">        <button type="button" class="close" data-ng-click="vm.cancel()" aria-hidden="true">&times;</button>        <h3 class="modal-title" translate>HEATMAP.EDITOR_TITLE</h3>    </div>    <div class="modal-body container-fluid">        <div class="row-fluid">            <input type="text" data-ng-model="vm.heatmap.title" style="margin: 0 5px" placeholder="{{ \'HEATMAP.TITLE\' | translate }}" />        </div>        <h4 class="row-fluid" style="margin-top: 20px;" translate>HEATMAP.MAIN_FEATURE</h4>        <!--<select data-ng-model="vm.selectedFeatureType"                data-ng-change="vm.loadPropertyTypes()"                data-ng-options="item as item.name for (key, item) in vm.dataset.featureTypes"                class="form-control row-fluid"></select>        <h4 class="row-fluid" translate>HEATMAP.PROPERTIES</h4>-->        <ul class="form-group row-fluid" style="margin-top: 1em; margin-left: -2em; overflow-y: auto; overflow-x: hidden;"            resize resize-y="450">            <li ng-repeat="hi in vm.heatmap.heatmapItems"                class="row-fluid list-unstyled truncate">                <div style="padding: 5px 0;" class="row-fluid"><!--                    name="vm.selectedTitles[]" value="{{hi.title}}"-->                    <input type="checkbox"                           data-ng-checked="hi.isSelected"                           data-ng-click="hi.isSelected = !hi.isSelected">&nbsp;&nbsp;{{hi.title}}                    <div data-ng-if="hi.isSelected" class="pull-right">                        <a href="" class="pull-right"                           style="margin-right: 5px;"                           data-ng-click="vm.toggleItemDetails($index)"><i class="fa fa-2x fa-edit"></i></a>                    </div>                </div>                <div class="row-fluid" data-ng-show="vm.showItem == {{$index}}" id="scoringFunction">                    <select class="col-xs-10"                            style="margin-right: 5px; margin-bottom: 5px;"                            data-ng-init="hi.scoringFunctionType = hi.scoringFunctionType || vm.scoringFunctions[0]"                            data-ng-model="hi.scoringFunctionType"                            data-ng-options="sf as sf.title for sf in vm.scoringFunctions"></select>                    <div class="pull-right" data-ng-class="hi.scoringFunctionType.cssClass" style="width: 40px; height: 28px; margin-top: -5px;"></div>                    <div class="row-fluid" >                        <input type="text" class="col-xs-3" style="padding: 0; margin-right: 5px;" data-ng-model="hi.idealityMeasure.atLocation" placeholder="{{ \'HEATMAP.AT_LOCATION_VALUE\' | translate }}" />                        <input type="text" class="col-xs-3" style="padding: 0; margin-right: 5px;" data-ng-model="hi.idealityMeasure.idealDistance" placeholder="{{ \'HEATMAP.DISTANCE_MAX_VALUE\' | translate }}" />                        <input type="text" class="col-xs-3" style="padding: 0;" data-ng-model="hi.idealityMeasure.lostInterestDistance" placeholder="{{ \'HEATMAP.LOST_INTEREST_VALUE\' | translate }}" />                    </div>                </div>            </li>        </ul>    </div>    <div class="modal-footer">        <button type="button" class="btn btn-warning" data-ng-click="vm.cancel()" translate>CANCEL_BTN</button>        <button type="button" class="btn btn-primary" data-ng-click="vm.save()" translate>OK_BTN</button>    </div></div>';
+})(HeatmapEditorView || (HeatmapEditorView = {}));
+var Heatmap;
+(function (Heatmap) {
+    var HeatmapItem = (function () {
+        function HeatmapItem(title, featureType) {
+            this.title = title;
+            this.featureType = featureType;
+            /**
+             * The user weight specifies how much you like this item, e.g. the maximum value.
+             * @type {number}, range [-5..5].
+             */
+            this.userWeight = 1;
+            /**
+             * The weight specifies how much you like this item, relative to others.
+             * @type {number}, range [-1..1].
+             */
+            this.weight = 0;
+            /**
+             * The ideality measure specifies how much you like this item with respect to its
+             * distance.
+             * @type {IIdealityMeasure}
+             */
+            this.idealityMeasure = new Heatmap.IdealityMeasure();
+            this.heatspots = [];
+            /** Represents the number of items that are needed to obtain an ideal location. */
+            this.isSelected = false;
+            this.intensityScale = 1;
+            // TODO Needs improvement based on actual location
+            this.setScale(52);
+        }
+        HeatmapItem.prototype.calculateHeatspots = function (feature, cellWidth, cellHeight, horizCells, vertCells, mapBounds) {
+            // right type?
+            if (!this.isSelected || this.featureType !== feature.fType)
+                return null;
+            if (this.heatspots.length === 0)
+                this.calculateHeatspot(cellWidth, cellHeight);
+            // create heatspot solely based on feature type?
+            if (!this.propertyLabel) {
+                return this.pinHeatspotToGrid(feature, horizCells, vertCells, mapBounds);
+            }
+            // create heatspot based on the preferred option?
+            if (feature.properties.hasOwnProperty(this.propertyLabel) && feature.properties[this.propertyLabel] === this.optionIndex) {
+                return this.pinHeatspotToGrid(feature, horizCells, vertCells, mapBounds);
+            }
+            return null;
+        };
+        /**
+        * Calculate the intensity around the location.
+        * NOTE We are performing a relative computation around location (0,0) in a rectangular grid.
+        */
+        HeatmapItem.prototype.calculateHeatspot = function (cellWidth, cellHeight) {
+            var maxRadius = this.idealityMeasure.lostInterestDistance;
+            var horizCells = Math.floor(maxRadius / cellWidth);
+            var vertCells = Math.floor(maxRadius / cellHeight);
+            var sCellSize = cellWidth * cellHeight;
+            var scaledWeight = this.weight * this.intensityScale;
+            var arrayLength = horizCells * vertCells;
+            this.heatspots = new Array(arrayLength);
+            this.heatspots.push(new Heatmap.Heatspot(0, 0, scaledWeight * this.idealityMeasure.atLocation));
+            for (var i = -vertCells; i <= vertCells; i++) {
+                for (var j = -horizCells; j <= horizCells; j++) {
+                    var radius = Math.sqrt(i * i * sCellSize + j * j * sCellSize);
+                    var weightedIntensity = scaledWeight * this.idealityMeasure.computeIdealityAtDistance(radius);
+                    if (!(i == 0 && j == 0) && weightedIntensity != 0) {
+                        this.heatspots.push(new Heatmap.Heatspot(i, j, weightedIntensity));
+                    }
+                }
+            }
+            //var latRadius = radius * HeatmapItem.meterToLatDegree; 
+            //var lonRadius = radius * HeatmapItem.meterToLonDegree; 
+            //for (var lat = -latRadius; lat < latRadius; lat += deltaLatDegree) {
+            //    for (var lon = -lonRadius; lat < lonRadius; lat += deltaLonDegree) {
+            //        // TODO Compute radius
+            //        var intensity = this.idealityMeasure.computeIdealityAtDistance(radius);
+            //        this.heatspots.push(new Heatspot(lat, lon, this.weight * intensity.ideality));
+            //    }
+            //}
+            //var count = 0;
+            //while (count++ < 200) {
+            //    var radius    = Math.random() * this.idealityMeasure.lostInterestDistance;
+            //    var latRadius = radius * HeatmapItem.meterToLatDegree; 
+            //    var lonRadius = radius * HeatmapItem.meterToLonDegree; 
+            //    var angleRad  = Math.random() * HeatmapItem.twoPi;
+            //    var lat       = Math.sin(angleRad) * latRadius;
+            //    var lon       = Math.cos(angleRad) * lonRadius;
+            //    var intensity = this.idealityMeasure.computeIdealityAtDistance(radius);
+            //    this.heatspots.push(new Heatspot(lat, lon, this.weight * intensity.ideality, intensity.radius));
+            //}
+            //var twoPi: number = Math.PI * 2;
+            //var lat = 0,
+            //    lon = 0;
+            //// add start point
+            //this.heatspots.push(new Heatspot(lat, lon, this.weight * this.idealityMeasure.atLocation));
+            //// halfway between start and ideal location
+            //var stepSize  = Math.PI / 2;
+            //var radius    = this.idealityMeasure.idealDistance / 2;
+            //var latRadius = radius * HeatmapItem.meterToLatDegree; 
+            //var lonRadius = radius * HeatmapItem.meterToLonDegree; 
+            //var itensity  = 0.5 * this.weight;
+            //for (var i = Math.PI / 4; i < twoPi; i += stepSize) {
+            //    lat = Math.sin(i) * latRadius;
+            //    lon = Math.cos(i) * lonRadius;
+            //    this.heatspots.push(new Heatspot(lat, lon, itensity));
+            //}
+            //// At ideal distance
+            //stepSize /= 2;
+            //radius = this.idealityMeasure.idealDistance;
+            //latRadius = radius * HeatmapItem.meterToLatDegree;
+            //lonRadius = radius * HeatmapItem.meterToLonDegree; 
+            //itensity = this.weight;
+            //for (var i = 0; i < twoPi; i += stepSize) {
+            //    lat = Math.sin(i) * latRadius;
+            //    lon = Math.cos(i) * lonRadius;
+            //    this.heatspots.push(new Heatspot(lat, lon, itensity));
+            //}
+            //// At ring halfway between ideal distance and no interest
+            //stepSize /= 2;
+            //radius   += (this.idealityMeasure.lostInterestDistance - this.idealityMeasure.idealDistance) / 2;
+            //latRadius = radius * HeatmapItem.meterToLatDegree;
+            //lonRadius = radius * HeatmapItem.meterToLonDegree; 
+            //itensity = this.weight / 2;
+            //for (var i = Math.PI / 8; i < twoPi; i += stepSize) {
+            //    lat = Math.sin(i) * latRadius;
+            //    lon = Math.cos(i) * lonRadius;
+            //    this.heatspots.push(new Heatspot(lat, lon, itensity));
+            //}
+        };
+        /**
+        * Translate the heatspot (at (0,0)) to the actual location.
+        */
+        HeatmapItem.prototype.pinHeatspotToGrid = function (feature, horizCells, vertCells, mapBounds) {
+            if (feature.geometry.type !== 'Point')
+                return null;
+            var latlong = new L.LatLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
+            //TODO add a padding that takes the current zoom into account
+            var paddedBounds = mapBounds.pad(1.1);
+            if (!paddedBounds.contains(latlong))
+                return null; //Only draw features that are visible in the map
+            var actualHeatspots = [];
+            //Find the indices of the feature in the grid
+            var hCell = Math.floor(((latlong.lng - mapBounds.getNorthWest().lng) / (mapBounds.getNorthEast().lng - mapBounds.getNorthWest().lng)) * horizCells);
+            var vCell = Math.floor(((latlong.lat - mapBounds.getSouthWest().lat) / (mapBounds.getNorthWest().lat - mapBounds.getSouthWest().lat)) * vertCells);
+            this.heatspots.forEach(function (hs) {
+                //TODO actualHeatspots.push(hs.AddLocation(lat, lon));
+                actualHeatspots.push(hs.AddLocation(hCell, vCell));
+            });
+            return actualHeatspots;
+        };
+        /**
+        * Set the scale to convert a 1x1 meter grid cell to the appropriate number of degrees
+        * in vertical and horizontal direction.
+        */
+        HeatmapItem.prototype.setScale = function (latitude) {
+            var latlonlen = csComp.Helpers.GeoExtensions.convertDegreesToMeters(latitude);
+            HeatmapItem.meterToLatDegree = 1 / latlonlen.latitudeLength;
+            HeatmapItem.meterToLonDegree = 1 / latlonlen.longitudeLength;
+        };
+        HeatmapItem.prototype.select = function () {
+            this.reset();
+            this.isSelected = !this.isSelected;
+            if (!this.isSelected) {
+                this.idealityMeasure = null;
+            }
+            else {
+                switch (this.featureType.style.drawingMode.toLowerCase()) {
+                    case 'point':
+                    case 'image':
+                        this.idealityMeasure = new Heatmap.IdealityMeasure();
+                        break;
+                    default:
+                        break;
+                }
+            }
+        };
+        HeatmapItem.prototype.reset = function () {
+            this.heatspots = [];
+        };
+        HeatmapItem.prototype.toString = function () {
+            return this.propertyTitle ? this.propertyTitle + '.' + this.title + ' (' + this.featureType.name + ')' : this.title;
+        };
+        HeatmapItem.twoPi = Math.PI * 2;
+        return HeatmapItem;
+    })();
+    Heatmap.HeatmapItem = HeatmapItem;
+})(Heatmap || (Heatmap = {}));
+var Heatmap;
+(function (Heatmap) {
+    var HeatmapModel = (function () {
+        function HeatmapModel(title) {
+            this.title = title;
+            this.heatmapItems = [];
+            this.scaleMaxValue = 16;
+            this.scaleMinValue = 9;
+            this.intensityScale = 1;
+            this.title = title;
+        }
+        /**
+         * Calculate the heatmap.
+         */
+        HeatmapModel.prototype.calculate = function (layerService, mapService, heatmap) {
+            var _this = this;
+            console.log('Calculating heatmap');
+            var mapBounds = mapService.map.getBounds();
+            var NW = mapBounds.getNorthWest();
+            var NE = mapBounds.getNorthEast();
+            var SW = mapBounds.getSouthWest();
+            var width = NW.distanceTo(NE); //Width of the map as it is currently visible on the screen, including padding
+            var height = NW.distanceTo(SW); //Height ...
+            var heatspots = [];
+            // Iterate over all applicable features on the map and find the one with the largest interest distance.
+            var dataset = csComp.Helpers.loadMapLayers(layerService);
+            var maxInterestDistance = 0;
+            //heatmap.clearData();
+            dataset.features.forEach(function (f) {
+                _this.heatmapItems.forEach(function (hi) {
+                    if (hi.idealityMeasure.lostInterestDistance > maxInterestDistance) {
+                        maxInterestDistance = hi.idealityMeasure.lostInterestDistance;
+                    }
+                });
+            });
+            //Calculate a grid based on the maximum number of cells and the map ratio.
+            var mapRatio = width / height;
+            var maxCellCount = Heatmap.HeatmapCtrl.MAX_HEATMAP_CELLS;
+            var horizCells = Math.floor(Math.sqrt(maxCellCount * mapRatio));
+            var vertCells = Math.floor(horizCells / mapRatio);
+            var cellWidth = width / horizCells;
+            var cellHeight = height / vertCells;
+            var dLat = (NE.lat - SW.lat) / vertCells;
+            var dLng = (NE.lng - SW.lng) / horizCells;
+            var count = 0;
+            var intensityGrid = [];
+            for (var i = 0; i < horizCells; i++) {
+                intensityGrid[i] = [];
+                for (var j = 0; j < vertCells; j++) {
+                    intensityGrid[i][j] = 0;
+                }
+            }
+            // Iterate over all applicable features on the map and create a intensity "stamp" for each feature
+            dataset.features.forEach(function (f) {
+                _this.heatmapItems.forEach(function (hi) {
+                    var heatspot = hi.calculateHeatspots(f, cellWidth, cellHeight, horizCells, vertCells, mapBounds);
+                    if (heatspot) {
+                        //heatspots = heatspots.concat(heatspot);
+                        //console.log('Created ' + heatspot.length + ' heatspots');
+                        heatspot.forEach(function (hs) {
+                            //heatmap.addDataPoint(hs.i, hs.j, hs.intensity);
+                            if (hs.intensity != 0 && hs.i >= 0 && hs.i < horizCells && hs.j >= 0 && hs.j < vertCells) {
+                                intensityGrid[hs.i][hs.j] = intensityGrid[hs.i][hs.j] + hs.intensity;
+                                count = count + 1;
+                            }
+                        });
+                    }
+                });
+            });
+            console.log('Created ' + count + ' heatspots');
+            heatmap.clearLayers();
+            for (var i = 0; i < horizCells; i++) {
+                for (var j = 0; j < vertCells; j++) {
+                    if (intensityGrid[i][j] != 0) {
+                        var polyCoord = [[SW.lng + dLng * i, SW.lat + dLat * j], [SW.lng + dLng * (i + 1), SW.lat + dLat * j], [SW.lng + dLng * (i + 1), SW.lat + dLat * (j + 1)], [SW.lng + dLng * i, SW.lat + dLat * (j + 1)], [SW.lng + dLng * i, SW.lat + dLat * j]];
+                        var feature = {
+                            "type": "Feature",
+                            "geometry": {
+                                "type": "Polygon",
+                                "coordinates": [polyCoord]
+                            },
+                            "properties": {
+                                "gridX": i,
+                                "gridY": j,
+                                "intensity": intensityGrid[i][j]
+                            }
+                        };
+                        heatmap.addData(feature);
+                    }
+                }
+            }
+        };
+        /**
+         * Update the weights of all heatmap items.
+         */
+        HeatmapModel.prototype.updateWeights = function () {
+            var totalUserWeight = 0;
+            this.heatmapItems.forEach(function (hi) {
+                if (hi.isSelected)
+                    totalUserWeight += Math.abs(hi.userWeight);
+            });
+            this.heatmapItems.forEach(function (hi) {
+                if (hi.isSelected) {
+                    if (totalUserWeight != 0) {
+                        hi.weight = hi.userWeight / totalUserWeight;
+                    }
+                    else {
+                        hi.weight = 0;
+                    }
+                    hi.reset();
+                }
+            });
+        };
+        /**
+        * Update the intensity scale of all heatmap items.
+        */
+        HeatmapModel.prototype.updateIntensityScale = function () {
+            var _this = this;
+            this.heatmapItems.forEach(function (hi) {
+                hi.intensityScale = _this.intensityScale;
+            });
+        };
+        /**
+        * Add a heatmap item to the list of items only in case we don't have it yet.
+        */
+        HeatmapModel.prototype.addHeatmapItem = function (heatmapItem) {
+            var ft = heatmapItem.featureType;
+            var title = heatmapItem.title;
+            for (var i = 0; i < this.heatmapItems.length; i++) {
+                var hi = this.heatmapItems[i];
+                if (hi.featureType === ft && hi.title === title)
+                    return;
+            }
+            this.heatmapItems.push(heatmapItem);
+        };
+        return HeatmapModel;
+    })();
+    Heatmap.HeatmapModel = HeatmapModel;
+})(Heatmap || (Heatmap = {}));
+var Heatmap;
+(function (Heatmap) {
+    /**
+     * A heat spot represents a point on the map with a certain intensity.
+     */
+    var Heatspot = (function () {
+        function Heatspot(i, j, intensity) {
+            this.i = i;
+            this.j = j;
+            this.intensity = intensity;
+        }
+        Heatspot.prototype.AddLocation = function (i, j) {
+            // TODO
+            //return new Heatspot(this.latitude + lat, this.longitude + lon, this.intensity);
+            return new Heatspot(this.i + i, this.j + j, this.intensity);
+        };
+        return Heatspot;
+    })();
+    Heatmap.Heatspot = Heatspot;
+})(Heatmap || (Heatmap = {}));
+var Heatmap;
+(function (Heatmap) {
+    (function (ScoringFunctionType) {
+        ScoringFunctionType[ScoringFunctionType["LinearAscendingDescending"] = 0] = "LinearAscendingDescending";
+    })(Heatmap.ScoringFunctionType || (Heatmap.ScoringFunctionType = {}));
+    var ScoringFunctionType = Heatmap.ScoringFunctionType;
+    var ScoringFunction = (function () {
+        function ScoringFunction(scoringFunctionType) {
+            if (typeof scoringFunctionType != 'undefined' && scoringFunctionType != null)
+                this.type = scoringFunctionType;
+            this.title = ScoringFunctionType[scoringFunctionType].toString();
+        }
+        Object.defineProperty(ScoringFunction.prototype, "cssClass", {
+            get: function () {
+                return ScoringFunctionType[this.type].toLowerCase();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        return ScoringFunction;
+    })();
+    Heatmap.ScoringFunction = ScoringFunction;
+    var ScoringFunctions = (function () {
+        function ScoringFunctions() {
+        }
+        return ScoringFunctions;
+    })();
+    Heatmap.ScoringFunctions = ScoringFunctions;
+    var IdealityMeasure = (function () {
+        function IdealityMeasure() {
+            /**
+            * The distance with respect to my location where I would like to find the item.
+            * @type {number}, in meters
+            */
+            this.idealDistance = 500;
+            /**
+            * How happy would I be if the item would be at my location.
+            * @type {number}, range [0..1]
+            */
+            this.atLocation = 0.1;
+            /**
+             * At what distance would the item no longer be of value to me.
+             * @type {number}, range in meters
+             */
+            this.lostInterestDistance = 2000;
+        }
+        IdealityMeasure.prototype.computeIdealityAtDistance = function (distance) {
+            if (distance < this.idealDistance) {
+                return this.atLocation + (1 - this.atLocation) * distance / this.idealDistance;
+            }
+            else if (distance < this.lostInterestDistance) {
+                return 1 - (distance - this.idealDistance) / (this.lostInterestDistance - this.idealDistance);
+            }
+            return 0;
+        };
+        return IdealityMeasure;
+    })();
+    Heatmap.IdealityMeasure = IdealityMeasure;
+})(Heatmap || (Heatmap = {}));
 var LanguageSwitch;
 (function (LanguageSwitch) {
     LanguageSwitch.html = '<div class="navbar-collapse collapse">    <ul class="nav navbar-nav">        <li class="dropdown">            <a href=""               class="navbar-brand dropdown-toggle pull-left"               style="color:white; margin-left:-10px;">                <img data-ng-src="{{vm.language.img}}" />                <span class="caret" data-ng-if="vm.$languages.length > 1"></span>            </a>            <ul data-ng-if="vm.$languages.length > 1" class="dropdown-menu" role="menu">                <li ng-repeat="language in vm.$languages">                    <a ng-click="vm.switchLanguage(language)">                        <span>                            <img data-ng-src="{{language.img}}" />                            &nbsp;{{language.name}}                        </span>                    </a>                </li>            </ul>        </li>    </ul></div>';
@@ -4386,6 +5107,55 @@ var csComp;
     var Helpers;
     (function (Helpers) {
         /**
+        * A set of static geo tools
+        * Source: http://www.csgnetwork.com/degreelenllavcalc.html
+        */
+        var GeoExtensions = (function () {
+            function GeoExtensions() {
+            }
+            GeoExtensions.deg2rad = function (degree) {
+                var conv_factor = (2.0 * Math.PI) / 360.0;
+                return (degree * conv_factor);
+            };
+            GeoExtensions.rad2deg = function (rad) {
+                var conv_factor = 360 / (2.0 * Math.PI);
+                return (rad * conv_factor);
+            };
+            /**
+            * Calculate the log base 10 of val
+            */
+            GeoExtensions.log10 = function (val) {
+                return (Math.LOG10E * Math.log(val));
+            };
+            GeoExtensions.convertDegreesToMeters = function (latitudeDegrees) {
+                // Convert latitude to radians
+                var lat = GeoExtensions.deg2rad(latitudeDegrees);
+                // Set up "Constants"
+                var m1 = 111132.92, m2 = -559.82, m3 = 1.175, m4 = -0.0023, p1 = 111412.84, p2 = -93.5, p3 = 0.118; // longitude calculation term 3
+                // Calculate the length of a degree of latitude and longitude in meters
+                var latlen = m1 + (m2 * Math.cos(2 * lat)) + (m3 * Math.cos(4 * lat)) + (m4 * Math.cos(6 * lat));
+                var lonlen = (p1 * Math.cos(lat)) + (p2 * Math.cos(3 * lat)) + (p3 * Math.cos(5 * lat));
+                return {
+                    /**
+                    * Length of a degree of latitude in meters
+                    */
+                    latitudeLength: latlen,
+                    /**
+                    * Length of a degree of longitude in meters
+                    */
+                    longitudeLength: lonlen
+                };
+            };
+            return GeoExtensions;
+        })();
+        Helpers.GeoExtensions = GeoExtensions;
+    })(Helpers = csComp.Helpers || (csComp.Helpers = {}));
+})(csComp || (csComp = {}));
+var csComp;
+(function (csComp) {
+    var Helpers;
+    (function (Helpers) {
+        /**
         * Convert topojson data to geojson data.
         */
         function convertTopoToGeoJson(data) {
@@ -5208,19 +5978,7 @@ var csComp;
                 this.mapRenderers["cesium"].init(this);
                 this.selectRenderer("leaflet");
                 //this.mapRenderers["leaflet"].enable();
-                // init layer sources
-                this.layerSources = {};
-                // add a topo/geojson source
-                var geojsonsource = new Services.GeoJsonSource();
-                geojsonsource.init(this);
-                this.layerSources["geojson"] = geojsonsource;
-                this.layerSources["topojson"] = geojsonsource;
-                //var dynamicgeojsonsource = new DynamicGeoJsonSource();
-                //dynamicgeojsonsource.init(this);
-                //this.layerSources["dynamicgeojson"] = dynamicgeojsonsource;
-                // add wms source
-                this.layerSources["wms"] = new Services.WmsSource();
-                this.layerSources["wms"].init(this);
+                this.initLayerSources();
                 $messageBusService.subscribe('timeline', function (trigger) {
                     switch (trigger) {
                         case 'focusChange':
@@ -5238,6 +5996,25 @@ var csComp;
                     }
                 });
             }
+            // initialize the available layer sources
+            LayerService.prototype.initLayerSources = function () {
+                // init layer sources
+                this.layerSources = {};
+                // add a topo/geojson source
+                var geojsonsource = new Services.GeoJsonSource();
+                geojsonsource.init(this);
+                this.layerSources["geojson"] = geojsonsource;
+                this.layerSources["topojson"] = geojsonsource;
+                //var dynamicgeojsonsource = new DynamicGeoJsonSource();
+                //dynamicgeojsonsource.init(this);
+                //this.layerSources["dynamicgeojson"] = dynamicgeojsonsource;
+                // add wms source
+                this.layerSources["wms"] = new Services.WmsSource();
+                this.layerSources["wms"].init(this);
+                //add tile layer
+                this.layerSources["tilelayer"] = new Services.TileLayerSource();
+                this.layerSources["tilelayer"].init(this);
+            };
             LayerService.prototype.addLayer = function (layer) {
                 var _this = this;
                 var disableLayers = [];
@@ -6441,6 +7218,7 @@ var csComp;
                 var _this = this;
                 async.series([
                     function (cb) {
+                        layer.layerRenderer = "svg";
                         // Open a layer URL
                         layer.isLoading = true;
                         // get data
@@ -6508,6 +7286,49 @@ var csComp;
     var Services;
     (function (Services) {
         'use strict';
+        var TileLayerSource = (function () {
+            function TileLayerSource() {
+                this.title = "tilelayer";
+            }
+            TileLayerSource.prototype.init = function (service) {
+                this.service = service;
+            };
+            TileLayerSource.prototype.addLayer = function (layer, callback) {
+                var _this = this;
+                var tileLayer = L.tileLayer(layer.url, {
+                    attribution: layer.description
+                });
+                layer.mapLayer = new L.LayerGroup();
+                this.service.map.map.addLayer(layer.mapLayer);
+                layer.mapLayer.addLayer(tileLayer);
+                tileLayer.on('loading', function (event) {
+                    layer.isLoading = true;
+                    _this.service.$rootScope.$apply();
+                    if (_this.service.$rootScope.$$phase != '$apply' && _this.service.$rootScope.$$phase != '$digest') {
+                        _this.service.$rootScope.$apply();
+                    }
+                });
+                tileLayer.on('load', function (event) {
+                    layer.isLoading = false;
+                    if (_this.service.$rootScope.$$phase != '$apply' && _this.service.$rootScope.$$phase != '$digest') {
+                        _this.service.$rootScope.$apply();
+                    }
+                });
+                layer.isLoading = true;
+                //this.$rootScope.$apply();
+            };
+            TileLayerSource.prototype.removeLayer = function (layer) {
+            };
+            return TileLayerSource;
+        })();
+        Services.TileLayerSource = TileLayerSource;
+    })(Services = csComp.Services || (csComp.Services = {}));
+})(csComp || (csComp = {}));
+var csComp;
+(function (csComp) {
+    var Services;
+    (function (Services) {
+        'use strict';
         var WmsSource = (function () {
             function WmsSource() {
                 this.title = "wms";
@@ -6516,7 +7337,6 @@ var csComp;
                 this.service = service;
             };
             WmsSource.prototype.addLayer = function (layer, callback) {
-                var _this = this;
                 var wms = L.tileLayer.wms(layer.url, {
                     layers: layer.wmsLayers,
                     opacity: layer.opacity / 100,
@@ -6524,23 +7344,7 @@ var csComp;
                     transparent: true,
                     attribution: layer.description
                 });
-                layer.mapLayer = new L.LayerGroup();
-                this.service.map.map.addLayer(layer.mapLayer);
-                layer.mapLayer.addLayer(wms);
-                wms.on('loading', function (event) {
-                    layer.isLoading = true;
-                    _this.service.$rootScope.$apply();
-                    if (_this.service.$rootScope.$$phase != '$apply' && _this.service.$rootScope.$$phase != '$digest') {
-                        _this.service.$rootScope.$apply();
-                    }
-                });
-                wms.on('load', function (event) {
-                    layer.isLoading = false;
-                    if (_this.service.$rootScope.$$phase != '$apply' && _this.service.$rootScope.$$phase != '$digest') {
-                        _this.service.$rootScope.$apply();
-                    }
-                });
-                layer.isLoading = true;
+                callback(layer);
                 //this.$rootScope.$apply();
             };
             WmsSource.prototype.removeLayer = function (layer) {
@@ -6718,6 +7522,20 @@ var csComp;
                     }
                 });
             };
+            Object.defineProperty(MapService.prototype, "isExpert", {
+                get: function () {
+                    return this.expertMode === 3 /* Expert */;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(MapService.prototype, "isIntermediate", {
+                get: function () {
+                    return this.expertMode === 3 /* Expert */ || this.expertMode === 2 /* Intermediate */;
+                },
+                enumerable: true,
+                configurable: true
+            });
             MapService.prototype.initMap = function () {
                 // alert('map service');
                 // this.map = L.map("map", {
@@ -6810,6 +7628,11 @@ var csComp;
             };
             CesiumRenderer.prototype.enable = function () {
                 this.viewer = new Cesium.Viewer('map');
+                this.camera = this.viewer.camera;
+                this.camera.setView({
+                    position: Cesium.Cartesian3.fromDegrees(5, 52, 1000000)
+                });
+                //console.log(this.service.project);
                 $(".cesium-viewer-toolbar").hide();
             };
             CesiumRenderer.prototype.disable = function () {
@@ -6817,9 +7640,25 @@ var csComp;
                 //$("#map").empty();
             };
             CesiumRenderer.prototype.addLayer = function (layer) {
-                this.viewer.dataSources.add(Cesium.GeoJsonDataSource.load(layer.url));
+                if (layer.type == "GeoJson") {
+                    var object = layer.data;
+                    if (object.type == null)
+                        object.type = "FeatureCollection";
+                    var geoJSONPromise = Cesium.GeoJsonDataSource.load(object);
+                    Cesium.when(geoJSONPromise, function (dataSource) {
+                        layer.cesiumDatasource = dataSource;
+                    });
+                    this.viewer.dataSources.add(geoJSONPromise);
+                }
+                if (layer.type == "wms") {
+                }
             };
             CesiumRenderer.prototype.removeLayer = function (layer) {
+                if (layer.type == "GeoJson") {
+                    this.viewer.dataSources.remove(layer.cesiumDatasource);
+                }
+                if (layer.type == "wms") {
+                }
             };
             CesiumRenderer.prototype.updateMapFilter = function (group) {
             };
@@ -6877,71 +7716,107 @@ var csComp;
                 }
             };
             LeafletRenderer.prototype.removeLayer = function (layer) {
-                var g = layer.group;
-                //m = layer.group.vectors;
-                if (g.clustering) {
-                    var m = g.cluster;
-                    this.service.project.features.forEach(function (feature) {
-                        if (feature.layerId === layer.id) {
-                            try {
-                                m.removeLayer(layer.group.markers[feature.id]);
-                                delete layer.group.markers[feature.id];
-                            }
-                            catch (error) {
-                            }
+                switch (layer.layerRenderer) {
+                    case "svg":
+                        var g = layer.group;
+                        //m = layer.group.vectors;
+                        if (g.clustering) {
+                            var m = g.cluster;
+                            this.service.project.features.forEach(function (feature) {
+                                if (feature.layerId === layer.id) {
+                                    try {
+                                        m.removeLayer(layer.group.markers[feature.id]);
+                                        delete layer.group.markers[feature.id];
+                                    }
+                                    catch (error) {
+                                    }
+                                }
+                            });
                         }
-                    });
-                }
-                else {
-                    this.service.map.map.removeLayer(layer.mapLayer);
+                        else {
+                            this.service.map.map.removeLayer(layer.mapLayer);
+                        }
+                        break;
+                    case "wms":
+                        break;
                 }
             };
             LeafletRenderer.prototype.addLayer = function (layer) {
                 var _this = this;
-                // create leaflet layers
-                if (layer.group.clustering) {
-                    var markers = L.geoJson(layer.data, {
-                        pointToLayer: function (feature, latlng) { return _this.addFeature(feature); },
-                        onEachFeature: function (feature, lay) {
-                            //We do not need to init the feature here: already done in style.
-                            //this.initFeature(feature, layer);
-                            layer.group.markers[feature.id] = lay;
-                            lay.on({
-                                mouseover: function (a) { return _this.showFeatureTooltip(a, layer.group); },
-                                mouseout: function (s) { return _this.hideFeatureTooltip(s); }
+                switch (layer.layerRenderer) {
+                    case "wms":
+                        var wms = L.tileLayer.wms(layer.url, {
+                            layers: layer.wmsLayers,
+                            opacity: layer.opacity / 100,
+                            format: 'image/png',
+                            transparent: true,
+                            attribution: layer.description
+                        });
+                        layer.mapLayer = new L.LayerGroup();
+                        this.service.map.map.addLayer(layer.mapLayer);
+                        layer.mapLayer.addLayer(wms);
+                        wms.on('loading', function (event) {
+                            layer.isLoading = true;
+                            _this.service.$rootScope.$apply();
+                            if (_this.service.$rootScope.$$phase != '$apply' && _this.service.$rootScope.$$phase != '$digest') {
+                                _this.service.$rootScope.$apply();
+                            }
+                        });
+                        wms.on('load', function (event) {
+                            layer.isLoading = false;
+                            if (_this.service.$rootScope.$$phase != '$apply' && _this.service.$rootScope.$$phase != '$digest') {
+                                _this.service.$rootScope.$apply();
+                            }
+                        });
+                        layer.isLoading = true;
+                        break;
+                    case "svg":
+                        // create leaflet layers
+                        if (layer.group.clustering) {
+                            var markers = L.geoJson(layer.data, {
+                                pointToLayer: function (feature, latlng) { return _this.addFeature(feature); },
+                                onEachFeature: function (feature, lay) {
+                                    //We do not need to init the feature here: already done in style.
+                                    //this.initFeature(feature, layer);
+                                    layer.group.markers[feature.id] = lay;
+                                    lay.on({
+                                        mouseover: function (a) { return _this.showFeatureTooltip(a, layer.group); },
+                                        mouseout: function (s) { return _this.hideFeatureTooltip(s); }
+                                    });
+                                }
                             });
+                            layer.group.cluster.addLayer(markers);
                         }
-                    });
-                    layer.group.cluster.addLayer(markers);
-                }
-                else {
-                    layer.mapLayer = new L.LayerGroup();
-                    this.service.map.map.addLayer(layer.mapLayer);
-                    var v = L.geoJson(layer.data, {
-                        onEachFeature: function (feature, lay) {
-                            //We do not need to init the feature here: already done in style.
-                            //this.initFeature(feature, layer);
-                            layer.group.markers[feature.id] = lay;
-                            lay.on({
-                                mouseover: function (a) { return _this.showFeatureTooltip(a, layer.group); },
-                                mouseout: function (s) { return _this.hideFeatureTooltip(s); },
-                                mousemove: function (d) { return _this.updateFeatureTooltip(d); },
-                                click: function () { return _this.service.selectFeature(feature); }
+                        else {
+                            layer.mapLayer = new L.LayerGroup();
+                            this.service.map.map.addLayer(layer.mapLayer);
+                            var v = L.geoJson(layer.data, {
+                                onEachFeature: function (feature, lay) {
+                                    //We do not need to init the feature here: already done in style.
+                                    //this.initFeature(feature, layer);
+                                    layer.group.markers[feature.id] = lay;
+                                    lay.on({
+                                        mouseover: function (a) { return _this.showFeatureTooltip(a, layer.group); },
+                                        mouseout: function (s) { return _this.hideFeatureTooltip(s); },
+                                        mousemove: function (d) { return _this.updateFeatureTooltip(d); },
+                                        click: function () { return _this.service.selectFeature(feature); }
+                                    });
+                                },
+                                style: function (f, m) {
+                                    layer.group.markers[f.id] = m;
+                                    return f.effectiveStyle;
+                                },
+                                pointToLayer: function (feature, latlng) { return _this.addFeature(feature); }
                             });
-                        },
-                        style: function (f, m) {
-                            layer.group.markers[f.id] = m;
-                            return f.effectiveStyle;
-                        },
-                        pointToLayer: function (feature, latlng) { return _this.addFeature(feature); }
-                    });
-                    this.service.project.features.forEach(function (f) {
-                        if (f.layerId !== layer.id)
-                            return;
-                        var ft = _this.service.getFeatureType(f);
-                        f.properties['Name'] = f.properties[ft.style.nameLabel];
-                    });
-                    layer.mapLayer.addLayer(v);
+                            this.service.project.features.forEach(function (f) {
+                                if (f.layerId !== layer.id)
+                                    return;
+                                var ft = _this.service.getFeatureType(f);
+                                f.properties['Name'] = f.properties[ft.style.nameLabel];
+                            });
+                            layer.mapLayer.addLayer(v);
+                            break;
+                        }
                 }
             };
             /***

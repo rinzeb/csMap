@@ -197,7 +197,7 @@ var App;
             template: "<datatable id='datatable'></datatable>",
             sticky: true
         });
-    }).service('messageBusService', csComp.Services.MessageBusService).service('mapService', csComp.Services.MapService).service('layerService', csComp.Services.LayerService).controller('appCtrl', AppCtrl).controller('mapLayersCtrl', csComp.Services.MapCtrl).controller('mapViewCtrl', MapView.MapViewCtrl).controller('searchCtrl', Search.SearchCtrl).controller('mcaEditorCtrl', Mca.McaEditorCtrl).filter('csmillions', [
+    }).service('messageBusService', csComp.Services.MessageBusService).service('mapService', csComp.Services.MapService).service('layerService', csComp.Services.LayerService).controller('appCtrl', AppCtrl).controller('searchCtrl', Search.SearchCtrl).controller('mcaEditorCtrl', Mca.McaEditorCtrl).filter('csmillions', [
         '$filter',
         '$locale',
         function (filter, locale) {
