@@ -2742,6 +2742,16 @@
                     "opacity": 50
                 },
                 {
+                    "id": "us",
+                    "reference": "us",
+                    "title" : "US",
+                    "type": "wms",
+                    "wmsLayers": "NoiseTrafficLden55dB",
+                    "url": "http://practice.tno.nl:8080/geoserver/rasters/wms?",
+                    "enabled": false,
+                    "opacity": 50
+                },
+                {
                     "id": "cbs",
                     "reference": "cbs",
                     "languages": {
@@ -2837,6 +2847,18 @@
                     "opacity": 50
                 }
             ]
+        },
+        {
+          "title" : "us test",
+          "layers" :[
+            {
+              "description"      : "US test",
+              "type"             : "tilelayer",
+              "title"            : "US",
+              "url"              : "http://airapp.lohman-solutions.com/Tiles/{z}/{x}/{y}/hour_0.png"              
+            }
+
+          ]
         },
         {
             "languages": {

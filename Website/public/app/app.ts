@@ -174,7 +174,7 @@
             'csWeb.expertMode',
             'ngCookies',
             //'csWeb.charts',
-            'csWeb.timeline'//, 
+            'csWeb.timeline'//,
             //'csWeb.heatmap'
         ])
         .config(localStorageServiceProvider => {
@@ -259,9 +259,7 @@
         .service('messageBusService', csComp.Services.MessageBusService)
         .service('mapService', csComp.Services.MapService)
         .service('layerService', csComp.Services.LayerService)
-        .controller('appCtrl', AppCtrl)
-        .controller('mapLayersCtrl', csComp.Services.MapCtrl)
-        .controller('mapViewCtrl', MapView.MapViewCtrl)
+        .controller('appCtrl', AppCtrl)        
         .controller('searchCtrl', Search.SearchCtrl)
         .controller('mcaEditorCtrl', Mca.McaEditorCtrl)
         .filter('csmillions', [
