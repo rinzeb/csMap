@@ -2968,10 +2968,34 @@
                   "title"            : "Heatmap test",
                   "description"      : "Test of a heatmap(Source: thumb.)",
                   "type"             : "Heatmap",
-                  "referenceList"    : [ 
-										"Hospitals",
-										"firestation"
-										],
+				  "criteria"		 : {
+						"referenceList"  : [ 
+											"Hospitals",
+											"firestation"
+											],
+						"featureTypes"   : [
+											"Ziekenhuis",
+											"Brandweerkazerne"
+										   ],						
+						"weights"		 : {
+											"Ziekenhuis": 0.6,
+											"Brandweerkazerne": -0.4
+										   },
+						"idealities"     : {
+											"Ziekenhuis": 
+											    { 
+													"atLocation": 0.2,
+													"idealDistance": 750,
+													"lostInterestDistance" : 2500 
+											    },
+											"Brandweerkazerne": 
+											    { 
+													"atLocation": 0.4,
+													"idealDistance": 500,
+													"lostInterestDistance" : 1500
+											    }
+										   }					   
+				  },
                   "enabled"          : false,
                   "opacity"          : 100
                 }
