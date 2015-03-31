@@ -8,6 +8,7 @@
     "email": "erik.vullings@tno.nl"
   },
   "dependencies": {
+    "cs-offline-search": "latest",
     "express": "3.4.4"
   },
   "devDependencies": {

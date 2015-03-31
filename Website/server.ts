@@ -1,9 +1,18 @@
-﻿import express = require('express');
-import http    = require('http');
-import path    = require('path');
+﻿import express       = require('express');
+import http          = require('http');
+import path          = require('path');
+import offlineSearch = require('cs-offline-search');
+
+/**
+ * Create a search index file which can be loaded statically.
+ */
+var offlineSearchManager = new offlineSearch('public/data/projects/projects.json', {
+    propertyNames: ['Name', 'plaatnaam', 'postcode', 'Postcode', 'straat', 'loc_straat', 'KvK', 'gemeente', 'plaats', 'Naam_van_het_concern_DigiMV_2012'],
+    stopWords: ['de', 'het', 'een', 'en', 'van', 'aan']
+});
 
 var server = express();
-// all environments
+//   all environments
 server.set('port', '3003');
 server.set('views', path.join(__dirname, 'views'));
 server.set('view engine', 'jade');

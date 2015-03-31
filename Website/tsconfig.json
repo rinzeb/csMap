@@ -9,7 +9,8 @@
     },
     "filesGlob": [
         "./**/*.ts",
-        "!node_modules/**/*.ts"
+        "!./node_modules/**/*.ts",
+        "!./public/bower_components/**/*.ts"
     ],
     "files": [
         "./Scripts/typings/angular-translate/angular-translate.d.ts",
@@ -32,7 +33,6 @@
         "./Scripts/typings/xbbcode/xbbcode.d.ts",
         "./public/app/app.ts",
         "./public/app/search/SearchCtrl.ts",
-        "./public/bower_components/angular-ui-router/api/angular-ui-router.d.ts",
         "./public/views/map/MapViewCtrl.ts",
         "./server.ts"
     ]

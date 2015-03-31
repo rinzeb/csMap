@@ -23,14 +23,14 @@ var MapView;
         }
         Object.defineProperty(MapViewCtrl.prototype, "isExpert", {
             get: function () {
-                return this.expertMode === Expertise.Expert;
+                return this.expertMode === 3 /* Expert */;
             },
             enumerable: true,
             configurable: true
         });
         Object.defineProperty(MapViewCtrl.prototype, "isIntermediate", {
             get: function () {
-                return this.expertMode === Expertise.Expert || this.expertMode === Expertise.Intermediate;
+                return this.expertMode === 3 /* Expert */ || this.expertMode === 2 /* Intermediate */;
             },
             enumerable: true,
             configurable: true

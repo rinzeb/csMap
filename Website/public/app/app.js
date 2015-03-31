@@ -111,6 +111,7 @@ var App;
     App.AppCtrl = AppCtrl;
     // Start the application
     angular.module('csWebApp', [
+        'ngSanitize',
         'ui.router',
         'ui.bootstrap',
         'LocalStorageModule',
@@ -132,9 +133,9 @@ var App;
         'csWeb.projectSettings',
         'csWeb.charts',
         'csWeb.expertMode',
+        'csWeb.offlineSearch',
         'ngCookies',
         'csWeb.timeline',
-        'csWeb.heatmap'
     ]).config(function (localStorageServiceProvider) {
         localStorageServiceProvider.prefix = 'csMap';
     }).config(function (TimelineServiceProvider) {

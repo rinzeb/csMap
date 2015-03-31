@@ -1,3 +1,491 @@
+var csComp;
+(function (csComp) {
+    var Services;
+    (function (Services) {
+        var Widget = (function () {
+            function Widget() {
+            }
+            return Widget;
+        })();
+        Services.Widget = Widget;
+        var BaseWidget = (function () {
+            //public static deserialize(input: IWidget): IWidget {
+            //    var loader = new InstanceLoader(window);
+            //    var w = <IWidget>loader.getInstance(widget.widgetType);
+            //    var res = $.extend(new BaseWidget(), input);
+            //    return res;
+            //}
+            function BaseWidget(title, type) {
+                this.renderer = function ($compile, $scope) {
+                };
+                this.resize = function (status, width, height) {
+                };
+                if (title)
+                    this.title = title;
+                this.properties = {};
+                this.dataSets = [];
+            }
+            BaseWidget.prototype.start = function () {
+            };
+            BaseWidget.prototype.init = function () {
+                //if (!sizeX)
+                //this.sizeX = sX;
+                //this.sizeY = sY;
+                //this.col = c;
+                //this.row = r;
+                this.background = "red";
+                if (!this.id)
+                    this.id = "widget" + csComp.Helpers.getGuid().replace('-', '');
+                //this.width = (width) ? width : 300;
+                //this.height = (height) ? height : 150;
+                //this.id = id;
+                this.elementId = this.id;
+                this.start();
+            };
+            BaseWidget.prototype.updateDateRange = function (r) {
+                this.range = r;
+            };
+            return BaseWidget;
+        })();
+        Services.BaseWidget = BaseWidget;
+        var Dashboard = (function () {
+            function Dashboard() {
+                this.showTimeline = true;
+                this.showRightmenu = true;
+                this.draggable = true;
+                this.resizable = true;
+                this.widgets = [];
+            }
+            Dashboard.deserialize = function (input) {
+                var _this = this;
+                var res = $.extend(new Dashboard(), input);
+                res.widgets = [];
+                if (input.widgets)
+                    input.widgets.forEach(function (w) {
+                        _this.addNewWidget(w, res);
+                    });
+                if (input.timeline)
+                    res.timeline = $.extend(new Services.DateRange(), input.timeline);
+                return res;
+            };
+            Dashboard.addNewWidget = function (widget, dashboard) {
+                //var loader = new InstanceLoader(window);
+                //var w = <IWidget>loader.getInstance(widget.widgetType);
+                //w.messageBusService = this.$messageBusService;
+                //w.layerService = this.$layerService;
+                //w.init();
+                //var w = BaseWidget();
+                if (!widget.id)
+                    widget.id = csComp.Helpers.getGuid();
+                //alert(widget.id);
+                widget.elementId = "widget-" + widget.id;
+                widget.dashboard = dashboard;
+                dashboard.widgets.push(widget);
+                /*if (this.$rootScope.$root.$$phase != '$apply' && this.$rootScope.$root.$$phase != '$digest') { this.$rootScope.$apply(); }
+                setTimeout(() => {
+                    //if (w != null) w.renderer(this.$compile, this.$rootScope);
+                    this.updateWidget(widget);
+      
+                }, 50);*/
+                //this.editWidget(w);
+                return widget;
+            };
+            return Dashboard;
+        })();
+        Services.Dashboard = Dashboard;
+        var Timeline = (function () {
+            function Timeline() {
+            }
+            return Timeline;
+        })();
+        Services.Timeline = Timeline;
+        var TimedDataSet = (function () {
+            function TimedDataSet() {
+            }
+            return TimedDataSet;
+        })();
+        Services.TimedDataSet = TimedDataSet;
+        var DataSet = (function () {
+            function DataSet(id, title) {
+                this.id = id;
+                this.title = title;
+                this.data = [];
+            }
+            return DataSet;
+        })();
+        Services.DataSet = DataSet;
+    })(Services = csComp.Services || (csComp.Services = {}));
+})(csComp || (csComp = {}));
+var csComp;
+(function (csComp) {
+    var Services;
+    (function (Services) {
+        var Event = (function () {
+            function Event() {
+                var _this = this;
+                this.startDate = function () {
+                    return new Date(_this.start);
+                };
+            }
+            return Event;
+        })();
+        Services.Event = Event;
+        /**
+         * A feature is a single object that is show on a map (e.g. point, polyline, etc)
+         * Features are part of a layer and filtered and styled using group filters and styles
+         *
+         */
+        var Feature = (function () {
+            function Feature() {
+            }
+            return Feature;
+        })();
+        Services.Feature = Feature;
+        (function (DrawingModeType) {
+            DrawingModeType[DrawingModeType["None"] = 0] = "None";
+            DrawingModeType[DrawingModeType["Image"] = 1] = "Image";
+            DrawingModeType[DrawingModeType["Point"] = 2] = "Point";
+            DrawingModeType[DrawingModeType["Square"] = 3] = "Square";
+            DrawingModeType[DrawingModeType["Rectangle"] = 4] = "Rectangle";
+            DrawingModeType[DrawingModeType["Line"] = 5] = "Line";
+            DrawingModeType[DrawingModeType["Circle"] = 6] = "Circle";
+            DrawingModeType[DrawingModeType["Freehand"] = 7] = "Freehand";
+            DrawingModeType[DrawingModeType["Polyline"] = 8] = "Polyline";
+            DrawingModeType[DrawingModeType["Polygon"] = 9] = "Polygon";
+            DrawingModeType[DrawingModeType["MultiPolygon"] = 10] = "MultiPolygon";
+        })(Services.DrawingModeType || (Services.DrawingModeType = {}));
+        var DrawingModeType = Services.DrawingModeType;
+        //export enum propertyTypeType {
+        //    Text,
+        //    TextArea,
+        //    Rating,
+        //    Number,
+        //    Bbcode,
+        //    Boolean,
+        //    Bit,
+        //    Sensor,
+        //    Xml,
+        //    Options,
+        //    Unknown,
+        //    Image,
+        //    DateTime,
+        //    Mediafolder
+        //}
+        (function (featureFilterType) {
+            /** Turn filtering off */
+            featureFilterType[featureFilterType["none"] = 0] = "none";
+            /** Default for numbers: histogram */
+            featureFilterType[featureFilterType["bar"] = 1] = "bar";
+            /** Default for text */
+            featureFilterType[featureFilterType["text"] = 2] = "text";
+        })(Services.featureFilterType || (Services.featureFilterType = {}));
+        var featureFilterType = Services.featureFilterType;
+        var PropertyInfo = (function () {
+            function PropertyInfo() {
+            }
+            return PropertyInfo;
+        })();
+        Services.PropertyInfo = PropertyInfo;
+    })(Services = csComp.Services || (csComp.Services = {}));
+})(csComp || (csComp = {}));
+var csComp;
+(function (csComp) {
+    var Services;
+    (function (Services) {
+        (function (LayerType) {
+            LayerType[LayerType["GeoJson"] = 0] = "GeoJson";
+            LayerType[LayerType["Kml"] = 1] = "Kml";
+        })(Services.LayerType || (Services.LayerType = {}));
+        var LayerType = Services.LayerType;
+        /**
+         * A project group contains a list of layers that can be grouped together.
+         * Filters, styles and clustering is always defined on the group level.
+         * If a filter is selected (e.g. show only the features within a certain property range)
+         * this filter is applied to all layers within this group.
+         * If clustering is enabled all features in all layers are grouped together.
+         */
+        var ProjectGroup = (function () {
+            function ProjectGroup() {
+            }
+            return ProjectGroup;
+        })();
+        Services.ProjectGroup = ProjectGroup;
+        /**
+         * Filters are used to select a subset of features within a group.
+         */
+        var GroupFilter = (function () {
+            function GroupFilter() {
+            }
+            return GroupFilter;
+        })();
+        Services.GroupFilter = GroupFilter;
+        /**
+         * Styles can determine how features are shown on the map
+         */
+        var GroupStyle = (function () {
+            function GroupStyle($translate) {
+                var _this = this;
+                this.availableAspects = ['strokeColor', 'fillColor', 'strokeWidth'];
+                this.colorScales = {};
+                $translate('WHITE_RED').then(function (translation) {
+                    _this.colorScales[translation] = ['white', 'red'];
+                });
+                $translate('RED_WHITE').then(function (translation) {
+                    _this.colorScales[translation] = ['red', 'white'];
+                });
+                $translate('GREEN_RED').then(function (translation) {
+                    _this.colorScales[translation] = ['green', 'red'];
+                });
+                $translate('RED_GREEN').then(function (translation) {
+                    _this.colorScales[translation] = ['red', 'green'];
+                });
+                $translate('BLUE_RED').then(function (translation) {
+                    _this.colorScales[translation] = ['#F04030', '#3040F0'];
+                });
+                $translate('RED_BLUE').then(function (translation) {
+                    _this.colorScales[translation] = ['#3040F0', '#F04030'];
+                });
+                $translate('WHITE_BLUE').then(function (translation) {
+                    _this.colorScales[translation] = ['white', 'blue'];
+                });
+                $translate('BLUE_WHITE').then(function (translation) {
+                    _this.colorScales[translation] = ['blue', 'white'];
+                });
+                $translate('WHITE_GREEN').then(function (translation) {
+                    _this.colorScales[translation] = ['white', 'green'];
+                });
+                $translate('GREEN_WHITE').then(function (translation) {
+                    _this.colorScales[translation] = ['green', 'white'];
+                });
+                $translate('WHITE_ORANGE').then(function (translation) {
+                    _this.colorScales[translation] = ['white', 'orange'];
+                });
+                $translate('ORANGE_WHITE').then(function (translation) {
+                    _this.colorScales[translation] = ['orange', 'white'];
+                });
+            }
+            return GroupStyle;
+        })();
+        Services.GroupStyle = GroupStyle;
+    })(Services = csComp.Services || (csComp.Services = {}));
+})(csComp || (csComp = {}));
+var csComp;
+(function (csComp) {
+    var Services;
+    (function (Services) {
+        /**
+        * Expert level for determining what options to show to the user.
+        */
+        (function (Expertise) {
+            Expertise[Expertise["Beginner"] = 1] = "Beginner";
+            Expertise[Expertise["Intermediate"] = 2] = "Intermediate";
+            Expertise[Expertise["Expert"] = 3] = "Expert";
+        })(Services.Expertise || (Services.Expertise = {}));
+        var Expertise = Services.Expertise;
+        var availableZoomLevels = [
+            { title: "decades", value: 315360000000 },
+            { title: "years", value: 31536000000 },
+            { title: "weeks", value: 604800000 },
+            { title: "days", value: 86400000 },
+            { title: "hours", value: 3600000 },
+            { title: "quarters", value: 900000 },
+            { title: "minutes", value: 60000 },
+            { title: "seconds", value: 1000 },
+            { title: "milliseconds", value: 1 }
+        ];
+        var DateRange = (function () {
+            function DateRange() {
+                var _this = this;
+                this.startDate = function () {
+                    if (_this.focus < _this.start)
+                        _this.start = _this.focus - _this.range / 5;
+                    return new Date(_this.start);
+                };
+                this.focusDate = function () {
+                    return new Date(_this.focus);
+                };
+                this.endDate = function () {
+                    if (_this.focus > _this.end)
+                        _this.end = _this.focus + _this.range / 5;
+                    return new Date(_this.end);
+                };
+            }
+            //constructor() {
+            //    if (!this.focus) this.setFocus(new Date());
+            //}
+            DateRange.deserialize = function (input) {
+                var res = $.extend(new DateRange(), input);
+                if (typeof res.focus === 'undefined' || res.focus === null)
+                    res.focus = Date.now();
+                return res;
+            };
+            /**
+            * Set the focus time of the timeline, optionally including start and end time.
+            */
+            DateRange.prototype.setFocus = function (d, s, e) {
+                var _this = this;
+                this.focus = d.getTime();
+                if (s)
+                    this.start = s.getTime();
+                if (e)
+                    this.end = e.getTime();
+                var newRange = this.end - this.start;
+                if (this.range !== newRange) {
+                    this.range = newRange;
+                    availableZoomLevels.some(function (tl) {
+                        _this.zoomLevel = tl.value;
+                        _this.zoomLevelName = tl.title;
+                        return (tl.value < (_this.range / 10));
+                    });
+                }
+            };
+            return DateRange;
+        })();
+        Services.DateRange = DateRange;
+        /**
+         * Represents to the overall solution class. A solution can contain multiple project.
+         * This can be usefull when you want to have the same website, but with different content.
+         * e.g. you could make it so that you can switch between different regions or different domains of interest.
+         */
+        var Solution = (function () {
+            function Solution() {
+            }
+            return Solution;
+        })();
+        Services.Solution = Solution;
+        /** Project within a solution file, refers to a project url*/
+        var SolutionProject = (function () {
+            function SolutionProject() {
+            }
+            return SolutionProject;
+        })();
+        Services.SolutionProject = SolutionProject;
+        /** project configuration. */
+        var Project = (function () {
+            function Project() {
+                this.expertMode = 3 /* Expert */;
+                this.markers = {};
+            }
+            Project.prototype.deserialize = function (input) {
+                var res = jQuery.extend(new Project(), input);
+                if (input.timeLine)
+                    res.timeLine = DateRange.deserialize(input.timeLine); // <DateRange>jQuery.extend(new DateRange(), input.timeLine);
+                if (input.dashboards) {
+                    res.dashboards = [];
+                    input.dashboards.forEach(function (d) {
+                        res.dashboards.push(Services.Dashboard.deserialize(d));
+                    });
+                    for (var mca in input.mcas) {
+                        if (input.mcas.hasOwnProperty(mca)) {
+                            res.mcas.push(new Mca.Models.Mca().deserialize(mca));
+                        }
+                    }
+                }
+                if (!res.propertyTypeData)
+                    res.propertyTypeData = {};
+                return res;
+            };
+            return Project;
+        })();
+        Services.Project = Project;
+        /** layer information. a layer is described in a project file and is always part of a group */
+        var ProjectLayer = (function () {
+            function ProjectLayer() {
+            }
+            return ProjectLayer;
+        })();
+        Services.ProjectLayer = ProjectLayer;
+    })(Services = csComp.Services || (csComp.Services = {}));
+})(csComp || (csComp = {}));
+var BaseMapList;
+(function (BaseMapList) {
+    BaseMapList.html = '<div>    <h4 class="leftpanel-header" translate="MAP"></h4>    <div data-ng-repeat="(key, value) in vm.$mapService.baseLayers" style="clear:left;">        <div ng-click="vm.selectBaseLayer(key);" class="select-basestyle">            <img data-ng-src="{{value.options.preview}}" class="preview-base-layer" style="margin-bottom:5px" />            <div style="margin:3px;float:left">                <span style="font-size: 18px;font-weight: bold;">{{key}}</span><br />                {{value.options.subtitle}}            </div>        </div>    </div></div>';
+})(BaseMapList || (BaseMapList = {}));
+var BaseMapList;
+(function (BaseMapList) {
+    /**
+      * Config
+      */
+    var moduleName = 'csWeb.baseMapList';
+    /**
+      * Module
+      */
+    BaseMapList.myModule;
+    try {
+        BaseMapList.myModule = angular.module(moduleName);
+    }
+    catch (err) {
+        // named module does not exist, so create one
+        BaseMapList.myModule = angular.module(moduleName, []);
+    }
+    /**
+      * Directive to display the available map layers.
+      */
+    BaseMapList.myModule.directive('baseMapList', [
+        '$window',
+        '$compile',
+        function ($window, $compile) {
+            return {
+                terminal: false,
+                restrict: 'E',
+                scope: {},
+                template: BaseMapList.html,
+                //compile : el          => {    // I need to explicitly compile it in order to use interpolation like {{xxx}}
+                //    var fn                        = $compile(el);
+                //    return scope                  => { 
+                //        fn(scope);
+                //    };
+                //},
+                link: function (scope, element, attrs) {
+                    // Deal with resizing the element list
+                    scope.onResizeFunction = function () {
+                        var filterHeight = 50;
+                        var paginationCtrlHeight = 100;
+                        var itemHeight = 60;
+                        //scope.windowHeight          = $window.innerHeight;
+                        //scope.windowWidth           = $window.innerWidth;
+                        scope.numberOfItems = Math.floor(($window.innerHeight - filterHeight - paginationCtrlHeight) / itemHeight);
+                    };
+                    // Call to the function when the page is first loaded
+                    scope.onResizeFunction();
+                    angular.element($window).bind('resize', function () {
+                        scope.onResizeFunction();
+                        scope.$apply();
+                    });
+                },
+                replace: true,
+                transclude: true,
+                controller: BaseMapList.BaseMapListCtrl
+            };
+        }
+    ]);
+})(BaseMapList || (BaseMapList = {}));
+var BaseMapList;
+(function (BaseMapList) {
+    var BaseMapListCtrl = (function () {
+        // dependencies are injected via AngularJS $injector
+        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
+        function BaseMapListCtrl($scope, $mapService) {
+            this.$scope = $scope;
+            this.$mapService = $mapService;
+            $scope.vm = this;
+        }
+        BaseMapListCtrl.prototype.selectBaseLayer = function (key) {
+            var bl = this.$mapService.baseLayers[key];
+            this.$mapService.changeBaseLayer(bl);
+        };
+        // $inject annotation.
+        // It provides $injector with information about dependencies to be injected into constructor
+        // it is better to have it close to the constructor, because the parameters must match in count and type.
+        // See http://docs.angularjs.org/guide/di
+        BaseMapListCtrl.$inject = [
+            '$scope',
+            'mapService'
+        ];
+        return BaseMapListCtrl;
+    })();
+    BaseMapList.BaseMapListCtrl = BaseMapListCtrl;
+})(BaseMapList || (BaseMapList = {}));
 var Charts;
 (function (Charts) {
     'use strict';
@@ -350,192 +838,6 @@ var Charts;
         };
     }]);
 })(Charts || (Charts = {}));
-var DashboardSelection;
-(function (DashboardSelection) {
-    DashboardSelection.html = '<div class="tab-pane" id="dashboardSelection">    <h3 class="leftpanel-header" style="width: 100%">        Dashboards        <div class="leftpanel-header-button-container">            <button ng-show="vm.$dashboardService.editMode" ng-click="vm.$dashboardService.editMode = false; vm.stopEdit()" class="button fa fa-check leftpanel-header-button" />            <button ng-show="vm.$dashboardService.editMode" class="button fa fa-plus leftpanel-header-button" ng-click="vm.addDashboard()" />            <button ng-hide="vm.$dashboardService.editMode" ng-click="vm.$dashboardService.editMode = true; vm.startEdit()" class="button fa fa-pencil leftpanel-header-button" />        </div>    </h3>    <style>    </style>    <ul style="padding: 0;list-style-type: none" data-ng-repeat="value in vm.$layerService.project.dashboards">        <li>            <div ng-class="{\'dashboard-selected\' : value.id === vm.$dashboardService.mainDashboard.id}" class="dashboard-item">                <span ng-click="vm.selectDashboard(value)" class="dashboard-name">{{value.name}}</span>                <div ng-show="vm.$dashboardService.editMode" class="leftpanel-header-button-container">                    <button ng-click="vm.removeDashboard(value.id)" class="button fa fa-trash leftpanel-header-button" />                    <div ng-show="value == vm.$dashboardService.mainDashboard" style="float:right">                        <button ng-hide="value.editMode" ng-click="value.editMode = true; vm.startDashboardEdit(value)" class="button fa fa-pencil leftpanel-header-button" />                        <button ng-show="value.editMode" ng-click="value.editMode = false" class="button fa fa-check leftpanel-header-button" />                    </div>                </div>            </div>            <div style="margin-top:0" ng-show="value.editMode">                <label class="control-label" for="dashboardTitle">Title</label>                <div class="controls">                    <input id="dashboardTitle" name="textinput" type="text" ng-model="value.name" placeholder="placeholder" class="input-xlarge">                </div>                <div class="checkbox" style="margin-left: 20px">                     <input type="checkbox" id="showmap-{{value.id}}" ng-model="value.showMap" ng-click="vm.toggleMap()">                    <label for="showmap-{{value.id}}">Show Map</label>                </div>                <div class="checkbox" style="margin-left: 20px">                    <input type="checkbox" id="timeline-{{value.id}}" ng-model="value.showTimeline" ng-click="vm.toggleTimeline()">                    <label for="timeline-{{value.id}}">Show Timeline</label>                </div>            </div>        </li>    </ul></div>';
-})(DashboardSelection || (DashboardSelection = {}));
-var DashboardSelection;
-(function (DashboardSelection) {
-    /**
-      * Config
-      */
-    var moduleName = 'csWeb.dashboardSelection';
-    /**
-      * Module
-      */
-    DashboardSelection.myModule;
-    try {
-        DashboardSelection.myModule = angular.module(moduleName);
-    }
-    catch (err) {
-        // named module does not exist, so create one
-        DashboardSelection.myModule = angular.module(moduleName, []);
-    }
-    /**
-      * Directive to display the available map layers.
-      */
-    DashboardSelection.myModule.directive('dashboardSelection', [
-        '$window',
-        '$compile',
-        function ($window, $compile) {
-            return {
-                terminal: false,
-                restrict: 'E',
-                scope: {},
-                template: DashboardSelection.html,
-                //compile             : el          => {    // I need to explicitly compile it in order to use interpolation like {{xxx}}
-                //    var fn                        = $compile(el);
-                //    return scope                  => { 
-                //        fn(scope);
-                //    };
-                //},
-                link: function (scope, element, attrs) {
-                    // Deal with resizing the element list
-                    scope.onResizeFunction = function () {
-                        var filterHeight = 50;
-                        var paginationCtrlHeight = 100;
-                        var itemHeight = 60;
-                        //scope.windowHeight          = $window.innerHeight;
-                        //scope.windowWidth           = $window.innerWidth;
-                        scope.numberOfItems = Math.floor(($window.innerHeight - filterHeight - paginationCtrlHeight) / itemHeight);
-                    };
-                    // Call to the function when the page is first loaded
-                    scope.onResizeFunction();
-                    angular.element($window).bind('resize', function () {
-                        scope.onResizeFunction();
-                        scope.$apply();
-                    });
-                },
-                replace: true,
-                transclude: true,
-                controller: DashboardSelection.DashboardSelectionCtrl
-            };
-        }
-    ]).directive('bsPopover', function () {
-        return function (scope, element, attrs) {
-            element.find("a[rel=popover]").popover({ placement: 'right', html: 'true' });
-        };
-    });
-})(DashboardSelection || (DashboardSelection = {}));
-var DashboardSelection;
-(function (DashboardSelection) {
-    var DashboardSelectionCtrl = (function () {
-        // dependencies are injected via AngularJS $injector
-        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
-        function DashboardSelectionCtrl($scope, $layerService, $mapService, $messageBusService) {
-            this.$scope = $scope;
-            this.$layerService = $layerService;
-            this.$mapService = $mapService;
-            this.$messageBusService = $messageBusService;
-            $scope.vm = this;
-            //$messageBusService.subscribe("dashboardSelect", ((s: string, dashboard: csComp.Services.Dashboard) => {
-            //    switch (s) {
-            //        case "selectRequest":
-            //            this.selectDashboard(dashboard);
-            //            break;
-            //    }
-            //}));
-        }
-        DashboardSelectionCtrl.prototype.startDashboardEdit = function (dashboard) {
-            //this.group.dashboards.forEach((d: csComp.Services.Dashboard) => {
-            //if (d.id !== dashboard.id) d.editMode = false;
-            //}
-            //);
-        };
-        DashboardSelectionCtrl.prototype.stopEdit = function () {
-            //for (var property in this.group.dashboards) {
-            //this.group.dashboards[property].editMode = false;
-            //}
-            //this.activeWidget = null;
-            //this.$scope.gridsterOptions.draggable.enabled = false;
-            //this.$scope.gridsterOptions.resizable.enabled = false;
-        };
-        DashboardSelectionCtrl.prototype.startEdit = function () {
-            //this.$scope.gridsterOptions.draggable.enabled = true;
-            //this.$scope.gridsterOptions.resizable.enabled = true;
-        };
-        /** Add new dashboard */
-        DashboardSelectionCtrl.prototype.addDashboard = function (widget) {
-            var id = csComp.Helpers.getGuid();
-            var d = new csComp.Services.Dashboard();
-            d.id = id;
-            d.name = "New Dashboard";
-            //this.group.dashboards.push(d);
-        };
-        /** Remove existing dashboard */
-        DashboardSelectionCtrl.prototype.removeDashboard = function (key) {
-            //this.group.dashboards = this.group.dashboards.filter((s : csComp.Services.Dashboard) => s.id !== key);
-        };
-        DashboardSelectionCtrl.prototype.toggleTimeline = function () {
-            //this.$dashboardService.mainDashboard.showTimeline = !this.$dashboardService.mainDashboard.showTimeline;
-            this.checkTimeline();
-        };
-        DashboardSelectionCtrl.prototype.toggleMap = function () {
-            setTimeout(function () {
-                //this.checkMap();
-            }, 100);
-        };
-        DashboardSelectionCtrl.prototype.checkTimeline = function () {
-            var db = this.$layerService.project.activeDashboard;
-            if (db.timeline) {
-                var s = new Date(db.timeline.start);
-                var e = new Date();
-                if (db.timeline.end)
-                    e = new Date(db.timeline.end);
-                //this.$messageBusService.publish("timeline", "updateTimerange", { "start": s, "end": e});
-                this.$messageBusService.publish("timeline", "updateTimerange", { start: s, end: e });
-            }
-            if (db.showTimeline != this.$mapService.timelineVisible) {
-                if (db.showTimeline) {
-                    this.$mapService.timelineVisible = true;
-                }
-                else {
-                    this.$mapService.timelineVisible = false;
-                }
-                if (this.$scope.$root.$$phase != '$apply' && this.$scope.$root.$$phase != '$digest') {
-                    this.$scope.$apply();
-                }
-            }
-        };
-        /** publish a message that a new dashboard was selected */
-        DashboardSelectionCtrl.prototype.publishDashboardUpdate = function () {
-            this.$messageBusService.publish('dashboard', 'onDashboardSelected', this.$layerService.project.activeDashboard);
-        };
-        /** Select an active dashboard */
-        DashboardSelectionCtrl.prototype.selectDashboard = function (dashboard) {
-            var _this = this;
-            for (var key in this.$layerService.project.dashboards) {
-                this.$layerService.project.dashboards[key].editMode = false;
-            }
-            if (dashboard) {
-                //this.$dashboardService.mainDashboard = dashboard;
-                if (this.$scope.$root.$$phase != '$apply' && this.$scope.$root.$$phase != '$digest') {
-                    this.$scope.$apply();
-                }
-                setTimeout(function () {
-                    //this.$dashboardService.checkMap();
-                    //this.checkTimeline();
-                    //this.checkViewbound();
-                    _this.publishDashboardUpdate();
-                    //this.checkLayers();
-                }, 100);
-            }
-        };
-        // $inject annotation.
-        // It provides $injector with information about dependencies to be injected into constructor
-        // it is better to have it close to the constructor, because the parameters must match in count and type.
-        // See http://docs.angularjs.org/guide/di
-        DashboardSelectionCtrl.$inject = [
-            '$scope',
-            'layerService',
-            'dashboardService',
-            'mapService',
-            'messageBusService'
-        ];
-        return DashboardSelectionCtrl;
-    })();
-    DashboardSelection.DashboardSelectionCtrl = DashboardSelectionCtrl;
-})(DashboardSelection || (DashboardSelection = {}));
 var Dashboard;
 (function (Dashboard) {
     Dashboard.html = '<div gridster="gridsterOptions" style="width:100%; height:100%;pointer-events: none;margin-top:-10px">    <div  style="position:relative;width:100%; height:100%;pointer-events: none">        <ul style="padding:0;pointer-events: none">            <li gridster-item="widget" ng-repeat="widget in dashboard.widgets" class="widget-parent">                <!--<div class="widget-title" ng-click="widget.collapse=!widget.collapse" ><span class="fa fa-area-chart" style="float:left;margin-right:4px"></span>{{widget.title}}</div>-->                <!--<div class="widget-edit" style="z-index: 1000">                    <div ng-show="widget.dashboard.editMode" ng-click="vm.$dashboardService.editWidget(widget)" class="fa fa-pencil widget-button"></div>                    <div ng-hide="widget.collapse" ng-click="widget.collapse=true"  class="fa fa-minus-square-o widget-button"></div>                    <div ng-show="widget.collapse" ng-click="widget.collapse=false"  class="fa fa-plus-square-o widget-button"></div>                    <div ng-show="widget.allowFullscreen" ng-click="vm.popup(widget)"  class="fa fa-square-o widget-button"></div>                </div>-->                    <div class="box" ng-hide="widget.collapse" style="top: 0;position: absolute;width:100%;height:100%;background: white">                        <div id="{{widget.elementId}}" class="box-content" style="width:100%;height:100%">                                                     </div>                    </div>            </li>        </ul>    </div></div>';
@@ -757,6 +1059,589 @@ var Dashboard;
     })();
     Dashboard.DashboardCtrl = DashboardCtrl;
 })(Dashboard || (Dashboard = {}));
+var DashboardSelection;
+(function (DashboardSelection) {
+    DashboardSelection.html = '<div class="tab-pane" id="dashboardSelection">    <h3 class="leftpanel-header" style="width: 100%">        Dashboards        <div class="leftpanel-header-button-container">            <button ng-show="vm.$dashboardService.editMode" ng-click="vm.$dashboardService.editMode = false; vm.stopEdit()" class="button fa fa-check leftpanel-header-button" />            <button ng-show="vm.$dashboardService.editMode" class="button fa fa-plus leftpanel-header-button" ng-click="vm.addDashboard()" />            <button ng-hide="vm.$dashboardService.editMode" ng-click="vm.$dashboardService.editMode = true; vm.startEdit()" class="button fa fa-pencil leftpanel-header-button" />        </div>    </h3>    <style>    </style>    <ul style="padding: 0;list-style-type: none" data-ng-repeat="value in vm.$layerService.project.dashboards">        <li>            <div ng-class="{\'dashboard-selected\' : value.id === vm.$dashboardService.mainDashboard.id}" class="dashboard-item">                <span ng-click="vm.selectDashboard(value)" class="dashboard-name">{{value.name}}</span>                <div ng-show="vm.$dashboardService.editMode" class="leftpanel-header-button-container">                    <button ng-click="vm.removeDashboard(value.id)" class="button fa fa-trash leftpanel-header-button" />                    <div ng-show="value == vm.$dashboardService.mainDashboard" style="float:right">                        <button ng-hide="value.editMode" ng-click="value.editMode = true; vm.startDashboardEdit(value)" class="button fa fa-pencil leftpanel-header-button" />                        <button ng-show="value.editMode" ng-click="value.editMode = false" class="button fa fa-check leftpanel-header-button" />                    </div>                </div>            </div>            <div style="margin-top:0" ng-show="value.editMode">                <label class="control-label" for="dashboardTitle">Title</label>                <div class="controls">                    <input id="dashboardTitle" name="textinput" type="text" ng-model="value.name" placeholder="placeholder" class="input-xlarge">                </div>                <div class="checkbox" style="margin-left: 20px">                     <input type="checkbox" id="showmap-{{value.id}}" ng-model="value.showMap" ng-click="vm.toggleMap()">                    <label for="showmap-{{value.id}}">Show Map</label>                </div>                <div class="checkbox" style="margin-left: 20px">                    <input type="checkbox" id="timeline-{{value.id}}" ng-model="value.showTimeline" ng-click="vm.toggleTimeline()">                    <label for="timeline-{{value.id}}">Show Timeline</label>                </div>            </div>        </li>    </ul></div>';
+})(DashboardSelection || (DashboardSelection = {}));
+var DashboardSelection;
+(function (DashboardSelection) {
+    /**
+      * Config
+      */
+    var moduleName = 'csWeb.dashboardSelection';
+    /**
+      * Module
+      */
+    DashboardSelection.myModule;
+    try {
+        DashboardSelection.myModule = angular.module(moduleName);
+    }
+    catch (err) {
+        // named module does not exist, so create one
+        DashboardSelection.myModule = angular.module(moduleName, []);
+    }
+    /**
+      * Directive to display the available map layers.
+      */
+    DashboardSelection.myModule.directive('dashboardSelection', [
+        '$window',
+        '$compile',
+        function ($window, $compile) {
+            return {
+                terminal: false,
+                restrict: 'E',
+                scope: {},
+                template: DashboardSelection.html,
+                //compile             : el          => {    // I need to explicitly compile it in order to use interpolation like {{xxx}}
+                //    var fn                        = $compile(el);
+                //    return scope                  => { 
+                //        fn(scope);
+                //    };
+                //},
+                link: function (scope, element, attrs) {
+                    // Deal with resizing the element list
+                    scope.onResizeFunction = function () {
+                        var filterHeight = 50;
+                        var paginationCtrlHeight = 100;
+                        var itemHeight = 60;
+                        //scope.windowHeight          = $window.innerHeight;
+                        //scope.windowWidth           = $window.innerWidth;
+                        scope.numberOfItems = Math.floor(($window.innerHeight - filterHeight - paginationCtrlHeight) / itemHeight);
+                    };
+                    // Call to the function when the page is first loaded
+                    scope.onResizeFunction();
+                    angular.element($window).bind('resize', function () {
+                        scope.onResizeFunction();
+                        scope.$apply();
+                    });
+                },
+                replace: true,
+                transclude: true,
+                controller: DashboardSelection.DashboardSelectionCtrl
+            };
+        }
+    ]).directive('bsPopover', function () {
+        return function (scope, element, attrs) {
+            element.find("a[rel=popover]").popover({ placement: 'right', html: 'true' });
+        };
+    });
+})(DashboardSelection || (DashboardSelection = {}));
+var DashboardSelection;
+(function (DashboardSelection) {
+    var DashboardSelectionCtrl = (function () {
+        // dependencies are injected via AngularJS $injector
+        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
+        function DashboardSelectionCtrl($scope, $layerService, $mapService, $messageBusService) {
+            this.$scope = $scope;
+            this.$layerService = $layerService;
+            this.$mapService = $mapService;
+            this.$messageBusService = $messageBusService;
+            $scope.vm = this;
+            //$messageBusService.subscribe("dashboardSelect", ((s: string, dashboard: csComp.Services.Dashboard) => {
+            //    switch (s) {
+            //        case "selectRequest":
+            //            this.selectDashboard(dashboard);
+            //            break;
+            //    }
+            //}));
+        }
+        DashboardSelectionCtrl.prototype.startDashboardEdit = function (dashboard) {
+            //this.group.dashboards.forEach((d: csComp.Services.Dashboard) => {
+            //if (d.id !== dashboard.id) d.editMode = false;
+            //}
+            //);
+        };
+        DashboardSelectionCtrl.prototype.stopEdit = function () {
+            //for (var property in this.group.dashboards) {
+            //this.group.dashboards[property].editMode = false;
+            //}
+            //this.activeWidget = null;
+            //this.$scope.gridsterOptions.draggable.enabled = false;
+            //this.$scope.gridsterOptions.resizable.enabled = false;
+        };
+        DashboardSelectionCtrl.prototype.startEdit = function () {
+            //this.$scope.gridsterOptions.draggable.enabled = true;
+            //this.$scope.gridsterOptions.resizable.enabled = true;
+        };
+        /** Add new dashboard */
+        DashboardSelectionCtrl.prototype.addDashboard = function (widget) {
+            var id = csComp.Helpers.getGuid();
+            var d = new csComp.Services.Dashboard();
+            d.id = id;
+            d.name = "New Dashboard";
+            //this.group.dashboards.push(d);
+        };
+        /** Remove existing dashboard */
+        DashboardSelectionCtrl.prototype.removeDashboard = function (key) {
+            //this.group.dashboards = this.group.dashboards.filter((s : csComp.Services.Dashboard) => s.id !== key);
+        };
+        DashboardSelectionCtrl.prototype.toggleTimeline = function () {
+            //this.$dashboardService.mainDashboard.showTimeline = !this.$dashboardService.mainDashboard.showTimeline;
+            this.checkTimeline();
+        };
+        DashboardSelectionCtrl.prototype.toggleMap = function () {
+            setTimeout(function () {
+                //this.checkMap();
+            }, 100);
+        };
+        DashboardSelectionCtrl.prototype.checkTimeline = function () {
+            var db = this.$layerService.project.activeDashboard;
+            if (db.timeline) {
+                var s = new Date(db.timeline.start);
+                var e = new Date();
+                if (db.timeline.end)
+                    e = new Date(db.timeline.end);
+                //this.$messageBusService.publish("timeline", "updateTimerange", { "start": s, "end": e});
+                this.$messageBusService.publish("timeline", "updateTimerange", { start: s, end: e });
+            }
+            if (db.showTimeline != this.$mapService.timelineVisible) {
+                if (db.showTimeline) {
+                    this.$mapService.timelineVisible = true;
+                }
+                else {
+                    this.$mapService.timelineVisible = false;
+                }
+                if (this.$scope.$root.$$phase != '$apply' && this.$scope.$root.$$phase != '$digest') {
+                    this.$scope.$apply();
+                }
+            }
+        };
+        /** publish a message that a new dashboard was selected */
+        DashboardSelectionCtrl.prototype.publishDashboardUpdate = function () {
+            this.$messageBusService.publish('dashboard', 'onDashboardSelected', this.$layerService.project.activeDashboard);
+        };
+        /** Select an active dashboard */
+        DashboardSelectionCtrl.prototype.selectDashboard = function (dashboard) {
+            var _this = this;
+            for (var key in this.$layerService.project.dashboards) {
+                this.$layerService.project.dashboards[key].editMode = false;
+            }
+            if (dashboard) {
+                //this.$dashboardService.mainDashboard = dashboard;
+                if (this.$scope.$root.$$phase != '$apply' && this.$scope.$root.$$phase != '$digest') {
+                    this.$scope.$apply();
+                }
+                setTimeout(function () {
+                    //this.$dashboardService.checkMap();
+                    //this.checkTimeline();
+                    //this.checkViewbound();
+                    _this.publishDashboardUpdate();
+                    //this.checkLayers();
+                }, 100);
+            }
+        };
+        // $inject annotation.
+        // It provides $injector with information about dependencies to be injected into constructor
+        // it is better to have it close to the constructor, because the parameters must match in count and type.
+        // See http://docs.angularjs.org/guide/di
+        DashboardSelectionCtrl.$inject = [
+            '$scope',
+            'layerService',
+            'dashboardService',
+            'mapService',
+            'messageBusService'
+        ];
+        return DashboardSelectionCtrl;
+    })();
+    DashboardSelection.DashboardSelectionCtrl = DashboardSelectionCtrl;
+})(DashboardSelection || (DashboardSelection = {}));
+var DataTable;
+(function (DataTable) {
+    DataTable.html = '<div>    <div style="width:100%; margin: 10px auto;">        <div style="float: left; width: 15%; margin: 0; padding: 1em">            <!-- Pull down of map layers -->            <select data-ng-model="vm.selectedLayerId"                    data-ng-change="vm.loadLayer()"                    data-ng-options="layer.id as layer.title group by layer.group for layer in vm.layerOptions"                    class="form-control tt-input"></select>            <!-- List of headers -->            <ul class="form-group" style="margin-top: 1em; margin-left: -2em; overflow-y: auto; overflow-x: hidden;"                resize resize-y="150">                <li ng-repeat="mi in vm.propertyTypes" class="list-unstyled" style="white-space: nowrap; text-overflow: ellipsis">                    <label>                        <input type="checkbox" name="vm.selectedTitles[]" value="{{mi.title}}"                               data-ng-checked="vm.headers.indexOf(mi.title) > -1"                               data-ng-click="vm.toggleSelection(mi.title)">&nbsp;&nbsp;{{mi.title}}                    </label>                    <!--<div class="checkbox">                        <label>                            <input type="checkbox" name="vm.selectedTitles[]" value="{{mi.title}}"                                   data-ng-checked="vm.headers.indexOf(mi.title) > -1"                                   data-ng-click="vm.toggleSelection(mi.title)">&nbsp;&nbsp;{{mi.title}}                        </label>                    </div>-->                </li>            </ul>            <!--       <pre>{{vm.headers|json}}</pre>-->        </div>        <!-- Right side of the table view -->        <div style="margin-left: 16%; border-left: 1px solid gray; padding: 1em;" ng-init="poiTypeFilter">            <!-- Filter -->            <div class="has-feedback" style="margin-bottom: 1em; float: right; width: 16%; min-width: 200px;">                <span style="direction: ltr; position: static; display: block;">                    <input id="searchbox" data-ng-model="featureFilter" type="text"                           placeholder="Filter" autocomplete="off" spellcheck="false"                           style="position: relative; vertical-align: top;" class="form-control tt-input">                </span>                <span id="searchicon" class="fa form-control-feedback fa-filter" style="padding-top: 0px;"></span>            </div>            <!--Download to CSV option-->            <a href="" data-ng-click="vm.downloadCsv()" alt="Download CSV" style="margin-top: 5px; margin-right: 1em; float: right;"><i class="fa fa-download fa-2x"></i></a>            <!-- Specify how many items to show -->            <select data-ng-model="vm.numberOfItems" style="margin-bottom: 1em; margin-right: 10px; float: left; width: 16%; min-width: 200px;" class="form-control tt-input">                <option value="5" translate="SHOW5"></option>                <option value="10" translate="SHOW10"></option>                <option value="15" translate="SHOW15"></option>                <option value="20" translate="SHOW20"></option>                <option value="25" translate="SHOW25"></option>                <option value="30" translate="SHOW30"></option>                <option value="35" translate="SHOW35"></option>                <option value="40" translate="SHOW40"></option>            </select>            <!-- Data table -->            <table class="table table-striped table-condensed">                <tr>                    <th data-ng-repeat="header in vm.headers track by $index">                        {{header}}&nbsp;                        <a data-ng-click="reverseSort = !reverseSort; vm.orderBy($index, reverseSort);"><i data-ng-class="vm.sortOrderClass($index, reverseSort)">&nbsp;&nbsp;</i></a>                    </th>                </tr>                <tr dir-paginate="row in vm.rows | filter:featureFilter | itemsPerPage: vm.numberOfItems"                    style="cursor: pointer; vertical-align: central">                    <td data-ng-class="{\'text-right\': field.type == \'number\'}" data-ng-repeat="field in row track by $index" data-ng-bind-html="vm.toTrusted(field.displayValue)"></td>                </tr>            </table>            <dir-pagination-controls style="" max-size="10" boundary-links="true" direction-links="true"                                     template-url="bower_components/angular-utils-pagination/dirPagination.tpl.html"></dir-pagination-controls>        </div>    </div>    <div style="clear: both; margin: 0; padding: .5em"></div></div>';
+})(DataTable || (DataTable = {}));
+var DataTable;
+(function (DataTable) {
+    /**
+      * Config
+      */
+    var moduleName = 'csWeb.datatable';
+    /**
+      * Module
+      */
+    DataTable.myModule;
+    try {
+        DataTable.myModule = angular.module(moduleName);
+    }
+    catch (err) {
+        // named module does not exist, so create one
+        DataTable.myModule = angular.module(moduleName, []);
+    }
+    /**
+      * Directive to display a feature's properties in a panel.
+      *
+      * @seealso : http://www.youtube.com/watch?v=gjJ5vLRK8R8&list=UUGD_0i6L48hucTiiyhb5QzQ
+      * @seealso : http://plnkr.co/edit/HyBP9d?p=preview
+      */
+    DataTable.myModule.directive('datatable', ['$compile', function ($compile) {
+        return {
+            terminal: false,
+            restrict: 'E',
+            scope: {},
+            template: DataTable.html,
+            //compile   : el => {     // I need to explicitly compile it in order to use interpolation like {{xxx}}
+            //    var fn = $compile(el);
+            //    return scope => {
+            //        fn(scope);
+            //    };
+            //},
+            replace: true,
+            transclude: true,
+            controller: DataTable.DataTableCtrl
+        };
+    }]);
+})(DataTable || (DataTable = {}));
+var DataTable;
+(function (DataTable) {
+    /**
+     * Represents a field in the table.
+     * The value is the actual displayValue shown, the type is the propertyType type (e.g. number or text, useful when aligning the data), and the header is used for sorting.
+     */
+    var TableField = (function () {
+        function TableField(displayValue, originalValue, type, header) {
+            this.displayValue = displayValue;
+            this.originalValue = originalValue;
+            this.type = type;
+            this.header = header;
+        }
+        return TableField;
+    })();
+    DataTable.TableField = TableField;
+    var DataTableCtrl = (function () {
+        // dependencies are injected via AngularJS $injector
+        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
+        function DataTableCtrl($scope, $http, $sce, $translate, $layerService, $localStorageService, $messageBusService) {
+            var _this = this;
+            this.$scope = $scope;
+            this.$http = $http;
+            this.$sce = $sce;
+            this.$translate = $translate;
+            this.$layerService = $layerService;
+            this.$localStorageService = $localStorageService;
+            this.$messageBusService = $messageBusService;
+            this.mapLabel = "map";
+            this.numberOfItems = 10;
+            this.layerOptions = [];
+            this.propertyTypes = [];
+            this.headers = [];
+            this.rows = [];
+            // 'vm' stands for 'view model'. We're adding a reference to the controller to the scope
+            // for its methods to be accessible from view / HTML
+            $scope.vm = this;
+            $translate('MAP_FEATURES').then(function (translation) {
+                _this.layerOptions[0].title = translation;
+            });
+            this.bindToStorage('vm.numberOfItems', 10);
+            this.numberOfItems = $localStorageService.get('vm.numberOfItems');
+            this.bindToStorage('vm.selectedLayerId', this.mapLabel);
+            if (this.$layerService.project == null || this.$layerService.project.groups == null)
+                return;
+            this.updateLayerOptions();
+            this.loadLayer();
+            $messageBusService.publish('timeline', 'isEnabled', 'false');
+        }
+        /**
+         * Add a label to local storage and bind it to the scope.
+         */
+        DataTableCtrl.prototype.bindToStorage = function (label, defaultValue) {
+            if (this.$localStorageService.get(label) === null)
+                this.$localStorageService.set(label, defaultValue); // You first need to set the key
+            this.$localStorageService.bind(this.$scope, label);
+        };
+        /**
+         * Create a list of layer options and select the one used previously.
+         */
+        DataTableCtrl.prototype.updateLayerOptions = function () {
+            var _this = this;
+            this.layerOptions.push({
+                "group": '',
+                "id": this.mapLabel,
+                "title": this.mapFeatureTitle
+            });
+            if (this.$layerService.project == null || this.$layerService.project.groups == null)
+                return;
+            this.$layerService.project.groups.forEach(function (group) {
+                group.layers.forEach(function (layer) {
+                    _this.layerOptions.push({
+                        "group": group.title,
+                        "id": layer.id,
+                        "title": layer.title
+                    });
+                });
+            });
+            this.selectedLayerId = this.$localStorageService.get('vm.selectedLayerId');
+        };
+        DataTableCtrl.prototype.loadLayer = function () {
+            var _this = this;
+            if (!this.selectedLayerId || this.selectedLayerId === this.mapLabel)
+                return this.loadMapLayers();
+            var selectedLayer = this.findLayerById(this.selectedLayerId);
+            if (selectedLayer == null)
+                return this.loadMapLayers();
+            this.$http.get(selectedLayer.url).success(function (data) {
+                _this.dataset = data;
+                if (data.featureTypes == null)
+                    data.featureTypes = {};
+                data.features.forEach(function (f) {
+                    f.featureTypeName = f.properties['FeatureTypeId'];
+                    if (!(f.featureTypeName in data.featureTypes))
+                        data.featureTypes[f.featureTypeName] = _this.$layerService.featureTypes[f.featureTypeName];
+                });
+                _this.updatepropertyType(data);
+            }).error(function (data, status, headers, config) {
+                _this.$messageBusService.notify("ERROR opening " + selectedLayer.title, "Could not get the data.");
+            });
+        };
+        /**
+         * Load the features as visible on the map.
+         */
+        DataTableCtrl.prototype.loadMapLayers = function () {
+            var _this = this;
+            this.selectedLayerId = this.mapLabel;
+            var data = {
+                type: '',
+                features: [],
+                featureTypes: {}
+            };
+            // If we are filtering, load the filter results
+            this.$layerService.project.groups.forEach(function (group) {
+                if (group.filterResult != null)
+                    group.filterResult.forEach(function (f) { return data.features.push(f); });
+            });
+            // Otherwise, take all loaded features
+            if (data.features.length === 0)
+                data.features = this.$layerService.project.features;
+            data.features.forEach(function (f) {
+                if (!(f.featureTypeName in data.featureTypes))
+                    data.featureTypes[f.featureTypeName] = _this.$layerService.featureTypes[f.featureTypeName];
+            });
+            this.dataset = data;
+            this.updatepropertyType(data);
+        };
+        DataTableCtrl.prototype.updatepropertyType = function (data) {
+            var _this = this;
+            this.propertyTypes = [];
+            this.headers = [];
+            this.rows = [];
+            var titles = [];
+            var mis = [];
+            // Push the Name, so it always appears on top.
+            mis.push({
+                label: "Name",
+                visibleInCallOut: true,
+                title: "Naam",
+                type: "text",
+                filterType: "text",
+                isSearchable: true
+            });
+            var featureType;
+            for (var key in data.featureTypes) {
+                featureType = data.featureTypes[key];
+                if (featureType.propertyTypeKeys != null) {
+                    var keys = featureType.propertyTypeKeys.split(';');
+                    keys.forEach(function (k) {
+                        if (k in _this.$layerService.propertyTypeData)
+                            mis.push(_this.$layerService.propertyTypeData[k]);
+                        else if (featureType.propertyTypeData != null) {
+                            var result = $.grep(featureType.propertyTypeData, function (e) { return e.label === k; });
+                            if (result.length >= 1)
+                                mis.push(result);
+                        }
+                    });
+                }
+                else if (featureType.propertyTypeData != null) {
+                    featureType.propertyTypeData.forEach(function (mi) { return mis.push(mi); });
+                }
+                mis.forEach(function (mi) {
+                    if ((mi.visibleInCallOut || mi.label === "Name") && titles.indexOf(mi.title) < 0) {
+                        titles.push(mi.title);
+                        _this.propertyTypes.push(mi);
+                    }
+                });
+            }
+            // Select the first couple of headers
+            var nmbrOfDefaultSelectedHeaders = 3;
+            for (var i = 0; i < nmbrOfDefaultSelectedHeaders; i++) {
+                this.headers.push(titles[i]);
+            }
+            this.rows = this.getRows();
+        };
+        DataTableCtrl.prototype.toggleSelection = function (propertyTypeTitle) {
+            var idx = this.headers.indexOf(propertyTypeTitle);
+            // is currently selected
+            if (idx > -1) {
+                this.headers.splice(idx, 1);
+            }
+            else {
+                this.headers.push(propertyTypeTitle);
+            }
+            this.rows = this.getRows();
+        };
+        DataTableCtrl.prototype.findLayerById = function (id) {
+            for (var i = 0; i < this.$layerService.project.groups.length; i++) {
+                var group = this.$layerService.project.groups[i];
+                for (var j = 0; j < group.layers.length; j++) {
+                    var layer = group.layers[j];
+                    if (layer.id != id)
+                        continue;
+                    return layer;
+                }
+            }
+            return null;
+        };
+        /**
+         * Returns the data rows that are relevant for the current selection.
+         */
+        DataTableCtrl.prototype.getRows = function () {
+            var _this = this;
+            var meta = [this.headers.length];
+            this.propertyTypes.forEach(function (mi) {
+                // Keep headers and mi in the right order
+                var index = _this.headers.indexOf(mi.title);
+                if (index >= 0)
+                    meta[index] = mi;
+            });
+            var props = [];
+            var displayValue;
+            this.dataset.features.forEach(function (f) {
+                var row = [];
+                meta.forEach(function (mi) {
+                    var text = f.properties[mi.label];
+                    displayValue = csComp.Helpers.convertPropertyInfo(mi, text);
+                    //if (!text)
+                    //    text = ' ';
+                    //else if (!$.isNumeric(text))
+                    //    text = text.replace(/&amp;/g, '&');
+                    //switch (mi.type) {
+                    //    case "bbcode":
+                    //        displayValue = XBBCODE.process({ text: text }).html;
+                    //        break;
+                    //    case "number":
+                    //        if (!$.isNumeric(text)) displayValue ='??';
+                    //        else if (!mi.stringFormat)
+                    //            displayValue = text.toString();
+                    //        else
+                    //            displayValue = String.format(mi.stringFormat, parseFloat(text));
+                    //        break;
+                    //    default:
+                    //        displayValue = text;
+                    //        break;
+                    //}
+                    row.push(new TableField(displayValue, text, mi.type, mi.title));
+                });
+                props.push(row);
+            });
+            return props;
+        };
+        /**
+         * Generate a font awesome class based on the order.
+         */
+        DataTableCtrl.prototype.sortOrderClass = function (headerIndex, reverseOrder) {
+            var t;
+            if (reverseOrder != null && headerIndex == this.sortingColumn) {
+                t = ('fa fa-sort-' + ((reverseOrder) ? 'desc' : 'asc'));
+            }
+            else {
+                t = 'fa fa-sort';
+            }
+            return t;
+        };
+        /**
+         * Order the rows based on the header index and the order.
+         */
+        DataTableCtrl.prototype.orderBy = function (headerIndex, reverseOrder) {
+            this.sortingColumn = headerIndex;
+            this.rows = this.rows.sort(function (a, b) {
+                var order; // Original sort order
+                if (a[headerIndex].type == 'number')
+                    order = a[headerIndex].originalValue > b[headerIndex].originalValue;
+                else
+                    order = a[headerIndex].originalValue.toLowerCase() > b[headerIndex].originalValue.toLowerCase();
+                if (order == reverseOrder)
+                    return 1;
+                else
+                    return -1;
+            });
+        };
+        DataTableCtrl.prototype.downloadCsv = function () {
+            var csvRows = [];
+            csvRows.push(this.headers.join(';'));
+            for (var i = 0; i < this.rows.length; i++) {
+                csvRows.push(this.rows[i].map(function (f) {
+                    return f.originalValue;
+                }).join(';'));
+            }
+            var csvString = csvRows.join('\r\n');
+            var filename = this.mapLabel;
+            if (this.selectedLayerId !== this.mapLabel) {
+                var layer = this.findLayerById(this.selectedLayerId);
+                if (layer)
+                    filename = layer.title.replace(' ', '_');
+            }
+            this.saveData(csvString, filename + '.csv');
+        };
+        DataTableCtrl.prototype.saveData = function (csvData, filename) {
+            if (navigator.msSaveBlob) {
+                // IE 10+
+                var link = document.createElement('a');
+                link.addEventListener("click", function (event) {
+                    var blob = new Blob([csvData], { "type": "text/csv;charset=utf-8;" });
+                    navigator.msSaveBlob(blob, filename);
+                }, false);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+            else if (!csComp.Helpers.supportsDataUri()) {
+                // Older versions of IE: show the data in a new window
+                var popup = window.open('', 'csv', '');
+                popup.document.body.innerHTML = '<pre>' + csvData + '</pre>';
+            }
+            else {
+                // Support for browsers that support the data uri.
+                var a = document.createElement('a');
+                document.body.appendChild(a);
+                a.href = 'data:text/csv;charset=utf-8,' + encodeURI(csvData);
+                a.target = '_blank';
+                a.download = filename;
+                a.click();
+                document.body.removeChild(a);
+            }
+        };
+        /**
+         * Convert to trusted html string.
+         */
+        DataTableCtrl.prototype.toTrusted = function (html) {
+            try {
+                if (html === undefined || html === null)
+                    return this.$sce.trustAsHtml(html);
+                return this.$sce.trustAsHtml(html.toString());
+            }
+            catch (e) {
+                console.log(e + ': ' + html);
+                return '';
+            }
+        };
+        // $inject annotation.
+        // It provides $injector with information about dependencies to be injected into constructor
+        // it is better to have it close to the constructor, because the parameters must match in count and type.
+        // See http://docs.angularjs.org/guide/di
+        DataTableCtrl.$inject = [
+            '$scope',
+            '$http',
+            '$sce',
+            '$translate',
+            'layerService',
+            'localStorageService',
+            'messageBusService'
+        ];
+        return DataTableCtrl;
+    })();
+    DataTable.DataTableCtrl = DataTableCtrl;
+})(DataTable || (DataTable = {}));
+var ExpertMode;
+(function (ExpertMode) {
+    ExpertMode.html = '<div class="navbar-collapse collapse"     tooltip-html-unsafe="{{\'EXPERTMODE.EXPLANATION\' | translate}}"     tooltip-placement="left"     tooltip-trigger="mouseenter"     tooltip-append-to-body="false">    <ul class="nav navbar-nav">        <li class="dropdown">            <a href=""               class="navbar-brand dropdown-toggle pull-left"               data-toggle="dropdown"               style="color:white; margin-left:-10px;">                <div class="circle"><span data-ng-class="vm.getCssClass()" style="width: 32px; height: 32px"></span></div>            </a>            <ul class="dropdown-menu" role="menu">                <li>                    <a data-ng-click="vm.setExpertMode(1)">                        <span class="beginnerUserIcon" style="margin-left: -10px; width: 40px; height: 32px"></span>                        <div translate>EXPERTMODE.BEGINNER</div>                    </a>                </li>                <li>                    <a data-ng-click="vm.setExpertMode(2)">                        <span class="intermediateUserIcon" style="margin-left: -10px; width: 40px; height: 32px"></span>                        <div translate>EXPERTMODE.INTERMEDIATE</div>                    </a>                </li>                <li>                    <a data-ng-click="vm.setExpertMode(3)">                        <span class="expertUserIcon" style="margin-left: -10px; width: 40px; height: 32px"></span>                        <div translate>EXPERTMODE.EXPERT</div>                    </a>                </li>            </ul>        </li>    </ul></div>';
+})(ExpertMode || (ExpertMode = {}));
 var ExpertMode;
 (function (ExpertMode) {
     /**
@@ -793,19 +1678,27 @@ var ExpertMode;
                 terminal: true,
                 restrict: 'E',
                 scope: {},
-                link: function (scope, element, attrs) {
-                    // Since we are wrapping the rating directive in this directive, I couldn't use transclude,
-                    // so I copy the existing attributes manually.
-                    var attributeString = '';
-                    for (var key in attrs) {
-                        if (key.substr(0, 1) !== '$' && attrs.hasOwnProperty(key))
-                            attributeString += key + '="' + attrs[key] + '" ';
-                    }
-                    var html = '<rating ng-model="expertMode" ' + attributeString + 'tooltip-html-unsafe="{{\'EXPERTMODE.EXPLANATION\' | translate}}" tooltip-placement="bottom" tooltip-trigger="mouseenter" tooltip-append-to-body="false"' + 'max="3"></rating>';
-                    var e = $compile(html)(scope);
-                    element.replaceWith(e);
+                template: ExpertMode.html,
+                compile: function (el) {
+                    var fn = $compile(el);
+                    return function (scope) {
+                        fn(scope);
+                    };
                 },
-                //template: '<div><rating ng-model="expertise" max="3"></rating></div>',
+                //link: function (scope, element, attrs) {
+                //     // Since we are wrapping the rating directive in this directive, I couldn't use transclude,
+                //     // so I copy the existing attributes manually.
+                //     var attributeString = ''; 
+                //     for (var key in attrs) {
+                //         if (key.substr(0, 1) !== '$' && attrs.hasOwnProperty(key)) attributeString += key + '="' + attrs[key] + '" ';
+                //     }
+                //     var html = '<rating ng-model="expertMode" '
+                //         + attributeString
+                //         + 'tooltip-html-unsafe="{{\'EXPERTMODE.EXPLANATION\' | translate}}" tooltip-placement="bottom" tooltip-trigger="mouseenter" tooltip-append-to-body="false"'
+                //         + 'max="3"></rating>';
+                //     var e = $compile(html)(scope);
+                //     element.replaceWith(e);
+                // },  
                 replace: true,
                 transclude: true,
                 controller: ExpertMode.ExpertModeCtrl
@@ -815,6 +1708,7 @@ var ExpertMode;
 })(ExpertMode || (ExpertMode = {}));
 var ExpertMode;
 (function (ExpertMode) {
+    var Expertise = csComp.Services.Expertise;
     var ExpertModeCtrl = (function () {
         function ExpertModeCtrl($scope, $localStorageService, $layerService, $mapService, $messageBus) {
             var _this = this;
@@ -835,6 +1729,22 @@ var ExpertMode;
             });
         }
         /**
+        * Get the CSS class to render the mode.
+        */
+        ExpertModeCtrl.prototype.getCssClass = function () {
+            switch (this.$mapService.expertMode) {
+                case 1 /* Beginner */:
+                    return 'beginnerUserIcon';
+                    break;
+                case 2 /* Intermediate */:
+                    return 'intermediateUserIcon';
+                    break;
+                case 3 /* Expert */:
+                    return 'expertUserIcon';
+                    break;
+            }
+        };
+        /**
         * Set the expert mode: although we assume that each directive is responsible for managing it by listening
         * to the expertMode.newExpertise message, we already set some common options here.
         * This is to reduce the dependency on this directive.
@@ -853,6 +1763,503 @@ var ExpertMode;
     })();
     ExpertMode.ExpertModeCtrl = ExpertModeCtrl;
 })(ExpertMode || (ExpertMode = {}));
+var FeatureList;
+(function (FeatureList) {
+    FeatureList.html = '<div style="position: relative;">    <h4 class="leftpanel-header" translate="FEATURES"></h4>    <div class="has-feedback" style="padding:10px 4px 4px 4px;">        <span style="direction: ltr; position: static; display: block;">            <input id="searchbox" data-ng-model="featureFilter.properties" type="text"                   placeholder="Filter" autocomplete="off" spellcheck="false"                   style="position: relative; vertical-align: top;" class="form-control tt-input">        </span>        <span id="searchicon" class="fa form-control-feedback fa-filter" style="padding-top: 10px;"></span>    </div>    <table class="table table-striped table-condensed">        <!--vm.$layerService.features-->        <tr dir-paginate="feature in vm.$layerService.project.features | filter:featureFilter | orderBy:\'properties.Name\' | itemsPerPage: numberOfItems "            data-ng-click="vm.$mapService.zoomTo(feature);vm.$layerService.selectFeature(feature);" style="cursor: pointer; height: 50px; vertical-align: central">            <!--<td>Icon</td>-->            <td>{{ feature.properties.Name }}</td>            <td>                <i class="fa fa-chevron-right pull-right"></i>            </td>        </tr>    </table>    <dir-pagination-controls style="position: absolute; bottom: -80px;" max-size="6" boundary-links="false" direction-links="false" template-url="bower_components/angular-utils-pagination/dirPagination.tpl.html"></dir-pagination-controls></div>';
+})(FeatureList || (FeatureList = {}));
+var FeatureList;
+(function (FeatureList) {
+    /**
+      * Config
+      */
+    var moduleName = 'csWeb.featureList';
+    /**
+      * Module
+      */
+    FeatureList.myModule;
+    try {
+        FeatureList.myModule = angular.module(moduleName);
+    }
+    catch (err) {
+        // named module does not exist, so create one
+        FeatureList.myModule = angular.module(moduleName, []);
+    }
+    /**
+      * Directive to display the available map layers.
+      */
+    FeatureList.myModule.directive('featureList', [
+        '$window',
+        '$compile',
+        function ($window, $compile) {
+            return {
+                terminal: false,
+                restrict: 'E',
+                scope: {},
+                template: FeatureList.html,
+                //compile             : el          => {    // I need to explicitly compile it in order to use interpolation like {{xxx}}
+                //    var fn                        = $compile(el);
+                //    return scope                  => { 
+                //        fn(scope);
+                //    };
+                //},
+                // Directives that want to modify the DOM typically use the link option.link takes a function with the following signature, function link(scope, element, attrs) { ... } where:
+                // scope is an Angular scope object.
+                // element is the jqLite - wrapped element that this directive matches.
+                // attrs is a hash object with key - value pairs of normalized attribute names and their corresponding attribute values.
+                link: function (scope, element, attrs) {
+                    // Deal with resizing the element list
+                    scope.onResizeFunction = function () {
+                        var filterHeight = 50;
+                        var paginationCtrlHeight = 100;
+                        var itemHeight = 60;
+                        //scope.windowHeight          = $window.innerHeight;
+                        //scope.windowWidth           = $window.innerWidth;
+                        scope.numberOfItems = Math.floor(($window.innerHeight - filterHeight - paginationCtrlHeight) / itemHeight);
+                    };
+                    // Call to the function when the page is first loaded
+                    scope.onResizeFunction();
+                    angular.element($window).bind('resize', function () {
+                        scope.onResizeFunction();
+                        scope.$apply();
+                    });
+                },
+                replace: true,
+                transclude: true,
+                controller: FeatureList.FeatureListCtrl
+            };
+        }
+    ]).directive('bsPopover', function () {
+        return function (scope, element, attrs) {
+            element.find("a[rel=popover]").popover({ placement: 'right', html: 'true' });
+        };
+    });
+})(FeatureList || (FeatureList = {}));
+var FeatureList;
+(function (FeatureList) {
+    var FeatureListCtrl = (function () {
+        // dependencies are injected via AngularJS $injector
+        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
+        function FeatureListCtrl($scope, $layerService, $mapService) {
+            this.$scope = $scope;
+            this.$layerService = $layerService;
+            this.$mapService = $mapService;
+            $scope.vm = this;
+            $scope.numberOfItems = 10; // This is being reset in the directive upon receiving a resize.
+        }
+        // $inject annotation.
+        // It provides $injector with information about dependencies to be injected into constructor
+        // it is better to have it close to the constructor, because the parameters must match in count and type.
+        // See http://docs.angularjs.org/guide/di
+        FeatureListCtrl.$inject = [
+            '$scope',
+            'layerService',
+            'mapService'
+        ];
+        return FeatureListCtrl;
+    })();
+    FeatureList.FeatureListCtrl = FeatureListCtrl;
+})(FeatureList || (FeatureList = {}));
+var FeatureProps;
+(function (FeatureProps) {
+    FeatureProps.html = '<div data-ng-cloak data-ng-show="showMenu" >    <h4 class="rightpanel-header">        <img data-ng-if="callOut.icon" data-ng-src="{{callOut.icon}}" width="24" height="24" style="margin-left:5px" alt="Icon" />        &nbsp;&nbsp;{{callOut.title}}    </h4>        <div class="container-fluid rightpanel-tabs" style="position: relative">        <div class="row" style="overflow:hidden" ng-if="callOut.sectionCount() < 4">            <!-- Nav tabs -->            <span id="leftArr" style="display:block;padding:10px;margin-top:5px;position:absolute;background-color:transparent;z-index:2">                <i class="glyphicon glyphicon-chevron-left"></i>            </span>            <span id="rightArr" style="display:block;padding:10px;margin-top:5px;position:absolute;background-color:transparent;z-index:2">                <i class="glyphicon glyphicon-chevron-right"></i>            </span>            <ul class="nav nav-tabs" id="featureTabs" style="margin-left:10px">                <li data-toggle="tab" data-ng-class="{active : $first}" data-ng-repeat="(sectionTitle, section) in callOut.sections" ng-if="section.hasProperties()">                    <a ng-href="#rp-{{$index}}" data-toggle="tab" data-ng-if="section.showSectionIcon()" ng-click="featureTabActivated(sectionTitle, section)"><i class="fa {{section.sectionIcon}}"></i></a>                    <a ng-href="#rp-{{$index}}" data-toggle="tab" data-ng-if="!section.showSectionIcon()" ng-click="featureTabActivated(sectionTitle, section)">{{sectionTitle}}</a>                </li>            </ul>        </div>                <div class="row" ng-if="callOut.sectionCount() >= 4">            <ul class="nav nav-tabs" id="featureTabs" style="margin-left:10px">                <li data-toggle="tab" class="active" ng-init="firstCallOutsection=callOut.firstSection()">                    <a ng-href="#rp-0" data-toggle="tab" data-ng-if="firstCallOutsection.showSectionIcon()" >                        <i class="fa {{firstCallOutsection.sectionIcon}}"></i>                    </a>                                    </li>                <li class="dropdown" ng-init="selectedSection.title=\'...\'">                    <a style="cursor:pointer" data-toggle="dropdown">{{selectedSection.title}} <span class="caret"></span></a>                    <ul class="dropdown-menu">                        <li data-ng-repeat="(sectionTitle, section) in callOut.sections" ng-if="!$last">                            <a ng-href="#rp-{{$index}}"                               ng-click="selectedSection.title = sectionTitle"                               data-toggle="tab">{{sectionTitle}}</a>                        </li>                    </ul>                </li>                <li data-toggle="tab" ng-init="lastCallOutsection=callOut.lastSection()">                    <a ng-href="#rp-{{callOut.sectionCount()-1}}" data-toggle="tab"                        data-ng-if="lastCallOutsection.showSectionIcon()">                        <i class="fa {{lastCallOutsection.sectionIcon}}"></i>                    </a>                                    </li>            </ul>        </div>    </div>        <div class="tab-content" style="top:50px; width:355px; overflow-y: auto; overflow-x: hidden" resize resize-y="150">        <div data-ng-if="!$last" class="tab-pane" data-ng-class="{active : $first}"              id="rp-{{$index}}"              data-ng-repeat="(sectionTitle, section) in callOut.sections">            <!--<td>                    <span class="dropdown">                        <a href class="fa fa-circle-o makeNarrow dropdown-toggle"></a>                        <ul class="dropdown-menu">                            <li><a data-ng-click="vm.$layerService.createScatter(item)">scatter plot</a></li>                            <li><a>add to dashboard</a></li>                        </ul>                    </span>                </td>-->            <div class="panel-group" id="accordion">                <div class="panel panel-default"                     popover="{{(item.description) ? item.description : \'\'}}"                     popover-placement="left"                     popover-trigger="mouseenter"                     popover-append-to-body="true"                     data-ng-repeat="item in section.properties">                    <div class="panel-heading" style="min-height: 36px">                        <div class="pull-left accordionIcon"><a class="fa fa-filter makeNarrow" data-ng-show="item.canFilter" data-ng-click="vm.$layerService.setPropertyFilter(item)" style="cursor: pointer"></a></div>                        <div class="pull-left accordionIcon"><a class="fa fa-eye makeNarrow" data-ng-show="item.canStyle" data-ng-click="vm.$layerService.setStyle(item)" style="cursor: pointer"></a></div>                        <div class="pull-left accordionIcon" data-ng-if="item.isSensor">                            <a class="fa fa-line-chart makeNarrow"                               data-toggle="collapse"                               data-target="#sensor{{item.property}}"                               href="#sensor{{item.property}}"                               style="cursor: pointer"></a>                        </div>                        <div class="pull-left" style="margin-left: 4px;">                            {{item.key}}                        </div>                        <div class="text-right" data-ng-bind-html="vm.toTrusted(item.value)"></div>                        <div id="sensor{{item.property}}"                             data-ng-if="item.isSensor"                             class="panel-collapse collapse" style="padding-top: 10px;">                            <sparkline-chart timestamps="item.timestamps" sensor="item.sensor" width="320" height="90" showaxis="true"></sparkline-chart>                            <!--<div class="panel-body">            <sparkline-chart timestamps="item.timestamps" sensor="item.sensor" width="320" height="90" showaxis="true"></sparkline-chart>        </div>-->                        </div>                    </div>                </div>            </div>        </div>        <!-- Treat last tab (filter) differently -->        <div data-ng-if="$last" class="tab-pane" data-ng-class="{active : $first}" id="rp-{{$index}}" data-ng-repeat="(sectionTitle, section) in callOut.sections">            <!-- Add filter panel to the last rendered element -->            <div class="has-feedback" style="padding:0 4px 4px 4px;">                <span style="direction: ltr; position: static; display: block;">                    <input id="searchbox" data-ng-model="search.key" type="text"                           placeholder="Filter" autocomplete="off" spellcheck="false"                           style="position: relative; vertical-align: top;" class="form-control tt-input">                </span>                <span id="searchicon" class="fa form-control-feedback fa-filter"></span>            </div>            <div class="panel-group" id="accordion">                <div class="panel panel-default"                     popover="{{(item.description) ? item.description : \'\'}}"                     popover-placement="left"                     popover-trigger="mouseenter"                     popover-append-to-body="true"                     data-ng-repeat="item in section.properties">                    <div class="panel-heading" style="min-height: 36px">                        <div class="pull-left accordionIcon"><a class="fa fa-filter makeNarrow" data-ng-show="item.canFilter" data-ng-click="vm.$layerService.setPropertyFilter(item)" style="cursor: pointer"></a></div>                        <div class="pull-left accordionIcon"><a class="fa fa-eye makeNarrow" data-ng-show="item.canStyle" data-ng-click="vm.$layerService.setStyle(item)" style="cursor: pointer"></a></div>                        <div class="pull-left accordionIcon" data-ng-if="item.isSensor">                            <a class="fa fa-line-chart makeNarrow"                               data-toggle="collapse"                               data-target="#fsensor{{item.property}}"                               href="#fsensor{{item.property}}"                               style="cursor: pointer"></a>                        </div>                        <div class="pull-left" style="margin-left: 4px;">                            {{item.key}}                        </div>                        <div class="text-right" data-ng-bind-html="vm.toTrusted(item.value)"></div>                        <div id="fsensor{{item.property}}"                             data-ng-if="item.isSensor"                             class="panel-collapse collapse">                            <div class="panel-body">Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt accusamus labore sustainable VHS.</div>                        </div>                    </div>                </div>            </div>            <!--<input style="padding:4px;" class=" form-control" data-ng-model="search" placeholder="...">-->            <!--<table id="searchTextResults" class="table table-condensed">                <tr popover="{{(item.description) ? item.description : \'\'}}"                    popover-placement="left"                    popover-trigger="mouseenter"                    popover-append-to-body="true"                    data-ng-repeat="item in section.properties | filter:search">                    <td><a class="fa fa-filter makeNarrow" data-ng-show="item.canFilter" data-ng-click="vm.$layerService.setFilter(item)"></a></td>                    <td><a class="fa fa-eye makeNarrow" data-ng-show="item.canStyle" data-ng-click="vm.$layerService.setStyle(item)"></a></td>                    <td>{{item.key}}</td>                    <td class="text-right" data-ng-bind-html="vm.toTrusted(item.value)"></td>                </tr>            </table>-->        </div>                <!--SimpleTimeline component-->        <div data-ng-if="vm.showSimpleTimeline" style="margin-left: 10px">            <div class="btn-group" dropdown is-open="status.isopen">                <button type="button" class="btn btn-primary dropdown-toggle" dropdown-toggle ng-disabled="disabled">                    {{vm.focusTime}} <span class="caret"></span>                </button>                <ul class="dropdown-menu" role="menu">                    <li data-ng-repeat="ts in vm.timestamps"                         data-ng-click="vm.setTime(ts)">{{ts.title}}</li>                </ul>            </div>        </div>    </div></div>';
+})(FeatureProps || (FeatureProps = {}));
+var FeatureProps;
+(function (FeatureProps) {
+    /**
+      * Config
+      */
+    var moduleName = 'csWeb.featureprops';
+    /**
+      * Module
+      */
+    FeatureProps.myModule;
+    try {
+        FeatureProps.myModule = angular.module(moduleName);
+    }
+    catch (err) {
+        // named module does not exist, so create one
+        FeatureProps.myModule = angular.module(moduleName, []);
+    }
+    /**
+      * Directive to display a feature's properties in a panel.
+      *
+      * @seealso          : http://www.youtube.com/watch?v=gjJ5vLRK8R8&list=UUGD_0i6L48hucTiiyhb5QzQ
+      * @seealso          : http://plnkr.co/edit/HyBP9d?p=preview
+      */
+    FeatureProps.myModule.directive('featureprops', ['$compile', function ($compile) {
+        return {
+            terminal: true,
+            restrict: 'E',
+            scope: {},
+            template: FeatureProps.html,
+            compile: function (el) {
+                var fn = $compile(el);
+                return function (scope) {
+                    fn(scope);
+                };
+            },
+            replace: true,
+            transclude: true,
+            controller: FeatureProps.FeaturePropsCtrl
+        };
+    }]);
+})(FeatureProps || (FeatureProps = {}));
+var FeatureProps;
+(function (FeatureProps) {
+    var FeaturePropsOptions = (function () {
+        function FeaturePropsOptions(position) {
+            this.position = position;
+            this.closeButton = true;
+            this.autoPan = true;
+        }
+        return FeaturePropsOptions;
+    })();
+    var CallOutProperty = (function () {
+        function CallOutProperty(key, value, property, canFilter, canStyle, feature, isFilter, isSensor, description, meta, timestamps, sensor) {
+            this.key = key;
+            this.value = value;
+            this.property = property;
+            this.canFilter = canFilter;
+            this.canStyle = canStyle;
+            this.feature = feature;
+            this.isFilter = isFilter;
+            this.isSensor = isSensor;
+            this.description = description;
+            this.meta = meta;
+            this.timestamps = timestamps;
+            this.sensor = sensor;
+        }
+        return CallOutProperty;
+    })();
+    FeatureProps.CallOutProperty = CallOutProperty;
+    var CallOutSection = (function () {
+        function CallOutSection(sectionIcon) {
+            this.propertyTypes = {};
+            this.properties = [];
+            this.sectionIcon = sectionIcon;
+        }
+        CallOutSection.prototype.showSectionIcon = function () {
+            return !csComp.StringExt.isNullOrEmpty(this.sectionIcon);
+        };
+        CallOutSection.prototype.addProperty = function (key, value, property, canFilter, canStyle, feature, isFilter, description, meta) {
+            var isSensor = typeof feature.sensors !== 'undefined' && feature.sensors.hasOwnProperty(property);
+            if (isSensor)
+                this.properties.push(new CallOutProperty(key, value, property, canFilter, canStyle, feature, isFilter, isSensor, description ? description : null, meta, feature.timestamps, feature.sensors[property]));
+            else
+                this.properties.push(new CallOutProperty(key, value, property, canFilter, canStyle, feature, isFilter, isSensor, description ? description : null, meta));
+        };
+        CallOutSection.prototype.hasProperties = function () {
+            return this.properties != null && this.properties.length > 0;
+        };
+        return CallOutSection;
+    })();
+    FeatureProps.CallOutSection = CallOutSection;
+    var CallOut = (function () {
+        function CallOut(type, feature, propertyTypeData) {
+            var _this = this;
+            this.type = type;
+            this.feature = feature;
+            this.propertyTypeData = propertyTypeData;
+            this.sections = {};
+            //if (type == null) this.createDefaultType();
+            this.setTitle();
+            this.setIcon(feature);
+            var infoCallOutSection = new CallOutSection('fa-info');
+            var searchCallOutSection = new CallOutSection('fa-filter');
+            var displayValue;
+            if (type != null) {
+                var propertyTypes = csComp.Helpers.getPropertyTypes(type, propertyTypeData);
+                propertyTypes.forEach(function (mi) {
+                    var callOutSection = _this.getOrCreateCallOutSection(mi.section) || infoCallOutSection;
+                    callOutSection.propertyTypes[mi.label] = mi;
+                    var text = feature.properties[mi.label];
+                    displayValue = csComp.Helpers.convertPropertyInfo(mi, text);
+                    // Skip empty, non-editable values
+                    if (!mi.canEdit && csComp.StringExt.isNullOrEmpty(displayValue))
+                        return;
+                    var canFilter = (mi.type === "number" || mi.type === "text" || mi.type === "options");
+                    var canStyle = (mi.type === "number" || mi.type === "options" || mi.type === "color");
+                    if (mi.filterType != null)
+                        canFilter = mi.filterType.toLowerCase() != "none";
+                    if (mi.visibleInCallOut) {
+                        callOutSection.addProperty(mi.title, displayValue, mi.label, canFilter, canStyle, feature, false, mi.description, mi);
+                    }
+                    searchCallOutSection.addProperty(mi.title, displayValue, mi.label, canFilter, canStyle, feature, false, mi.description);
+                });
+            }
+            if (infoCallOutSection.properties.length > 0)
+                this.sections['AAA Info'] = infoCallOutSection; // The AAA is added as the sections are sorted alphabetically
+            if (searchCallOutSection.properties.length > 0)
+                this.sections['Zzz Search'] = searchCallOutSection;
+        }
+        CallOut.prototype.sectionCount = function () {
+            return Object.keys(this.sections).length;
+        };
+        CallOut.prototype.firstSection = function () {
+            return this.sections[Object.keys(this.sections)[this.sectionCount() - 2]];
+        };
+        CallOut.prototype.lastSection = function () {
+            return this.sections[Object.keys(this.sections)[this.sectionCount() - 1]];
+        };
+        CallOut.prototype.getOrCreateCallOutSection = function (sectionTitle) {
+            if (!sectionTitle) {
+                return null;
+            }
+            if (sectionTitle in this.sections)
+                return this.sections[sectionTitle];
+            this.sections[sectionTitle] = new CallOutSection();
+            return this.sections[sectionTitle];
+        };
+        /**
+         * Set the title of the callout to the title of the feature.
+         */
+        CallOut.prototype.setTitle = function () {
+            this.title = CallOut.title(this.type, this.feature);
+        };
+        CallOut.prototype.setIcon = function (feature) {
+            this.icon = (this.type == null || this.type.style == null || !this.type.style.hasOwnProperty('iconUri') || this.type.style.iconUri.toLowerCase().indexOf('_media') >= 0) ? '' : this.type.style.iconUri.indexOf('{') >= 0 ? csComp.Helpers.convertStringFormat(feature, this.type.style.iconUri) : this.type.style.iconUri;
+        };
+        CallOut.title = function (type, feature) {
+            var title = '';
+            if (type != null && type.style != null && type.style.nameLabel)
+                title = feature.properties[type.style.nameLabel];
+            else {
+                if (feature.properties.hasOwnProperty('Name'))
+                    title = feature.properties['Name'];
+                else if (feature.properties.hasOwnProperty('name'))
+                    title = feature.properties['name'];
+            }
+            if (!csComp.StringExt.isNullOrEmpty(title) && !$.isNumeric(title))
+                title = title.replace(/&amp;/g, '&');
+            return title;
+        };
+        return CallOut;
+    })();
+    FeatureProps.CallOut = CallOut;
+    var FeaturePropsCtrl = (function () {
+        // dependencies are injected via AngularJS $injector
+        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
+        function FeaturePropsCtrl($scope, $location, $sce, $mapService, $layerService, $messageBusService) {
+            var _this = this;
+            this.$scope = $scope;
+            this.$location = $location;
+            this.$sce = $sce;
+            this.$mapService = $mapService;
+            this.$layerService = $layerService;
+            this.$messageBusService = $messageBusService;
+            /**
+             * Callback function
+             * @see {http://stackoverflow.com/questions/12756423/is-there-an-alias-for-this-in-typescript}
+             * @see {http://stackoverflow.com/questions/20627138/typescript-this-scoping-issue-when-called-in-jquery-callback}
+             * @todo {notice the strange syntax using a fat arrow =>, which is to preserve the this reference in a callback!}
+             */
+            this.sidebarMessageReceived = function (title) {
+                switch (title) {
+                    case "toggle":
+                        _this.$scope.showMenu = !_this.$scope.showMenu;
+                        break;
+                    case "show":
+                        _this.$scope.showMenu = true;
+                        break;
+                    case "hide":
+                        _this.$scope.showMenu = false;
+                        break;
+                    default:
+                }
+                // NOTE EV: You need to call apply only when an event is received outside the angular scope.
+                // However, make sure you are not calling this inside an angular apply cycle, as it will generate an error.
+                if (_this.$scope.$root.$$phase != '$apply' && _this.$scope.$root.$$phase != '$digest') {
+                    _this.$scope.$apply();
+                }
+            };
+            this.featureMessageReceived = function (title, feature) {
+                switch (title) {
+                    case "onFeatureSelect":
+                        _this.setShowSimpleTimeline();
+                        _this.displayFeature(feature);
+                        _this.$scope.poi = feature;
+                        _this.$scope.autocollapse(true);
+                        break;
+                    case "onFeatureUpdated":
+                        _this.displayFeature(_this.$layerService.lastSelectedFeature);
+                        _this.$scope.poi = _this.$layerService.lastSelectedFeature;
+                        break;
+                    default:
+                }
+                if (_this.$scope.$root.$$phase != '$apply' && _this.$scope.$root.$$phase != '$digest') {
+                    _this.$scope.$apply();
+                }
+            };
+            this.timestamps = new Array();
+            this.scope = $scope;
+            $scope.vm = this;
+            $scope.showMenu = false;
+            $scope.featureTabActivated = function (sectionTitle, section) {
+                $messageBusService.publish('FeatureTab', 'activated', { sectionTitle: sectionTitle, section: section });
+            };
+            $messageBusService.subscribe("sidebar", this.sidebarMessageReceived);
+            $messageBusService.subscribe("feature", this.featureMessageReceived);
+            var widthOfList = function () {
+                var itemsWidth = 0;
+                $('#featureTabs>li').each(function () {
+                    var itemWidth = $(this).outerWidth();
+                    itemsWidth += itemWidth;
+                });
+                return itemsWidth;
+            };
+            $scope.autocollapse = function (initializeTabPosition) {
+                if (initializeTabPosition === void 0) { initializeTabPosition = false; }
+                //                console.log('autocollapse');
+                var tabs = $('#featureTabs');
+                //                console.log('#ft.ow(): ' + tabs.outerWidth());
+                //                console.log('wol: ' + widthOfList());
+                //                console.log('ml: ' + tabs.css('margin-left'));
+                if (tabs.outerWidth() < widthOfList() || parseFloat(tabs.css('margin-left')) < 0) {
+                    $('#leftArr').show();
+                    $('#rightArr').show();
+                    if (initializeTabPosition) {
+                        tabs.animate({ 'margin-left': '20px' }, 'slow');
+                    }
+                }
+                else {
+                    $('#leftArr').hide();
+                    $('#rightArr').hide();
+                    if (initializeTabPosition) {
+                        tabs.animate({ 'margin-left': '0px' }, 'slow');
+                    }
+                }
+            };
+            $scope.autocollapse(true); // when document first loads
+            $scope.tabs = $('#featureTabs');
+            $scope.tabScrollDelta = $scope.tabs.outerWidth();
+            $('#leftArr').click(function () {
+                //console.log('leftArr');
+                //var tabs = $('#featureTabs');
+                var current = parseFloat($scope.tabs.css('margin-left'));
+                var min = 20;
+                var nextPos = $scope.tabScrollDelta;
+                if (current + nextPos > min) {
+                    nextPos = min - current;
+                }
+                $scope.tabs.animate({ 'margin-left': '+=' + nextPos + 'px' }, 'slow', function () {
+                    //                    console.log('rightarr hide');
+                    $('#rightArr').show();
+                    $('#leftArr').show();
+                    $scope.autocollapse(false);
+                });
+            });
+            $('#rightArr').click(function () {
+                //var tabs = $('#featureTabs');
+                var max = widthOfList() - $scope.tabs.outerWidth() + 30;
+                //var current = Math.abs(parseFloat($scope.tabs.css('margin-left')));
+                var nextPos = $scope.tabScrollDelta;
+                nextPos = Math.min(max, nextPos);
+                $scope.tabs.animate({ 'margin-left': '-=' + nextPos + 'px' }, 'slow', function () {
+                    $('#leftArr').show();
+                    $('#rightArr').show();
+                    $scope.autocollapse(false);
+                });
+            });
+        }
+        FeaturePropsCtrl.prototype.toTrusted = function (html) {
+            try {
+                if (html === undefined || html === null)
+                    return this.$sce.trustAsHtml(html);
+                return this.$sce.trustAsHtml(html.toString());
+            }
+            catch (e) {
+                console.log(e + ': ' + html);
+                return '';
+            }
+        };
+        FeaturePropsCtrl.prototype.createScatter = function (property) {
+            var sc = new csComp.Services.GroupFilter();
+            sc.property = property.property;
+            sc.property2 = "opp_land";
+            sc.id = csComp.Helpers.getGuid();
+            sc.filterType = "scatter";
+            sc.title = sc.property;
+            var l = this.$layerService.findLayer(this.$scope.poi.layerId);
+            this.$layerService.setFilter(sc, l.group);
+            //alert('scatter ' + property.property);
+        };
+        FeaturePropsCtrl.prototype.displayFeature = function (feature) {
+            if (!feature)
+                return;
+            var featureType = this.$layerService.featureTypes[feature.featureTypeName];
+            // If we are dealing with a sensor, make sure that the feature's timestamps are valid so we can add it to a chart
+            if (typeof feature.sensors !== 'undefined' && typeof feature.timestamps === 'undefined')
+                feature.timestamps = this.$layerService.findLayer(feature.layerId).timestamps;
+            this.$scope.callOut = new CallOut(featureType, feature, this.$layerService.propertyTypeData);
+        };
+        FeaturePropsCtrl.prototype.showSensorData = function (property) {
+            console.log(property);
+        };
+        FeaturePropsCtrl.prototype.setShowSimpleTimeline = function () {
+            if (this.$mapService.timelineVisible || typeof this.$layerService.lastSelectedFeature === 'undefined' || this.$layerService.lastSelectedFeature == null) {
+                this.showSimpleTimeline = false;
+                return;
+            }
+            var feature = this.$layerService.lastSelectedFeature;
+            this.showSimpleTimeline = (typeof feature.sensors !== 'undefined' && feature.sensors !== null);
+            if (this.showSimpleTimeline)
+                this.setTimestamps();
+        };
+        FeaturePropsCtrl.prototype.setTimestamps = function () {
+            var feature = this.$layerService.lastSelectedFeature;
+            var layer = this.$layerService.findLayer(feature.layerId);
+            if ((typeof layer.timestamps === 'undefined' || layer.timestamps == null) && (typeof feature.timestamps === 'undefined' || feature.timestamps == null))
+                return [];
+            var time = this.timestamps = new Array();
+            (layer.timestamps || feature.timestamps).forEach(function (ts) {
+                var date = new Date(ts);
+                var dateString = String.format("{0}-{1:00}-{2:00}", date.getFullYear(), date.getUTCMonth() + 1, date.getUTCDate());
+                if (date.getUTCHours() > 0 || date.getUTCMinutes() > 0)
+                    dateString += String.format(" {0:00}:{1:00}", date.getUTCHours(), date.getUTCMinutes());
+                time.push({ title: dateString, timestamp: ts });
+            });
+            // Set focus time
+            var focus = this.$layerService.project.timeLine.focus;
+            if (focus > time[time.length - 1].timestamp) {
+                this.focusTime = time[time.length - 1].title;
+                this.setTime(time[time.length - 1]);
+            }
+            else if (focus < time[0].timestamp) {
+                this.focusTime = time[0].title;
+                this.setTime(time[0]);
+            }
+            else {
+                for (var i = 1; i < time.length; i++) {
+                    if (focus > time[i].timestamp)
+                        continue;
+                    this.focusTime = time[i].title;
+                    this.setTime(time[i]);
+                    break;
+                }
+            }
+            return time;
+        };
+        FeaturePropsCtrl.prototype.setTime = function (time) {
+            this.focusTime = time.title;
+            this.$layerService.project.timeLine.setFocus(new Date(time.timestamp));
+            this.$messageBusService.publish("timeline", "focusChange", time.timestamp);
+        };
+        // $inject annotation.
+        // It provides $injector with information about dependencies to be injected into constructor
+        // it is better to have it close to the constructor, because the parameters must match in count and type.
+        // See http://docs.angularjs.org/guide/di
+        FeaturePropsCtrl.$inject = [
+            '$scope',
+            '$location',
+            '$sce',
+            'mapService',
+            'layerService',
+            'messageBusService'
+        ];
+        return FeaturePropsCtrl;
+    })();
+    FeatureProps.FeaturePropsCtrl = FeaturePropsCtrl;
+})(FeatureProps || (FeatureProps = {}));
 var FeatureRelations;
 (function (FeatureRelations) {
     FeatureRelations.html = '<div style="max-width: 700px">    <style>        .relationgroup-title {            font-size: 18px;            font-weight: bold;        }        .relation-title {            font-size: 16px;        }    </style>    <h4 class="rightpanel-header">        <img data-ng-if="callOut.icon" data-ng-src="{{callOut.icon}}" width="24" height="24" style="margin-left:5px" alt="Icon" />        &nbsp;&nbsp;{{callOut.title}}    </h4>    <div id="relations" class="rightpanel-content" style="min-width:355px;margin-left: 20px">        <div ng-repeat="group in vm.relations">            <div style="float: left; margin-left: -5px; margin-top: 5px" data-toggle="collapse" data-target="#relationgroup_{{group.id}}"><i class="fa fa-chevron-down togglebutton toggle-arrow-down"></i><i class="fa fa-chevron-up togglebutton toggle-arrow-up"></i></div>            <div class="relationgroup-title">{{group.title}}</div>            <div id="relationgroup_{{group.id}}" class="collapse in">                <div ng-repeat="relation in group.relations" style="margin-bottom: 5px">                    <img data-ng-if="relation.icon" data-ng-src="{{relation.icon}}" width="24" height="24" style="margin-left:5px; " alt="Icon" />                    <a class="relation-title" ng-click="vm.selectRelation(relation)">                        {{relation.title}}                    </a>                </div>            </div>        </div>    </div></div>';
@@ -1014,84 +2421,143 @@ var FeatureRelations;
     })();
     FeatureRelations.FeatureRelationsCtrl = FeatureRelationsCtrl;
 })(FeatureRelations || (FeatureRelations = {}));
+var FilterList;
+(function (FilterList) {
+    FilterList.html = '<div>    <h4 class="leftpanel-header" translate="FILTERS"></h4>    <div ng-show="vm.$layerService.noFilters" translate="FILTER_INFO"></div>    <a ng-hide="vm.$layerService.noFilters" ng-click="vm.$layerService.resetFilters()"><span class="fa fa-refresh"></span> reset</a>    <div id="filterChart"></div></div>';
+})(FilterList || (FilterList = {}));
+var FilterList;
+(function (FilterList) {
+    /**
+      * Config
+      */
+    var moduleName = 'csWeb.filterList';
+    /**
+      * Module
+      */
+    FilterList.myModule;
+    try {
+        FilterList.myModule = angular.module(moduleName);
+    }
+    catch (err) {
+        // named module does not exist, so create one
+        FilterList.myModule = angular.module(moduleName, []);
+    }
+    /**
+      * Directive to display the available map layers.
+      */
+    FilterList.myModule.directive('filterList', [
+        '$window',
+        '$compile',
+        function ($window, $compile) {
+            return {
+                terminal: false,
+                restrict: 'E',
+                scope: {},
+                template: FilterList.html,
+                //compile             : el          => {    // I need to explicitly compile it in order to use interpolation like {{xxx}}
+                //    var fn                        = $compile(el);
+                //    return scope                  => { 
+                //        fn(scope);
+                //    };
+                //},
+                link: function (scope, element, attrs) {
+                    // Deal with resizing the element list
+                    scope.onResizeFunction = function () {
+                        var filterHeight = 50;
+                        var paginationCtrlHeight = 100;
+                        var itemHeight = 60;
+                        //scope.windowHeight          = $window.innerHeight;
+                        //scope.windowWidth           = $window.innerWidth;
+                        scope.numberOfItems = Math.floor(($window.innerHeight - filterHeight - paginationCtrlHeight) / itemHeight);
+                    };
+                    // Call to the function when the page is first loaded
+                    scope.onResizeFunction();
+                    angular.element($window).bind('resize', function () {
+                        scope.onResizeFunction();
+                        scope.$apply();
+                    });
+                },
+                replace: true,
+                transclude: true,
+                controller: FilterList.FilterListCtrl
+            };
+        }
+    ]).directive('bsPopover', function () {
+        return function (scope, element, attrs) {
+            element.find("a[rel=popover]").popover({ placement: 'right', html: 'true' });
+        };
+    });
+})(FilterList || (FilterList = {}));
+var FilterList;
+(function (FilterList) {
+    var FilterListCtrl = (function () {
+        // dependencies are injected via AngularJS $injector
+        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
+        function FilterListCtrl($scope, $layerService) {
+            this.$scope = $scope;
+            this.$layerService = $layerService;
+            $scope.vm = this;
+        }
+        // $inject annotation.   
+        // It provides $injector with information about dependencies to be injected into constructor
+        // it is better to have it close to the constructor, because the parameters must match in count and type.
+        // See http://docs.angularjs.org/guide/di
+        FilterListCtrl.$inject = [
+            '$scope',
+            'layerService'
+        ];
+        return FilterListCtrl;
+    })();
+    FilterList.FilterListCtrl = FilterListCtrl;
+})(FilterList || (FilterList = {}));
 var Heatmap;
 (function (Heatmap) {
-    /**
-     * A heat spot represents a point on the map with a certain intensity.
-     */
-    var Heatspot = (function () {
-        function Heatspot(i, j, intensity) {
-            this.i = i;
-            this.j = j;
-            this.intensity = intensity;
-        }
-        return Heatspot;
-    })();
-    Heatmap.Heatspot = Heatspot;
+    Heatmap.html = '<div>    <div class="wide-tooltip">        <span class="pull-right fa fa-info-circle fa-2x"              tooltip-html-unsafe="{{\'HEATMAP.DESCRIPTION\' | translate}}"              tooltip-placement="bottom"              tooltip-trigger="mouseenter"              tooltip-append-to-body="false"              style="margin-right: 5px;"></span>        <h4 class="leftpanel-header" translate>HEATMAP</h4>    </div>    <div>        <select data-ng-model="vm.heatmapModel"                data-ng-options="heatmap.title for heatmap in vm.heatmapModels"                data-ng-change="vm.updateHeatmap()"                style="width: 65%; margin-bottom: 10px;"></select>        <div data-ng-if="vm.expertMode" class="pull-right">            <a href="" data-ng-click="vm.createHeatmap()" tooltip="{{\'MCA.ADD_MCA\' | translate}}" style="margin-right:5px;"><i class="fa fa-plus"></i></a>            <a href="" data-ng-click="vm.removeHeatmap(vm.heatmapModel)" tooltip="{{\'MCA.DELETE_MCA\' | translate}}" style="margin-right:5px;"><i class="fa fa-trash"></i></a>            <a href="" data-ng-click="vm.editHeatmap(vm.heatmapModel)" tooltip="{{\'MCA.EDIT_MCA\' | translate}}" tooltip-placement="right" style="margin-right:5px;"><i class="fa fa-edit"></i></a>        </div>    </div>        <div data-ng-if="vm.heatmapModel" style="overflow-y: auto; overflow-x: hidden; margin-left: -5px;" resize resize-y="140">        <div data-ng-repeat="hi in vm.heatmapModel.heatmapItems" class="wide-tooltip">            <div data-ng-if="hi.isSelected">                <div class="truncate" data-ng-class="{true: \'ignoredCriteria\'}[hi.userWeight == 0]" style="display: inline-block; width: 190px; font-weight: bold">{{hi.toString()}}</div>                <voting class="pull-right"                        data-ng-class="vm.getVotingClass(hi)"                        data-ng-change="vm.weightUpdated()"                        min="-5"                        max="5"                        ng-model="hi.userWeight"                        style="margin-right: 5px; margin-bottom: 3px;"></voting>            </div>        </div>    </div></div>';
 })(Heatmap || (Heatmap = {}));
 var Heatmap;
 (function (Heatmap) {
-    var HeatmapModel = (function () {
-        function HeatmapModel(title) {
-            this.title = title;
-            this.heatmapItems = [];
+    'use strict';
+    /**
+     * Config
+     */
+    var moduleName = 'csWeb.heatmap';
+    /**
+     * Module
+     */
+    Heatmap.myModule;
+    try {
+        Heatmap.myModule = angular.module(moduleName);
+    }
+    catch (err) {
+        // named module does not exist, so create one
+        Heatmap.myModule = angular.module(moduleName, []);
+    }
+    /**
+     * Directive to display a heatmap control.
+     */
+    Heatmap.myModule.directive('heatmap', [
+        '$window',
+        '$compile',
+        '$templateCache',
+        function ($window, $compile, $templateCache) {
+            return {
+                terminal: true,
+                restrict: 'EA',
+                scope: {},
+                template: Heatmap.html,
+                compile: function (el) {
+                    $templateCache.put('heatmapEditorView.html', HeatmapEditorView.html);
+                    var fn = $compile(el);
+                    return function (scope) {
+                        fn(scope);
+                    };
+                },
+                replace: true,
+                transclude: true,
+                controller: Heatmap.HeatmapCtrl
+            };
         }
-        /**
-         * Calculate the heatmap.
-         */
-        HeatmapModel.prototype.calculate = function (layerService, heatmap) {
-            var _this = this;
-            console.log('Calculating heatmap');
-            var heatspots = [];
-            // Iterate over all applicable features on the map and add them to the list of heat spots.
-            var dataset = csComp.Helpers.loadMapLayers(layerService);
-            heatmap.clearData();
-            dataset.features.forEach(function (f) {
-                _this.heatmapItems.forEach(function (hi) {
-                    var heatspot = hi.calculateHeatspots(f, 0.00001, 0.00001);
-                    if (heatspot) {
-                        //heatspots = heatspots.concat(heatspot);
-                        //console.log('Created ' + heatspot.length + ' heatspots');
-                        heatspot.forEach(function (hs) {
-                            //heatmap.addDataPoint(hs.latitude, hs.longitude, hs.intensity);
-                        });
-                    }
-                });
-            });
-            //console.log('Created ' + heatspots.length + ' heatspots');
-        };
-        /**
-         * Update the weights of all heatmap items.
-         */
-        HeatmapModel.prototype.updateWeights = function () {
-            var totalUserWeight = 0;
-            this.heatmapItems.forEach(function (hi) {
-                if (hi.isSelected)
-                    totalUserWeight += Math.abs(hi.userWeight);
-            });
-            this.heatmapItems.forEach(function (hi) {
-                if (hi.isSelected) {
-                    hi.weight = hi.userWeight / totalUserWeight;
-                    hi.reset();
-                }
-            });
-        };
-        /**
-        * Add a heatmap item to the list of items only in case we don't have it yet.
-        */
-        HeatmapModel.prototype.addHeatmapItem = function (heatmapItem) {
-            var ft = heatmapItem.featureType;
-            var title = heatmapItem.title;
-            for (var i = 0; i < this.heatmapItems.length; i++) {
-                var hi = this.heatmapItems[i];
-                if (hi.featureType === ft && hi.title === title)
-                    return;
-            }
-            this.heatmapItems.push(heatmapItem);
-        };
-        return HeatmapModel;
-    })();
-    Heatmap.HeatmapModel = HeatmapModel;
+    ]);
 })(Heatmap || (Heatmap = {}));
 var Heatmap;
 (function (Heatmap) {
@@ -1253,6 +2719,65 @@ var Heatmap;
     })();
     Heatmap.HeatmapCtrl = HeatmapCtrl;
 })(Heatmap || (Heatmap = {}));
+var Heatmap;
+(function (Heatmap) {
+    'use strict';
+    var HeatmapEditorCtrl = (function () {
+        function HeatmapEditorCtrl($scope, $modalInstance, $layerService, $translate, messageBusService, heatmap) {
+            this.$scope = $scope;
+            this.$modalInstance = $modalInstance;
+            this.$layerService = $layerService;
+            this.$translate = $translate;
+            this.messageBusService = messageBusService;
+            this.heatmap = heatmap;
+            $scope.vm = this;
+            this.dataset = csComp.Helpers.loadMapLayers($layerService);
+            if (!heatmap)
+                heatmap = new Heatmap.HeatmapModel('Heatmap');
+            for (var k in this.dataset.featureTypes) {
+                if (this.dataset.featureTypes.hasOwnProperty(k)) {
+                    var ft = this.dataset.featureTypes[k];
+                    heatmap.addHeatmapItem(new Heatmap.HeatmapItem(ft.name, ft));
+                    var propertyTypeData;
+                    if (!ft.propertyTypeData)
+                        return;
+                    ft.propertyTypeData.forEach(function (pt) {
+                        if (pt.type == 'options') {
+                            var i = 0;
+                            pt.options.forEach(function (o) {
+                                var hi = new Heatmap.HeatmapItem(o, ft);
+                                hi.propertyLabel = pt.label;
+                                hi.propertyTitle = pt.title;
+                                hi.optionIndex = i++;
+                                heatmap.addHeatmapItem(hi);
+                            });
+                        }
+                    });
+                }
+            }
+        }
+        HeatmapEditorCtrl.prototype.save = function () {
+            this.$modalInstance.close(this.heatmap);
+        };
+        HeatmapEditorCtrl.prototype.cancel = function () {
+            this.$modalInstance.dismiss('cancel');
+        };
+        HeatmapEditorCtrl.$inject = [
+            '$scope',
+            '$modalInstance',
+            'layerService',
+            '$translate',
+            'messageBusService',
+            'heatmap'
+        ];
+        return HeatmapEditorCtrl;
+    })();
+    Heatmap.HeatmapEditorCtrl = HeatmapEditorCtrl;
+})(Heatmap || (Heatmap = {}));
+var HeatmapEditorView;
+(function (HeatmapEditorView) {
+    HeatmapEditorView.html = '<div class="modal-content">    <div class="modal-header">        <button type="button" class="close" data-ng-click="vm.cancel()" aria-hidden="true">&times;</button>        <h3 class="modal-title" translate>HEATMAP.EDITOR_TITLE</h3>    </div>    <div class="modal-body container-fluid">        <div class="row-fluid">            <input type="text" class="pull-left" data-ng-model="vm.heatmap.title" style="margin: 0 5px" placeholder="{{ \'HEATMAP.TITLE\' | translate }}" />        </div>        <h4 class="row-fluid" style="margin-top: 5px;" translate>HEATMAP.MAIN_FEATURE</h4>        <!--<select data-ng-model="vm.selectedFeatureType"                data-ng-change="vm.loadPropertyTypes()"                data-ng-options="item as item.name for (key, item) in vm.dataset.featureTypes"                class="form-control row-fluid"></select>-->        <h4 class="row-fluid" translate>HEATMAP.PROPERTIES</h4>        <ul class="form-group row-fluid" style="margin-top: 1em; margin-left: -2em; overflow-y: auto; overflow-x: hidden;"            resize resize-y="450">            <li ng-repeat="hi in vm.heatmap.heatmapItems"                class="row-fluid list-unstyled truncate">                <div style="padding: 5px 0;" class="row-fluid"><!--                    name="vm.selectedTitles[]" value="{{hi.title}}"-->                    <input type="checkbox"                            data-ng-checked="hi.isSelected"                           data-ng-click="hi.select()">&nbsp;&nbsp;{{hi.toString()}}                </div>            </li>        </ul>    </div>    <div class="modal-footer">        <button type="button" class="btn btn-warning" data-ng-click="vm.cancel()" translate>CANCEL_BTN</button>        <button type="button" class="btn btn-primary" data-ng-click="vm.save()" translate>OK_BTN</button>    </div></div>';
+})(HeatmapEditorView || (HeatmapEditorView = {}));
 var Heatmap;
 (function (Heatmap) {
     var HeatmapItem = (function () {
@@ -1431,112 +2956,83 @@ var Heatmap;
 })(Heatmap || (Heatmap = {}));
 var Heatmap;
 (function (Heatmap) {
-    Heatmap.html = '<div>    <div class="wide-tooltip">        <span class="pull-right fa fa-info-circle fa-2x"              tooltip-html-unsafe="{{\'HEATMAP.DESCRIPTION\' | translate}}"              tooltip-placement="bottom"              tooltip-trigger="mouseenter"              tooltip-append-to-body="false"              style="margin-right: 5px;"></span>        <h4 class="leftpanel-header" translate>HEATMAP</h4>    </div>    <div>        <select data-ng-model="vm.heatmapModel"                data-ng-options="heatmap.title for heatmap in vm.heatmapModels"                data-ng-change="vm.updateHeatmap()"                style="width: 65%; margin-bottom: 10px;"></select>        <div data-ng-if="vm.expertMode" class="pull-right">            <a href="" data-ng-click="vm.createHeatmap()" tooltip="{{\'MCA.ADD_MCA\' | translate}}" style="margin-right:5px;"><i class="fa fa-plus"></i></a>            <a href="" data-ng-click="vm.removeHeatmap(vm.heatmapModel)" tooltip="{{\'MCA.DELETE_MCA\' | translate}}" style="margin-right:5px;"><i class="fa fa-trash"></i></a>            <a href="" data-ng-click="vm.editHeatmap(vm.heatmapModel)" tooltip="{{\'MCA.EDIT_MCA\' | translate}}" tooltip-placement="right" style="margin-right:5px;"><i class="fa fa-edit"></i></a>        </div>    </div>        <div data-ng-if="vm.heatmapModel" style="overflow-y: auto; overflow-x: hidden; margin-left: -5px;" resize resize-y="140">        <div data-ng-repeat="hi in vm.heatmapModel.heatmapItems" class="wide-tooltip">            <div data-ng-if="hi.isSelected">                <div class="truncate" data-ng-class="{true: \'ignoredCriteria\'}[hi.userWeight == 0]" style="display: inline-block; width: 190px; font-weight: bold">{{hi.toString()}}</div>                <voting class="pull-right"                        data-ng-class="vm.getVotingClass(hi)"                        data-ng-change="vm.weightUpdated()"                        min="-5"                        max="5"                        ng-model="hi.userWeight"                        style="margin-right: 5px; margin-bottom: 3px;"></voting>            </div>        </div>    </div></div>';
-})(Heatmap || (Heatmap = {}));
-var Heatmap;
-(function (Heatmap) {
-    'use strict';
-    /**
-     * Config
-     */
-    var moduleName = 'csWeb.heatmap';
-    /**
-     * Module
-     */
-    Heatmap.myModule;
-    try {
-        Heatmap.myModule = angular.module(moduleName);
-    }
-    catch (err) {
-        // named module does not exist, so create one
-        Heatmap.myModule = angular.module(moduleName, []);
-    }
-    /**
-     * Directive to display a heatmap control.
-     */
-    Heatmap.myModule.directive('heatmap', [
-        '$window',
-        '$compile',
-        '$templateCache',
-        function ($window, $compile, $templateCache) {
-            return {
-                terminal: true,
-                restrict: 'EA',
-                scope: {},
-                template: Heatmap.html,
-                compile: function (el) {
-                    $templateCache.put('heatmapEditorView.html', HeatmapEditorView.html);
-                    var fn = $compile(el);
-                    return function (scope) {
-                        fn(scope);
-                    };
-                },
-                replace: true,
-                transclude: true,
-                controller: Heatmap.HeatmapCtrl
-            };
+    var HeatmapModel = (function () {
+        function HeatmapModel(title) {
+            this.title = title;
+            this.heatmapItems = [];
         }
-    ]);
-})(Heatmap || (Heatmap = {}));
-var Heatmap;
-(function (Heatmap) {
-    'use strict';
-    var HeatmapEditorCtrl = (function () {
-        function HeatmapEditorCtrl($scope, $modalInstance, $layerService, $translate, messageBusService, heatmap) {
-            this.$scope = $scope;
-            this.$modalInstance = $modalInstance;
-            this.$layerService = $layerService;
-            this.$translate = $translate;
-            this.messageBusService = messageBusService;
-            this.heatmap = heatmap;
-            $scope.vm = this;
-            this.dataset = csComp.Helpers.loadMapLayers($layerService);
-            if (!heatmap)
-                heatmap = new Heatmap.HeatmapModel('Heatmap');
-            for (var k in this.dataset.featureTypes) {
-                if (this.dataset.featureTypes.hasOwnProperty(k)) {
-                    var ft = this.dataset.featureTypes[k];
-                    heatmap.addHeatmapItem(new Heatmap.HeatmapItem(ft.name, ft));
-                    var propertyTypeData;
-                    if (!ft.propertyTypeData)
-                        return;
-                    ft.propertyTypeData.forEach(function (pt) {
-                        if (pt.type == 'options') {
-                            var i = 0;
-                            pt.options.forEach(function (o) {
-                                var hi = new Heatmap.HeatmapItem(o, ft);
-                                hi.propertyLabel = pt.label;
-                                hi.propertyTitle = pt.title;
-                                hi.optionIndex = i++;
-                                heatmap.addHeatmapItem(hi);
-                            });
-                        }
-                    });
+        /**
+         * Calculate the heatmap.
+         */
+        HeatmapModel.prototype.calculate = function (layerService, heatmap) {
+            var _this = this;
+            console.log('Calculating heatmap');
+            var heatspots = [];
+            // Iterate over all applicable features on the map and add them to the list of heat spots.
+            var dataset = csComp.Helpers.loadMapLayers(layerService);
+            heatmap.clearData();
+            dataset.features.forEach(function (f) {
+                _this.heatmapItems.forEach(function (hi) {
+                    var heatspot = hi.calculateHeatspots(f, 0.00001, 0.00001);
+                    if (heatspot) {
+                        //heatspots = heatspots.concat(heatspot);
+                        //console.log('Created ' + heatspot.length + ' heatspots');
+                        heatspot.forEach(function (hs) {
+                            //heatmap.addDataPoint(hs.latitude, hs.longitude, hs.intensity);
+                        });
+                    }
+                });
+            });
+            //console.log('Created ' + heatspots.length + ' heatspots');
+        };
+        /**
+         * Update the weights of all heatmap items.
+         */
+        HeatmapModel.prototype.updateWeights = function () {
+            var totalUserWeight = 0;
+            this.heatmapItems.forEach(function (hi) {
+                if (hi.isSelected)
+                    totalUserWeight += Math.abs(hi.userWeight);
+            });
+            this.heatmapItems.forEach(function (hi) {
+                if (hi.isSelected) {
+                    hi.weight = hi.userWeight / totalUserWeight;
+                    hi.reset();
                 }
+            });
+        };
+        /**
+        * Add a heatmap item to the list of items only in case we don't have it yet.
+        */
+        HeatmapModel.prototype.addHeatmapItem = function (heatmapItem) {
+            var ft = heatmapItem.featureType;
+            var title = heatmapItem.title;
+            for (var i = 0; i < this.heatmapItems.length; i++) {
+                var hi = this.heatmapItems[i];
+                if (hi.featureType === ft && hi.title === title)
+                    return;
             }
-        }
-        HeatmapEditorCtrl.prototype.save = function () {
-            this.$modalInstance.close(this.heatmap);
+            this.heatmapItems.push(heatmapItem);
         };
-        HeatmapEditorCtrl.prototype.cancel = function () {
-            this.$modalInstance.dismiss('cancel');
-        };
-        HeatmapEditorCtrl.$inject = [
-            '$scope',
-            '$modalInstance',
-            'layerService',
-            '$translate',
-            'messageBusService',
-            'heatmap'
-        ];
-        return HeatmapEditorCtrl;
+        return HeatmapModel;
     })();
-    Heatmap.HeatmapEditorCtrl = HeatmapEditorCtrl;
+    Heatmap.HeatmapModel = HeatmapModel;
 })(Heatmap || (Heatmap = {}));
-var HeatmapEditorView;
-(function (HeatmapEditorView) {
-    HeatmapEditorView.html = '<div class="modal-content">    <div class="modal-header">        <button type="button" class="close" data-ng-click="vm.cancel()" aria-hidden="true">&times;</button>        <h3 class="modal-title" translate>HEATMAP.EDITOR_TITLE</h3>    </div>    <div class="modal-body container-fluid">        <div class="row-fluid">            <input type="text" class="pull-left" data-ng-model="vm.heatmap.title" style="margin: 0 5px" placeholder="{{ \'HEATMAP.TITLE\' | translate }}" />        </div>        <h4 class="row-fluid" style="margin-top: 5px;" translate>HEATMAP.MAIN_FEATURE</h4>        <!--<select data-ng-model="vm.selectedFeatureType"                data-ng-change="vm.loadPropertyTypes()"                data-ng-options="item as item.name for (key, item) in vm.dataset.featureTypes"                class="form-control row-fluid"></select>-->        <h4 class="row-fluid" translate>HEATMAP.PROPERTIES</h4>        <ul class="form-group row-fluid" style="margin-top: 1em; margin-left: -2em; overflow-y: auto; overflow-x: hidden;"            resize resize-y="450">            <li ng-repeat="hi in vm.heatmap.heatmapItems"                class="row-fluid list-unstyled truncate">                <div style="padding: 5px 0;" class="row-fluid"><!--                    name="vm.selectedTitles[]" value="{{hi.title}}"-->                    <input type="checkbox"                            data-ng-checked="hi.isSelected"                           data-ng-click="hi.select()">&nbsp;&nbsp;{{hi.toString()}}                </div>            </li>        </ul>    </div>    <div class="modal-footer">        <button type="button" class="btn btn-warning" data-ng-click="vm.cancel()" translate>CANCEL_BTN</button>        <button type="button" class="btn btn-primary" data-ng-click="vm.save()" translate>OK_BTN</button>    </div></div>';
-})(HeatmapEditorView || (HeatmapEditorView = {}));
+var Heatmap;
+(function (Heatmap) {
+    /**
+     * A heat spot represents a point on the map with a certain intensity.
+     */
+    var Heatspot = (function () {
+        function Heatspot(i, j, intensity) {
+            this.i = i;
+            this.j = j;
+            this.intensity = intensity;
+        }
+        return Heatspot;
+    })();
+    Heatmap.Heatspot = Heatspot;
+})(Heatmap || (Heatmap = {}));
 var Heatmap;
 (function (Heatmap) {
     var IdealityMeasure = (function () {
@@ -1652,6 +3148,587 @@ var LanguageSwitch;
     })();
     LanguageSwitch.LanguageSwitchCtrl = LanguageSwitchCtrl;
 })(LanguageSwitch || (LanguageSwitch = {}));
+var LayersDirective;
+(function (LayersDirective) {
+    LayersDirective.html = '<div>    <h4 class="leftpanel-header" translate="LAYERS"></h4>    <div style="overflow-y: auto; overflow-x: hidden; margin-top: -10px" resize resize-y="95">        <div data-ng-repeat="group in vm.$layerService.project.groups" style="margin-left: 5px">            <div style="float: left; margin-left: -5px; margin-top: 5px"                  data-toggle="collapse"                  data-target="#layergroup_{{group.id}}">                <i class="fa fa-chevron-down togglebutton toggle-arrow-down"></i>                <i class="fa fa-chevron-up togglebutton toggle-arrow-up"></i>            </div>            <div popover="{{(group.description) ? group.description : \'\'}}"                 popover-placement="right"                 popover-width="400"                 popover-trigger="mouseenter"                 class="group-title">{{group.title}}</div>            <div id="layergroup_{{group.id}}" class="collapse in">                <div popover="{{(layer.description) ? layer.description : \'\'}}"                     popover-placement="right"                     popover-trigger="mouseenter"                     data-ng-repeat="layer in group.layers">                    <!--bs-popover>-->                    <div style="list-style-type: none; padding: 0;" data-ng-class="{indent: layer.isSublayer}">                        <!--<button type="button" class="btn btn-default" data-container="body" data-toggle="popover" data-placement="right" data-content="Vivamus sagittis lacus vel augue laoreet rutrum faucibus." data-original-title="" title="">Right</button>-->                        <div ng-hide="group.oneLayerActive" class="checkbox checkbox-primary" style="margin-left: 20px">                            <input type="checkbox" id="cblayer{{layer.id}}"                                   data-ng-model="layer.enabled"                                    data-ng-click="vm.toggleLayer(layer);">                            <label for="cblayer{{layer.id}}">                                {{layer.title}}                            </label>                            <div ng-show="layer.isLoading" class="spinner">                                <div class="bounce1"></div>                                <div class="bounce2"></div>                                <div class="bounce3"></div>                            </div>                        </div>                        <div ng-show="group.oneLayerActive" class="radio radio-primary" style="margin-left: 20px">                            <input type="radio" id="rblayer{{layer.id}}"                                   data-ng-value="true"                                    data-ng-model="layer.enabled"                                    data-ng-click="vm.toggleLayer(layer);">                            <label for="rblayer{{layer.id}}">                                {{layer.title}}                            </label>                            <div ng-show="layer.isLoading" class="spinner">                                <div class="bounce1"></div>                                <div class="bounce2"></div>                                <div class="bounce3"></div>                            </div>                        </div>                    </div>                </div>            </div>        </div>    </div></div>';
+})(LayersDirective || (LayersDirective = {}));
+var LayersDirective;
+(function (LayersDirective) {
+    /**
+      * Config
+      */
+    var moduleName = 'csWeb.layersDirective';
+    /**
+      * Module
+      */
+    LayersDirective.myModule;
+    try {
+        LayersDirective.myModule = angular.module(moduleName);
+    }
+    catch (err) {
+        // named module does not exist, so create one
+        LayersDirective.myModule = angular.module(moduleName, []);
+    }
+    /**
+      * Directive to display the available map layers.
+      */
+    LayersDirective.myModule.directive('layersDirective', [
+        '$compile',
+        function ($compile) {
+            return {
+                terminal: true,
+                restrict: 'E',
+                scope: {},
+                template: LayersDirective.html,
+                compile: function (el) {
+                    var fn = $compile(el);
+                    return function (scope) {
+                        fn(scope);
+                    };
+                },
+                replace: true,
+                transclude: true,
+                controller: LayersDirective.LayersDirectiveCtrl
+            };
+        }
+    ]).directive('bsPopover', function () {
+        return function (scope, element, attrs) {
+            element.find("a[rel=popover]").popover({ placement: 'right', html: 'true' });
+        };
+    });
+})(LayersDirective || (LayersDirective = {}));
+var LayersDirective;
+(function (LayersDirective) {
+    var LayersDirectiveCtrl = (function () {
+        // dependencies are injected via AngularJS $injector
+        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
+        function LayersDirectiveCtrl($scope, $layerService) {
+            this.$scope = $scope;
+            this.$layerService = $layerService;
+            $scope.vm = this;
+        }
+        LayersDirectiveCtrl.prototype.toggleLayer = function (layer) {
+            //Uncommented after updating the bower packages: the behaviour changed between angular versions.
+            // layer.enabled = !layer.enabled;
+            // Unselect when dealing with a radio group, so you can turn a loaded layer off again.
+            if (layer.group.oneLayerActive && this.$layerService.findLayer(layer.id))
+                layer.enabled = false;
+            if (layer.enabled) {
+                this.$layerService.addLayer(layer);
+            }
+            else {
+                this.$layerService.removeLayer(layer);
+            }
+            // NOTE EV: You need to call apply only when an event is received outside the angular scope.
+            // However, make sure you are not calling this inside an angular apply cycle, as it will generate an error.
+            if (this.$scope.$root.$$phase != '$apply' && this.$scope.$root.$$phase != '$digest') {
+                this.$scope.$apply();
+            }
+        };
+        // $inject annotation.
+        // It provides $injector with information about dependencies to be injected into constructor
+        // it is better to have it close to the constructor, because the parameters must match in count and type.
+        // See http://docs.angularjs.org/guide/di
+        LayersDirectiveCtrl.$inject = [
+            '$scope',
+            'layerService'
+        ];
+        return LayersDirectiveCtrl;
+    })();
+    LayersDirective.LayersDirectiveCtrl = LayersDirectiveCtrl;
+})(LayersDirective || (LayersDirective = {}));
+var LegendList;
+(function (LegendList) {
+    LegendList.html = '<div style="position: relative;">    <h4 class="leftpanel-header" translate="LEGEND"></h4>    <div>        <div ng-repeat="legendItem in legendItems" class="legendItem">            <div class="legendIcon">                <img ng-src="{{legendItem.uri}}" class="legendImage" />            </div>            <span class="legendText">{{legendItem.title}}</span>        </div>    </div></div>';
+})(LegendList || (LegendList = {}));
+var LegendList;
+(function (LegendList) {
+    /**
+      * Config
+      */
+    var moduleName = 'csWeb.legendList';
+    /**
+      * Module
+      */
+    LegendList.myModule;
+    try {
+        LegendList.myModule = angular.module(moduleName);
+    }
+    catch (err) {
+        // named module does not exist, so create one
+        LegendList.myModule = angular.module(moduleName, []);
+    }
+    /**
+      * Directive to display the available map layers.
+      */
+    LegendList.myModule.directive('legendList', [
+        '$window',
+        '$compile',
+        function ($window, $compile) {
+            return {
+                terminal: false,
+                restrict: 'E',
+                scope: {},
+                template: LegendList.html,
+                //compile             : el          => {    // I need to explicitly compile it in order to use interpolation like {{xxx}}
+                //    var fn                        = $compile(el);
+                //    return scope                  => { 
+                //        fn(scope);
+                //    };       
+                //},
+                // Directives that want to modify the DOM typically use the link option.link takes a function with the following signature, function link(scope, element, attrs) { ... } where:
+                // scope is an Angular scope object.
+                // element is the jqLite - wrapped element that this directive matches.
+                // attrs is a hash object with key - value pairs of normalized attribute names and their corresponding attribute values.
+                link: function (scope, element, attrs) {
+                    // Deal with resizing the element list
+                    scope.onResizeFunction = function () {
+                        var filterHeight = 50;
+                        var paginationCtrlHeight = 100;
+                        var itemHeight = 60;
+                        //scope.windowHeight          = $window.innerHeight;
+                        //scope.windowWidth           = $window.innerWidth;
+                        scope.numberOfItems = Math.floor(($window.innerHeight - filterHeight - paginationCtrlHeight) / itemHeight);
+                    };
+                    // Call to the function when the page is first loaded
+                    scope.onResizeFunction();
+                    angular.element($window).bind('resize', function () {
+                        scope.onResizeFunction();
+                        scope.$apply();
+                    });
+                },
+                replace: true,
+                transclude: true,
+                controller: LegendList.LegendListCtrl
+            };
+        }
+    ]).directive('bsPopover', function () {
+        return function (scope, element, attrs) {
+            element.find("a[rel=popover]").popover({ placement: 'right', html: 'true' });
+        };
+    });
+})(LegendList || (LegendList = {}));
+var LegendList;
+(function (LegendList) {
+    var LegendListCtrl = (function () {
+        // dependencies are injected via AngularJS $injector
+        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
+        function LegendListCtrl($scope, $layerService, $mapService, $messageBusService) {
+            var _this = this;
+            this.$scope = $scope;
+            this.$layerService = $layerService;
+            this.$mapService = $mapService;
+            this.$messageBusService = $messageBusService;
+            $scope.vm = this;
+            $messageBusService.subscribe('project', function () {
+                // Update the legend when a project is loaded.
+                _this.updateLegendItems();
+            });
+            $messageBusService.subscribe('layer', function () {
+                // Update the legend when a layer is added or removed.
+                _this.updateLegendItems();
+            });
+            this.updateLegendItems();
+            $scope.legendItems = [];
+            $scope.numberOfItems = 10; // This is being reset in the directive upon receiving a resize.
+        }
+        LegendListCtrl.prototype.updateLegendItems = function () {
+            var legendItems = [];
+            var existingItems = [];
+            for (var key in this.$layerService.featureTypes) {
+                var ft = this.$layerService.featureTypes[key];
+                var uri = this.getImageUri(ft);
+                var title = this.getName(key, ft);
+                var existingItem = name + uri;
+                if (existingItems.indexOf(existingItem) < 0) {
+                    existingItems.push(existingItem);
+                    legendItems.push({ "title": title, "uri": uri });
+                }
+            }
+            legendItems.sort(function (a, b) {
+                if (a.title > b.title)
+                    return 1;
+                if (a.title < b.title)
+                    return -1;
+                return 0;
+            });
+            this.$scope.legendItems = legendItems;
+        };
+        LegendListCtrl.prototype.getImageUri = function (ft) {
+            var iconUri = ft.style.iconUri;
+            if (iconUri == null)
+                iconUri = "includes/images/marker.png";
+            if (iconUri.indexOf('{') >= 0)
+                iconUri = iconUri.replace('{', '').replace('}', '');
+            if (ft.style != null && ft.style.drawingMode != null && ft.style.drawingMode.toLowerCase() != "point") {
+                if (iconUri.indexOf('_Media') < 0)
+                    return iconUri;
+                else
+                    return "includes/images/polygon.png";
+            }
+            else if (ft.style != null && iconUri != null) {
+                return iconUri;
+            }
+            else {
+                return "includes/images/marker.png";
+            }
+        };
+        LegendListCtrl.prototype.getName = function (key, ft) {
+            return ft.name || key.replace('_Default', '');
+        };
+        // $inject annotation.
+        // It provides $injector with information about dependencies to be injected into constructor
+        // it is better to have it close to the constructor, because the parameters must match in count and type.
+        // See http://docs.angularjs.org/guide/di
+        LegendListCtrl.$inject = [
+            '$scope',
+            'layerService',
+            'mapService',
+            'messageBusService'
+        ];
+        return LegendListCtrl;
+    })();
+    LegendList.LegendListCtrl = LegendListCtrl;
+})(LegendList || (LegendList = {}));
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Mca;
+(function (_Mca) {
+    var Models;
+    (function (Models) {
+        (function (ScoringFunctionType) {
+            ScoringFunctionType[ScoringFunctionType["Manual"] = 0] = "Manual";
+            ScoringFunctionType[ScoringFunctionType["Ascending"] = 1] = "Ascending";
+            ScoringFunctionType[ScoringFunctionType["Descending"] = 2] = "Descending";
+            ScoringFunctionType[ScoringFunctionType["AscendingSigmoid"] = 3] = "AscendingSigmoid";
+            ScoringFunctionType[ScoringFunctionType["DescendingSigmoid"] = 4] = "DescendingSigmoid";
+            ScoringFunctionType[ScoringFunctionType["GaussianPeak"] = 5] = "GaussianPeak";
+            ScoringFunctionType[ScoringFunctionType["GaussianValley"] = 6] = "GaussianValley";
+        })(Models.ScoringFunctionType || (Models.ScoringFunctionType = {}));
+        var ScoringFunctionType = Models.ScoringFunctionType;
+        /**
+        * Scoring function creates a PLA of the scoring algorithm.
+        */
+        var ScoringFunction = (function () {
+            //get img(): string {
+            //    return '/includes/images/plot' + csComp.StringExt.Utils.toUnderscore(ScoringFunctionType[this.type]) + '.png';
+            //}
+            function ScoringFunction(scoringFunctionType) {
+                if (typeof scoringFunctionType != 'undefined' && scoringFunctionType != null)
+                    this.type = scoringFunctionType;
+                this.title = ScoringFunctionType[scoringFunctionType].toString();
+            }
+            Object.defineProperty(ScoringFunction.prototype, "cssClass", {
+                get: function () {
+                    return ScoringFunctionType[this.type].toLowerCase();
+                },
+                enumerable: true,
+                configurable: true
+            });
+            /**
+             * Create a score based on the type, in which x in [0,10] and y in [0.1].
+             * Before applying it, you need to scale the x-axis based on your actual range.
+             * Typically, you would map x=0 to the min(x)+0.1*range(x) and x(10)-0.1*range(x) to max(x),
+             * i.e. x' = ax+b, where a=100/(8r) and b=-100(min+0.1r)/(8r) and r=max-min
+             */
+            ScoringFunction.createScores = function (type) {
+                var scores;
+                switch (type) {
+                    default:
+                    case 1 /* Ascending */:
+                        scores = '[0,0 10,1]';
+                        break;
+                    case 2 /* Descending */:
+                        scores = '[0,1 10,0]';
+                        break;
+                    case 3 /* AscendingSigmoid */:
+                        // http://mathnotepad.com/: f(x) = (3.5+2*atan(x-5))/7
+                        // f([0,1,2,3,4,5,6,7,8,9,10])
+                        // round(100*f([0,1,2,3,4,5,6,7,8,9,10]))/100
+                        // [0.11 0.12 0.14 0.18 0.28 0.5 0.72 0.82 0.86 0.88 0.89]
+                        scores = '[0,0.11 1,0.12 2,0.14 3,0.18 4,0.28 5,0.5 6,0.72 7,0.82 8,0.86 9,0.88 10,0.89]';
+                        break;
+                    case 4 /* DescendingSigmoid */:
+                        // 1-f(x)
+                        scores = '[0,0.89 1,0.88 2,0.86 3,0.82 4,0.72 5,0.5 6,0.28 7,0.18 8,0.14 9,0.12 10,0.11]';
+                        break;
+                    case 5 /* GaussianPeak */:
+                        // h(x)=3*exp(-((x-u)^2)/(2s^2))/(s*sqrt(2pi))
+                        scores = '[0,0 2,0.04 3,0.25 4,0.7 5,1 6,0.7 7,0.25 8,0.04 9,0]';
+                        break;
+                    case 6 /* GaussianValley */:
+                        // 1-h(x)
+                        scores = '[0,1 2,0.96 3,0.75 4,0.3 5,0 6,0.3 7,0.75 8,0.96 9,0]';
+                        break;
+                }
+                return scores;
+            };
+            return ScoringFunction;
+        })();
+        Models.ScoringFunction = ScoringFunction;
+        var ScoringFunctions = (function () {
+            function ScoringFunctions() {
+            }
+            return ScoringFunctions;
+        })();
+        Models.ScoringFunctions = ScoringFunctions;
+        var Criterion = (function () {
+            function Criterion() {
+                /** Specified weight by the user */
+                this.userWeight = 1;
+                this.propValues = [];
+                this.criteria = [];
+                /** Piece-wise linear approximation of the scoring function by a set of x and y points */
+                this.isPlaUpdated = false;
+                /** Piece-wise linear approximation must be scaled:x' = ax+b, where a=100/(8r) and b=-100(min+0.1r)/(8r) and r=max-min */
+                this.isPlaScaled = false;
+                this.x = [];
+                this.y = [];
+            }
+            Criterion.prototype.deserialize = function (input) {
+                var _this = this;
+                this.title = input.title;
+                this.description = input.description;
+                this.label = input.label;
+                this.color = input.color;
+                this.userWeight = input.userWeight;
+                this.weight = input.weight;
+                this.isPlaScaled = input.isPlaScaled;
+                this.scores = input.scores;
+                this.minCutoffValue = input.minCutoffValue;
+                this.maxCutoffValue = input.maxCutoffValue;
+                this.minValue = input.minValue;
+                this.maxValue = input.maxValue;
+                input.criteria.forEach(function (c) {
+                    _this.criteria.push(new Criterion().deserialize(c));
+                });
+                return this;
+            };
+            Criterion.prototype.requiresMinimum = function () {
+                return this.scores && this.scores.indexOf('min') >= 0;
+            };
+            Criterion.prototype.requiresMaximum = function () {
+                return this.scores && this.scores.indexOf('max') >= 0;
+            };
+            Criterion.prototype.getTitle = function () {
+                if (this.title)
+                    return this.title;
+                return this.label;
+            };
+            /**
+             * Update the piecewise linear approximation (PLA) of the scoring (a.k.a. user) function,
+             * which translates a property value to a MCA value in the range [0,1] using all features.
+             */
+            Criterion.prototype.updatePla = function (features) {
+                var _this = this;
+                if (this.isPlaUpdated)
+                    return;
+                if (this.criteria.length > 0) {
+                    this.criteria.forEach(function (c) {
+                        c.updatePla(features);
+                    });
+                    this.isPlaUpdated = true;
+                    return;
+                }
+                // Replace min and max by their values:
+                if (this.scores == null)
+                    return;
+                var scores = this.scores;
+                this.propValues = [];
+                if (this.requiresMaximum() || this.requiresMinimum() || this.isPlaScaled) {
+                    features.forEach(function (feature) {
+                        if (feature.properties.hasOwnProperty(_this.label)) {
+                            // The property is available. I use the '+' to convert the string value to a number.
+                            var prop = feature.properties[_this.label];
+                            if ($.isNumeric(prop))
+                                _this.propValues.push(prop);
+                        }
+                    });
+                }
+                var max = this.maxValue, min = this.minValue;
+                if (this.isPlaScaled || this.requiresMaximum()) {
+                    max = max || Math.max.apply(null, this.propValues);
+                    scores.replace('max', max.toPrecision(3));
+                }
+                if (this.isPlaScaled || this.requiresMinimum()) {
+                    min = min || Math.min.apply(null, this.propValues);
+                    scores.replace('min', min.toPrecision(3));
+                }
+                if (this.isPlaScaled) {
+                    var stats = csComp.Helpers.standardDeviation(this.propValues);
+                    max = max || Math.min(max, stats.avg + 2 * stats.stdDev);
+                    min = min || Math.max(min, stats.avg - 2 * stats.stdDev);
+                }
+                // Regex to split the scores: [^\d\.]+ and remove empty entries
+                var pla = scores.split(/[^\d\.]+/).filter(function (item) { return item.length > 0; });
+                // Test that we have an equal number of x and y,
+                var range = max - min, a, b;
+                if (this.minValue != null || this.maxValue != null) {
+                    a = range / 10;
+                    b = min;
+                }
+                else {
+                    a = 0.08 * range, b = min + 0.1 * range;
+                }
+                if (pla.length % 2 !== 0)
+                    throw Error(this.label + ' does not have an even (x,y) pair in scores.');
+                for (var i = 0; i < pla.length / 2; i++) {
+                    var x = parseFloat(pla[2 * i]);
+                    if (this.isPlaScaled) {
+                        // Scale x, i.e. x'=ax+b with x'(0)=min+0.1r and x'(10)=max-0.1r, r=max-min
+                        // min+0.1r=b
+                        // max-0.1r=10a+b=10a+min+0.1r <=> max-min-0.2r=10a <=> 0.8r=10a <=> a=0.08r
+                        x = a * x + b;
+                    }
+                    if (i > 0 && this.x[i - 1] > x)
+                        throw Error(this.label + ': x should increment continuously.');
+                    this.x.push(x);
+                    // Test that y in [0, 1].
+                    var y = parseFloat(pla[2 * i + 1]);
+                    if (y < 0)
+                        y = 0;
+                    else if (y > 1)
+                        y = 1;
+                    this.y.push(y);
+                }
+                this.isPlaUpdated = true;
+            };
+            Criterion.prototype.getScore = function (feature) {
+                if (!this.isPlaUpdated)
+                    throw ('Error: PLA must be updated for criterion ' + this.title + '!');
+                if (this.criteria.length === 0) {
+                    // End point: compute the score for each feature
+                    if (feature.properties.hasOwnProperty(this.label)) {
+                        // The property is available
+                        var x = feature.properties[this.label];
+                        if (this.maxCutoffValue <= x || x <= this.minCutoffValue)
+                            return 0;
+                        if (x < this.x[0])
+                            return this.y[0];
+                        var last = this.x.length - 1;
+                        if (x > this.x[last])
+                            return this.y[last];
+                        for (var k = 0; k < this.x.length; k++) {
+                            if (x < this.x[k]) {
+                                // Found relative position of x in this.x
+                                var x0 = this.x[k - 1];
+                                var x1 = this.x[k];
+                                var y0 = this.y[k - 1];
+                                var y1 = this.y[k];
+                                // Use linear interpolation
+                                return (y1 - y0) * (x - x0) / (x1 - x0);
+                            }
+                        }
+                    }
+                    else {
+                        return 0;
+                    }
+                }
+                else {
+                    // Sum all the sub-criteria.
+                    var finalScore = 0;
+                    this.criteria.forEach(function (crit) {
+                        finalScore += crit.weight > 0 ? crit.weight * crit.getScore(feature) : Math.abs(crit.weight) * (1 - crit.getScore(feature));
+                    });
+                    return this.weight > 0 ? this.weight * finalScore : Math.abs(this.weight) * (1 - finalScore);
+                }
+                return 0;
+            };
+            return Criterion;
+        })();
+        Models.Criterion = Criterion;
+        // NOTE: When extending a base class, make sure that the base class has been defined already.
+        var Mca = (function (_super) {
+            __extends(Mca, _super);
+            function Mca() {
+                _super.call(this);
+                /** Maximum number of star ratings to use to set the weight */
+                this.userWeightMax = 5;
+                /** Applicable feature ids as a string[]. */
+                this.featureIds = [];
+                this.weight = 1;
+                this.isPlaUpdated = false;
+            }
+            Object.defineProperty(Mca.prototype, "rankLabel", {
+                get: function () {
+                    return this.label + '#';
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Mca.prototype.deserialize = function (input) {
+                this.section = input.section;
+                this.stringFormat = input.stringFormat;
+                this.rankTitle = input.rankTitle;
+                this.rankDescription = input.rankDescription;
+                this.rankFormat = input.rankFormat;
+                this.userWeightMax = input.userWeightMax;
+                this.featureIds = input.featureIds;
+                this.minCutoffValue = input.minCutoffValue;
+                this.maxCutoffValue = input.maxCutoffValue;
+                this.minValue = input.minValue;
+                this.maxValue = input.maxValue;
+                this.scaleMinValue = input.scaleMinValue;
+                this.scaleMaxValue = input.scaleMaxValue;
+                _super.prototype.deserialize.call(this, input);
+                return this;
+            };
+            /**
+            * Update the MCA by calculating the weights and setting the colors.
+            */
+            Mca.prototype.update = function () {
+                this.calculateWeights();
+                this.setColors();
+            };
+            Mca.prototype.calculateWeights = function (criteria) {
+                if (!criteria)
+                    criteria = this.criteria;
+                var totalWeight = 0;
+                for (var k in criteria) {
+                    if (!criteria.hasOwnProperty(k))
+                        continue;
+                    var crit = criteria[k];
+                    if (crit.criteria.length > 0)
+                        this.calculateWeights(crit.criteria);
+                    totalWeight += Math.abs(crit.userWeight);
+                }
+                if (totalWeight > 0) {
+                    for (var j in criteria) {
+                        if (!criteria.hasOwnProperty(j))
+                            continue;
+                        var critj = criteria[j];
+                        critj.weight = critj.userWeight / totalWeight;
+                    }
+                }
+            };
+            /** Set the colors of all criteria and sub-criteria */
+            Mca.prototype.setColors = function () {
+                var redColors = chroma.scale('RdYlBu').domain([0, this.criteria.length - 1], this.criteria.length);
+                var totalSubcrit = 0;
+                var i = 0;
+                this.criteria.forEach(function (c) {
+                    totalSubcrit += c.criteria.length;
+                    if (!c.color)
+                        c.color = redColors(i++).hex();
+                });
+                var blueColors = chroma.scale('PRGn').domain([0, totalSubcrit - 1], totalSubcrit);
+                i = 0;
+                this.criteria.forEach(function (c) {
+                    c.criteria.forEach(function (crit) {
+                        if (!crit.color)
+                            crit.color = blueColors(i++).hex();
+                    });
+                });
+            };
+            return Mca;
+        })(Criterion);
+        Models.Mca = Mca;
+    })(Models = _Mca.Models || (_Mca.Models = {}));
+})(Mca || (Mca = {}));
 var Mca;
 (function (Mca) {
     Mca.html = '<div>    <div class="wide-tooltip">        <span class="pull-right fa fa-info-circle fa-2x"              tooltip-html-unsafe="{{\'MCA.DESCRIPTION\' | translate}}"              tooltip-placement="bottom"              tooltip-trigger="mouseenter"              tooltip-append-to-body="false"              style="margin-right: 5px;"></span>        <h4 class="leftpanel-header">MCA</h4>    </div>    <div>        <select data-ng-model="vm.mca"                data-ng-options="mca.title for mca in vm.availableMcas"                data-ng-change="vm.updateMca()"                style="width: 65%; margin-bottom: 10px;"></select>        <div data-ng-if="vm.expertMode" class="pull-right">            <a href="" data-ng-click="vm.createMca()" tooltip="{{\'MCA.ADD_MCA\' | translate}}" style="margin-right:5px;"><i class="fa fa-plus"></i></a>            <a href="" data-ng-click="vm.removeMca(vm.mca)" tooltip="{{\'MCA.DELETE_MCA\' | translate}}" style="margin-right:5px;"><i class="fa fa-trash"></i></a>            <a href="" data-ng-click="vm.editMca(vm.mca)" tooltip="{{\'MCA.EDIT_MCA\' | translate}}" tooltip-placement="right" style="margin-right:5px;"><i class="fa fa-edit"></i></a>        </div>        <a href=""           tooltip="{{\'MCA.TOGGLE_SPARKLINE\' | translate}}"           data-ng-init="sparkLineStyle = vm.showSparkline ? {} : {color:\'lightgray\'}"           data-ng-click="vm.toggleSparkline(); sparkLineStyle = vm.showSparkline ? {} : {color:\'lightgray\'}"           data-ng-style="sparkLineStyle"           class="pull-right" style="margin-right:5px;"><i class="fa fa-bar-chart"></i></a>    </div>        <div data-ng-if="!vm.mca">        <div data-ng-if="vm.expertMode"  translate>MCA.INFO_EXPERT</div>        <div data-ng-if="!vm.expertMode" translate>MCA.INFO</div>    </div>    <div data-ng-if="vm.mca" style="overflow-y: auto; overflow-x: hidden; margin-left: -5px;" resize resize-y="140">        <div data-ng-repeat="criterion in vm.mca.criteria" class="wide-tooltip">            <div data-ng-if="criterion.criteria.length > 0 && criterion.userWeight != 0" class="collapsed pull-left" style="margin: 0 5px 0 0" data-toggle="collapse" data-target="#criterion_{{$index}}"><i class="fa fa-chevron-down togglebutton toggle-arrow-down"></i><i class="fa fa-chevron-up togglebutton toggle-arrow-up"></i></div>            <div data-ng-style="{\'display\': \'inline-block\', \'margin-bottom\': \'6px\', \'width\':\'10px\', \'height\':\'10px\', \'border\':\'solid 1px black\', \'background-color\': criterion.color}"></div>            <div class="truncate" data-ng-class="{true: \'ignoredCriteria\'}[criterion.userWeight == 0]" style="display: inline-block; width: 150px; font-weight: bold">{{criterion.getTitle()}}</div>            <voting class="pull-right"                    data-ng-class="vm.getVotingClass(criterion)"                    data-ng-change="vm.weightUpdated(criterion)"                    min="-vm.mca.userWeightMax"                    max="vm.mca.userWeightMax"                    ng-model="criterion.userWeight"                    style="margin-right: 5px; margin-bottom: 3px;"></voting>            <div id="histogram_{{$index}}" data-ng-show="vm.showSparkline && criterion.criteria.length == 0" style="margin-top: 5px;"></div>            <div data-ng-if="criterion.criteria.length > 0" id="criterion_{{$parent.$index}}" class="collapse out" style="margin-left: 19px">                <div data-ng-repeat="crit in criterion.criteria">                    <div data-ng-style="{\'display\': \'inline-block\', \'margin-bottom\': \'6px\', \'width\':\'10px\', \'height\':\'10px\', \'border\':\'solid 1px black\', \'background-color\': crit.color}"></div>                    <div class="truncate" data-ng-class="{true: \'ignoredCriteria\'}[crit.userWeight == 0 || criterion.userWeight == 0]" style="display: inline-block; width: 150px;">{{crit.getTitle()}}</div>                    <div class="pull-right" style="margin-right: 15px;">{{Math.abs(crit.userWeight)}}</div>                    <voting class="pull-right"                            data-ng-class="vm.getVotingClass(criterion)"                            data-ng-change="vm.weightUpdated(crit)"                            min="0"                            max="vm.mca.userWeightMax"                            ng-model="crit.userWeight"                            style="margin-right: 5px;"></voting>                    <div id="histogram_{{$parent.$index}}_{{$index}}" data-ng-show="vm.showSparkline" style="margin-top: 5px;"></div>                </div>            </div>        </div>        <!--<a href="" style="display: inline-block; width: 100%; text-transform: uppercase"               data-ng-click="vm.calculateMca()" translate="MCA.COMPUTE_MGS" translate-values="{ mcaTitle: vm.mca.title }"></a>-->        <h4 data-ng-if="vm.showChart">            <a href="" data-ng-click="vm.weightUpdated(vm.mca)" translate="MCA.TOTAL_RESULT"></a>            <a href="" data-ng-if="vm.selectedCriterion">&gt;&nbsp;{{vm.selectedCriterion.title}}</a>        </h4>                <a href="" data-ng-if="vm.showFeature" class="pull-right" data-ng-click="vm.toggleMcaChartType();" style="margin-right: 10px">            <i class="fa" data-ng-class="{true: \'fa-bar-chart\', false: \'fa-pie-chart\'}[vm.showAsterChart]"></i>        </a>        <div style="margin-top: 5px; margin-left: auto; margin-right: auto; width: 95%;" id="mcaChart"></div>        <div data-ng-if="vm.showFeature">            <h4>                <img data-ng-if="vm.featureIcon" data-ng-src="{{vm.featureIcon}}" width="24" height="24" style="margin:0 5px" alt="Icon" />                {{vm.selectedFeature.properties[\'Name\']}}            </h4>            <table class="table table-condensed">                <tr data-ng-repeat="item in vm.properties"                    popover="{{item.description}}"                    popover-placement="right"                    popover-trigger="mouseenter"                    popover-append-to-body="true">                    <td><a class="fa fa-filter makeNarrow" data-ng-if="item.canFilter" data-ng-click="vm.$layerService.setFilter(item)" style="cursor: pointer"></a></td>                    <td><a class="fa fa-eye makeNarrow" data-ng-if="item.canStyle" data-ng-click="vm.setStyle(item)" style="cursor: pointer"></a></td>                    <td>{{item.key}}</td>                    <td class="text-right">{{item.value}}</td>                </tr>            </table>        </div>        <i data-ng-if="!vm.showFeature"><div translate="MCA.SHOW_FEATURE_MSG"></div></i>    </div>    <!--<div rating class="pull-right"             data-ng-style="{\'margin\': \'0 10px\', \'background\':\'rgba(0, 0, 0, 0.1)\', \'border-radius\': \'8px\', \'padding\': \'0 4px\', \'color\': criterion.color}"             ng-model="criterion.userWeight" max="11" readonly="isReadonly"             rating-states="ratingStates"             data-ng-click="vm.weightUpdated(criterion)"             on-hover="hoveringOver(value)" on-leave="overStar = null"></div>--></div>';
@@ -1700,6 +3777,589 @@ var Mca;
             };
         }
     ]);
+})(Mca || (Mca = {}));
+var Mca;
+(function (Mca) {
+    'use strict';
+    var McaCtrl = (function () {
+        function McaCtrl($scope, $modal, $translate, $timeout, $localStorageService, $layerService, messageBusService) {
+            var _this = this;
+            this.$scope = $scope;
+            this.$modal = $modal;
+            this.$translate = $translate;
+            this.$timeout = $timeout;
+            this.$localStorageService = $localStorageService;
+            this.$layerService = $layerService;
+            this.messageBusService = messageBusService;
+            this.features = [];
+            this.availableMcas = [];
+            this.showAsterChart = false; // When true, show a pie chart, when false, show a bar chart.
+            this.showDialog = false;
+            this.expertMode = false;
+            this.showSparkline = false;
+            this.featureMessageReceived = function (title, feature) {
+                //console.log("MC: featureMessageReceived");
+                if (_this.mca == null)
+                    return;
+                switch (title) {
+                    case 'onFeatureSelect':
+                        _this.updateSelectedFeature(feature, true);
+                        break;
+                    case 'onFeatureDeselect':
+                        _this.showFeature = false;
+                        _this.selectedFeature = null;
+                        _this.drawChart();
+                        break;
+                    default:
+                        break;
+                }
+                _this.scopeApply();
+            };
+            $scope.vm = this;
+            messageBusService.subscribe('layer', function (title) {
+                switch (title) {
+                    case 'deactivate':
+                    case 'activated':
+                        _this.updateAvailableMcas();
+                        _this.calculateMca();
+                        break;
+                }
+            });
+            messageBusService.subscribe('project', function (title) {
+                switch (title) {
+                    case 'loaded':
+                        _this.expertMode = $layerService.project != null && $layerService.project.hasOwnProperty('userPrivileges') && $layerService.project.userPrivileges.hasOwnProperty('mca') && $layerService.project.userPrivileges.mca.hasOwnProperty('expertMode') && $layerService.project.userPrivileges.mca.expertMode;
+                        if (typeof $layerService.project.mcas === 'undefined' || $layerService.project.mcas == null)
+                            $layerService.project.mcas = [];
+                        var mcas = _this.$localStorageService.get(McaCtrl.mcas);
+                        if (typeof mcas === 'undefined' || mcas === null)
+                            return;
+                        mcas.forEach(function (mca) {
+                            $layerService.project.mcas.push(new Mca.Models.Mca().deserialize(mca));
+                        });
+                        break;
+                }
+            });
+            messageBusService.subscribe('feature', this.featureMessageReceived);
+            $translate('MCA.DELETE_MSG').then(function (translation) {
+                McaCtrl.confirmationMsg1 = translation;
+            });
+            $translate('MCA.DELETE_MSG2').then(function (translation) {
+                McaCtrl.confirmationMsg2 = translation;
+            });
+        }
+        McaCtrl.prototype.getVotingClass = function (criterion) {
+            if (criterion == null || this.mca == null || criterion.userWeight === 0 || criterion.userWeight < -this.mca.userWeightMax || criterion.userWeight > this.mca.userWeightMax)
+                return 'disabledMca';
+            return criterion.userWeight > 0 ? 'prefer' : 'avoid';
+        };
+        McaCtrl.prototype.createDummyMca = function () {
+            var mca = new Mca.Models.Mca();
+            mca.title = 'Mijn Zelfredzaamheid';
+            mca.description = 'Analyse van de zelfredzaamheid van een gemeente.';
+            mca.label = 'mca_zelfredzaamheid';
+            mca.stringFormat = '{0:0.0}';
+            mca.rankTitle = 'Positie';
+            mca.rankDescription = 'Relatieve positie in de lijst.';
+            mca.rankFormat = '{0} van {1}';
+            mca.userWeightMax = 5;
+            mca.featureIds = ['cities_Default'];
+            var criterion = new Mca.Models.Criterion();
+            criterion.label = 'p_00_14_jr';
+            criterion.scores = '[0,0 20,1]';
+            criterion.userWeight = 1;
+            mca.criteria.push(criterion);
+            criterion = new Mca.Models.Criterion();
+            criterion.label = 'p_15_24_jr';
+            criterion.scores = '[0,0 20,1]';
+            criterion.userWeight = 1;
+            mca.criteria.push(criterion);
+            criterion = new Mca.Models.Criterion();
+            criterion.label = 'p_65_eo_jr';
+            criterion.scores = '[0,0 25,1]';
+            criterion.userWeight = 3;
+            mca.criteria.push(criterion);
+            this.$layerService.project.mcas.push(mca);
+            mca = new Mca.Models.Mca();
+            mca.title = 'test';
+            mca.label = 'mca_test';
+            mca.stringFormat = '{0:0.0}';
+            mca.rankTitle = 'Rang';
+            mca.rankFormat = '{0} van {1}';
+            mca.userWeightMax = 3;
+            mca.featureIds = ['cities_Default'];
+            criterion = new Mca.Models.Criterion();
+            criterion.label = 'p_15_24_jr';
+            criterion.scores = '[0,0 20,1]';
+            criterion.userWeight = 1;
+            mca.criteria.push(criterion);
+            criterion = new Mca.Models.Criterion();
+            criterion.label = 'p_65_eo_jr';
+            criterion.scores = '[0,0 25,1]';
+            criterion.userWeight = 3;
+            mca.criteria.push(criterion);
+            this.$layerService.project.mcas.push(mca);
+        };
+        McaCtrl.prototype.toggleMcaChartType = function () {
+            this.showAsterChart = !this.showAsterChart;
+            this.drawChart(this.mca.criteria[0]);
+        };
+        McaCtrl.prototype.toggleSparkline = function () {
+            this.showSparkline = !this.showSparkline;
+            if (this.showSparkline)
+                this.drawChart();
+        };
+        McaCtrl.prototype.weightUpdated = function (criterion) {
+            this.selectedCriterion = criterion;
+            this.addMca(this.mca);
+            this.updateMca(criterion);
+        };
+        McaCtrl.prototype.updateMca = function (criterion) {
+            this.selectedCriterion = criterion;
+            this.features = [];
+            this.calculateMca();
+            this.drawChart(criterion);
+        };
+        McaCtrl.prototype.editMca = function (mca) {
+            this.showMcaEditor(mca);
+        };
+        McaCtrl.prototype.createMca = function () {
+            this.showMcaEditor(new Mca.Models.Mca());
+        };
+        McaCtrl.prototype.showMcaEditor = function (newMca) {
+            var _this = this;
+            var modalInstance = this.$modal.open({
+                templateUrl: 'mcaEditorView.html',
+                controller: Mca.McaEditorCtrl,
+                resolve: {
+                    mca: function () { return newMca; }
+                }
+            });
+            modalInstance.result.then(function (mca) {
+                _this.showSparkline = false;
+                _this.addMca(mca);
+                _this.updateMca();
+                //console.log(JSON.stringify(mca, null, 2));
+            }, function () {
+                //console.log('Modal dismissed at: ' + new Date());
+            });
+        };
+        McaCtrl.prototype.removeMca = function (mca) {
+            var _this = this;
+            if (!mca)
+                return;
+            var title = String.format(McaCtrl.confirmationMsg1, mca.title);
+            this.messageBusService.confirm(title, McaCtrl.confirmationMsg2, function (result) {
+                if (!result)
+                    return;
+                _this.$timeout(function () {
+                    _this.deleteMca(mca);
+                    if (_this.mca)
+                        _this.updateMca();
+                }, 0);
+            });
+            this.scopeApply();
+        };
+        McaCtrl.prototype.getMcaIndex = function (mca) {
+            var mcaIndex = -1;
+            var mcas = this.$layerService.project.mcas;
+            for (var i = 0; i < mcas.length; i++) {
+                if (mcas[i].title !== mca.title)
+                    continue;
+                mcaIndex = i;
+                break;
+            }
+            return mcaIndex;
+        };
+        McaCtrl.prototype.addMca = function (mca) {
+            if (!mca)
+                return;
+            this.deleteMca(mca);
+            this.$layerService.project.mcas.push(mca);
+            this.addMcaToLocalStorage(mca);
+            this.updateAvailableMcas(mca);
+        };
+        McaCtrl.prototype.deleteMca = function (mca) {
+            if (!mca)
+                return;
+            var mcaIndex = this.getMcaIndex(mca);
+            if (mcaIndex < 0)
+                return;
+            var mcas = this.$layerService.project.mcas;
+            if (mcaIndex >= 0)
+                mcas.splice(mcaIndex, 1);
+            this.removeMcaFromLocalStorage(mca);
+            this.updateAvailableMcas();
+        };
+        McaCtrl.prototype.addMcaToLocalStorage = function (mca) {
+            var mcas = this.$localStorageService.get(McaCtrl.mcas);
+            if (typeof mcas === 'undefined' || mcas === null)
+                mcas = [];
+            this.removeMcaFromLocalStorage(mca);
+            mcas.push(mca);
+            this.$localStorageService.set(McaCtrl.mcas, mcas); // You first need to set the key
+        };
+        McaCtrl.prototype.removeMcaFromLocalStorage = function (mca) {
+            var mcas = this.$localStorageService.get(McaCtrl.mcas);
+            if (typeof mcas === 'undefined' || mcas === null)
+                return;
+            var mcaIndex = -1;
+            for (var i = 0; i < mcas.length; i++) {
+                if (mcas[i].title !== mca.title)
+                    continue;
+                mcaIndex = i;
+                break;
+            }
+            if (mcaIndex < 0)
+                return;
+            mcas.splice(mcaIndex, 1);
+            this.$localStorageService.set(McaCtrl.mcas, mcas); // You first need to set the key
+        };
+        McaCtrl.prototype.scopeApply = function () {
+            if (this.$scope.$root.$$phase !== '$apply' && this.$scope.$root.$$phase !== '$digest') {
+                this.$scope.$apply();
+            }
+        };
+        McaCtrl.prototype.updateSelectedFeature = function (feature, drawCharts) {
+            if (drawCharts === void 0) { drawCharts = false; }
+            if (typeof feature === 'undefined' || feature == null) {
+                this.featureIcon = '';
+                return;
+            }
+            this.selectedFeature = feature;
+            this.featureIcon = this.selectedFeature.fType != null && this.selectedFeature.fType.style != null ? this.selectedFeature.fType.style.iconUri : '';
+            if (!feature.properties.hasOwnProperty(this.mca.label))
+                return;
+            this.showFeature = true;
+            this.properties = [];
+            var mi = McaCtrl.createPropertyType(this.mca);
+            var displayValue = csComp.Helpers.convertPropertyInfo(mi, feature.properties[mi.label]);
+            this.properties.push(new FeatureProps.CallOutProperty(mi.title, displayValue, mi.label, true, true, feature, false, false, mi.description, mi));
+            if (this.mca.rankTitle) {
+                mi = McaCtrl.createRankPropertyType(this.mca);
+                displayValue = csComp.Helpers.convertPropertyInfo(mi, feature.properties[mi.label]);
+                this.properties.push(new FeatureProps.CallOutProperty(mi.title, displayValue, mi.label, false, false, feature, false, false, mi.description, mi));
+            }
+            if (drawCharts)
+                this.drawChart();
+        };
+        McaCtrl.prototype.drawChart = function (criterion) {
+            var _this = this;
+            this.selectedCriterion = criterion;
+            this.showChart = true;
+            if (this.showFeature)
+                if (this.showAsterChart)
+                    this.drawAsterPlot(criterion);
+                else
+                    this.drawHistogram(criterion);
+            else
+                this.drawPieChart(criterion);
+            if (!this.showSparkline)
+                return;
+            var i = 0;
+            this.mca.criteria.forEach(function (crit) {
+                var id = 'histogram_' + i++;
+                if (crit.criteria.length === 0) {
+                    var y1 = crit.y;
+                    if (crit.userWeight < 0)
+                        y1 = y1.map(function (v) { return 1 - v; });
+                    csComp.Helpers.Plot.drawMcaPlot(crit.propValues, {
+                        id: id,
+                        width: 220,
+                        height: 70,
+                        xy: { x: crit.x, y: y1 },
+                        featureValue: _this.selectedFeature ? _this.selectedFeature.properties[crit.label] : null
+                    });
+                }
+                else {
+                    var j = 0;
+                    crit.criteria.forEach(function (c) {
+                        var y2 = c.y;
+                        if (crit.userWeight < 0)
+                            y2 = y2.map(function (v) { return 1 - v; });
+                        csComp.Helpers.Plot.drawMcaPlot(c.propValues, {
+                            id: id + '_' + j++,
+                            width: 220,
+                            height: 70,
+                            xy: { x: c.x, y: y2 },
+                            featureValue: _this.selectedFeature ? _this.selectedFeature.properties[c.label] : null
+                        });
+                    });
+                }
+            });
+        };
+        McaCtrl.prototype.getParentOfSelectedCriterion = function (criterion) {
+            var _this = this;
+            var parent;
+            this.mca.update();
+            if (typeof criterion === 'undefined' || this.mca.criteria.indexOf(criterion) >= 0) {
+                this.selectedCriterion = null;
+                parent = this.mca.criteria;
+            }
+            else {
+                this.mca.criteria.forEach(function (c) {
+                    if (c.criteria.indexOf(criterion) >= 0) {
+                        _this.selectedCriterion = c;
+                        parent = c.criteria;
+                    }
+                });
+            }
+            return parent;
+        };
+        McaCtrl.prototype.drawHistogram = function (criterion) {
+            var _this = this;
+            if (!this.mca || !this.selectedFeature)
+                return;
+            var currentLevel = this.getParentOfSelectedCriterion(criterion);
+            if (typeof currentLevel === 'undefined' || currentLevel == null)
+                return;
+            var data = [];
+            var options = {
+                id: McaCtrl.mcaChartId,
+                numberOfBins: 10,
+                width: 240,
+                height: 100,
+                selectedValue: this.selectedFeature.properties[this.mca.label]
+            };
+            this.features.forEach(function (feature) {
+                if (feature.properties.hasOwnProperty(_this.mca.label)) {
+                    // The property is available. I use the '+' to convert the string value to a number.
+                    var prop = feature.properties[_this.mca.label];
+                    if ($.isNumeric(prop))
+                        data.push(prop);
+                }
+            });
+            csComp.Helpers.Plot.drawHistogram(data, options);
+        };
+        McaCtrl.prototype.drawAsterPlot = function (criterion) {
+            var _this = this;
+            if (!this.mca || !this.selectedFeature)
+                return;
+            var currentLevel = this.getParentOfSelectedCriterion(criterion);
+            if (typeof currentLevel === 'undefined' || currentLevel == null)
+                return;
+            var data = [];
+            var i = 0;
+            currentLevel.forEach(function (c) {
+                var rawScore = c.getScore(_this.selectedFeature);
+                var pieData = new csComp.Helpers.AsterPieData();
+                pieData.id = i++;
+                pieData.label = c.getTitle();
+                pieData.weight = Math.abs(c.weight);
+                pieData.color = c.color;
+                pieData.score = (c.weight > 0 ? rawScore : 1 - rawScore) * 100;
+                data.push(pieData);
+            });
+            csComp.Helpers.Plot.drawAsterPlot(100, data, McaCtrl.mcaChartId);
+        };
+        McaCtrl.prototype.drawPieChart = function (criterion) {
+            if (!this.mca)
+                return;
+            var currentLevel = this.getParentOfSelectedCriterion(criterion);
+            if (typeof currentLevel === 'undefined' || currentLevel == null)
+                return;
+            var data = [];
+            var i = 0;
+            currentLevel.forEach(function (c) {
+                var pieData = new csComp.Helpers.PieData();
+                pieData.id = i++;
+                pieData.label = c.getTitle();
+                pieData.weight = Math.abs(c.weight);
+                pieData.color = c.color;
+                data.push(pieData);
+            });
+            csComp.Helpers.Plot.drawPie(100, data, McaCtrl.mcaChartId);
+        };
+        /**
+        * Based on the currently loaded features, which MCA can we use
+        */
+        McaCtrl.prototype.updateAvailableMcas = function (mca) {
+            var _this = this;
+            this.showChart = false;
+            this.mca = mca;
+            this.availableMcas = [];
+            this.$layerService.project.mcas.forEach(function (m) {
+                m.featureIds.forEach(function (featureId) {
+                    if (_this.availableMcas.indexOf(m) < 0 && _this.$layerService.featureTypes.hasOwnProperty(featureId)) {
+                        _this.availableMcas.push(m);
+                        var featureType = _this.$layerService.featureTypes[featureId];
+                        _this.applyPropertyInfoToCriteria(m, featureType);
+                    }
+                });
+            });
+            if (mca == null && this.availableMcas.length > 0) {
+                this.mca = this.availableMcas[0];
+                this.updateMca();
+            }
+        };
+        McaCtrl.prototype.calculateMca = function () {
+            var _this = this;
+            if (!this.mca)
+                return;
+            var mca = this.mca;
+            mca.featureIds.forEach(function (featureId) {
+                if (!(_this.$layerService.featureTypes.hasOwnProperty(featureId)))
+                    return;
+                _this.addPropertyInfo(featureId, mca);
+                _this.$layerService.project.features.forEach(function (feature) {
+                    if (feature.featureTypeName != null && feature.featureTypeName === featureId)
+                        _this.features.push(feature);
+                });
+                if (_this.features.length === 0)
+                    return;
+                mca.updatePla(_this.features);
+                mca.update();
+                var tempScores = [];
+                var index = 0;
+                _this.features.forEach(function (feature) {
+                    var score = mca.getScore(feature);
+                    if (mca.rankTitle) {
+                        var tempItem = { score: score, index: index++ };
+                        tempScores.push(tempItem);
+                    }
+                    feature.properties[mca.label] = score * 100;
+                    _this.$layerService.updateFeature(feature);
+                });
+                if (mca.rankTitle) {
+                    // Add rank information
+                    tempScores.sort(function (a, b) {
+                        return b.score - a.score;
+                    });
+                    var length = _this.features.length;
+                    var scaleRange = mca.scaleMinValue ? Math.abs(mca.scaleMaxValue - mca.scaleMinValue) + 1 : length;
+                    var scaleFactor = Math.ceil(length / scaleRange);
+                    var rankFunction = mca.scaleMinValue ? mca.scaleMaxValue > mca.scaleMinValue ? function (position) {
+                        return mca.scaleMaxValue - Math.round(position / scaleFactor);
+                    } : function (position) {
+                        return mca.scaleMinValue + Math.round(position / scaleFactor);
+                    } : function (position) {
+                        return position;
+                    };
+                    var prevScore = -1;
+                    var rank = 1;
+                    for (var i = 0; i < length; i++) {
+                        var item = tempScores[i];
+                        // Assign items with the same value the same rank.
+                        if (item.score !== prevScore)
+                            rank = i + 1;
+                        prevScore = item.score;
+                        _this.features[item.index].properties[mca.label + '#'] = rankFunction(rank) + ',' + scaleRange;
+                    }
+                }
+            });
+            this.updateSelectedFeature(this.selectedFeature, false);
+            if (this.selectedFeature) {
+                this.messageBusService.publish('feature', 'onFeatureSelect', this.selectedFeature);
+            }
+            if (this.groupStyle)
+                this.$layerService.updateStyle(this.groupStyle);
+        };
+        McaCtrl.prototype.applyPropertyInfoToCriteria = function (mca, featureType) {
+            var propertyTypes = csComp.Helpers.getPropertyTypes(featureType, this.$layerService.propertyTypeData);
+            if (propertyTypes.length === 0)
+                return;
+            mca.criteria.forEach(function (criterion) {
+                var label = criterion.label;
+                propertyTypes.forEach(function (propInfo) {
+                    if (propInfo.label === label) {
+                        criterion.title = propInfo.title;
+                        criterion.description = propInfo.description;
+                    }
+                });
+            });
+        };
+        McaCtrl.prototype.addPropertyInfo = function (featureId, mca, forceUpdate) {
+            if (forceUpdate === void 0) { forceUpdate = false; }
+            var featureType = this.$layerService.featureTypes[featureId];
+            //var propertyTypes = featureType.propertyTypeData;
+            var propertyTypes = csComp.Helpers.getPropertyTypes(featureType, this.$layerService.propertyTypeData);
+            var labelIndex = -1;
+            for (var i = propertyTypes.length - 1; i >= 0; i--) {
+                if (propertyTypes[i].label === mca.label) {
+                    labelIndex = i;
+                    break;
+                }
+            }
+            if (forceUpdate || labelIndex < 0) {
+                var pt = McaCtrl.createPropertyType(mca);
+                if (labelIndex < 0) {
+                    if (featureType.propertyTypeData === null)
+                        featureType.propertyTypeData = [];
+                    featureType.propertyTypeData.push(pt); // NOTE: propertyTypes refers to a new list, so you cannot add to it.
+                }
+                else
+                    propertyTypes[labelIndex] = pt; // NOTE: but you should be able to overwrite an existing property.
+            }
+            if (!mca.rankTitle)
+                return;
+            labelIndex = -1;
+            for (i = propertyTypes.length - 1; i >= 0; i--) {
+                if (propertyTypes[i].label === mca.rankLabel) {
+                    labelIndex = i;
+                    break;
+                }
+            }
+            if (forceUpdate || labelIndex < 0) {
+                pt = McaCtrl.createRankPropertyType(mca);
+                if (labelIndex < 0)
+                    featureType.propertyTypeData.push(pt);
+                else
+                    propertyTypes[labelIndex] = pt;
+            }
+        };
+        McaCtrl.prototype.setStyle = function (item) {
+            // If groupStyle has been set, we have called it before.
+            // However, make sure that not another filter has set the fillColor too, overwriting our label.
+            if (this.groupStyle && this.groupStyle.group != null && this.groupStyle.group.styles != null && this.groupStyle.group.styles.filter(function (s) {
+                return s.visualAspect === 'fillColor';
+            })[0].property === this.mca.label)
+                this.$layerService.updateStyle(this.groupStyle);
+            else {
+                this.groupStyle = this.$layerService.setStyle(item, false);
+                this.groupStyle.colors = ['#F04030', '#3040F0'];
+                this.$layerService.updateStyle(this.groupStyle);
+            }
+        };
+        McaCtrl.createPropertyType = function (mca) {
+            var mi = {
+                title: mca.title,
+                label: mca.label,
+                type: 'number',
+                maxValue: 1,
+                minValue: 0,
+                description: mca.description,
+                stringFormat: mca.stringFormat,
+                visibleInCallOut: true,
+                section: mca.section || 'MCA'
+            };
+            return mi;
+        };
+        McaCtrl.createRankPropertyType = function (mca) {
+            var mi = {
+                title: mca.rankTitle,
+                label: mca.rankLabel,
+                type: 'rank',
+                description: mca.rankDescription,
+                stringFormat: mca.rankFormat,
+                visibleInCallOut: true,
+                section: mca.section || 'MCA'
+            };
+            return mi;
+        };
+        McaCtrl.mcaChartId = 'mcaChart';
+        McaCtrl.mcas = 'MCAs';
+        McaCtrl.$inject = [
+            '$scope',
+            '$modal',
+            '$translate',
+            '$timeout',
+            'localStorageService',
+            'layerService',
+            'messageBusService'
+        ];
+        return McaCtrl;
+    })();
+    Mca.McaCtrl = McaCtrl;
 })(Mca || (Mca = {}));
 var Mca;
 (function (Mca) {
@@ -1974,408 +4634,350 @@ var Mca;
     })();
     Mca.McaEditorCtrl = McaEditorCtrl;
 })(Mca || (Mca = {}));
-var csComp;
-(function (csComp) {
-    var Services;
-    (function (Services) {
-        var Widget = (function () {
-            function Widget() {
-            }
-            return Widget;
-        })();
-        Services.Widget = Widget;
-        var BaseWidget = (function () {
-            //public static deserialize(input: IWidget): IWidget {
-            //    var loader = new InstanceLoader(window);
-            //    var w = <IWidget>loader.getInstance(widget.widgetType);
-            //    var res = $.extend(new BaseWidget(), input);
-            //    return res;
-            //}
-            function BaseWidget(title, type) {
-                this.renderer = function ($compile, $scope) {
-                };
-                this.resize = function (status, width, height) {
-                };
-                if (title)
-                    this.title = title;
-                this.properties = {};
-                this.dataSets = [];
-            }
-            BaseWidget.prototype.start = function () {
-            };
-            BaseWidget.prototype.init = function () {
-                //if (!sizeX)
-                //this.sizeX = sX;
-                //this.sizeY = sY;
-                //this.col = c;
-                //this.row = r;
-                this.background = "red";
-                if (!this.id)
-                    this.id = "widget" + csComp.Helpers.getGuid().replace('-', '');
-                //this.width = (width) ? width : 300;
-                //this.height = (height) ? height : 150;
-                //this.id = id;
-                this.elementId = this.id;
-                this.start();
-            };
-            BaseWidget.prototype.updateDateRange = function (r) {
-                this.range = r;
-            };
-            return BaseWidget;
-        })();
-        Services.BaseWidget = BaseWidget;
-        var Dashboard = (function () {
-            function Dashboard() {
-                this.showTimeline = true;
-                this.showRightmenu = true;
-                this.draggable = true;
-                this.resizable = true;
-                this.widgets = [];
-            }
-            Dashboard.deserialize = function (input) {
-                var _this = this;
-                var res = $.extend(new Dashboard(), input);
-                res.widgets = [];
-                if (input.widgets)
-                    input.widgets.forEach(function (w) {
-                        _this.addNewWidget(w, res);
-                    });
-                if (input.timeline)
-                    res.timeline = $.extend(new Services.DateRange(), input.timeline);
-                return res;
-            };
-            Dashboard.addNewWidget = function (widget, dashboard) {
-                //var loader = new InstanceLoader(window);
-                //var w = <IWidget>loader.getInstance(widget.widgetType);
-                //w.messageBusService = this.$messageBusService;
-                //w.layerService = this.$layerService;
-                //w.init();
-                //var w = BaseWidget();
-                if (!widget.id)
-                    widget.id = csComp.Helpers.getGuid();
-                //alert(widget.id);
-                widget.elementId = "widget-" + widget.id;
-                widget.dashboard = dashboard;
-                dashboard.widgets.push(widget);
-                /*if (this.$rootScope.$root.$$phase != '$apply' && this.$rootScope.$root.$$phase != '$digest') { this.$rootScope.$apply(); }
-                setTimeout(() => {
-                    //if (w != null) w.renderer(this.$compile, this.$rootScope);
-                    this.updateWidget(widget);
-      
-                }, 50);*/
-                //this.editWidget(w);
-                return widget;
-            };
-            return Dashboard;
-        })();
-        Services.Dashboard = Dashboard;
-        var Timeline = (function () {
-            function Timeline() {
-            }
-            return Timeline;
-        })();
-        Services.Timeline = Timeline;
-        var TimedDataSet = (function () {
-            function TimedDataSet() {
-            }
-            return TimedDataSet;
-        })();
-        Services.TimedDataSet = TimedDataSet;
-        var DataSet = (function () {
-            function DataSet(id, title) {
-                this.id = id;
-                this.title = title;
-                this.data = [];
-            }
-            return DataSet;
-        })();
-        Services.DataSet = DataSet;
-    })(Services = csComp.Services || (csComp.Services = {}));
-})(csComp || (csComp = {}));
-var csComp;
-(function (csComp) {
-    var Services;
-    (function (Services) {
-        var Event = (function () {
-            function Event() {
-                var _this = this;
-                this.startDate = function () {
-                    return new Date(_this.start);
-                };
-            }
-            return Event;
-        })();
-        Services.Event = Event;
-        /**
-         * A feature is a single object that is show on a map (e.g. point, polyline, etc)
-         * Features are part of a layer and filtered and styled using group filters and styles
-         *
-         */
-        var Feature = (function () {
-            function Feature() {
-            }
-            return Feature;
-        })();
-        Services.Feature = Feature;
-        (function (DrawingModeType) {
-            DrawingModeType[DrawingModeType["None"] = 0] = "None";
-            DrawingModeType[DrawingModeType["Image"] = 1] = "Image";
-            DrawingModeType[DrawingModeType["Point"] = 2] = "Point";
-            DrawingModeType[DrawingModeType["Square"] = 3] = "Square";
-            DrawingModeType[DrawingModeType["Rectangle"] = 4] = "Rectangle";
-            DrawingModeType[DrawingModeType["Line"] = 5] = "Line";
-            DrawingModeType[DrawingModeType["Circle"] = 6] = "Circle";
-            DrawingModeType[DrawingModeType["Freehand"] = 7] = "Freehand";
-            DrawingModeType[DrawingModeType["Polyline"] = 8] = "Polyline";
-            DrawingModeType[DrawingModeType["Polygon"] = 9] = "Polygon";
-            DrawingModeType[DrawingModeType["MultiPolygon"] = 10] = "MultiPolygon";
-        })(Services.DrawingModeType || (Services.DrawingModeType = {}));
-        var DrawingModeType = Services.DrawingModeType;
-        //export enum propertyTypeType {
-        //    Text,
-        //    TextArea,
-        //    Rating,
-        //    Number,
-        //    Bbcode,
-        //    Boolean,
-        //    Bit,
-        //    Sensor,
-        //    Xml,
-        //    Options,
-        //    Unknown,
-        //    Image,
-        //    DateTime,
-        //    Mediafolder
-        //}
-        (function (featureFilterType) {
-            /** Turn filtering off */
-            featureFilterType[featureFilterType["none"] = 0] = "none";
-            /** Default for numbers: histogram */
-            featureFilterType[featureFilterType["bar"] = 1] = "bar";
-            /** Default for text */
-            featureFilterType[featureFilterType["text"] = 2] = "text";
-        })(Services.featureFilterType || (Services.featureFilterType = {}));
-        var featureFilterType = Services.featureFilterType;
-        var PropertyInfo = (function () {
-            function PropertyInfo() {
-            }
-            return PropertyInfo;
-        })();
-        Services.PropertyInfo = PropertyInfo;
-    })(Services = csComp.Services || (csComp.Services = {}));
-})(csComp || (csComp = {}));
-var csComp;
-(function (csComp) {
-    var Services;
-    (function (Services) {
-        (function (LayerType) {
-            LayerType[LayerType["GeoJson"] = 0] = "GeoJson";
-            LayerType[LayerType["Kml"] = 1] = "Kml";
-        })(Services.LayerType || (Services.LayerType = {}));
-        var LayerType = Services.LayerType;
-        /** a project group contains a list of layers that can be grouped together.
-         * Filters, styles can clustering is always defined on the group level.
-         * If a filter is selected (e.g. show only the features within a certain property range)
-         * this filter is applied to all layers within this group.
-         * If clustering is enabled all features in all layers are grouped together
-         */
-        var ProjectGroup = (function () {
-            function ProjectGroup() {
-            }
-            return ProjectGroup;
-        })();
-        Services.ProjectGroup = ProjectGroup;
-        /**
-         * Filters are used to select a subset of features within a group.
-         */
-        var GroupFilter = (function () {
-            function GroupFilter() {
-            }
-            return GroupFilter;
-        })();
-        Services.GroupFilter = GroupFilter;
-        /**
-         * Styles can determine how features are shown on the map
-         */
-        var GroupStyle = (function () {
-            function GroupStyle($translate) {
-                var _this = this;
-                this.availableAspects = ['strokeColor', 'fillColor', 'strokeWidth'];
-                this.colorScales = {};
-                $translate('WHITE_RED').then(function (translation) {
-                    _this.colorScales[translation] = ['white', 'red'];
-                });
-                $translate('RED_WHITE').then(function (translation) {
-                    _this.colorScales[translation] = ['red', 'white'];
-                });
-                $translate('GREEN_RED').then(function (translation) {
-                    _this.colorScales[translation] = ['green', 'red'];
-                });
-                $translate('RED_GREEN').then(function (translation) {
-                    _this.colorScales[translation] = ['red', 'green'];
-                });
-                $translate('BLUE_RED').then(function (translation) {
-                    _this.colorScales[translation] = ['#F04030', '#3040F0'];
-                });
-                $translate('RED_BLUE').then(function (translation) {
-                    _this.colorScales[translation] = ['#3040F0', '#F04030'];
-                });
-                $translate('WHITE_BLUE').then(function (translation) {
-                    _this.colorScales[translation] = ['white', 'blue'];
-                });
-                $translate('BLUE_WHITE').then(function (translation) {
-                    _this.colorScales[translation] = ['blue', 'white'];
-                });
-                $translate('WHITE_GREEN').then(function (translation) {
-                    _this.colorScales[translation] = ['white', 'green'];
-                });
-                $translate('GREEN_WHITE').then(function (translation) {
-                    _this.colorScales[translation] = ['green', 'white'];
-                });
-                $translate('WHITE_ORANGE').then(function (translation) {
-                    _this.colorScales[translation] = ['white', 'orange'];
-                });
-                $translate('ORANGE_WHITE').then(function (translation) {
-                    _this.colorScales[translation] = ['orange', 'white'];
-                });
-            }
-            return GroupStyle;
-        })();
-        Services.GroupStyle = GroupStyle;
-    })(Services = csComp.Services || (csComp.Services = {}));
-})(csComp || (csComp = {}));
-var csComp;
-(function (csComp) {
-    var Services;
-    (function (Services) {
-        /**
-        * Expert level for determining what options to show to the user.
-        */
-        (function (Expertise) {
-            Expertise[Expertise["Beginner"] = 1] = "Beginner";
-            Expertise[Expertise["Intermediate"] = 2] = "Intermediate";
-            Expertise[Expertise["Expert"] = 3] = "Expert";
-        })(Services.Expertise || (Services.Expertise = {}));
-        var Expertise = Services.Expertise;
-        var availableZoomLevels = [
-            { title: "decades", value: 315360000000 },
-            { title: "years", value: 31536000000 },
-            { title: "weeks", value: 604800000 },
-            { title: "days", value: 86400000 },
-            { title: "hours", value: 3600000 },
-            { title: "quarters", value: 900000 },
-            { title: "minutes", value: 60000 },
-            { title: "seconds", value: 1000 },
-            { title: "milliseconds", value: 1 }
-        ];
-        var DateRange = (function () {
-            function DateRange() {
-                var _this = this;
-                this.startDate = function () {
-                    if (_this.focus < _this.start)
-                        _this.start = _this.focus - _this.range / 5;
-                    return new Date(_this.start);
-                };
-                this.focusDate = function () {
-                    return new Date(_this.focus);
-                };
-                this.endDate = function () {
-                    if (_this.focus > _this.end)
-                        _this.end = _this.focus + _this.range / 5;
-                    return new Date(_this.end);
-                };
-            }
-            //constructor() {
-            //    if (!this.focus) this.setFocus(new Date());
-            //}
-            DateRange.deserialize = function (input) {
-                var res = $.extend(new DateRange(), input);
-                if (typeof res.focus === 'undefined' || res.focus === null)
-                    res.focus = Date.now();
-                return res;
-            };
-            /**
-            * Set the focus time of the timeline, optionally including start and end time.
-            */
-            DateRange.prototype.setFocus = function (d, s, e) {
-                var _this = this;
-                this.focus = d.getTime();
-                if (s)
-                    this.start = s.getTime();
-                if (e)
-                    this.end = e.getTime();
-                var newRange = this.end - this.start;
-                if (this.range !== newRange) {
-                    this.range = newRange;
-                    availableZoomLevels.some(function (tl) {
-                        _this.zoomLevel = tl.value;
-                        _this.zoomLevelName = tl.title;
-                        return (tl.value < (_this.range / 10));
-                    });
-                }
-            };
-            return DateRange;
-        })();
-        Services.DateRange = DateRange;
-        /**
-         * Represents to the overall solution class. A solution can contain multiple project.
-         * This can be usefull when you want to have the same website, but with different content.
-         * e.g. you could make it so that you can switch between different regions or different domains of interest.
-         */
-        var Solution = (function () {
-            function Solution() {
-            }
-            return Solution;
-        })();
-        Services.Solution = Solution;
-        /** Project within a solution file, refers to a project url*/
-        var SolutionProject = (function () {
-            function SolutionProject() {
-            }
-            return SolutionProject;
-        })();
-        Services.SolutionProject = SolutionProject;
-        /** project configuration. */
-        var Project = (function () {
-            function Project() {
-                this.expertMode = 3 /* Expert */;
-                this.markers = {};
-            }
-            Project.prototype.deserialize = function (input) {
-                var res = jQuery.extend(new Project(), input);
-                if (input.timeLine)
-                    res.timeLine = DateRange.deserialize(input.timeLine); // <DateRange>jQuery.extend(new DateRange(), input.timeLine);
-                if (input.dashboards) {
-                    res.dashboards = [];
-                    input.dashboards.forEach(function (d) {
-                        res.dashboards.push(Services.Dashboard.deserialize(d));
-                    });
-                    for (var mca in input.mcas) {
-                        if (input.mcas.hasOwnProperty(mca)) {
-                            res.mcas.push(new Mca.Models.Mca().deserialize(mca));
-                        }
-                    }
-                }
-                if (!res.propertyTypeData)
-                    res.propertyTypeData = {};
-                return res;
-            };
-            return Project;
-        })();
-        Services.Project = Project;
-        /** layer information. a layer is described in a project file and is always part of a group */
-        var ProjectLayer = (function () {
-            function ProjectLayer() {
-            }
-            return ProjectLayer;
-        })();
-        Services.ProjectLayer = ProjectLayer;
-    })(Services = csComp.Services || (csComp.Services = {}));
-})(csComp || (csComp = {}));
 var McaEditorView;
 (function (McaEditorView) {
     McaEditorView.html = '<div class="modal-content">    <div class="modal-header">        <button type="button" class="close" data-ng-click="vm.cancel()" aria-hidden="true">&times;</button>        <h3 class="modal-title" translate>MCA.EDITOR_TITLE</h3>    </div>    <div class="modal-body container-fluid">        <div class="row-fluid">            <input type="text" class="pull-left" data-ng-model="vm.mcaTitle" style="margin: 0 5px" placeholder="{{ \'MCA.TITLE\' | translate }}" />            <!-- <span><input type="checkbox" data-ng-model="vm.hasRank" style="margin-left: 10px;" /><span translate>MCA.INCLUDE_RANK</span></span>-->            <input type="text" class="pull-left" data-ng-model="vm.rankTitle" style="margin: 0 5px"  placeholder="{{ \'MCA.RANK_TITLE\' | translate }}" />            <input type="text" class="pull-left" data-ng-model="vm.scaleMin" style="width: 100px; margin: 0 5px" placeholder="{{ \'MCA.SCALE_MIN_TITLE\' | translate }}" />            <input type="text" class="pull-left" data-ng-model="vm.scaleMax" style="width: 100px; margin: 0 5px" placeholder="{{ \'MCA.SCALE_MAX_TITLE\' | translate }}" />        </div>        <h4 class="row-fluid" style="margin-top: 5px;" translate>MCA.MAIN_FEATURE</h4>        <select data-ng-model="vm.selectedFeatureType"                data-ng-change="vm.loadPropertyTypes()"                data-ng-options="item as item.name for (key, item) in vm.dataset.featureTypes"                class="form-control row-fluid"></select>        <h4 class="row-fluid" translate>MCA.PROPERTIES</h4>        <ul class="form-group row-fluid" style="margin-top: 1em; margin-left: -2em; overflow-y: auto; overflow-x: hidden;"            resize resize-y="450">            <li ng-repeat="mi in vm.propInfos"                class="row-fluid list-unstyled truncate">                <div style="padding: 5px 0;" class="row-fluid">                    <input type="checkbox" name="vm.selectedTitles[]" value="{{mi.title}}"                           data-ng-checked="mi.isSelected"                           data-ng-click="mi.isSelected = !mi.isSelected">&nbsp;&nbsp;{{mi.title}}                    <div data-ng-if="mi.isSelected" class="pull-right">                        <a href="" class="pull-right"                           style="margin-right: 5px;"                           data-ng-click="vm.toggleItemDetails($index)"><i class="fa fa-2x fa-edit"></i></a>                        <input type="text" class="pull-right"                               style="margin: -2px 5px -2px 0;"                               data-ng-model="mi.category"                               placeholder="{{\'MCA.CATEGORY_MSG\' | translate}}" />                    </div>                    <!--<form data-ng-if="mi.isSelected" name="myForm" style="margin-left: 20px;">                <label id="scoringFunctions" data-ng-repeat="sf in vm.scoringFunctions">                    <input type="radio" data-ng-model="mi.scoringFunctionType" value="{{sf.type}}">                    <a data-ng-href="" data-ng-class="sf.cssClass" data-ng-click="mi.isSelected = !mi.isSelected"></a>                </label>            </form>            <div data-ng-if="mi.scoringFunctionType == 0" style="margin-left: 20px;">                input -> score:&nbsp;<input type="text" data-ng-model="mi.scores" placeholder="[x0,y0 x1,y1 ...]"/>            </div>-->                </div>                <div class="row-fluid" data-ng-show="vm.showItem == {{$index}}" id="scoringFunctions">                    <select class="col-xs-10"                            style="margin-right: 5px; margin-bottom: 5px;"                            data-ng-init="mi.scoringFunctionType = mi.scoringFunctionType || vm.scoringFunctions[0]"                            data-ng-model="mi.scoringFunctionType"                            data-ng-options="sf as sf.title for sf in vm.scoringFunctions"></select>                    <div class="pull-right" data-ng-class="mi.scoringFunctionType.cssClass" style="width: 40px; height: 28px; margin-top: -5px;"></div>                    <div class="row-fluid">                        <input type="text" class="col-xs-3" style="padding: 0;" data-ng-model="mi.minValue" placeholder="{{ \'MCA.MIN_VALUE\' | translate }}" />                        <input type="text" class="col-xs-3" style="padding: 0;" data-ng-model="mi.maxValue" placeholder="{{ \'MCA.MAX_VALUE\' | translate }}" />                        <input type="text" class="col-xs-3" style="padding: 0;" data-ng-model="mi.minCutoffValue" placeholder="{{ \'MCA.MIN_CUTOFF_VALUE\' | translate }}" />                        <input type="text" class="col-xs-3" style="padding: 0;" data-ng-model="mi.maxCutoffValue" placeholder="{{ \'MCA.MAX_CUTOFF_VALUE\' | translate }}" />                    </div>                </div>            </li>        </ul>    </div>    <div class="modal-footer">        <button type="button" class="btn btn-warning" data-ng-click="vm.cancel()" translate>CANCEL_BTN</button>        <button type="button" class="btn btn-primary" data-ng-click="vm.save()" translate>OK_BTN</button>    </div></div>';
 })(McaEditorView || (McaEditorView = {}));
+var OfflineSearch;
+(function (OfflineSearch) {
+    OfflineSearch.html = '<form role="search">    <style>        .typeahead-group-header {            margin-left: 10px;            font-weight: bold;            font-size: 120%;        }    </style>    <script type="text/ng-template" id="typeahead-item.html">     <div class="typeahead-group-header" ng-if="match.model.firstInGroup">{{match.model.groupTitle}} >> {{match.model.layerTitle}}</div>     <a>       <span ng-bind-html="match.label.title"></span>     </a>   </script>   <div id="scrollable-dropdown-menu" data-ng-disabled="!vm.isReady" class="form-group has-feedback navbar-right">        <input data-ng-model="vm.searchText"               typeahead="address for address in vm.getLocation($viewValue)"               typeahead-loading="loadingLocations"               typeahead-min-length="3"               typeahead-highlight="true"               typeahead-editable="false"               typeahead-template-url="typeahead-item.html"               typeahead-on-select="vm.onSelect($item, $model, $label)"               id="searchbox"               type="text"               style="width:300px"               class="typeahead form-control">               <!-- placeholder="Zoek in kaartlagen" -->        <!-- <span ng-if="loadingLocations"  id="searchicon" class="fa fa-refresh fa-spin"></span>-->        <span id="searchicon" class="fa fa-search form-control-feedback"></span>    </div></form>';
+})(OfflineSearch || (OfflineSearch = {}));
+var OfflineSearch;
+(function (OfflineSearch) {
+    /**
+      * Config
+      */
+    var moduleName = 'csWeb.offlineSearch';
+    /**
+      * Module
+      */
+    OfflineSearch.myModule;
+    try {
+        OfflineSearch.myModule = angular.module(moduleName);
+    }
+    catch (err) {
+        // named module does not exist, so create one
+        OfflineSearch.myModule = angular.module(moduleName, []);
+    }
+    /**
+      * Directive to display the available map layers.
+      */
+    OfflineSearch.myModule.directive('offlineSearch', [
+        '$compile',
+        function ($compile) {
+            return {
+                terminal: true,
+                restrict: 'E',
+                scope: {},
+                template: OfflineSearch.html,
+                compile: function (el) {
+                    var fn = $compile(el);
+                    return function (scope) {
+                        fn(scope);
+                    };
+                },
+                replace: true,
+                transclude: true,
+                controller: OfflineSearch.OfflineSearchCtrl
+            };
+        }
+    ]);
+})(OfflineSearch || (OfflineSearch = {}));
+var OfflineSearch;
+(function (OfflineSearch) {
+    var Layer = (function () {
+        function Layer(groupTitle, index, id, title, path, type) {
+            this.groupTitle = groupTitle;
+            this.index = index;
+            this.id = id;
+            this.title = title;
+            this.path = path;
+            this.type = type;
+            /**
+             * Names of all the features.
+             * @type {string[]}
+             */
+            this.featureNames = [];
+        }
+        return Layer;
+    })();
+    OfflineSearch.Layer = Layer;
+    /**
+     * An index entry that contains a search result.
+     */
+    var Entry = (function () {
+        function Entry(layerIndexOrArray, featureIndex, propertyIndex) {
+            this.v = Array(2);
+            if (typeof layerIndexOrArray === 'number') {
+                this.v[0] = layerIndexOrArray;
+                this.v[1] = featureIndex;
+            }
+            else {
+                this.v = layerIndexOrArray;
+            }
+        }
+        Object.defineProperty(Entry.prototype, "layerIndex", {
+            get: function () {
+                return this.v[0];
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Entry.prototype, "featureIndex", {
+            get: function () {
+                return this.v[1];
+            },
+            enumerable: true,
+            configurable: true
+        });
+        /**
+         * This function is called when serializing the Entry object to JSON, which is
+         * much less verbose than the default JSON. In the constructor, I've used a
+         * Union type to deserialize it again.
+         */
+        Entry.prototype.toJSON = function () {
+            return this.v;
+        };
+        return Entry;
+    })();
+    OfflineSearch.Entry = Entry;
+    var KeywordIndex = (function () {
+        function KeywordIndex() {
+        }
+        return KeywordIndex;
+    })();
+    OfflineSearch.KeywordIndex = KeywordIndex;
+    var OfflineSearchResult = (function () {
+        function OfflineSearchResult(project, options) {
+            this.project = project;
+            this.options = options;
+            this.layers = [];
+            this.keywordIndex = {};
+        }
+        return OfflineSearchResult;
+    })();
+    OfflineSearch.OfflineSearchResult = OfflineSearchResult;
+})(OfflineSearch || (OfflineSearch = {}));
+var OfflineSearch;
+(function (OfflineSearch) {
+    var OfflineSearchResultViewModel = (function () {
+        function OfflineSearchResultViewModel(title, layerTitle, groupTitle, entry) {
+            this.title = title;
+            this.layerTitle = layerTitle;
+            this.groupTitle = groupTitle;
+            this.entry = entry;
+            this.firstInGroup = false;
+        }
+        OfflineSearchResultViewModel.prototype.toString = function () {
+            return this.title;
+        };
+        Object.defineProperty(OfflineSearchResultViewModel.prototype, "fullTitle", {
+            get: function () {
+                return this.groupTitle + ' >> ' + this.layerTitle + ' >> ' + this.title;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        return OfflineSearchResultViewModel;
+    })();
+    OfflineSearch.OfflineSearchResultViewModel = OfflineSearchResultViewModel;
+    var OfflineSearchCtrl = (function () {
+        // dependencies are injected via AngularJS $injector
+        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
+        function OfflineSearchCtrl($scope, $layerService, $mapService, $messageBus) {
+            var _this = this;
+            this.$scope = $scope;
+            this.$layerService = $layerService;
+            this.$mapService = $mapService;
+            this.$messageBus = $messageBus;
+            this.isReady = false;
+            $scope.vm = this;
+            $messageBus.subscribe('project', function (title) {
+                switch (title) {
+                    case 'loaded':
+                        var offlineSearchResultUrl = $layerService.projectUrl.replace('project.json', 'offline_search_result.json');
+                        _this.loadSearchResults(offlineSearchResultUrl);
+                        break;
+                }
+            });
+            $messageBus.subscribe('language', function (title, language) {
+                switch (title) {
+                    case 'newLanguage':
+                        break;
+                }
+            });
+        }
+        /**
+         * Load the offline search results (json file).
+         */
+        OfflineSearchCtrl.prototype.loadSearchResults = function (url) {
+            var _this = this;
+            $.getJSON(url, function (offlineSearchResult) {
+                _this.offlineSearchResult = offlineSearchResult;
+                var kwi = offlineSearchResult.keywordIndex;
+                var keywordIndex = {};
+                for (var key in kwi) {
+                    if (!kwi.hasOwnProperty(key))
+                        continue;
+                    kwi[key].forEach(function (entry) {
+                        if (!keywordIndex.hasOwnProperty(key))
+                            keywordIndex[key] = [];
+                        keywordIndex[key].push(new OfflineSearch.Entry(entry));
+                    });
+                }
+                _this.offlineSearchResult.keywordIndex = keywordIndex;
+                _this.isReady = true;
+            });
+        };
+        /**
+         * Get the locations based on the entered text.
+         */
+        OfflineSearchCtrl.prototype.getLocation = function (text, resultCount) {
+            if (resultCount === void 0) { resultCount = 15; }
+            if (!this.isReady || text === null || text.length < 3)
+                return [];
+            var searchWords = text.toLowerCase().split(' ');
+            var totResults;
+            for (var j in searchWords) {
+                var result = this.getKeywordHits(searchWords[j]);
+                totResults = !totResults ? result : this.mergeResults(totResults, result);
+            }
+            var searchResults = [];
+            var layers = this.offlineSearchResult.layers;
+            var count = resultCount;
+            var resultIndex = 0;
+            while (count > 0 && resultIndex < totResults.length) {
+                var r = totResults[resultIndex++];
+                var subCount = Math.min(count, r.entries.length);
+                for (var i = 0; i < subCount; i++) {
+                    var entry = r.entries[i];
+                    var layer = layers[entry.layerIndex];
+                    count--;
+                    searchResults.push(new OfflineSearchResultViewModel(layer.featureNames[entry.featureIndex], layer.title, layer.groupTitle, entry));
+                }
+            }
+            // Group search results by groupTitle | layerTitle
+            var groups = {};
+            searchResults.forEach(function (sr) {
+                var group = sr.groupTitle + ' >> ' + sr.layerTitle;
+                if (!groups.hasOwnProperty(group))
+                    groups[group] = [];
+                groups[group].push(sr);
+            });
+            searchResults = [];
+            for (var key in groups) {
+                if (!groups.hasOwnProperty(key))
+                    continue;
+                var firstInGroup = true;
+                groups[key].forEach(function (sr) {
+                    sr.firstInGroup = firstInGroup;
+                    searchResults.push(sr);
+                    firstInGroup = false;
+                });
+            }
+            return searchResults;
+        };
+        /**
+         * Merge the resuls of two keyword lookups by checking whether different entries refer
+         * to the same layer and feature.
+         * @result1 {ILookupResult[]}
+         * @result2 {ILookupResult[]}
+         */
+        OfflineSearchCtrl.prototype.mergeResults = function (result1, result2) {
+            var r = [];
+            result1.forEach(function (r1) {
+                result2.forEach(function (r2) {
+                    r1.entries.forEach(function (entry1) {
+                        r2.entries.forEach(function (entry2) {
+                            if (entry1.layerIndex === entry2.layerIndex && entry1.featureIndex === entry2.featureIndex)
+                                r.push({ score: r1.score * r2.score, key: r1.key + ' ' + r2.key, entries: [entry1] });
+                        });
+                    });
+                });
+            });
+            r = r.sort(function (a, b) {
+                return b.score - a.score;
+            });
+            return r;
+        };
+        /**
+         * Do a fuzzy keyword comparison between the entered text and the list of keywords,
+         * and return a subset.
+         * @text: {string}
+         */
+        OfflineSearchCtrl.prototype.getKeywordHits = function (text) {
+            var results = [];
+            var keywordIndex = this.offlineSearchResult.keywordIndex;
+            for (var key in keywordIndex) {
+                if (!keywordIndex.hasOwnProperty(key))
+                    continue;
+                var score = key.score(text);
+                if (score < 0.5)
+                    continue;
+                results.push({ score: score, key: key, entries: keywordIndex[key] });
+            }
+            results = results.sort(function (a, b) {
+                return b.score - a.score;
+            });
+            return results;
+        };
+        /**
+         * When an item is selected, optionally open the layer and jump to the selected feature.
+         */
+        OfflineSearchCtrl.prototype.onSelect = function (selectedItem) {
+            // if ($item.feature) {
+            //     this.$layerService.selectFeature($item.feature);
+            //     this.$mapService.zoomTo($item.feature);
+            // } else {
+            //     this.$mapService.zoomToLocation(new L.LatLng($item.lat, $item.lng), 12);
+            // }
+            var _this = this;
+            var layerIndex = selectedItem.entry.layerIndex;
+            var layer = this.offlineSearchResult.layers[layerIndex];
+            var projectLayer = this.$layerService.findLayer(layer.id);
+            console.log(selectedItem);
+            if (!projectLayer)
+                return;
+            if (projectLayer.enabled) {
+                this.selectFeature(layer.id, selectedItem.entry.featureIndex);
+                return;
+            }
+            else {
+                var handle = this.$messageBus.subscribe('layer', function (title, layer) {
+                    if (title !== 'activated' || projectLayer.url !== layer.url)
+                        return;
+                    _this.selectFeature(layer.id, selectedItem.entry.featureIndex);
+                    _this.$messageBus.unsubscribe(handle);
+                });
+                // projectLayer       = new csComp.Services.ProjectLayer();
+                // projectLayer.id    = layer.id;
+                // projectLayer.title = layer.title;
+                // projectLayer.url   = layer.path;
+                // projectLayer.type  = layer.type;
+                this.$layerService.addLayer(projectLayer);
+            }
+        };
+        OfflineSearchCtrl.prototype.selectFeature = function (layerId, featureIndex) {
+            var feature = this.$layerService.findFeatureById(layerId, featureIndex);
+            if (feature == null)
+                return;
+            this.$mapService.zoomTo(feature);
+            this.$layerService.selectFeature(feature);
+        };
+        // $inject annotation.
+        // It provides $injector with information about dependencies to be injected into constructor
+        // it is better to have it close to the constructor, because the parameters must match in count and type.
+        // See http://docs.angularjs.org/guide/di
+        OfflineSearchCtrl.$inject = [
+            '$scope',
+            'layerService',
+            'mapService',
+            'messageBusService'
+        ];
+        return OfflineSearchCtrl;
+    })();
+    OfflineSearch.OfflineSearchCtrl = OfflineSearchCtrl;
+})(OfflineSearch || (OfflineSearch = {}));
 var ProjectSettings;
 (function (ProjectSettings) {
     ProjectSettings.html = '<div>    <div class="wide-tooltip">        <span class="pull-right fa fa-info-circle fa-2x"              tooltip-html-unsafe="{{\'PROJECTSETTINGS.DESCRIPTION\' | translate}}"              tooltip-placement="bottom"              tooltip-trigger="mouseenter"              tooltip-append-to-body="false"              style="margin-right: 5px;"></span>        <h4 class="leftpanel-header" translate="PROJECTSETTINGS.TITLE"></h4>    </div>    <div style="overflow-y: auto; overflow-x: hidden; margin-top: -10px" resize resize-y="95">    </div></div>';
@@ -2449,6 +5051,213 @@ var ProjectSettings;
     })();
     ProjectSettings.ProjectSettingsCtrl = ProjectSettingsCtrl;
 })(ProjectSettings || (ProjectSettings = {}));
+var Helpers;
+(function (Helpers) {
+    var Resize;
+    (function (Resize) {
+        /**
+         * Config
+         */
+        var moduleName = 'csWeb.resize';
+        /**
+          * Module
+          */
+        Resize.myModule;
+        try {
+            Resize.myModule = angular.module(moduleName);
+        }
+        catch (err) {
+            // named module does not exist, so create one
+            Resize.myModule = angular.module(moduleName, []);
+        }
+        /**
+          * Directive to resize an element by settings its width or height,
+          * for example to make sure that the scrollbar appears.
+          * Typical usage:
+          * <div style="overflow-y: auto; overflow-x: hidden" resize resize-x="20" resize-y="250">...</div>
+          * Load the directive in your module, e.g.
+          * angular.module('myWebApp', ['csWeb.resize'])
+          */
+        Resize.myModule.directive('resize', ['$window', function ($window) {
+            return {
+                terminal: false,
+                // E = elements, A=attributes and C=css classes. Can be compined, e.g. EAC
+                restrict: 'A',
+                // Name if optional. Text Binding (Prefix: @), One-way Binding (Prefix: &), Two-way Binding (Prefix: =)
+                scope: {
+                    resizeX: '@',
+                    resizeY: '@'
+                },
+                // Directives that want to modify the DOM typically use the link option.link takes a function with the following signature, function link(scope, element, attrs) { ... } where:
+                // * scope is an Angular scope object.
+                // * element is the jqLite wrapped element that this directive matches.
+                // * attrs is a hash object with key-value pairs of normalized attribute names and their corresponding attribute values.
+                link: function (scope, element, attrs) {
+                    scope.onResizeFunction = function () {
+                        // console.log(scope.resizeX + "-" + scope.resizeY);
+                        if (scope.resizeX) {
+                            var windowWidth = $window.innerWidth;
+                            element.width((windowWidth - scope.resizeX) + 'px');
+                        }
+                        if (scope.resizeY) {
+                            var windowHeight = $window.innerHeight;
+                            element.height((windowHeight - scope.resizeY) + 'px');
+                        }
+                    };
+                    // Call to the function when the page is first loaded
+                    scope.onResizeFunction();
+                    // Listen to the resize event.
+                    angular.element($window).bind('resize', function () {
+                        scope.onResizeFunction();
+                        scope.$apply();
+                    });
+                }
+            };
+        }]);
+    })(Resize = Helpers.Resize || (Helpers.Resize = {}));
+})(Helpers || (Helpers = {}));
+var ShowModal;
+(function (ShowModal) {
+    /**
+    * Config
+    */
+    var moduleName = 'csWeb.showModal';
+    /**
+      * Module
+      */
+    ShowModal.myModule;
+    try {
+        ShowModal.myModule = angular.module(moduleName);
+    }
+    catch (err) {
+        // named module does not exist, so create one
+        ShowModal.myModule = angular.module(moduleName, []);
+    }
+    /**
+      * Directive to show a modal dialog, whose html is specified inside the main HTML code.
+      * Typical usage: http://plnkr.co/edit/WJBp7A6M3RB1MLERDXSS?p=info
+      * angular.module('myWebApp', ['csWeb.showModal'])
+      */
+    ShowModal.myModule.directive('showModal', [
+        '$parse',
+        function ($parse) {
+            return {
+                restrict: "A",
+                link: function (scope, element, attrs) {
+                    //Hide or show the modal
+                    scope.showModalDialog = function (visible, elem) {
+                        if (!elem)
+                            elem = element;
+                        var myElem = $(elem);
+                        if (visible)
+                            myElem.appendTo('body').modal("show");
+                        else
+                            myElem.modal("hide");
+                    };
+                    //Watch for changes to the modal-visible attribute
+                    scope.$watch(attrs.showModal, function (newValue, oldValue) {
+                        scope.showModalDialog(newValue, attrs.$$element);
+                    });
+                    //Update the visible value when the dialog is closed through UI actions (Ok, cancel, etc.)
+                    $(element).bind("hide.bs.modal", function () {
+                        $parse(attrs.showModal).assign(scope, false);
+                        if (!scope.$$phase && !scope.$root.$$phase)
+                            scope.$apply();
+                    });
+                }
+            };
+        }
+    ]);
+})(ShowModal || (ShowModal = {}));
+var StyleList;
+(function (StyleList) {
+    StyleList.html = '<div>    <h4 class="leftpanel-header" translate="STYLES"></h4>    <div ng-show="vm.$layerService.noStyles" translate="STYLE_INFO"></div>    <div data-ng-repeat="group in vm.$layerService.project.groups" style="margin-left: 5px">        <div ng-show="group.styles.length">            <div style="float:left;margin-left: -10px; margin-top: 5px" data-toggle="collapse" data-target="#stylegroup_{{group.id}}"><i class="fa fa-chevron-down togglebutton toggle-arrow-down"></i><i class="fa fa-chevron-up togglebutton toggle-arrow-up"></i></div>            <div class="group-title">{{group.title}}</div>            <div id="stylegroup_{{group.id}}" class="collapse in">                <div data-ng-repeat="style in group.styles">                    <div class="checkbox checkbox-primary" style="margin-left:20px;float:left">                        <input type="checkbox" id="cbstyle{{style.id}}" ng-model="style.enabled" data-ng-change="vm.$layerService.updateStyle(style);">                        <label class="style-title" for="cbstyle{{style.id}}" style="width:175px">{{style.title}}</label>                    </div>                    <div style="float:right;margin-top:10px; width: 50px">                        <div data-ng-show="style.canSelectColor" style="float:left">                            <div class="dropdown">                                <div class="style-settings" data-toggle="dropdown">                                    <style>                                                                             </style>                                    <!--<img src="includes/images/fillcolor.png" style="width: 32px; height:32px" />-->                                    <div id="colors" style="border-radius: 50%;width: 20px;height:20px;border-style:solid;border-color: black;border-width: 1px;background: linear-gradient(to right, {{style.colors[0]}} , {{style.colors[1]}})">                                                                        </div>                                    <b class="caret"></b>                                </div>                                <!--<a class="btn btn-primary btn-sm" ng-model="style.visualAspect"  style="padding-left: 10px" href="#"> {{ style.visualAspect }} </a>-->                                <ul class="dropdown-menu" role="menu">                                    <li ng-repeat="(key,val) in style.colorScales" style="margin:3px;cursor: pointer">                                        <span ng-click="$parent.style.colors = val;vm.$layerService.updateStyle($parent.style)"> {{key}} </span>                                    </li>                                </ul>                            </div>                        </div>                        <div style="float:right">                            <div class="dropdown">                                <div class="style-settings" data-toggle="dropdown">                                    <!--<img src="includes/images/fillcolor.png" style="width: 32px; height:32px" />-->                                    <div class="style-aspect style-{{style.visualAspect}}"></div><b class="caret"></b>                                </div>                                <!--<a class="btn btn-primary btn-sm" ng-model="style.visualAspect"  style="padding-left: 10px" href="#"> {{ style.visualAspect }} </a>-->                                <ul class="dropdown-menu" role="menu">                                    <li ng-repeat="title in style.availableAspects" style="margin:3px;cursor: pointer">                                        <i class="style-aspect style-{{title}}" style="float:left" /><span ng-click="$parent.style.visualAspect = title;vm.$layerService.updateStyle($parent.style)"><img class="fa fa-search" style="margin-right: 8px" /> {{title}} </span>                                    </li>                                    <li class="divider"></li>                                    <li style="margin:3px;cursor: pointer"><i class="fa fa-remove" style="margin-right: 8px" style=" float:left" /><span ng-click="vm.$layerService.removeStyle(style)">Verwijder</span></li>                                </ul>                            </div>                        </div>                    </div>                </div>                <!--<div style="right:5px; position:absolute; margin-top: -15px"><a href="#" id="stylepop{{style.id}}" rel="popover" popover-template="template.html"><img src="includes/images/settings.png" width="20px"></a></div>-->            </div>        </div>    </div></div>';
+})(StyleList || (StyleList = {}));
+var StyleList;
+(function (StyleList) {
+    /**
+      * Config
+      */
+    var moduleName = 'csWeb.styleList';
+    /**
+      * Module
+      */
+    StyleList.myModule;
+    try {
+        StyleList.myModule = angular.module(moduleName);
+    }
+    catch (err) {
+        // named module does not exist, so create one
+        StyleList.myModule = angular.module(moduleName, []);
+    }
+    /**
+      * Directive to display the available map layers.
+      */
+    StyleList.myModule.directive('styleList', [
+        '$window',
+        '$compile',
+        function ($window, $compile) {
+            return {
+                terminal: false,
+                restrict: 'E',
+                scope: {},
+                template: StyleList.html,
+                //compile             : el          => {    // I need to explicitly compile it in order to use interpolation like {{xxx}}
+                //    var fn                        = $compile(el);
+                //    return scope                  => { 
+                //        fn(scope);
+                //    };
+                //},
+                link: function (scope, element, attrs) {
+                    // Deal with resizing the element list
+                    scope.onResizeFunction = function () {
+                        var filterHeight = 50;
+                        var paginationCtrlHeight = 100;
+                        var itemHeight = 60;
+                        //scope.windowHeight          = $window.innerHeight;
+                        //scope.windowWidth           = $window.innerWidth;
+                        scope.numberOfItems = Math.floor(($window.innerHeight - filterHeight - paginationCtrlHeight) / itemHeight);
+                    };
+                    // Call to the function when the page is first loaded
+                    scope.onResizeFunction();
+                    angular.element($window).bind('resize', function () {
+                        scope.onResizeFunction();
+                        scope.$apply();
+                    });
+                },
+                replace: true,
+                transclude: true,
+                controller: StyleList.StyleListCtrl
+            };
+        }
+    ]).directive('bsPopover', function () {
+        return function (scope, element, attrs) {
+            element.find("a[rel=popover]").popover({ placement: 'right', html: 'true' });
+        };
+    });
+})(StyleList || (StyleList = {}));
+var StyleList;
+(function (StyleList) {
+    var StyleListCtrl = (function () {
+        // dependencies are injected via AngularJS $injector
+        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
+        function StyleListCtrl($scope, $layerService) {
+            this.$scope = $scope;
+            this.$layerService = $layerService;
+            $scope.vm = this;
+        }
+        // $inject annotation.                                                   
+        // It provides $injector with information about dependencies to be in  jected into constructor
+        // it is better to have it close to the constructor, because the parameters must match in count and type.
+        // See http://docs.angularjs.org/guide/di
+        StyleListCtrl.$inject = [
+            '$scope',
+            'layerService'
+        ];
+        return StyleListCtrl;
+    })();
+    StyleList.StyleListCtrl = StyleListCtrl;
+})(StyleList || (StyleList = {}));
 var Timeline;
 (function (Timeline) {
     Timeline.html = '<div>    <div id="timelinecontainer">        <div id="timeline"></div>    </div>    <div class="callout top" id="focustimeContainer" ng-class="{showControl : vm.showControl}" ng-mouseenter="vm.mouseEnter()" ng-mouseleave="vm.mouseLeave()">        <div ng-show="vm.showControl" class="timelineControl" ng-class="{isPlaying : vm.isPlaying}">            <span ng-hide="vm.$layerService.project.timeLine.isLive" class="focustimeButton">                <div ng-hide="vm.isPlaying" class="fa fa-play focustimeButton" ng-click="vm.start()"></div>                <div ng-show="vm.isPlaying" class="fa fa-stop focustimeButton" ng-click="vm.stop()"></div>            </span>            <div style="float: right">{{vm.$layerService.project.timeLine.levelName}}</div>            <div ng-click="vm.toggleLive()" class="islivebutton" ng-show="vm.$layerService.project.timeLine.isLive" style="float: right">live</div>            <div ng-click="vm.toggleLive()" class="livebutton" ng-hide="vm.$layerService.project.timeLine.isLive" style="float: right">go live</div>            <!--<div ng-hide="vm.isPinned" class="fa fa-thumb-tack focustimeButton pinButton" ng-class="{isPinned : vm.isPinned}" ng-click="vm.pinToNow()"></div>-->        </div>        <div class="focustimeText">            <span style="font-weight: bold">{{vm.line1}}</span><br />            <span>{{vm.line2}}</span>        </div>    </div></div>';
@@ -3154,6 +5963,403 @@ var csComp;
 })(csComp || (csComp = {}));
 var csComp;
 (function (csComp) {
+    var Helpers;
+    (function (Helpers) {
+        var PieData = (function () {
+            function PieData() {
+            }
+            return PieData;
+        })();
+        Helpers.PieData = PieData;
+        var AsterPieData = (function (_super) {
+            __extends(AsterPieData, _super);
+            function AsterPieData() {
+                _super.apply(this, arguments);
+            }
+            return AsterPieData;
+        })(PieData);
+        Helpers.AsterPieData = AsterPieData;
+        var Plot = (function () {
+            function Plot() {
+            }
+            /**
+             * Draw a histogram, and, if xy is specified, a line plot of x versus y (e.g. a scoring function).
+             */
+            Plot.drawHistogram = function (values, options) {
+                var id = (options != null && options.hasOwnProperty("id")) ? options.id : "myHistogram";
+                var numberOfBins = (options != null && options.hasOwnProperty("numberOfBins")) ? options.numberOfBins : 10;
+                var width = (options != null && options.hasOwnProperty("width")) ? options.width : 200;
+                var height = (options != null && options.hasOwnProperty("height")) ? options.height : 150;
+                var xLabel = (options != null && options.hasOwnProperty("xLabel")) ? options.xLabel : "";
+                var selectedValue = (options != null && options.hasOwnProperty("selectedValue")) ? options.selectedValue : null;
+                //var yLabel       = (options != null && options.hasOwnProperty('yLabel'))        ? options.yLabel        : '#';
+                var margin = { top: 0, right: 6, bottom: 24, left: 6 };
+                width -= margin.left + margin.right, height -= margin.top + margin.bottom;
+                var svgId = 'the_SVG_ID';
+                Plot.clearSvg(svgId);
+                if (values.length < numberOfBins)
+                    return;
+                // A formatter for counts.
+                var formatCount = d3.format(",.0f");
+                var max = Math.max.apply(null, values);
+                var min = Math.min.apply(null, values);
+                var range = max - min;
+                // Scale the x-range, so we don't have such long numbers
+                var scale = Plot.getScale(range / numberOfBins, max);
+                //var scale = range >= 10
+                //    ? Math.max(d3.round(range, 0), d3.round(max, 0)).toString().length - 2 // 100 -> 1
+                //    : -2;
+                var scaleFactor = 0;
+                if (Math.abs(scale) > 0) {
+                    xLabel += " (x10^" + scale + ")";
+                    scaleFactor = Math.pow(10, scale);
+                }
+                var tickFormatter = function (value) {
+                    return scaleFactor > 0 ? d3.round(value / scaleFactor, 0).toString() : d3.round(value, 0).toString();
+                };
+                var tempScale = d3.scale.linear().domain([0, numberOfBins]).range([min, max]);
+                var tickArray = d3.range(numberOfBins + 1).map(tempScale);
+                var x = d3.scale.linear().domain([min, max]).range([0, width]);
+                var xAxis = d3.svg.axis().scale(x).tickValues(tickArray).tickFormat(tickFormatter).orient("bottom");
+                // Generate a histogram using numberOfBins uniformly-spaced bins.
+                var data = d3.layout.histogram().bins(numberOfBins)(values);
+                var y = d3.scale.linear().domain([0, d3.max(data, function (d) { return d.y; })]).range([height, 0]);
+                var svg = d3.select("#" + id).append("svg").attr("id", svgId).attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom).attr("style", "display: block; margin: 0 auto;").append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+                var bar = svg.selectAll(".bar").data(data).enter().append("g").attr("class", function (d, i) {
+                    return selectedValue != null && (d.x < selectedValue && selectedValue < d.x + data[i].dx) ? "bar highlight" : "bar";
+                }).attr("transform", function (d) { return "translate(" + x(d.x) + "," + y(d.y) + ")"; });
+                bar.append("rect").attr("x", 1).attr("width", x(min + data[0].dx) - 1).attr("height", function (d) { return height - y(d.y); });
+                var conditionalFormatCounter = function (value) {
+                    return (height - y(value) > 6) ? formatCount(value) : "";
+                };
+                // Text (count) inside the bins
+                bar.append("text").attr("dy", ".75em").attr("y", 6).attr("x", x(min + data[0].dx) / 2).attr("text-anchor", "middle").text(function (d) { return conditionalFormatCounter(d.y); });
+                // x-label
+                svg.append("text").attr("class", "x label").attr("text-anchor", "end").attr("x", width).attr("y", height / 2 - 6).text(xLabel);
+                svg.append("g").attr("class", "x axis").attr("transform", "translate(0," + height + ")").call(xAxis);
+            };
+            Plot.getScale = function (stepSize, max) {
+                for (var sf = -5; sf < 5; sf++) {
+                    var scale = Math.pow(10, sf);
+                    var ls = d3.round(stepSize / scale, 0);
+                    var lm = d3.round(max / scale, 0);
+                    if (0 < ls && ls < 10 && 0 < lm && lm < 100)
+                        return sf;
+                }
+                return 0;
+            };
+            Plot.drawMcaPlot = function (values, options) {
+                var id = (options != null && options.hasOwnProperty("id")) ? options.id : "myHistogram";
+                var numberOfBins = (options != null && options.hasOwnProperty("numberOfBins")) ? options.numberOfBins : 10;
+                var width = (options != null && options.hasOwnProperty("width")) ? options.width : 200;
+                var height = (options != null && options.hasOwnProperty("height")) ? options.height : 150;
+                var xLabel = (options != null && options.hasOwnProperty("xLabel")) ? options.xLabel : "";
+                var xyData = (options != null && options.hasOwnProperty("xy")) ? options.xy : null;
+                var featureValue = (options != null && options.hasOwnProperty("featureValue")) ? options.featureValue : null;
+                //var yLabel       = (options != null && options.hasOwnProperty('yLabel'))       ? options.yLabel       : '#';
+                var margin = { top: 0, right: 6, bottom: 24, left: 6 };
+                width -= margin.left + margin.right, height -= margin.top + margin.bottom;
+                var svgId = id + "_histogram";
+                Plot.clearSvg(svgId);
+                // A formatter for counts.
+                var formatCount = d3.format(",.0f");
+                var max, min, range;
+                if (xyData != null) {
+                    max = xyData.x[xyData.x.length - 1];
+                    min = xyData.x[0];
+                    range = max - min;
+                    max += range / 10;
+                    min -= range / 10;
+                    range = max - min;
+                }
+                else {
+                    max = Math.max.apply(null, values);
+                    min = Math.min.apply(null, values);
+                    range = max - min;
+                }
+                // Scale the x-range, so we don't have such long numbers
+                var scale = Plot.getScale(range / numberOfBins, max);
+                //var scale = range >= 10
+                //    ? Math.max(d3.round(range, 0), d3.round(max, 0)).toString().length - 2 // 100 -> 1
+                //    : -2;
+                var scaleFactor = 0;
+                xLabel += " (";
+                if (Math.abs(scale) > 0) {
+                    xLabel += "x10^" + scale;
+                    scaleFactor = Math.pow(10, scale);
+                }
+                var tickFormatter = function (value) {
+                    return scaleFactor > 0 ? d3.round(value / scaleFactor, 0).toString() : d3.round(value, 0).toString();
+                };
+                var tempScale = d3.scale.linear().domain([0, numberOfBins]).range([min, max]);
+                var tickArray = d3.range(numberOfBins + 1).map(tempScale);
+                var x = d3.scale.linear().domain([min, max]).range([0, width]);
+                var xAxis = d3.svg.axis().scale(x).tickValues(tickArray).tickFormat(tickFormatter).orient("bottom");
+                // Generate a histogram using numberOfBins uniformly-spaced bins.
+                var valuesInRange = values.filter(function (value) { return (min <= value && value <= max); });
+                if (valuesInRange.length < 3) {
+                    var svg1 = d3.select("#" + id).append("svg").attr("id", svgId).attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom).append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+                    svg1.append("text").attr("class", "x label").attr("text-anchor", "center").attr("x", width / 2).attr("y", height / 2 + 6).text("\u03A7 NO DATA IN RANGE");
+                    return;
+                }
+                xLabel += " \u03A3" + valuesInRange.length;
+                var data = d3.layout.histogram().bins(numberOfBins)(valuesInRange);
+                var y = d3.scale.linear().domain([0, d3.max(data, function (d) { return d.y; })]).range([height, 0]);
+                var svg = d3.select("#" + id).append("svg").attr("id", svgId).attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom).attr("style", "display: block; margin: 0 auto;").append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+                var bar = svg.selectAll(".bar").data(data).enter().append("g").attr("class", "bar").attr("transform", function (d) { return "translate(" + x(d.x) + "," + y(d.y) + ")"; });
+                bar.append("rect").attr("x", 1).attr("width", x(min + data[0].dx) - 1).attr("height", function (d) { return height - y(d.y); });
+                var conditionalFormatCounter = function (value) {
+                    return (height - y(value) > 6) ? formatCount(value) : "";
+                };
+                // Text (count) inside the bins
+                bar.append("text").attr("dy", ".75em").attr("y", 6).attr("x", x(min + data[0].dx) / 2).attr("text-anchor", "middle").text(function (d) { return conditionalFormatCounter(d.y); });
+                // x-label
+                xLabel += ")";
+                svg.append("text").attr("class", "x label").attr("text-anchor", "end").attr("x", width).attr("y", height / 2 - 6).text(xLabel);
+                svg.append("g").attr("class", "x axis").attr("transform", "translate(0," + height + ")").call(xAxis);
+                if (xyData == null)
+                    return;
+                // Draw line chart
+                var xy = [];
+                xy.push({ x: min, y: xyData.y[0] });
+                for (var i = 0; i < xyData.x.length; i++) {
+                    xy.push({ x: xyData.x[i], y: xyData.y[i] });
+                }
+                xy.push({ x: max, y: xyData.y[xyData.y.length - 1] });
+                var y2 = d3.scale.linear().domain([0, d3.max(xy, function (d) { return d.y; })]).range([height - 1, 1]);
+                var lineFunc = d3.svg.line().x(function (d) { return x(d.x); }).y(function (d) { return y2(d.y); }).interpolate("linear");
+                svg.append("svg:path").attr("d", lineFunc(xy)).attr("stroke", "red").attr("stroke-width", 2).attr("fill", "none");
+                if (featureValue == null)
+                    return;
+                // Draw feature on the score
+                xy = [];
+                xy.push({ x: featureValue, y: 0 });
+                xy.push({ x: featureValue, y: height });
+                svg.append("svg:path").attr("d", lineFunc(xy)).attr("stroke", "blue").attr("stroke-width", 2).attr("fill", "none");
+            };
+            /**
+            * Draw a Pie chart.
+            */
+            Plot.drawPie = function (pieRadius, data, parentId, colorScale, svgId) {
+                if (parentId === void 0) { parentId = 'mcaPieChart'; }
+                if (colorScale === void 0) { colorScale = 'Reds'; }
+                if (svgId === void 0) { svgId = 'the_SVG_ID'; }
+                Plot.clearSvg(svgId);
+                if (!data)
+                    return;
+                var width = pieRadius, height = pieRadius, radius = Math.min(width, height) / 2, innerRadius = 0;
+                var pie = d3.layout.pie().sort(null).value(function (d) { return d.weight; });
+                var tip = d3.tip().attr('class', 'd3-tip').offset([0, 0]).html(function (d) { return '<strong>' + d.data.label + ": </strong><span style='color:orangered'>" + Math.round(d.data.weight * 100) + "%</span>"; });
+                var arc = d3.svg.arc().innerRadius(innerRadius).outerRadius(radius);
+                var outlineArc = d3.svg.arc().innerRadius(innerRadius).outerRadius(radius);
+                var svg = d3.select('#' + parentId).append("svg").attr("id", svgId).attr("width", width).attr("height", height).attr("style", "display: block; margin: 0 auto;").append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+                //svg.call(tip);
+                var colors = chroma.scale(colorScale).domain([0, data.length - 1], data.length);
+                var path = svg.selectAll(".solidArc").data(pie(data)).enter().append("path").attr("fill", function (d, i) { return d.data.color || colors(i).hex(); }).attr("class", "solidArc").attr("stroke", "gray").attr("d", arc).on('mouseover', function (d, i) {
+                    tip.show(d, i);
+                }).on('mouseout', tip.hide);
+                var outerPath = svg.selectAll(".outlineArc").data(pie(data)).enter().append("path").attr("fill", "none").attr("stroke", "gray").attr("class", "outlineArc").attr("d", outlineArc);
+            };
+            /**
+            * Draw an Aster Pie chart, i.e. a pie chart with varying radius depending on the score, where the maximum score of 100 equals the pie radius.
+            * See http://bl.ocks.org/bbest/2de0e25d4840c68f2db1
+            */
+            Plot.drawAsterPlot = function (pieRadius, data, parentId, colorScale, svgId) {
+                if (parentId === void 0) { parentId = 'mcaPieChart'; }
+                if (colorScale === void 0) { colorScale = 'Reds'; }
+                if (svgId === void 0) { svgId = 'the_SVG_ID'; }
+                Plot.clearSvg(svgId);
+                if (!data)
+                    return;
+                var width = pieRadius, height = pieRadius, radius = Math.min(width, height) / 2, innerRadius = 0.3 * radius;
+                var pie = d3.layout.pie().sort(null).value(function (d) { return d.weight; });
+                var tip = d3.tip().attr('class', 'd3-tip').offset([0, 0]).html(function (d) { return '<strong>' + d.data.label + ": </strong> <span style='color:orangered'>" + Math.round(d.data.weight * 100) + "% x " + Math.round(d.data.score) + "&nbsp; = " + Math.round(d.data.weight * d.data.score) + "</span>"; });
+                var arc = d3.svg.arc().innerRadius(innerRadius).outerRadius(function (d) { return (radius - innerRadius) * (d.data.score / 100.0) + innerRadius; });
+                var outlineArc = d3.svg.arc().innerRadius(innerRadius).outerRadius(radius);
+                var svg = d3.select('#' + parentId).append("svg").attr("id", svgId).attr("width", width).attr("height", height).attr("style", "display: block; margin: 0 auto;").append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+                try {
+                    svg.call(tip);
+                }
+                catch (err) {
+                    console.log("Error: " + err.message);
+                }
+                var colors = chroma.scale(colorScale).domain([0, data.length - 1], data.length);
+                var path = svg.selectAll(".solidArc").data(pie(data)).enter().append("path").attr("fill", function (d, i) { return d.data.color || colors(i).hex(); }).attr("class", "solidArc").attr("stroke", "gray").attr("d", arc).on('mouseover', function (d, i) {
+                    tip.show(d, i);
+                    //$rootScope.$broadcast('tooltipShown', { id: d.data.id });
+                }).on('mouseout', tip.hide);
+                var outerPath = svg.selectAll(".outlineArc").data(pie(data)).enter().append("path").attr("fill", "none").attr("stroke", "gray").attr("class", "outlineArc").attr("d", outlineArc);
+                // calculate the weighted mean score
+                var totalWeight = 0;
+                var totalScore = 0;
+                data.forEach(function (p) {
+                    totalWeight += p.weight;
+                    totalScore += p.weight * p.score;
+                });
+                svg.append("svg:text").attr("class", "aster-score").attr("dy", ".35em").attr("text-anchor", "middle").text(Math.round(totalScore / totalWeight));
+            };
+            Plot.clearSvg = function (svgId) {
+                var svgElement = d3.select('#' + svgId);
+                if (svgElement)
+                    svgElement.remove();
+            };
+            Plot.pieColors = ["#fff7ec", "#fee8c8", "#fdd49e", "#fdbb84", "#fc8d59", "#ef6548", "#d7301f", "#b30000", "#7f0000"];
+            return Plot;
+        })();
+        Helpers.Plot = Plot;
+    })(Helpers = csComp.Helpers || (csComp.Helpers = {}));
+})(csComp || (csComp = {}));
+var csComp;
+(function (csComp) {
+    var StringExt;
+    (function (StringExt) {
+        function isNullOrEmpty(s) {
+            return !s;
+        }
+        StringExt.isNullOrEmpty = isNullOrEmpty;
+        /**
+         * String formatting
+         * 'Added {0} by {1} to your collection'.f(title, artist)
+         * 'Your balance is {0} USD'.f(77.7)
+         */
+        function format(s) {
+            var args = [];
+            for (var _i = 1; _i < arguments.length; _i++) {
+                args[_i - 1] = arguments[_i];
+            }
+            var i = args.length;
+            while (i--) {
+                // "gm" = RegEx options for Global search (more than one instance) and for Multiline search
+                s = s.replace(new RegExp('\\{' + i + '\\}', 'gm'), args[i]);
+            }
+            return s;
+        }
+        StringExt.format = format;
+        ;
+        /*
+         * Returns true if we are dealing with a number, false otherwise.
+         */
+        function isNumber(n) {
+            return !isNaN(parseFloat(n)) && isFinite(n);
+        }
+        StringExt.isNumber = isNumber;
+        /*
+         * Returns true if we are dealing with a boolean, false otherwise.
+         */
+        function isBoolean(s) {
+            return s === 'true' || s === 'false';
+        }
+        StringExt.isBoolean = isBoolean;
+        /*
+         * Returns true if we are dealing with a bbcode, false otherwise.
+         */
+        function isBbcode(s) {
+            return false;
+            if (s == null)
+                return false;
+            return s.indexOf("[b]") > 0 || s.indexOf("[i]") > 0 || s.indexOf("[url") > 0;
+        }
+        StringExt.isBbcode = isBbcode;
+    })(StringExt = csComp.StringExt || (csComp.StringExt = {}));
+})(csComp || (csComp = {}));
+/*!
+ * string_score.js: String Scoring Algorithm 0.1.22
+ *
+ * http://joshaven.com/string_score
+ * https://github.com/joshaven/string_score
+ *
+ * Copyright (C) 2009-2014 Joshaven Potter <yourtech@gmail.com>
+ * Special thanks to all of the contributors listed here https://github.com/joshaven/string_score
+ * MIT License: http://opensource.org/licenses/MIT
+ *
+ * Date: Tue Mar 1 2011
+ * Updated: Tue Mar 10 2015
+*/
+/*jslint nomen:true, white:true, browser:true,devel:true */
+/**
+ * Scores a string against another string.
+ *    'Hello World'.score('he');         //=> 0.5931818181818181
+ *    'Hello World'.score('Hello');    //=> 0.7318181818181818
+ */
+String.prototype.score = function (word, fuzziness) {
+    'use strict';
+    // If the string is equal to the word, perfect match.
+    if (this === word) {
+        return 1;
+    }
+    //if it's not a perfect match and is empty return 0
+    if (word === "") {
+        return 0;
+    }
+    var runningScore = 0, charScore, finalScore, string = this, lString = string.toLowerCase(), strLength = string.length, lWord = word.toLowerCase(), wordLength = word.length, idxOf, startAt = 0, fuzzies = 1, fuzzyFactor, i;
+    // Cache fuzzyFactor for speed increase
+    if (fuzziness) {
+        fuzzyFactor = 1 - fuzziness;
+    }
+    // Walk through word and add up scores.
+    // Code duplication occurs to prevent checking fuzziness inside for loop
+    if (fuzziness) {
+        for (i = 0; i < wordLength; i += 1) {
+            // Find next first case-insensitive match of a character.
+            idxOf = lString.indexOf(lWord[i], startAt);
+            if (idxOf === -1) {
+                fuzzies += fuzzyFactor;
+            }
+            else {
+                if (startAt === idxOf) {
+                    // Consecutive letter & start-of-string Bonus
+                    charScore = 0.7;
+                }
+                else {
+                    charScore = 0.1;
+                    // Acronym Bonus
+                    // Weighing Logic: Typing the first character of an acronym is as if you
+                    // preceded it with two perfect character matches.
+                    if (string[idxOf - 1] === ' ') {
+                        charScore += 0.8;
+                    }
+                }
+                // Same case bonus.
+                if (string[idxOf] === word[i]) {
+                    charScore += 0.1;
+                }
+                // Update scores and startAt position for next round of indexOf
+                runningScore += charScore;
+                startAt = idxOf + 1;
+            }
+        }
+    }
+    else {
+        for (i = 0; i < wordLength; i += 1) {
+            idxOf = lString.indexOf(lWord[i], startAt);
+            if (-1 === idxOf) {
+                return 0;
+            }
+            if (startAt === idxOf) {
+                charScore = 0.7;
+            }
+            else {
+                charScore = 0.1;
+                if (string[idxOf - 1] === ' ') {
+                    charScore += 0.8;
+                }
+            }
+            if (string[idxOf] === word[i]) {
+                charScore += 0.1;
+            }
+            runningScore += charScore;
+            startAt = idxOf + 1;
+        }
+    }
+    // Reduce penalty for longer strings.
+    finalScore = 0.5 * (runningScore / strLength + runningScore / wordLength) / fuzzies;
+    if ((lWord[0] === lString[0]) && (finalScore < 0.85)) {
+        finalScore += 0.15;
+    }
+    return finalScore;
+};
+var csComp;
+(function (csComp) {
     (function (FileType) {
         FileType[FileType["Js"] = 0] = "Js";
         FileType[FileType["Css"] = 1] = "Css";
@@ -3444,1774 +6650,6 @@ var csComp;
         Services.EventObj = EventObj;
     })(Services = csComp.Services || (csComp.Services = {}));
 })(csComp || (csComp = {}));
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var csComp;
-(function (csComp) {
-    var Helpers;
-    (function (Helpers) {
-        var PieData = (function () {
-            function PieData() {
-            }
-            return PieData;
-        })();
-        Helpers.PieData = PieData;
-        var AsterPieData = (function (_super) {
-            __extends(AsterPieData, _super);
-            function AsterPieData() {
-                _super.apply(this, arguments);
-            }
-            return AsterPieData;
-        })(PieData);
-        Helpers.AsterPieData = AsterPieData;
-        var Plot = (function () {
-            function Plot() {
-            }
-            /**
-             * Draw a histogram, and, if xy is specified, a line plot of x versus y (e.g. a scoring function).
-             */
-            Plot.drawHistogram = function (values, options) {
-                var id = (options != null && options.hasOwnProperty("id")) ? options.id : "myHistogram";
-                var numberOfBins = (options != null && options.hasOwnProperty("numberOfBins")) ? options.numberOfBins : 10;
-                var width = (options != null && options.hasOwnProperty("width")) ? options.width : 200;
-                var height = (options != null && options.hasOwnProperty("height")) ? options.height : 150;
-                var xLabel = (options != null && options.hasOwnProperty("xLabel")) ? options.xLabel : "";
-                var selectedValue = (options != null && options.hasOwnProperty("selectedValue")) ? options.selectedValue : null;
-                //var yLabel       = (options != null && options.hasOwnProperty('yLabel'))        ? options.yLabel        : '#';
-                var margin = { top: 0, right: 6, bottom: 24, left: 6 };
-                width -= margin.left + margin.right, height -= margin.top + margin.bottom;
-                var svgId = 'the_SVG_ID';
-                Plot.clearSvg(svgId);
-                if (values.length < numberOfBins)
-                    return;
-                // A formatter for counts.
-                var formatCount = d3.format(",.0f");
-                var max = Math.max.apply(null, values);
-                var min = Math.min.apply(null, values);
-                var range = max - min;
-                // Scale the x-range, so we don't have such long numbers
-                var scale = Plot.getScale(range / numberOfBins, max);
-                //var scale = range >= 10
-                //    ? Math.max(d3.round(range, 0), d3.round(max, 0)).toString().length - 2 // 100 -> 1
-                //    : -2;
-                var scaleFactor = 0;
-                if (Math.abs(scale) > 0) {
-                    xLabel += " (x10^" + scale + ")";
-                    scaleFactor = Math.pow(10, scale);
-                }
-                var tickFormatter = function (value) {
-                    return scaleFactor > 0 ? d3.round(value / scaleFactor, 0).toString() : d3.round(value, 0).toString();
-                };
-                var tempScale = d3.scale.linear().domain([0, numberOfBins]).range([min, max]);
-                var tickArray = d3.range(numberOfBins + 1).map(tempScale);
-                var x = d3.scale.linear().domain([min, max]).range([0, width]);
-                var xAxis = d3.svg.axis().scale(x).tickValues(tickArray).tickFormat(tickFormatter).orient("bottom");
-                // Generate a histogram using numberOfBins uniformly-spaced bins.
-                var data = d3.layout.histogram().bins(numberOfBins)(values);
-                var y = d3.scale.linear().domain([0, d3.max(data, function (d) { return d.y; })]).range([height, 0]);
-                var svg = d3.select("#" + id).append("svg").attr("id", svgId).attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom).attr("style", "display: block; margin: 0 auto;").append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-                var bar = svg.selectAll(".bar").data(data).enter().append("g").attr("class", function (d, i) {
-                    return selectedValue != null && (d.x < selectedValue && selectedValue < d.x + data[i].dx) ? "bar highlight" : "bar";
-                }).attr("transform", function (d) { return "translate(" + x(d.x) + "," + y(d.y) + ")"; });
-                bar.append("rect").attr("x", 1).attr("width", x(min + data[0].dx) - 1).attr("height", function (d) { return height - y(d.y); });
-                var conditionalFormatCounter = function (value) {
-                    return (height - y(value) > 6) ? formatCount(value) : "";
-                };
-                // Text (count) inside the bins
-                bar.append("text").attr("dy", ".75em").attr("y", 6).attr("x", x(min + data[0].dx) / 2).attr("text-anchor", "middle").text(function (d) { return conditionalFormatCounter(d.y); });
-                // x-label
-                svg.append("text").attr("class", "x label").attr("text-anchor", "end").attr("x", width).attr("y", height / 2 - 6).text(xLabel);
-                svg.append("g").attr("class", "x axis").attr("transform", "translate(0," + height + ")").call(xAxis);
-            };
-            Plot.getScale = function (stepSize, max) {
-                for (var sf = -5; sf < 5; sf++) {
-                    var scale = Math.pow(10, sf);
-                    var ls = d3.round(stepSize / scale, 0);
-                    var lm = d3.round(max / scale, 0);
-                    if (0 < ls && ls < 10 && 0 < lm && lm < 100)
-                        return sf;
-                }
-                return 0;
-            };
-            Plot.drawMcaPlot = function (values, options) {
-                var id = (options != null && options.hasOwnProperty("id")) ? options.id : "myHistogram";
-                var numberOfBins = (options != null && options.hasOwnProperty("numberOfBins")) ? options.numberOfBins : 10;
-                var width = (options != null && options.hasOwnProperty("width")) ? options.width : 200;
-                var height = (options != null && options.hasOwnProperty("height")) ? options.height : 150;
-                var xLabel = (options != null && options.hasOwnProperty("xLabel")) ? options.xLabel : "";
-                var xyData = (options != null && options.hasOwnProperty("xy")) ? options.xy : null;
-                var featureValue = (options != null && options.hasOwnProperty("featureValue")) ? options.featureValue : null;
-                //var yLabel       = (options != null && options.hasOwnProperty('yLabel'))       ? options.yLabel       : '#';
-                var margin = { top: 0, right: 6, bottom: 24, left: 6 };
-                width -= margin.left + margin.right, height -= margin.top + margin.bottom;
-                var svgId = id + "_histogram";
-                Plot.clearSvg(svgId);
-                // A formatter for counts.
-                var formatCount = d3.format(",.0f");
-                var max, min, range;
-                if (xyData != null) {
-                    max = xyData.x[xyData.x.length - 1];
-                    min = xyData.x[0];
-                    range = max - min;
-                    max += range / 10;
-                    min -= range / 10;
-                    range = max - min;
-                }
-                else {
-                    max = Math.max.apply(null, values);
-                    min = Math.min.apply(null, values);
-                    range = max - min;
-                }
-                // Scale the x-range, so we don't have such long numbers
-                var scale = Plot.getScale(range / numberOfBins, max);
-                //var scale = range >= 10
-                //    ? Math.max(d3.round(range, 0), d3.round(max, 0)).toString().length - 2 // 100 -> 1
-                //    : -2;
-                var scaleFactor = 0;
-                xLabel += " (";
-                if (Math.abs(scale) > 0) {
-                    xLabel += "x10^" + scale;
-                    scaleFactor = Math.pow(10, scale);
-                }
-                var tickFormatter = function (value) {
-                    return scaleFactor > 0 ? d3.round(value / scaleFactor, 0).toString() : d3.round(value, 0).toString();
-                };
-                var tempScale = d3.scale.linear().domain([0, numberOfBins]).range([min, max]);
-                var tickArray = d3.range(numberOfBins + 1).map(tempScale);
-                var x = d3.scale.linear().domain([min, max]).range([0, width]);
-                var xAxis = d3.svg.axis().scale(x).tickValues(tickArray).tickFormat(tickFormatter).orient("bottom");
-                // Generate a histogram using numberOfBins uniformly-spaced bins.
-                var valuesInRange = values.filter(function (value) { return (min <= value && value <= max); });
-                if (valuesInRange.length < 3) {
-                    var svg1 = d3.select("#" + id).append("svg").attr("id", svgId).attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom).append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-                    svg1.append("text").attr("class", "x label").attr("text-anchor", "center").attr("x", width / 2).attr("y", height / 2 + 6).text("\u03A7 NO DATA IN RANGE");
-                    return;
-                }
-                xLabel += " \u03A3" + valuesInRange.length;
-                var data = d3.layout.histogram().bins(numberOfBins)(valuesInRange);
-                var y = d3.scale.linear().domain([0, d3.max(data, function (d) { return d.y; })]).range([height, 0]);
-                var svg = d3.select("#" + id).append("svg").attr("id", svgId).attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom).attr("style", "display: block; margin: 0 auto;").append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-                var bar = svg.selectAll(".bar").data(data).enter().append("g").attr("class", "bar").attr("transform", function (d) { return "translate(" + x(d.x) + "," + y(d.y) + ")"; });
-                bar.append("rect").attr("x", 1).attr("width", x(min + data[0].dx) - 1).attr("height", function (d) { return height - y(d.y); });
-                var conditionalFormatCounter = function (value) {
-                    return (height - y(value) > 6) ? formatCount(value) : "";
-                };
-                // Text (count) inside the bins
-                bar.append("text").attr("dy", ".75em").attr("y", 6).attr("x", x(min + data[0].dx) / 2).attr("text-anchor", "middle").text(function (d) { return conditionalFormatCounter(d.y); });
-                // x-label
-                xLabel += ")";
-                svg.append("text").attr("class", "x label").attr("text-anchor", "end").attr("x", width).attr("y", height / 2 - 6).text(xLabel);
-                svg.append("g").attr("class", "x axis").attr("transform", "translate(0," + height + ")").call(xAxis);
-                if (xyData == null)
-                    return;
-                // Draw line chart
-                var xy = [];
-                xy.push({ x: min, y: xyData.y[0] });
-                for (var i = 0; i < xyData.x.length; i++) {
-                    xy.push({ x: xyData.x[i], y: xyData.y[i] });
-                }
-                xy.push({ x: max, y: xyData.y[xyData.y.length - 1] });
-                var y2 = d3.scale.linear().domain([0, d3.max(xy, function (d) { return d.y; })]).range([height - 1, 1]);
-                var lineFunc = d3.svg.line().x(function (d) { return x(d.x); }).y(function (d) { return y2(d.y); }).interpolate("linear");
-                svg.append("svg:path").attr("d", lineFunc(xy)).attr("stroke", "red").attr("stroke-width", 2).attr("fill", "none");
-                if (featureValue == null)
-                    return;
-                // Draw feature on the score
-                xy = [];
-                xy.push({ x: featureValue, y: 0 });
-                xy.push({ x: featureValue, y: height });
-                svg.append("svg:path").attr("d", lineFunc(xy)).attr("stroke", "blue").attr("stroke-width", 2).attr("fill", "none");
-            };
-            /**
-            * Draw a Pie chart.
-            */
-            Plot.drawPie = function (pieRadius, data, parentId, colorScale, svgId) {
-                if (parentId === void 0) { parentId = 'mcaPieChart'; }
-                if (colorScale === void 0) { colorScale = 'Reds'; }
-                if (svgId === void 0) { svgId = 'the_SVG_ID'; }
-                Plot.clearSvg(svgId);
-                if (!data)
-                    return;
-                var width = pieRadius, height = pieRadius, radius = Math.min(width, height) / 2, innerRadius = 0;
-                var pie = d3.layout.pie().sort(null).value(function (d) { return d.weight; });
-                var tip = d3.tip().attr('class', 'd3-tip').offset([0, 0]).html(function (d) { return '<strong>' + d.data.label + ": </strong><span style='color:orangered'>" + Math.round(d.data.weight * 100) + "%</span>"; });
-                var arc = d3.svg.arc().innerRadius(innerRadius).outerRadius(radius);
-                var outlineArc = d3.svg.arc().innerRadius(innerRadius).outerRadius(radius);
-                var svg = d3.select('#' + parentId).append("svg").attr("id", svgId).attr("width", width).attr("height", height).attr("style", "display: block; margin: 0 auto;").append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
-                //svg.call(tip);
-                var colors = chroma.scale(colorScale).domain([0, data.length - 1], data.length);
-                var path = svg.selectAll(".solidArc").data(pie(data)).enter().append("path").attr("fill", function (d, i) { return d.data.color || colors(i).hex(); }).attr("class", "solidArc").attr("stroke", "gray").attr("d", arc).on('mouseover', function (d, i) {
-                    tip.show(d, i);
-                }).on('mouseout', tip.hide);
-                var outerPath = svg.selectAll(".outlineArc").data(pie(data)).enter().append("path").attr("fill", "none").attr("stroke", "gray").attr("class", "outlineArc").attr("d", outlineArc);
-            };
-            /**
-            * Draw an Aster Pie chart, i.e. a pie chart with varying radius depending on the score, where the maximum score of 100 equals the pie radius.
-            * See http://bl.ocks.org/bbest/2de0e25d4840c68f2db1
-            */
-            Plot.drawAsterPlot = function (pieRadius, data, parentId, colorScale, svgId) {
-                if (parentId === void 0) { parentId = 'mcaPieChart'; }
-                if (colorScale === void 0) { colorScale = 'Reds'; }
-                if (svgId === void 0) { svgId = 'the_SVG_ID'; }
-                Plot.clearSvg(svgId);
-                if (!data)
-                    return;
-                var width = pieRadius, height = pieRadius, radius = Math.min(width, height) / 2, innerRadius = 0.3 * radius;
-                var pie = d3.layout.pie().sort(null).value(function (d) { return d.weight; });
-                var tip = d3.tip().attr('class', 'd3-tip').offset([0, 0]).html(function (d) { return '<strong>' + d.data.label + ": </strong> <span style='color:orangered'>" + Math.round(d.data.weight * 100) + "% x " + Math.round(d.data.score) + "&nbsp; = " + Math.round(d.data.weight * d.data.score) + "</span>"; });
-                var arc = d3.svg.arc().innerRadius(innerRadius).outerRadius(function (d) { return (radius - innerRadius) * (d.data.score / 100.0) + innerRadius; });
-                var outlineArc = d3.svg.arc().innerRadius(innerRadius).outerRadius(radius);
-                var svg = d3.select('#' + parentId).append("svg").attr("id", svgId).attr("width", width).attr("height", height).attr("style", "display: block; margin: 0 auto;").append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
-                try {
-                    svg.call(tip);
-                }
-                catch (err) {
-                    console.log("Error: " + err.message);
-                }
-                var colors = chroma.scale(colorScale).domain([0, data.length - 1], data.length);
-                var path = svg.selectAll(".solidArc").data(pie(data)).enter().append("path").attr("fill", function (d, i) { return d.data.color || colors(i).hex(); }).attr("class", "solidArc").attr("stroke", "gray").attr("d", arc).on('mouseover', function (d, i) {
-                    tip.show(d, i);
-                    //$rootScope.$broadcast('tooltipShown', { id: d.data.id });
-                }).on('mouseout', tip.hide);
-                var outerPath = svg.selectAll(".outlineArc").data(pie(data)).enter().append("path").attr("fill", "none").attr("stroke", "gray").attr("class", "outlineArc").attr("d", outlineArc);
-                // calculate the weighted mean score
-                var totalWeight = 0;
-                var totalScore = 0;
-                data.forEach(function (p) {
-                    totalWeight += p.weight;
-                    totalScore += p.weight * p.score;
-                });
-                svg.append("svg:text").attr("class", "aster-score").attr("dy", ".35em").attr("text-anchor", "middle").text(Math.round(totalScore / totalWeight));
-            };
-            Plot.clearSvg = function (svgId) {
-                var svgElement = d3.select('#' + svgId);
-                if (svgElement)
-                    svgElement.remove();
-            };
-            Plot.pieColors = ["#fff7ec", "#fee8c8", "#fdd49e", "#fdbb84", "#fc8d59", "#ef6548", "#d7301f", "#b30000", "#7f0000"];
-            return Plot;
-        })();
-        Helpers.Plot = Plot;
-    })(Helpers = csComp.Helpers || (csComp.Helpers = {}));
-})(csComp || (csComp = {}));
-var Helpers;
-(function (Helpers) {
-    var Resize;
-    (function (Resize) {
-        /**
-         * Config
-         */
-        var moduleName = 'csWeb.resize';
-        /**
-          * Module
-          */
-        Resize.myModule;
-        try {
-            Resize.myModule = angular.module(moduleName);
-        }
-        catch (err) {
-            // named module does not exist, so create one
-            Resize.myModule = angular.module(moduleName, []);
-        }
-        /**
-          * Directive to resize an element by settings its width or height,
-          * for example to make sure that the scrollbar appears.
-          * Typical usage:
-          * <div style="overflow-y: auto; overflow-x: hidden" resize resize-x="20" resize-y="250">...</div>
-          * Load the directive in your module, e.g.
-          * angular.module('myWebApp', ['csWeb.resize'])
-          */
-        Resize.myModule.directive('resize', ['$window', function ($window) {
-            return {
-                terminal: false,
-                // E = elements, A=attributes and C=css classes. Can be compined, e.g. EAC
-                restrict: 'A',
-                // Name if optional. Text Binding (Prefix: @), One-way Binding (Prefix: &), Two-way Binding (Prefix: =)
-                scope: {
-                    resizeX: '@',
-                    resizeY: '@'
-                },
-                // Directives that want to modify the DOM typically use the link option.link takes a function with the following signature, function link(scope, element, attrs) { ... } where:
-                // * scope is an Angular scope object.
-                // * element is the jqLite wrapped element that this directive matches.
-                // * attrs is a hash object with key-value pairs of normalized attribute names and their corresponding attribute values.
-                link: function (scope, element, attrs) {
-                    scope.onResizeFunction = function () {
-                        // console.log(scope.resizeX + "-" + scope.resizeY);
-                        if (scope.resizeX) {
-                            var windowWidth = $window.innerWidth;
-                            element.width((windowWidth - scope.resizeX) + 'px');
-                        }
-                        if (scope.resizeY) {
-                            var windowHeight = $window.innerHeight;
-                            element.height((windowHeight - scope.resizeY) + 'px');
-                        }
-                    };
-                    // Call to the function when the page is first loaded
-                    scope.onResizeFunction();
-                    // Listen to the resize event.
-                    angular.element($window).bind('resize', function () {
-                        scope.onResizeFunction();
-                        scope.$apply();
-                    });
-                }
-            };
-        }]);
-    })(Resize = Helpers.Resize || (Helpers.Resize = {}));
-})(Helpers || (Helpers = {}));
-var LegendList;
-(function (LegendList) {
-    LegendList.html = '<div style="position: relative;">    <h4 class="leftpanel-header" translate="LEGEND"></h4>    <div>        <div ng-repeat="legendItem in legendItems" class="legendItem">            <div class="legendIcon">                <img ng-src="{{legendItem.uri}}" class="legendImage" />            </div>            <span class="legendText">{{legendItem.title}}</span>        </div>    </div></div>';
-})(LegendList || (LegendList = {}));
-var LegendList;
-(function (LegendList) {
-    /**
-      * Config
-      */
-    var moduleName = 'csWeb.legendList';
-    /**
-      * Module
-      */
-    LegendList.myModule;
-    try {
-        LegendList.myModule = angular.module(moduleName);
-    }
-    catch (err) {
-        // named module does not exist, so create one
-        LegendList.myModule = angular.module(moduleName, []);
-    }
-    /**
-      * Directive to display the available map layers.
-      */
-    LegendList.myModule.directive('legendList', [
-        '$window',
-        '$compile',
-        function ($window, $compile) {
-            return {
-                terminal: false,
-                restrict: 'E',
-                scope: {},
-                template: LegendList.html,
-                //compile             : el          => {    // I need to explicitly compile it in order to use interpolation like {{xxx}}
-                //    var fn                        = $compile(el);
-                //    return scope                  => { 
-                //        fn(scope);
-                //    };       
-                //},
-                // Directives that want to modify the DOM typically use the link option.link takes a function with the following signature, function link(scope, element, attrs) { ... } where:
-                // scope is an Angular scope object.
-                // element is the jqLite - wrapped element that this directive matches.
-                // attrs is a hash object with key - value pairs of normalized attribute names and their corresponding attribute values.
-                link: function (scope, element, attrs) {
-                    // Deal with resizing the element list
-                    scope.onResizeFunction = function () {
-                        var filterHeight = 50;
-                        var paginationCtrlHeight = 100;
-                        var itemHeight = 60;
-                        //scope.windowHeight          = $window.innerHeight;
-                        //scope.windowWidth           = $window.innerWidth;
-                        scope.numberOfItems = Math.floor(($window.innerHeight - filterHeight - paginationCtrlHeight) / itemHeight);
-                    };
-                    // Call to the function when the page is first loaded
-                    scope.onResizeFunction();
-                    angular.element($window).bind('resize', function () {
-                        scope.onResizeFunction();
-                        scope.$apply();
-                    });
-                },
-                replace: true,
-                transclude: true,
-                controller: LegendList.LegendListCtrl
-            };
-        }
-    ]).directive('bsPopover', function () {
-        return function (scope, element, attrs) {
-            element.find("a[rel=popover]").popover({ placement: 'right', html: 'true' });
-        };
-    });
-})(LegendList || (LegendList = {}));
-var LegendList;
-(function (LegendList) {
-    var LegendListCtrl = (function () {
-        // dependencies are injected via AngularJS $injector
-        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
-        function LegendListCtrl($scope, $layerService, $mapService, $messageBusService) {
-            var _this = this;
-            this.$scope = $scope;
-            this.$layerService = $layerService;
-            this.$mapService = $mapService;
-            this.$messageBusService = $messageBusService;
-            $scope.vm = this;
-            $messageBusService.subscribe('project', function () {
-                // Update the legend when a project is loaded.
-                _this.updateLegendItems();
-            });
-            $messageBusService.subscribe('layer', function () {
-                // Update the legend when a layer is added or removed.
-                _this.updateLegendItems();
-            });
-            this.updateLegendItems();
-            $scope.legendItems = [];
-            $scope.numberOfItems = 10; // This is being reset in the directive upon receiving a resize.
-        }
-        LegendListCtrl.prototype.updateLegendItems = function () {
-            var legendItems = [];
-            var existingItems = [];
-            for (var key in this.$layerService.featureTypes) {
-                var ft = this.$layerService.featureTypes[key];
-                var uri = this.getImageUri(ft);
-                var title = this.getName(key, ft);
-                var existingItem = name + uri;
-                if (existingItems.indexOf(existingItem) < 0) {
-                    existingItems.push(existingItem);
-                    legendItems.push({ "title": title, "uri": uri });
-                }
-            }
-            legendItems.sort(function (a, b) {
-                if (a.title > b.title)
-                    return 1;
-                if (a.title < b.title)
-                    return -1;
-                return 0;
-            });
-            this.$scope.legendItems = legendItems;
-        };
-        LegendListCtrl.prototype.getImageUri = function (ft) {
-            var iconUri = ft.style.iconUri;
-            if (iconUri == null)
-                iconUri = "includes/images/marker.png";
-            if (iconUri.indexOf('{') >= 0)
-                iconUri = iconUri.replace('{', '').replace('}', '');
-            if (ft.style != null && ft.style.drawingMode != null && ft.style.drawingMode.toLowerCase() != "point") {
-                if (iconUri.indexOf('_Media') < 0)
-                    return iconUri;
-                else
-                    return "includes/images/polygon.png";
-            }
-            else if (ft.style != null && iconUri != null) {
-                return iconUri;
-            }
-            else {
-                return "includes/images/marker.png";
-            }
-        };
-        LegendListCtrl.prototype.getName = function (key, ft) {
-            return ft.name || key.replace('_Default', '');
-        };
-        // $inject annotation.
-        // It provides $injector with information about dependencies to be injected into constructor
-        // it is better to have it close to the constructor, because the parameters must match in count and type.
-        // See http://docs.angularjs.org/guide/di
-        LegendListCtrl.$inject = [
-            '$scope',
-            'layerService',
-            'mapService',
-            'messageBusService'
-        ];
-        return LegendListCtrl;
-    })();
-    LegendList.LegendListCtrl = LegendListCtrl;
-})(LegendList || (LegendList = {}));
-var FeatureList;
-(function (FeatureList) {
-    FeatureList.html = '<div style="position: relative;">    <h4 class="leftpanel-header" translate="FEATURES"></h4>    <div class="has-feedback" style="padding:10px 4px 4px 4px;">        <span style="direction: ltr; position: static; display: block;">            <input id="searchbox" data-ng-model="featureFilter.properties" type="text"                   placeholder="Filter" autocomplete="off" spellcheck="false"                   style="position: relative; vertical-align: top;" class="form-control tt-input">        </span>        <span id="searchicon" class="fa form-control-feedback fa-filter" style="padding-top: 10px;"></span>    </div>    <table class="table table-striped table-condensed">        <!--vm.$layerService.features-->        <tr dir-paginate="feature in vm.$layerService.project.features | filter:featureFilter | orderBy:\'properties.Name\' | itemsPerPage: numberOfItems "            data-ng-click="vm.$mapService.zoomTo(feature);vm.$layerService.selectFeature(feature);" style="cursor: pointer; height: 50px; vertical-align: central">            <!--<td>Icon</td>-->            <td>{{ feature.properties.Name }}</td>            <td>                <i class="fa fa-chevron-right pull-right"></i>            </td>        </tr>    </table>    <dir-pagination-controls style="position: absolute; bottom: -80px;" max-size="6" boundary-links="false" direction-links="false" template-url="bower_components/angular-utils-pagination/dirPagination.tpl.html"></dir-pagination-controls></div>';
-})(FeatureList || (FeatureList = {}));
-var FeatureList;
-(function (FeatureList) {
-    /**
-      * Config
-      */
-    var moduleName = 'csWeb.featureList';
-    /**
-      * Module
-      */
-    FeatureList.myModule;
-    try {
-        FeatureList.myModule = angular.module(moduleName);
-    }
-    catch (err) {
-        // named module does not exist, so create one
-        FeatureList.myModule = angular.module(moduleName, []);
-    }
-    /**
-      * Directive to display the available map layers.
-      */
-    FeatureList.myModule.directive('featureList', [
-        '$window',
-        '$compile',
-        function ($window, $compile) {
-            return {
-                terminal: false,
-                restrict: 'E',
-                scope: {},
-                template: FeatureList.html,
-                //compile             : el          => {    // I need to explicitly compile it in order to use interpolation like {{xxx}}
-                //    var fn                        = $compile(el);
-                //    return scope                  => { 
-                //        fn(scope);
-                //    };
-                //},
-                // Directives that want to modify the DOM typically use the link option.link takes a function with the following signature, function link(scope, element, attrs) { ... } where:
-                // scope is an Angular scope object.
-                // element is the jqLite - wrapped element that this directive matches.
-                // attrs is a hash object with key - value pairs of normalized attribute names and their corresponding attribute values.
-                link: function (scope, element, attrs) {
-                    // Deal with resizing the element list
-                    scope.onResizeFunction = function () {
-                        var filterHeight = 50;
-                        var paginationCtrlHeight = 100;
-                        var itemHeight = 60;
-                        //scope.windowHeight          = $window.innerHeight;
-                        //scope.windowWidth           = $window.innerWidth;
-                        scope.numberOfItems = Math.floor(($window.innerHeight - filterHeight - paginationCtrlHeight) / itemHeight);
-                    };
-                    // Call to the function when the page is first loaded
-                    scope.onResizeFunction();
-                    angular.element($window).bind('resize', function () {
-                        scope.onResizeFunction();
-                        scope.$apply();
-                    });
-                },
-                replace: true,
-                transclude: true,
-                controller: FeatureList.FeatureListCtrl
-            };
-        }
-    ]).directive('bsPopover', function () {
-        return function (scope, element, attrs) {
-            element.find("a[rel=popover]").popover({ placement: 'right', html: 'true' });
-        };
-    });
-})(FeatureList || (FeatureList = {}));
-var FeatureList;
-(function (FeatureList) {
-    var FeatureListCtrl = (function () {
-        // dependencies are injected via AngularJS $injector
-        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
-        function FeatureListCtrl($scope, $layerService, $mapService) {
-            this.$scope = $scope;
-            this.$layerService = $layerService;
-            this.$mapService = $mapService;
-            $scope.vm = this;
-            $scope.numberOfItems = 10; // This is being reset in the directive upon receiving a resize.
-        }
-        // $inject annotation.
-        // It provides $injector with information about dependencies to be injected into constructor
-        // it is better to have it close to the constructor, because the parameters must match in count and type.
-        // See http://docs.angularjs.org/guide/di
-        FeatureListCtrl.$inject = [
-            '$scope',
-            'layerService',
-            'mapService'
-        ];
-        return FeatureListCtrl;
-    })();
-    FeatureList.FeatureListCtrl = FeatureListCtrl;
-})(FeatureList || (FeatureList = {}));
-var FilterList;
-(function (FilterList) {
-    FilterList.html = '<div>    <h4 class="leftpanel-header" translate="FILTERS"></h4>    <div ng-show="vm.$layerService.noFilters" translate="FILTER_INFO"></div>    <a ng-hide="vm.$layerService.noFilters" ng-click="vm.$layerService.resetFilters()"><span class="fa fa-refresh"></span> reset</a>    <div id="filterChart"></div></div>';
-})(FilterList || (FilterList = {}));
-var FilterList;
-(function (FilterList) {
-    /**
-      * Config
-      */
-    var moduleName = 'csWeb.filterList';
-    /**
-      * Module
-      */
-    FilterList.myModule;
-    try {
-        FilterList.myModule = angular.module(moduleName);
-    }
-    catch (err) {
-        // named module does not exist, so create one
-        FilterList.myModule = angular.module(moduleName, []);
-    }
-    /**
-      * Directive to display the available map layers.
-      */
-    FilterList.myModule.directive('filterList', [
-        '$window',
-        '$compile',
-        function ($window, $compile) {
-            return {
-                terminal: false,
-                restrict: 'E',
-                scope: {},
-                template: FilterList.html,
-                //compile             : el          => {    // I need to explicitly compile it in order to use interpolation like {{xxx}}
-                //    var fn                        = $compile(el);
-                //    return scope                  => { 
-                //        fn(scope);
-                //    };
-                //},
-                link: function (scope, element, attrs) {
-                    // Deal with resizing the element list
-                    scope.onResizeFunction = function () {
-                        var filterHeight = 50;
-                        var paginationCtrlHeight = 100;
-                        var itemHeight = 60;
-                        //scope.windowHeight          = $window.innerHeight;
-                        //scope.windowWidth           = $window.innerWidth;
-                        scope.numberOfItems = Math.floor(($window.innerHeight - filterHeight - paginationCtrlHeight) / itemHeight);
-                    };
-                    // Call to the function when the page is first loaded
-                    scope.onResizeFunction();
-                    angular.element($window).bind('resize', function () {
-                        scope.onResizeFunction();
-                        scope.$apply();
-                    });
-                },
-                replace: true,
-                transclude: true,
-                controller: FilterList.FilterListCtrl
-            };
-        }
-    ]).directive('bsPopover', function () {
-        return function (scope, element, attrs) {
-            element.find("a[rel=popover]").popover({ placement: 'right', html: 'true' });
-        };
-    });
-})(FilterList || (FilterList = {}));
-var FilterList;
-(function (FilterList) {
-    var FilterListCtrl = (function () {
-        // dependencies are injected via AngularJS $injector
-        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
-        function FilterListCtrl($scope, $layerService) {
-            this.$scope = $scope;
-            this.$layerService = $layerService;
-            $scope.vm = this;
-        }
-        // $inject annotation.   
-        // It provides $injector with information about dependencies to be injected into constructor
-        // it is better to have it close to the constructor, because the parameters must match in count and type.
-        // See http://docs.angularjs.org/guide/di
-        FilterListCtrl.$inject = [
-            '$scope',
-            'layerService'
-        ];
-        return FilterListCtrl;
-    })();
-    FilterList.FilterListCtrl = FilterListCtrl;
-})(FilterList || (FilterList = {}));
-var Mca;
-(function (Mca) {
-    'use strict';
-    var McaCtrl = (function () {
-        function McaCtrl($scope, $modal, $translate, $timeout, $localStorageService, $layerService, messageBusService) {
-            var _this = this;
-            this.$scope = $scope;
-            this.$modal = $modal;
-            this.$translate = $translate;
-            this.$timeout = $timeout;
-            this.$localStorageService = $localStorageService;
-            this.$layerService = $layerService;
-            this.messageBusService = messageBusService;
-            this.features = [];
-            this.availableMcas = [];
-            this.showAsterChart = false; // When true, show a pie chart, when false, show a bar chart.
-            this.showDialog = false;
-            this.expertMode = false;
-            this.showSparkline = false;
-            this.featureMessageReceived = function (title, feature) {
-                //console.log("MC: featureMessageReceived");
-                if (_this.mca == null)
-                    return;
-                switch (title) {
-                    case 'onFeatureSelect':
-                        _this.updateSelectedFeature(feature, true);
-                        break;
-                    case 'onFeatureDeselect':
-                        _this.showFeature = false;
-                        _this.selectedFeature = null;
-                        _this.drawChart();
-                        break;
-                    default:
-                        break;
-                }
-                _this.scopeApply();
-            };
-            $scope.vm = this;
-            messageBusService.subscribe('layer', function (title) {
-                switch (title) {
-                    case 'deactivate':
-                    case 'activated':
-                        _this.updateAvailableMcas();
-                        _this.calculateMca();
-                        break;
-                }
-            });
-            messageBusService.subscribe('project', function (title) {
-                switch (title) {
-                    case 'loaded':
-                        _this.expertMode = $layerService.project != null && $layerService.project.hasOwnProperty('userPrivileges') && $layerService.project.userPrivileges.hasOwnProperty('mca') && $layerService.project.userPrivileges.mca.hasOwnProperty('expertMode') && $layerService.project.userPrivileges.mca.expertMode;
-                        if (typeof $layerService.project.mcas === 'undefined' || $layerService.project.mcas == null)
-                            $layerService.project.mcas = [];
-                        var mcas = _this.$localStorageService.get(McaCtrl.mcas);
-                        if (typeof mcas === 'undefined' || mcas === null)
-                            return;
-                        mcas.forEach(function (mca) {
-                            $layerService.project.mcas.push(new Mca.Models.Mca().deserialize(mca));
-                        });
-                        break;
-                }
-            });
-            messageBusService.subscribe('feature', this.featureMessageReceived);
-            $translate('MCA.DELETE_MSG').then(function (translation) {
-                McaCtrl.confirmationMsg1 = translation;
-            });
-            $translate('MCA.DELETE_MSG2').then(function (translation) {
-                McaCtrl.confirmationMsg2 = translation;
-            });
-        }
-        McaCtrl.prototype.getVotingClass = function (criterion) {
-            if (criterion == null || this.mca == null || criterion.userWeight === 0 || criterion.userWeight < -this.mca.userWeightMax || criterion.userWeight > this.mca.userWeightMax)
-                return 'disabledMca';
-            return criterion.userWeight > 0 ? 'prefer' : 'avoid';
-        };
-        McaCtrl.prototype.createDummyMca = function () {
-            var mca = new Mca.Models.Mca();
-            mca.title = 'Mijn Zelfredzaamheid';
-            mca.description = 'Analyse van de zelfredzaamheid van een gemeente.';
-            mca.label = 'mca_zelfredzaamheid';
-            mca.stringFormat = '{0:0.0}';
-            mca.rankTitle = 'Positie';
-            mca.rankDescription = 'Relatieve positie in de lijst.';
-            mca.rankFormat = '{0} van {1}';
-            mca.userWeightMax = 5;
-            mca.featureIds = ['cities_Default'];
-            var criterion = new Mca.Models.Criterion();
-            criterion.label = 'p_00_14_jr';
-            criterion.scores = '[0,0 20,1]';
-            criterion.userWeight = 1;
-            mca.criteria.push(criterion);
-            criterion = new Mca.Models.Criterion();
-            criterion.label = 'p_15_24_jr';
-            criterion.scores = '[0,0 20,1]';
-            criterion.userWeight = 1;
-            mca.criteria.push(criterion);
-            criterion = new Mca.Models.Criterion();
-            criterion.label = 'p_65_eo_jr';
-            criterion.scores = '[0,0 25,1]';
-            criterion.userWeight = 3;
-            mca.criteria.push(criterion);
-            this.$layerService.project.mcas.push(mca);
-            mca = new Mca.Models.Mca();
-            mca.title = 'test';
-            mca.label = 'mca_test';
-            mca.stringFormat = '{0:0.0}';
-            mca.rankTitle = 'Rang';
-            mca.rankFormat = '{0} van {1}';
-            mca.userWeightMax = 3;
-            mca.featureIds = ['cities_Default'];
-            criterion = new Mca.Models.Criterion();
-            criterion.label = 'p_15_24_jr';
-            criterion.scores = '[0,0 20,1]';
-            criterion.userWeight = 1;
-            mca.criteria.push(criterion);
-            criterion = new Mca.Models.Criterion();
-            criterion.label = 'p_65_eo_jr';
-            criterion.scores = '[0,0 25,1]';
-            criterion.userWeight = 3;
-            mca.criteria.push(criterion);
-            this.$layerService.project.mcas.push(mca);
-        };
-        McaCtrl.prototype.toggleMcaChartType = function () {
-            this.showAsterChart = !this.showAsterChart;
-            this.drawChart(this.mca.criteria[0]);
-        };
-        McaCtrl.prototype.toggleSparkline = function () {
-            this.showSparkline = !this.showSparkline;
-            if (this.showSparkline)
-                this.drawChart();
-        };
-        McaCtrl.prototype.weightUpdated = function (criterion) {
-            this.selectedCriterion = criterion;
-            this.addMca(this.mca);
-            this.updateMca(criterion);
-        };
-        McaCtrl.prototype.updateMca = function (criterion) {
-            this.selectedCriterion = criterion;
-            this.features = [];
-            this.calculateMca();
-            this.drawChart(criterion);
-        };
-        McaCtrl.prototype.editMca = function (mca) {
-            this.showMcaEditor(mca);
-        };
-        McaCtrl.prototype.createMca = function () {
-            this.showMcaEditor(new Mca.Models.Mca());
-        };
-        McaCtrl.prototype.showMcaEditor = function (newMca) {
-            var _this = this;
-            var modalInstance = this.$modal.open({
-                templateUrl: 'mcaEditorView.html',
-                controller: Mca.McaEditorCtrl,
-                resolve: {
-                    mca: function () { return newMca; }
-                }
-            });
-            modalInstance.result.then(function (mca) {
-                _this.showSparkline = false;
-                _this.addMca(mca);
-                _this.updateMca();
-                //console.log(JSON.stringify(mca, null, 2));
-            }, function () {
-                //console.log('Modal dismissed at: ' + new Date());
-            });
-        };
-        McaCtrl.prototype.removeMca = function (mca) {
-            var _this = this;
-            if (!mca)
-                return;
-            var title = String.format(McaCtrl.confirmationMsg1, mca.title);
-            this.messageBusService.confirm(title, McaCtrl.confirmationMsg2, function (result) {
-                if (!result)
-                    return;
-                _this.$timeout(function () {
-                    _this.deleteMca(mca);
-                    if (_this.mca)
-                        _this.updateMca();
-                }, 0);
-            });
-            this.scopeApply();
-        };
-        McaCtrl.prototype.getMcaIndex = function (mca) {
-            var mcaIndex = -1;
-            var mcas = this.$layerService.project.mcas;
-            for (var i = 0; i < mcas.length; i++) {
-                if (mcas[i].title !== mca.title)
-                    continue;
-                mcaIndex = i;
-                break;
-            }
-            return mcaIndex;
-        };
-        McaCtrl.prototype.addMca = function (mca) {
-            if (!mca)
-                return;
-            this.deleteMca(mca);
-            this.$layerService.project.mcas.push(mca);
-            this.addMcaToLocalStorage(mca);
-            this.updateAvailableMcas(mca);
-        };
-        McaCtrl.prototype.deleteMca = function (mca) {
-            if (!mca)
-                return;
-            var mcaIndex = this.getMcaIndex(mca);
-            if (mcaIndex < 0)
-                return;
-            var mcas = this.$layerService.project.mcas;
-            if (mcaIndex >= 0)
-                mcas.splice(mcaIndex, 1);
-            this.removeMcaFromLocalStorage(mca);
-            this.updateAvailableMcas();
-        };
-        McaCtrl.prototype.addMcaToLocalStorage = function (mca) {
-            var mcas = this.$localStorageService.get(McaCtrl.mcas);
-            if (typeof mcas === 'undefined' || mcas === null)
-                mcas = [];
-            this.removeMcaFromLocalStorage(mca);
-            mcas.push(mca);
-            this.$localStorageService.set(McaCtrl.mcas, mcas); // You first need to set the key
-        };
-        McaCtrl.prototype.removeMcaFromLocalStorage = function (mca) {
-            var mcas = this.$localStorageService.get(McaCtrl.mcas);
-            if (typeof mcas === 'undefined' || mcas === null)
-                return;
-            var mcaIndex = -1;
-            for (var i = 0; i < mcas.length; i++) {
-                if (mcas[i].title !== mca.title)
-                    continue;
-                mcaIndex = i;
-                break;
-            }
-            if (mcaIndex < 0)
-                return;
-            mcas.splice(mcaIndex, 1);
-            this.$localStorageService.set(McaCtrl.mcas, mcas); // You first need to set the key
-        };
-        McaCtrl.prototype.scopeApply = function () {
-            if (this.$scope.$root.$$phase !== '$apply' && this.$scope.$root.$$phase !== '$digest') {
-                this.$scope.$apply();
-            }
-        };
-        McaCtrl.prototype.updateSelectedFeature = function (feature, drawCharts) {
-            if (drawCharts === void 0) { drawCharts = false; }
-            if (typeof feature === 'undefined' || feature == null) {
-                this.featureIcon = '';
-                return;
-            }
-            this.selectedFeature = feature;
-            this.featureIcon = this.selectedFeature.fType != null && this.selectedFeature.fType.style != null ? this.selectedFeature.fType.style.iconUri : '';
-            if (!feature.properties.hasOwnProperty(this.mca.label))
-                return;
-            this.showFeature = true;
-            this.properties = [];
-            var mi = McaCtrl.createPropertyType(this.mca);
-            var displayValue = csComp.Helpers.convertPropertyInfo(mi, feature.properties[mi.label]);
-            this.properties.push(new FeatureProps.CallOutProperty(mi.title, displayValue, mi.label, true, true, feature, false, false, mi.description, mi));
-            if (this.mca.rankTitle) {
-                mi = McaCtrl.createRankPropertyType(this.mca);
-                displayValue = csComp.Helpers.convertPropertyInfo(mi, feature.properties[mi.label]);
-                this.properties.push(new FeatureProps.CallOutProperty(mi.title, displayValue, mi.label, false, false, feature, false, false, mi.description, mi));
-            }
-            if (drawCharts)
-                this.drawChart();
-        };
-        McaCtrl.prototype.drawChart = function (criterion) {
-            var _this = this;
-            this.selectedCriterion = criterion;
-            this.showChart = true;
-            if (this.showFeature)
-                if (this.showAsterChart)
-                    this.drawAsterPlot(criterion);
-                else
-                    this.drawHistogram(criterion);
-            else
-                this.drawPieChart(criterion);
-            if (!this.showSparkline)
-                return;
-            var i = 0;
-            this.mca.criteria.forEach(function (crit) {
-                var id = 'histogram_' + i++;
-                if (crit.criteria.length === 0) {
-                    var y1 = crit.y;
-                    if (crit.userWeight < 0)
-                        y1 = y1.map(function (v) { return 1 - v; });
-                    csComp.Helpers.Plot.drawMcaPlot(crit.propValues, {
-                        id: id,
-                        width: 220,
-                        height: 70,
-                        xy: { x: crit.x, y: y1 },
-                        featureValue: _this.selectedFeature ? _this.selectedFeature.properties[crit.label] : null
-                    });
-                }
-                else {
-                    var j = 0;
-                    crit.criteria.forEach(function (c) {
-                        var y2 = c.y;
-                        if (crit.userWeight < 0)
-                            y2 = y2.map(function (v) { return 1 - v; });
-                        csComp.Helpers.Plot.drawMcaPlot(c.propValues, {
-                            id: id + '_' + j++,
-                            width: 220,
-                            height: 70,
-                            xy: { x: c.x, y: y2 },
-                            featureValue: _this.selectedFeature ? _this.selectedFeature.properties[c.label] : null
-                        });
-                    });
-                }
-            });
-        };
-        McaCtrl.prototype.getParentOfSelectedCriterion = function (criterion) {
-            var _this = this;
-            var parent;
-            this.mca.update();
-            if (typeof criterion === 'undefined' || this.mca.criteria.indexOf(criterion) >= 0) {
-                this.selectedCriterion = null;
-                parent = this.mca.criteria;
-            }
-            else {
-                this.mca.criteria.forEach(function (c) {
-                    if (c.criteria.indexOf(criterion) >= 0) {
-                        _this.selectedCriterion = c;
-                        parent = c.criteria;
-                    }
-                });
-            }
-            return parent;
-        };
-        McaCtrl.prototype.drawHistogram = function (criterion) {
-            var _this = this;
-            if (!this.mca || !this.selectedFeature)
-                return;
-            var currentLevel = this.getParentOfSelectedCriterion(criterion);
-            if (typeof currentLevel === 'undefined' || currentLevel == null)
-                return;
-            var data = [];
-            var options = {
-                id: McaCtrl.mcaChartId,
-                numberOfBins: 10,
-                width: 240,
-                height: 100,
-                selectedValue: this.selectedFeature.properties[this.mca.label]
-            };
-            this.features.forEach(function (feature) {
-                if (feature.properties.hasOwnProperty(_this.mca.label)) {
-                    // The property is available. I use the '+' to convert the string value to a number.
-                    var prop = feature.properties[_this.mca.label];
-                    if ($.isNumeric(prop))
-                        data.push(prop);
-                }
-            });
-            csComp.Helpers.Plot.drawHistogram(data, options);
-        };
-        McaCtrl.prototype.drawAsterPlot = function (criterion) {
-            var _this = this;
-            if (!this.mca || !this.selectedFeature)
-                return;
-            var currentLevel = this.getParentOfSelectedCriterion(criterion);
-            if (typeof currentLevel === 'undefined' || currentLevel == null)
-                return;
-            var data = [];
-            var i = 0;
-            currentLevel.forEach(function (c) {
-                var rawScore = c.getScore(_this.selectedFeature);
-                var pieData = new csComp.Helpers.AsterPieData();
-                pieData.id = i++;
-                pieData.label = c.getTitle();
-                pieData.weight = Math.abs(c.weight);
-                pieData.color = c.color;
-                pieData.score = (c.weight > 0 ? rawScore : 1 - rawScore) * 100;
-                data.push(pieData);
-            });
-            csComp.Helpers.Plot.drawAsterPlot(100, data, McaCtrl.mcaChartId);
-        };
-        McaCtrl.prototype.drawPieChart = function (criterion) {
-            if (!this.mca)
-                return;
-            var currentLevel = this.getParentOfSelectedCriterion(criterion);
-            if (typeof currentLevel === 'undefined' || currentLevel == null)
-                return;
-            var data = [];
-            var i = 0;
-            currentLevel.forEach(function (c) {
-                var pieData = new csComp.Helpers.PieData();
-                pieData.id = i++;
-                pieData.label = c.getTitle();
-                pieData.weight = Math.abs(c.weight);
-                pieData.color = c.color;
-                data.push(pieData);
-            });
-            csComp.Helpers.Plot.drawPie(100, data, McaCtrl.mcaChartId);
-        };
-        /**
-        * Based on the currently loaded features, which MCA can we use
-        */
-        McaCtrl.prototype.updateAvailableMcas = function (mca) {
-            var _this = this;
-            this.showChart = false;
-            this.mca = mca;
-            this.availableMcas = [];
-            this.$layerService.project.mcas.forEach(function (m) {
-                m.featureIds.forEach(function (featureId) {
-                    if (_this.availableMcas.indexOf(m) < 0 && _this.$layerService.featureTypes.hasOwnProperty(featureId)) {
-                        _this.availableMcas.push(m);
-                        var featureType = _this.$layerService.featureTypes[featureId];
-                        _this.applyPropertyInfoToCriteria(m, featureType);
-                    }
-                });
-            });
-            if (mca == null && this.availableMcas.length > 0) {
-                this.mca = this.availableMcas[0];
-                this.updateMca();
-            }
-        };
-        McaCtrl.prototype.calculateMca = function () {
-            var _this = this;
-            if (!this.mca)
-                return;
-            var mca = this.mca;
-            mca.featureIds.forEach(function (featureId) {
-                if (!(_this.$layerService.featureTypes.hasOwnProperty(featureId)))
-                    return;
-                _this.addPropertyInfo(featureId, mca);
-                _this.$layerService.project.features.forEach(function (feature) {
-                    if (feature.featureTypeName != null && feature.featureTypeName === featureId)
-                        _this.features.push(feature);
-                });
-                if (_this.features.length === 0)
-                    return;
-                mca.updatePla(_this.features);
-                mca.update();
-                var tempScores = [];
-                var index = 0;
-                _this.features.forEach(function (feature) {
-                    var score = mca.getScore(feature);
-                    if (mca.rankTitle) {
-                        var tempItem = { score: score, index: index++ };
-                        tempScores.push(tempItem);
-                    }
-                    feature.properties[mca.label] = score * 100;
-                    _this.$layerService.updateFeature(feature);
-                });
-                if (mca.rankTitle) {
-                    // Add rank information
-                    tempScores.sort(function (a, b) {
-                        return b.score - a.score;
-                    });
-                    var length = _this.features.length;
-                    var scaleRange = mca.scaleMinValue ? Math.abs(mca.scaleMaxValue - mca.scaleMinValue) + 1 : length;
-                    var scaleFactor = Math.ceil(length / scaleRange);
-                    var rankFunction = mca.scaleMinValue ? mca.scaleMaxValue > mca.scaleMinValue ? function (position) {
-                        return mca.scaleMaxValue - Math.round(position / scaleFactor);
-                    } : function (position) {
-                        return mca.scaleMinValue + Math.round(position / scaleFactor);
-                    } : function (position) {
-                        return position;
-                    };
-                    var prevScore = -1;
-                    var rank = 1;
-                    for (var i = 0; i < length; i++) {
-                        var item = tempScores[i];
-                        // Assign items with the same value the same rank.
-                        if (item.score !== prevScore)
-                            rank = i + 1;
-                        prevScore = item.score;
-                        _this.features[item.index].properties[mca.label + '#'] = rankFunction(rank) + ',' + scaleRange;
-                    }
-                }
-            });
-            this.updateSelectedFeature(this.selectedFeature, false);
-            if (this.selectedFeature) {
-                this.messageBusService.publish('feature', 'onFeatureSelect', this.selectedFeature);
-            }
-            if (this.groupStyle)
-                this.$layerService.updateStyle(this.groupStyle);
-        };
-        McaCtrl.prototype.applyPropertyInfoToCriteria = function (mca, featureType) {
-            var propertyTypes = csComp.Helpers.getPropertyTypes(featureType, this.$layerService.propertyTypeData);
-            if (propertyTypes.length === 0)
-                return;
-            mca.criteria.forEach(function (criterion) {
-                var label = criterion.label;
-                propertyTypes.forEach(function (propInfo) {
-                    if (propInfo.label === label) {
-                        criterion.title = propInfo.title;
-                        criterion.description = propInfo.description;
-                    }
-                });
-            });
-        };
-        McaCtrl.prototype.addPropertyInfo = function (featureId, mca, forceUpdate) {
-            if (forceUpdate === void 0) { forceUpdate = false; }
-            var featureType = this.$layerService.featureTypes[featureId];
-            //var propertyTypes = featureType.propertyTypeData;
-            var propertyTypes = csComp.Helpers.getPropertyTypes(featureType, this.$layerService.propertyTypeData);
-            var labelIndex = -1;
-            for (var i = propertyTypes.length - 1; i >= 0; i--) {
-                if (propertyTypes[i].label === mca.label) {
-                    labelIndex = i;
-                    break;
-                }
-            }
-            if (forceUpdate || labelIndex < 0) {
-                var pt = McaCtrl.createPropertyType(mca);
-                if (labelIndex < 0) {
-                    if (featureType.propertyTypeData === null)
-                        featureType.propertyTypeData = [];
-                    featureType.propertyTypeData.push(pt); // NOTE: propertyTypes refers to a new list, so you cannot add to it.
-                }
-                else
-                    propertyTypes[labelIndex] = pt; // NOTE: but you should be able to overwrite an existing property.
-            }
-            if (!mca.rankTitle)
-                return;
-            labelIndex = -1;
-            for (i = propertyTypes.length - 1; i >= 0; i--) {
-                if (propertyTypes[i].label === mca.rankLabel) {
-                    labelIndex = i;
-                    break;
-                }
-            }
-            if (forceUpdate || labelIndex < 0) {
-                pt = McaCtrl.createRankPropertyType(mca);
-                if (labelIndex < 0)
-                    featureType.propertyTypeData.push(pt);
-                else
-                    propertyTypes[labelIndex] = pt;
-            }
-        };
-        McaCtrl.prototype.setStyle = function (item) {
-            // If groupStyle has been set, we have called it before.
-            // However, make sure that not another filter has set the fillColor too, overwriting our label.
-            if (this.groupStyle && this.groupStyle.group != null && this.groupStyle.group.styles != null && this.groupStyle.group.styles.filter(function (s) {
-                return s.visualAspect === 'fillColor';
-            })[0].property === this.mca.label)
-                this.$layerService.updateStyle(this.groupStyle);
-            else {
-                this.groupStyle = this.$layerService.setStyle(item, false);
-                this.groupStyle.colors = ['#F04030', '#3040F0'];
-                this.$layerService.updateStyle(this.groupStyle);
-            }
-        };
-        McaCtrl.createPropertyType = function (mca) {
-            var mi = {
-                title: mca.title,
-                label: mca.label,
-                type: 'number',
-                maxValue: 1,
-                minValue: 0,
-                description: mca.description,
-                stringFormat: mca.stringFormat,
-                visibleInCallOut: true,
-                section: mca.section || 'MCA'
-            };
-            return mi;
-        };
-        McaCtrl.createRankPropertyType = function (mca) {
-            var mi = {
-                title: mca.rankTitle,
-                label: mca.rankLabel,
-                type: 'rank',
-                description: mca.rankDescription,
-                stringFormat: mca.rankFormat,
-                visibleInCallOut: true,
-                section: mca.section || 'MCA'
-            };
-            return mi;
-        };
-        McaCtrl.mcaChartId = 'mcaChart';
-        McaCtrl.mcas = 'MCAs';
-        McaCtrl.$inject = [
-            '$scope',
-            '$modal',
-            '$translate',
-            '$timeout',
-            'localStorageService',
-            'layerService',
-            'messageBusService'
-        ];
-        return McaCtrl;
-    })();
-    Mca.McaCtrl = McaCtrl;
-})(Mca || (Mca = {}));
-var Mca;
-(function (_Mca) {
-    var Models;
-    (function (Models) {
-        (function (ScoringFunctionType) {
-            ScoringFunctionType[ScoringFunctionType["Manual"] = 0] = "Manual";
-            ScoringFunctionType[ScoringFunctionType["Ascending"] = 1] = "Ascending";
-            ScoringFunctionType[ScoringFunctionType["Descending"] = 2] = "Descending";
-            ScoringFunctionType[ScoringFunctionType["AscendingSigmoid"] = 3] = "AscendingSigmoid";
-            ScoringFunctionType[ScoringFunctionType["DescendingSigmoid"] = 4] = "DescendingSigmoid";
-            ScoringFunctionType[ScoringFunctionType["GaussianPeak"] = 5] = "GaussianPeak";
-            ScoringFunctionType[ScoringFunctionType["GaussianValley"] = 6] = "GaussianValley";
-        })(Models.ScoringFunctionType || (Models.ScoringFunctionType = {}));
-        var ScoringFunctionType = Models.ScoringFunctionType;
-        /**
-        * Scoring function creates a PLA of the scoring algorithm.
-        */
-        var ScoringFunction = (function () {
-            //get img(): string {
-            //    return '/includes/images/plot' + csComp.StringExt.Utils.toUnderscore(ScoringFunctionType[this.type]) + '.png';
-            //}
-            function ScoringFunction(scoringFunctionType) {
-                if (typeof scoringFunctionType != 'undefined' && scoringFunctionType != null)
-                    this.type = scoringFunctionType;
-                this.title = ScoringFunctionType[scoringFunctionType].toString();
-            }
-            Object.defineProperty(ScoringFunction.prototype, "cssClass", {
-                get: function () {
-                    return ScoringFunctionType[this.type].toLowerCase();
-                },
-                enumerable: true,
-                configurable: true
-            });
-            /**
-             * Create a score based on the type, in which x in [0,10] and y in [0.1].
-             * Before applying it, you need to scale the x-axis based on your actual range.
-             * Typically, you would map x=0 to the min(x)+0.1*range(x) and x(10)-0.1*range(x) to max(x),
-             * i.e. x' = ax+b, where a=100/(8r) and b=-100(min+0.1r)/(8r) and r=max-min
-             */
-            ScoringFunction.createScores = function (type) {
-                var scores;
-                switch (type) {
-                    default:
-                    case 1 /* Ascending */:
-                        scores = '[0,0 10,1]';
-                        break;
-                    case 2 /* Descending */:
-                        scores = '[0,1 10,0]';
-                        break;
-                    case 3 /* AscendingSigmoid */:
-                        // http://mathnotepad.com/: f(x) = (3.5+2*atan(x-5))/7
-                        // f([0,1,2,3,4,5,6,7,8,9,10])
-                        // round(100*f([0,1,2,3,4,5,6,7,8,9,10]))/100
-                        // [0.11 0.12 0.14 0.18 0.28 0.5 0.72 0.82 0.86 0.88 0.89]
-                        scores = '[0,0.11 1,0.12 2,0.14 3,0.18 4,0.28 5,0.5 6,0.72 7,0.82 8,0.86 9,0.88 10,0.89]';
-                        break;
-                    case 4 /* DescendingSigmoid */:
-                        // 1-f(x)
-                        scores = '[0,0.89 1,0.88 2,0.86 3,0.82 4,0.72 5,0.5 6,0.28 7,0.18 8,0.14 9,0.12 10,0.11]';
-                        break;
-                    case 5 /* GaussianPeak */:
-                        // h(x)=3*exp(-((x-u)^2)/(2s^2))/(s*sqrt(2pi))
-                        scores = '[0,0 2,0.04 3,0.25 4,0.7 5,1 6,0.7 7,0.25 8,0.04 9,0]';
-                        break;
-                    case 6 /* GaussianValley */:
-                        // 1-h(x)
-                        scores = '[0,1 2,0.96 3,0.75 4,0.3 5,0 6,0.3 7,0.75 8,0.96 9,0]';
-                        break;
-                }
-                return scores;
-            };
-            return ScoringFunction;
-        })();
-        Models.ScoringFunction = ScoringFunction;
-        var ScoringFunctions = (function () {
-            function ScoringFunctions() {
-            }
-            return ScoringFunctions;
-        })();
-        Models.ScoringFunctions = ScoringFunctions;
-        var Criterion = (function () {
-            function Criterion() {
-                /** Specified weight by the user */
-                this.userWeight = 1;
-                this.propValues = [];
-                this.criteria = [];
-                /** Piece-wise linear approximation of the scoring function by a set of x and y points */
-                this.isPlaUpdated = false;
-                /** Piece-wise linear approximation must be scaled:x' = ax+b, where a=100/(8r) and b=-100(min+0.1r)/(8r) and r=max-min */
-                this.isPlaScaled = false;
-                this.x = [];
-                this.y = [];
-            }
-            Criterion.prototype.deserialize = function (input) {
-                var _this = this;
-                this.title = input.title;
-                this.description = input.description;
-                this.label = input.label;
-                this.color = input.color;
-                this.userWeight = input.userWeight;
-                this.weight = input.weight;
-                this.isPlaScaled = input.isPlaScaled;
-                this.scores = input.scores;
-                this.minCutoffValue = input.minCutoffValue;
-                this.maxCutoffValue = input.maxCutoffValue;
-                this.minValue = input.minValue;
-                this.maxValue = input.maxValue;
-                input.criteria.forEach(function (c) {
-                    _this.criteria.push(new Criterion().deserialize(c));
-                });
-                return this;
-            };
-            Criterion.prototype.requiresMinimum = function () {
-                return this.scores && this.scores.indexOf('min') >= 0;
-            };
-            Criterion.prototype.requiresMaximum = function () {
-                return this.scores && this.scores.indexOf('max') >= 0;
-            };
-            Criterion.prototype.getTitle = function () {
-                if (this.title)
-                    return this.title;
-                return this.label;
-            };
-            /**
-             * Update the piecewise linear approximation (PLA) of the scoring (a.k.a. user) function,
-             * which translates a property value to a MCA value in the range [0,1] using all features.
-             */
-            Criterion.prototype.updatePla = function (features) {
-                var _this = this;
-                if (this.isPlaUpdated)
-                    return;
-                if (this.criteria.length > 0) {
-                    this.criteria.forEach(function (c) {
-                        c.updatePla(features);
-                    });
-                    this.isPlaUpdated = true;
-                    return;
-                }
-                // Replace min and max by their values:
-                if (this.scores == null)
-                    return;
-                var scores = this.scores;
-                this.propValues = [];
-                if (this.requiresMaximum() || this.requiresMinimum() || this.isPlaScaled) {
-                    features.forEach(function (feature) {
-                        if (feature.properties.hasOwnProperty(_this.label)) {
-                            // The property is available. I use the '+' to convert the string value to a number. 
-                            var prop = feature.properties[_this.label];
-                            if ($.isNumeric(prop))
-                                _this.propValues.push(prop);
-                        }
-                    });
-                }
-                var max = this.maxValue, min = this.minValue;
-                if (this.isPlaScaled || this.requiresMaximum()) {
-                    max = max || Math.max.apply(null, this.propValues);
-                    scores.replace('max', max.toPrecision(3));
-                }
-                if (this.isPlaScaled || this.requiresMinimum()) {
-                    min = min || Math.min.apply(null, this.propValues);
-                    scores.replace('min', min.toPrecision(3));
-                }
-                if (this.isPlaScaled) {
-                    var stats = csComp.Helpers.standardDeviation(this.propValues);
-                    max = max || Math.min(max, stats.avg + 2 * stats.stdDev);
-                    min = min || Math.max(min, stats.avg - 2 * stats.stdDev);
-                }
-                // Regex to split the scores: [^\d\.]+ and remove empty entries
-                var pla = scores.split(/[^\d\.]+/).filter(function (item) { return item.length > 0; });
-                // Test that we have an equal number of x and y, 
-                var range = max - min, a, b;
-                if (this.minValue != null || this.maxValue != null) {
-                    a = range / 10;
-                    b = min;
-                }
-                else {
-                    a = 0.08 * range, b = min + 0.1 * range;
-                }
-                if (pla.length % 2 !== 0)
-                    throw Error(this.label + ' does not have an even (x,y) pair in scores.');
-                for (var i = 0; i < pla.length / 2; i++) {
-                    var x = parseFloat(pla[2 * i]);
-                    if (this.isPlaScaled) {
-                        // Scale x, i.e. x'=ax+b with x'(0)=min+0.1r and x'(10)=max-0.1r, r=max-min
-                        // min+0.1r=b
-                        // max-0.1r=10a+b=10a+min+0.1r <=> max-min-0.2r=10a <=> 0.8r=10a <=> a=0.08r
-                        x = a * x + b;
-                    }
-                    if (i > 0 && this.x[i - 1] > x)
-                        throw Error(this.label + ': x should increment continuously.');
-                    this.x.push(x);
-                    // Test that y in [0, 1].
-                    var y = parseFloat(pla[2 * i + 1]);
-                    if (y < 0)
-                        y = 0;
-                    else if (y > 1)
-                        y = 1;
-                    this.y.push(y);
-                }
-                this.isPlaUpdated = true;
-            };
-            Criterion.prototype.getScore = function (feature) {
-                if (!this.isPlaUpdated)
-                    throw ('Error: PLA must be updated for criterion ' + this.title + '!');
-                if (this.criteria.length === 0) {
-                    // End point: compute the score for each feature
-                    if (feature.properties.hasOwnProperty(this.label)) {
-                        // The property is available
-                        var x = feature.properties[this.label];
-                        if (this.maxCutoffValue <= x || x <= this.minCutoffValue)
-                            return 0;
-                        if (x < this.x[0])
-                            return this.y[0];
-                        var last = this.x.length - 1;
-                        if (x > this.x[last])
-                            return this.y[last];
-                        for (var k = 0; k < this.x.length; k++) {
-                            if (x < this.x[k]) {
-                                // Found relative position of x in this.x
-                                var x0 = this.x[k - 1];
-                                var x1 = this.x[k];
-                                var y0 = this.y[k - 1];
-                                var y1 = this.y[k];
-                                // Use linear interpolation
-                                return (y1 - y0) * (x - x0) / (x1 - x0);
-                            }
-                        }
-                    }
-                    else {
-                        return 0;
-                    }
-                }
-                else {
-                    // Sum all the sub-criteria.
-                    var finalScore = 0;
-                    this.criteria.forEach(function (crit) {
-                        finalScore += crit.weight > 0 ? crit.weight * crit.getScore(feature) : Math.abs(crit.weight) * (1 - crit.getScore(feature));
-                    });
-                    return this.weight > 0 ? this.weight * finalScore : Math.abs(this.weight) * (1 - finalScore);
-                }
-                return 0;
-            };
-            return Criterion;
-        })();
-        Models.Criterion = Criterion;
-        // NOTE: When extending a base class, make sure that the base class has been defined already.
-        var Mca = (function (_super) {
-            __extends(Mca, _super);
-            function Mca() {
-                _super.call(this);
-                /** Maximum number of star ratings to use to set the weight */
-                this.userWeightMax = 5;
-                /** Applicable feature ids as a string[]. */
-                this.featureIds = [];
-                this.weight = 1;
-                this.isPlaUpdated = false;
-            }
-            Object.defineProperty(Mca.prototype, "rankLabel", {
-                get: function () {
-                    return this.label + '#';
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Mca.prototype.deserialize = function (input) {
-                this.section = input.section;
-                this.stringFormat = input.stringFormat;
-                this.rankTitle = input.rankTitle;
-                this.rankDescription = input.rankDescription;
-                this.rankFormat = input.rankFormat;
-                this.userWeightMax = input.userWeightMax;
-                this.featureIds = input.featureIds;
-                this.minCutoffValue = input.minCutoffValue;
-                this.maxCutoffValue = input.maxCutoffValue;
-                this.minValue = input.minValue;
-                this.maxValue = input.maxValue;
-                this.scaleMinValue = input.scaleMinValue;
-                this.scaleMaxValue = input.scaleMaxValue;
-                _super.prototype.deserialize.call(this, input);
-                return this;
-            };
-            /**
-            * Update the MCA by calculating the weights and setting the colors.
-            */
-            Mca.prototype.update = function () {
-                this.calculateWeights();
-                this.setColors();
-            };
-            Mca.prototype.calculateWeights = function (criteria) {
-                if (!criteria)
-                    criteria = this.criteria;
-                var totalWeight = 0;
-                for (var k in criteria) {
-                    if (!criteria.hasOwnProperty(k))
-                        continue;
-                    var crit = criteria[k];
-                    if (crit.criteria.length > 0)
-                        this.calculateWeights(crit.criteria);
-                    totalWeight += Math.abs(crit.userWeight);
-                }
-                if (totalWeight > 0) {
-                    for (var j in criteria) {
-                        if (!criteria.hasOwnProperty(j))
-                            continue;
-                        var critj = criteria[j];
-                        critj.weight = critj.userWeight / totalWeight;
-                    }
-                }
-            };
-            /** Set the colors of all criteria and sub-criteria */
-            Mca.prototype.setColors = function () {
-                var redColors = chroma.scale('RdYlBu').domain([0, this.criteria.length - 1], this.criteria.length);
-                var totalSubcrit = 0;
-                var i = 0;
-                this.criteria.forEach(function (c) {
-                    totalSubcrit += c.criteria.length;
-                    if (!c.color)
-                        c.color = redColors(i++).hex();
-                });
-                var blueColors = chroma.scale('PRGn').domain([0, totalSubcrit - 1], totalSubcrit);
-                i = 0;
-                this.criteria.forEach(function (c) {
-                    c.criteria.forEach(function (crit) {
-                        if (!crit.color)
-                            crit.color = blueColors(i++).hex();
-                    });
-                });
-            };
-            return Mca;
-        })(Criterion);
-        Models.Mca = Mca;
-    })(Models = _Mca.Models || (_Mca.Models = {}));
-})(Mca || (Mca = {}));
-var ShowModal;
-(function (ShowModal) {
-    /**
-    * Config
-    */
-    var moduleName = 'csWeb.showModal';
-    /**
-      * Module
-      */
-    ShowModal.myModule;
-    try {
-        ShowModal.myModule = angular.module(moduleName);
-    }
-    catch (err) {
-        // named module does not exist, so create one
-        ShowModal.myModule = angular.module(moduleName, []);
-    }
-    /**
-      * Directive to show a modal dialog, whose html is specified inside the main HTML code.
-      * Typical usage: http://plnkr.co/edit/WJBp7A6M3RB1MLERDXSS?p=info
-      * angular.module('myWebApp', ['csWeb.showModal'])
-      */
-    ShowModal.myModule.directive('showModal', [
-        '$parse',
-        function ($parse) {
-            return {
-                restrict: "A",
-                link: function (scope, element, attrs) {
-                    //Hide or show the modal
-                    scope.showModalDialog = function (visible, elem) {
-                        if (!elem)
-                            elem = element;
-                        var myElem = $(elem);
-                        if (visible)
-                            myElem.appendTo('body').modal("show");
-                        else
-                            myElem.modal("hide");
-                    };
-                    //Watch for changes to the modal-visible attribute
-                    scope.$watch(attrs.showModal, function (newValue, oldValue) {
-                        scope.showModalDialog(newValue, attrs.$$element);
-                    });
-                    //Update the visible value when the dialog is closed through UI actions (Ok, cancel, etc.)
-                    $(element).bind("hide.bs.modal", function () {
-                        $parse(attrs.showModal).assign(scope, false);
-                        if (!scope.$$phase && !scope.$root.$$phase)
-                            scope.$apply();
-                    });
-                }
-            };
-        }
-    ]);
-})(ShowModal || (ShowModal = {}));
-var LayersDirective;
-(function (LayersDirective) {
-    LayersDirective.html = '<div>    <h4 class="leftpanel-header" translate="LAYERS"></h4>    <div style="overflow-y: auto; overflow-x: hidden; margin-top: -10px" resize resize-y="95">        <div data-ng-repeat="group in vm.$layerService.project.groups" style="margin-left: 5px">            <div style="float: left; margin-left: -5px; margin-top: 5px"                  data-toggle="collapse"                  data-target="#layergroup_{{group.id}}">                <i class="fa fa-chevron-down togglebutton toggle-arrow-down"></i>                <i class="fa fa-chevron-up togglebutton toggle-arrow-up"></i>            </div>            <div popover="{{(group.description) ? group.description : \'\'}}"                 popover-placement="right"                 popover-width="400"                 popover-trigger="mouseenter"                 class="group-title">{{group.title}}</div>            <div id="layergroup_{{group.id}}" class="collapse in">                <div popover="{{(layer.description) ? layer.description : \'\'}}"                     popover-placement="right"                     popover-trigger="mouseenter"                     data-ng-repeat="layer in group.layers">                    <!--bs-popover>-->                    <div style="list-style-type: none; padding: 0;" data-ng-class="{indent: layer.isSublayer}">                        <!--<button type="button" class="btn btn-default" data-container="body" data-toggle="popover" data-placement="right" data-content="Vivamus sagittis lacus vel augue laoreet rutrum faucibus." data-original-title="" title="">Right</button>-->                        <div ng-hide="group.oneLayerActive" class="checkbox checkbox-primary" style="margin-left: 20px">                            <input type="checkbox" id="cblayer{{layer.id}}"                                   data-ng-model="layer.enabled"                                    data-ng-click="vm.toggleLayer(layer);">                            <label for="cblayer{{layer.id}}">                                {{layer.title}}                            </label>                            <div ng-show="layer.isLoading" class="spinner">                                <div class="bounce1"></div>                                <div class="bounce2"></div>                                <div class="bounce3"></div>                            </div>                        </div>                        <div ng-show="group.oneLayerActive" class="radio radio-primary" style="margin-left: 20px">                            <input type="radio" id="rblayer{{layer.id}}"                                   data-ng-value="true"                                    data-ng-model="layer.enabled"                                    data-ng-click="vm.toggleLayer(layer);">                            <label for="rblayer{{layer.id}}">                                {{layer.title}}                            </label>                            <div ng-show="layer.isLoading" class="spinner">                                <div class="bounce1"></div>                                <div class="bounce2"></div>                                <div class="bounce3"></div>                            </div>                        </div>                    </div>                </div>            </div>        </div>    </div></div>';
-})(LayersDirective || (LayersDirective = {}));
-var LayersDirective;
-(function (LayersDirective) {
-    /**
-      * Config
-      */
-    var moduleName = 'csWeb.layersDirective';
-    /**
-      * Module
-      */
-    LayersDirective.myModule;
-    try {
-        LayersDirective.myModule = angular.module(moduleName);
-    }
-    catch (err) {
-        // named module does not exist, so create one
-        LayersDirective.myModule = angular.module(moduleName, []);
-    }
-    /**
-      * Directive to display the available map layers.
-      */
-    LayersDirective.myModule.directive('layersDirective', [
-        '$compile',
-        function ($compile) {
-            return {
-                terminal: true,
-                restrict: 'E',
-                scope: {},
-                template: LayersDirective.html,
-                compile: function (el) {
-                    var fn = $compile(el);
-                    return function (scope) {
-                        fn(scope);
-                    };
-                },
-                replace: true,
-                transclude: true,
-                controller: LayersDirective.LayersDirectiveCtrl
-            };
-        }
-    ]).directive('bsPopover', function () {
-        return function (scope, element, attrs) {
-            element.find("a[rel=popover]").popover({ placement: 'right', html: 'true' });
-        };
-    });
-})(LayersDirective || (LayersDirective = {}));
-var LayersDirective;
-(function (LayersDirective) {
-    var LayersDirectiveCtrl = (function () {
-        // dependencies are injected via AngularJS $injector
-        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
-        function LayersDirectiveCtrl($scope, $layerService) {
-            this.$scope = $scope;
-            this.$layerService = $layerService;
-            $scope.vm = this;
-        }
-        LayersDirectiveCtrl.prototype.toggleLayer = function (layer) {
-            //Uncommented after updating the bower packages: the behaviour changed between angular versions.
-            // layer.enabled = !layer.enabled;
-            // Unselect when dealing with a radio group, so you can turn a loaded layer off again.
-            if (layer.group.oneLayerActive && this.$layerService.findLayer(layer.id))
-                layer.enabled = false;
-            if (layer.enabled) {
-                this.$layerService.addLayer(layer);
-            }
-            else {
-                this.$layerService.removeLayer(layer);
-            }
-            // NOTE EV: You need to call apply only when an event is received outside the angular scope.
-            // However, make sure you are not calling this inside an angular apply cycle, as it will generate an error.
-            if (this.$scope.$root.$$phase != '$apply' && this.$scope.$root.$$phase != '$digest') {
-                this.$scope.$apply();
-            }
-        };
-        // $inject annotation.
-        // It provides $injector with information about dependencies to be injected into constructor
-        // it is better to have it close to the constructor, because the parameters must match in count and type.
-        // See http://docs.angularjs.org/guide/di
-        LayersDirectiveCtrl.$inject = [
-            '$scope',
-            'layerService'
-        ];
-        return LayersDirectiveCtrl;
-    })();
-    LayersDirective.LayersDirectiveCtrl = LayersDirectiveCtrl;
-})(LayersDirective || (LayersDirective = {}));
-var csComp;
-(function (csComp) {
-    var StringExt;
-    (function (StringExt) {
-        function isNullOrEmpty(s) {
-            return !s;
-        }
-        StringExt.isNullOrEmpty = isNullOrEmpty;
-        /**
-         * String formatting
-         * 'Added {0} by {1} to your collection'.f(title, artist)
-         * 'Your balance is {0} USD'.f(77.7)
-         */
-        function format(s) {
-            var args = [];
-            for (var _i = 1; _i < arguments.length; _i++) {
-                args[_i - 1] = arguments[_i];
-            }
-            var i = args.length;
-            while (i--) {
-                // "gm" = RegEx options for Global search (more than one instance) and for Multiline search
-                s = s.replace(new RegExp('\\{' + i + '\\}', 'gm'), args[i]);
-            }
-            return s;
-        }
-        StringExt.format = format;
-        ;
-        /*
-         * Returns true if we are dealing with a number, false otherwise.
-         */
-        function isNumber(n) {
-            return !isNaN(parseFloat(n)) && isFinite(n);
-        }
-        StringExt.isNumber = isNumber;
-        /*
-         * Returns true if we are dealing with a boolean, false otherwise.
-         */
-        function isBoolean(s) {
-            return s === 'true' || s === 'false';
-        }
-        StringExt.isBoolean = isBoolean;
-        /*
-         * Returns true if we are dealing with a bbcode, false otherwise.
-         */
-        function isBbcode(s) {
-            return false;
-            if (s == null)
-                return false;
-            return s.indexOf("[b]") > 0 || s.indexOf("[i]") > 0 || s.indexOf("[url") > 0;
-        }
-        StringExt.isBbcode = isBbcode;
-    })(StringExt = csComp.StringExt || (csComp.StringExt = {}));
-})(csComp || (csComp = {}));
 var csComp;
 (function (csComp) {
     var Services;
@@ -5321,6 +6759,7 @@ var csComp;
             LayerService.prototype.addLayer = function (layer) {
                 var _this = this;
                 var disableLayers = [];
+                layer.enabled = true;
                 switch (layer.type.toLowerCase()) {
                     case 'wms':
                         var wms = L.tileLayer.wms(layer.url, {
@@ -5433,6 +6872,7 @@ var csComp;
                                         if (data.timestamps)
                                             layer.timestamps = data.timestamps;
                                         if (layer.group.clustering) {
+                                            layer.count = 0;
                                             var markers = L.geoJson(data, {
                                                 pointToLayer: function (feature, latlng) { return _this.addFeature(feature, latlng, layer); },
                                                 onEachFeature: function (feature, lay) {
@@ -5493,6 +6933,28 @@ var csComp;
                                 });
                             }
                         ]);
+                }
+            };
+            /**
+             * Find a feature by layerId and FeatureId.
+             * @layerId {string}
+             * @featureIndex {number}
+             */
+            LayerService.prototype.findFeatureById = function (layerId, featureIndex) {
+                for (var i = 0; i < this.project.features.length; i++) {
+                    var feature = this.project.features[i];
+                    if (featureIndex === feature.index && layerId === feature.layerId)
+                        return feature;
+                }
+            };
+            /**
+             * Find the feature by name.
+             */
+            LayerService.prototype.findFeatureByName = function (name) {
+                for (var i = 0; i < this.project.features.length; i++) {
+                    var feature = this.project.features[i];
+                    if (feature.hasOwnProperty("Name") && name === feature.properties["Name"])
+                        return feature;
                 }
             };
             /**
@@ -5731,6 +7193,7 @@ var csComp;
             LayerService.prototype.initFeature = function (feature, layer) {
                 //if (!feature.isInitialized)
                 feature.isInitialized = true;
+                feature.index = layer.count++;
                 if (feature.id == null)
                     feature.id = csComp.Helpers.getGuid();
                 feature.layerId = layer.id;
@@ -5833,7 +7296,7 @@ var csComp;
                             var v = feature.properties[gs.property];
                             switch (gs.visualAspect) {
                                 case 'fillColor':
-                                    if (gs.meta.type === 'color') {
+                                    if (typeof gs.meta !== 'undefined' && gs.meta.type === 'color') {
                                         props['background-color'] = v;
                                     }
                                     else {
@@ -5887,7 +7350,7 @@ var csComp;
                 }
             };
             /**
-             * add a feature
+             * Add a feature.
              */
             LayerService.prototype.addFeature = function (feature, latlng, layer) {
                 var _this = this;
@@ -5912,6 +7375,9 @@ var csComp;
                 layer.group.markers[feature.id] = marker;
                 return marker;
             };
+            /**
+             * Select or deselect a feature and zoom to it on the map.
+             */
             LayerService.prototype.selectFeature = function (feature) {
                 feature.isSelected = !feature.isSelected;
                 this.updateFeature(feature);
@@ -5947,7 +7413,7 @@ var csComp;
             LayerService.prototype.findLayer = function (id) {
                 if (this.loadedLayers.containsKey(id))
                     return this.loadedLayers[id];
-                return null;
+                //return null;
                 //var r: ProjectLayer;
                 //this.project.groups.forEach(g => {
                 //    g.layers.forEach(l => {
@@ -6816,95 +8282,6 @@ var csComp;
         Services.LayerService = LayerService;
     })(Services = csComp.Services || (csComp.Services = {}));
 })(csComp || (csComp = {}));
-var BaseMapList;
-(function (BaseMapList) {
-    BaseMapList.html = '<div>    <h4 class="leftpanel-header" translate="MAP"></h4>    <div data-ng-repeat="(key, value) in vm.$mapService.baseLayers" style="clear:left;">        <div ng-click="vm.selectBaseLayer(key);" class="select-basestyle">            <img data-ng-src="{{value.options.preview}}" class="preview-base-layer" style="margin-bottom:5px" />            <div style="margin:3px;float:left">                <span style="font-size: 18px;font-weight: bold;">{{key}}</span><br />                {{value.options.subtitle}}            </div>        </div>    </div></div>';
-})(BaseMapList || (BaseMapList = {}));
-var BaseMapList;
-(function (BaseMapList) {
-    /**
-      * Config
-      */
-    var moduleName = 'csWeb.baseMapList';
-    /**
-      * Module
-      */
-    BaseMapList.myModule;
-    try {
-        BaseMapList.myModule = angular.module(moduleName);
-    }
-    catch (err) {
-        // named module does not exist, so create one
-        BaseMapList.myModule = angular.module(moduleName, []);
-    }
-    /**
-      * Directive to display the available map layers.
-      */
-    BaseMapList.myModule.directive('baseMapList', [
-        '$window',
-        '$compile',
-        function ($window, $compile) {
-            return {
-                terminal: false,
-                restrict: 'E',
-                scope: {},
-                template: BaseMapList.html,
-                //compile : el          => {    // I need to explicitly compile it in order to use interpolation like {{xxx}}
-                //    var fn                        = $compile(el);
-                //    return scope                  => { 
-                //        fn(scope);
-                //    };
-                //},
-                link: function (scope, element, attrs) {
-                    // Deal with resizing the element list
-                    scope.onResizeFunction = function () {
-                        var filterHeight = 50;
-                        var paginationCtrlHeight = 100;
-                        var itemHeight = 60;
-                        //scope.windowHeight          = $window.innerHeight;
-                        //scope.windowWidth           = $window.innerWidth;
-                        scope.numberOfItems = Math.floor(($window.innerHeight - filterHeight - paginationCtrlHeight) / itemHeight);
-                    };
-                    // Call to the function when the page is first loaded
-                    scope.onResizeFunction();
-                    angular.element($window).bind('resize', function () {
-                        scope.onResizeFunction();
-                        scope.$apply();
-                    });
-                },
-                replace: true,
-                transclude: true,
-                controller: BaseMapList.BaseMapListCtrl
-            };
-        }
-    ]);
-})(BaseMapList || (BaseMapList = {}));
-var BaseMapList;
-(function (BaseMapList) {
-    var BaseMapListCtrl = (function () {
-        // dependencies are injected via AngularJS $injector
-        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
-        function BaseMapListCtrl($scope, $mapService) {
-            this.$scope = $scope;
-            this.$mapService = $mapService;
-            $scope.vm = this;
-        }
-        BaseMapListCtrl.prototype.selectBaseLayer = function (key) {
-            var bl = this.$mapService.baseLayers[key];
-            this.$mapService.changeBaseLayer(bl);
-        };
-        // $inject annotation.
-        // It provides $injector with information about dependencies to be injected into constructor
-        // it is better to have it close to the constructor, because the parameters must match in count and type.
-        // See http://docs.angularjs.org/guide/di
-        BaseMapListCtrl.$inject = [
-            '$scope',
-            'mapService'
-        ];
-        return BaseMapListCtrl;
-    })();
-    BaseMapList.BaseMapListCtrl = BaseMapListCtrl;
-})(BaseMapList || (BaseMapList = {}));
 var csComp;
 (function (csComp) {
     var Services;
@@ -7151,95 +8528,6 @@ var csComp;
         Services.MapService = MapService;
     })(Services = csComp.Services || (csComp.Services = {}));
 })(csComp || (csComp = {}));
-var StyleList;
-(function (StyleList) {
-    StyleList.html = '<div>    <h4 class="leftpanel-header" translate="STYLES"></h4>    <div ng-show="vm.$layerService.noStyles" translate="STYLE_INFO"></div>    <div data-ng-repeat="group in vm.$layerService.project.groups" style="margin-left: 5px">        <div ng-show="group.styles.length">            <div style="float:left;margin-left: -10px; margin-top: 5px" data-toggle="collapse" data-target="#stylegroup_{{group.id}}"><i class="fa fa-chevron-down togglebutton toggle-arrow-down"></i><i class="fa fa-chevron-up togglebutton toggle-arrow-up"></i></div>            <div class="group-title">{{group.title}}</div>            <div id="stylegroup_{{group.id}}" class="collapse in">                <div data-ng-repeat="style in group.styles">                    <div class="checkbox checkbox-primary" style="margin-left:20px;float:left">                        <input type="checkbox" id="cbstyle{{style.id}}" ng-model="style.enabled" data-ng-change="vm.$layerService.updateStyle(style);">                        <label class="style-title" for="cbstyle{{style.id}}" style="width:175px">{{style.title}}</label>                    </div>                    <div style="float:right;margin-top:10px; width: 50px">                        <div data-ng-show="style.canSelectColor" style="float:left">                            <div class="dropdown">                                <div class="style-settings" data-toggle="dropdown">                                    <style>                                                                             </style>                                    <!--<img src="includes/images/fillcolor.png" style="width: 32px; height:32px" />-->                                    <div id="colors" style="border-radius: 50%;width: 20px;height:20px;border-style:solid;border-color: black;border-width: 1px;background: linear-gradient(to right, {{style.colors[0]}} , {{style.colors[1]}})">                                                                        </div>                                    <b class="caret"></b>                                </div>                                <!--<a class="btn btn-primary btn-sm" ng-model="style.visualAspect"  style="padding-left: 10px" href="#"> {{ style.visualAspect }} </a>-->                                <ul class="dropdown-menu" role="menu">                                    <li ng-repeat="(key,val) in style.colorScales" style="margin:3px;cursor: pointer">                                        <span ng-click="$parent.style.colors = val;vm.$layerService.updateStyle($parent.style)"> {{key}} </span>                                    </li>                                </ul>                            </div>                        </div>                        <div style="float:right">                            <div class="dropdown">                                <div class="style-settings" data-toggle="dropdown">                                    <!--<img src="includes/images/fillcolor.png" style="width: 32px; height:32px" />-->                                    <div class="style-aspect style-{{style.visualAspect}}"></div><b class="caret"></b>                                </div>                                <!--<a class="btn btn-primary btn-sm" ng-model="style.visualAspect"  style="padding-left: 10px" href="#"> {{ style.visualAspect }} </a>-->                                <ul class="dropdown-menu" role="menu">                                    <li ng-repeat="title in style.availableAspects" style="margin:3px;cursor: pointer">                                        <i class="style-aspect style-{{title}}" style="float:left" /><span ng-click="$parent.style.visualAspect = title;vm.$layerService.updateStyle($parent.style)"><img class="fa fa-search" style="margin-right: 8px" /> {{title}} </span>                                    </li>                                    <li class="divider"></li>                                    <li style="margin:3px;cursor: pointer"><i class="fa fa-remove" style="margin-right: 8px" style=" float:left" /><span ng-click="vm.$layerService.removeStyle(style)">Verwijder</span></li>                                </ul>                            </div>                        </div>                    </div>                </div>                <!--<div style="right:5px; position:absolute; margin-top: -15px"><a href="#" id="stylepop{{style.id}}" rel="popover" popover-template="template.html"><img src="includes/images/settings.png" width="20px"></a></div>-->            </div>        </div>    </div></div>';
-})(StyleList || (StyleList = {}));
-var StyleList;
-(function (StyleList) {
-    /**
-      * Config
-      */
-    var moduleName = 'csWeb.styleList';
-    /**
-      * Module
-      */
-    StyleList.myModule;
-    try {
-        StyleList.myModule = angular.module(moduleName);
-    }
-    catch (err) {
-        // named module does not exist, so create one
-        StyleList.myModule = angular.module(moduleName, []);
-    }
-    /**
-      * Directive to display the available map layers.
-      */
-    StyleList.myModule.directive('styleList', [
-        '$window',
-        '$compile',
-        function ($window, $compile) {
-            return {
-                terminal: false,
-                restrict: 'E',
-                scope: {},
-                template: StyleList.html,
-                //compile             : el          => {    // I need to explicitly compile it in order to use interpolation like {{xxx}}
-                //    var fn                        = $compile(el);
-                //    return scope                  => { 
-                //        fn(scope);
-                //    };
-                //},
-                link: function (scope, element, attrs) {
-                    // Deal with resizing the element list
-                    scope.onResizeFunction = function () {
-                        var filterHeight = 50;
-                        var paginationCtrlHeight = 100;
-                        var itemHeight = 60;
-                        //scope.windowHeight          = $window.innerHeight;
-                        //scope.windowWidth           = $window.innerWidth;
-                        scope.numberOfItems = Math.floor(($window.innerHeight - filterHeight - paginationCtrlHeight) / itemHeight);
-                    };
-                    // Call to the function when the page is first loaded
-                    scope.onResizeFunction();
-                    angular.element($window).bind('resize', function () {
-                        scope.onResizeFunction();
-                        scope.$apply();
-                    });
-                },
-                replace: true,
-                transclude: true,
-                controller: StyleList.StyleListCtrl
-            };
-        }
-    ]).directive('bsPopover', function () {
-        return function (scope, element, attrs) {
-            element.find("a[rel=popover]").popover({ placement: 'right', html: 'true' });
-        };
-    });
-})(StyleList || (StyleList = {}));
-var StyleList;
-(function (StyleList) {
-    var StyleListCtrl = (function () {
-        // dependencies are injected via AngularJS $injector
-        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
-        function StyleListCtrl($scope, $layerService) {
-            this.$scope = $scope;
-            this.$layerService = $layerService;
-            $scope.vm = this;
-        }
-        // $inject annotation.                                                   
-        // It provides $injector with information about dependencies to be in  jected into constructor
-        // it is better to have it close to the constructor, because the parameters must match in count and type.
-        // See http://docs.angularjs.org/guide/di
-        StyleListCtrl.$inject = [
-            '$scope',
-            'layerService'
-        ];
-        return StyleListCtrl;
-    })();
-    StyleList.StyleListCtrl = StyleListCtrl;
-})(StyleList || (StyleList = {}));
 var csComp;
 (function (csComp) {
     var Search;
@@ -7274,800 +8562,6 @@ var csComp;
         Search.SearchFormCtrl = SearchFormCtrl;
     })(Search = csComp.Search || (csComp.Search = {}));
 })(csComp || (csComp = {}));
-var FeatureProps;
-(function (FeatureProps) {
-    FeatureProps.html = '<div data-ng-cloak data-ng-show="showMenu" >    <h4 class="rightpanel-header">        <img data-ng-if="callOut.icon" data-ng-src="{{callOut.icon}}" width="24" height="24" style="margin-left:5px" alt="Icon" />        &nbsp;&nbsp;{{callOut.title}}    </h4>        <div class="container-fluid rightpanel-tabs" style="position: relative">        <div class="row" style="overflow:hidden" ng-if="callOut.sectionCount() < 4">            <!-- Nav tabs -->            <span id="leftArr" style="display:block;padding:10px;margin-top:5px;position:absolute;background-color:transparent;z-index:2">                <i class="glyphicon glyphicon-chevron-left"></i>            </span>            <span id="rightArr" style="display:block;padding:10px;margin-top:5px;position:absolute;background-color:transparent;z-index:2">                <i class="glyphicon glyphicon-chevron-right"></i>            </span>            <ul class="nav nav-tabs" id="featureTabs" style="margin-left:10px">                <li data-toggle="tab" data-ng-class="{active : $first}" data-ng-repeat="(sectionTitle, section) in callOut.sections" ng-if="section.hasProperties()">                    <a ng-href="#rp-{{$index}}" data-toggle="tab" data-ng-if="section.showSectionIcon()" ng-click="featureTabActivated(sectionTitle, section)"><i class="fa {{section.sectionIcon}}"></i></a>                    <a ng-href="#rp-{{$index}}" data-toggle="tab" data-ng-if="!section.showSectionIcon()" ng-click="featureTabActivated(sectionTitle, section)">{{sectionTitle}}</a>                </li>            </ul>        </div>                <div class="row" ng-if="callOut.sectionCount() >= 4">            <ul class="nav nav-tabs" id="featureTabs" style="margin-left:10px">                <li data-toggle="tab" class="active" ng-init="firstCallOutsection=callOut.firstSection()">                    <a ng-href="#rp-0" data-toggle="tab" data-ng-if="firstCallOutsection.showSectionIcon()" >                        <i class="fa {{firstCallOutsection.sectionIcon}}"></i>                    </a>                                    </li>                <li class="dropdown" ng-init="selectedSection.title=\'...\'">                    <a style="cursor:pointer" data-toggle="dropdown">{{selectedSection.title}} <span class="caret"></span></a>                    <ul class="dropdown-menu">                        <li data-ng-repeat="(sectionTitle, section) in callOut.sections" ng-if="!$last">                            <a ng-href="#rp-{{$index}}"                               ng-click="selectedSection.title = sectionTitle"                               data-toggle="tab">{{sectionTitle}}</a>                        </li>                    </ul>                </li>                <li data-toggle="tab" ng-init="lastCallOutsection=callOut.lastSection()">                    <a ng-href="#rp-{{callOut.sectionCount()-1}}" data-toggle="tab"                        data-ng-if="lastCallOutsection.showSectionIcon()">                        <i class="fa {{lastCallOutsection.sectionIcon}}"></i>                    </a>                                    </li>            </ul>        </div>    </div>        <div class="tab-content" style="top:50px; width:355px; overflow-y: auto; overflow-x: hidden" resize resize-y="150">        <div data-ng-if="!$last" class="tab-pane" data-ng-class="{active : $first}"              id="rp-{{$index}}"              data-ng-repeat="(sectionTitle, section) in callOut.sections">            <!--<td>                    <span class="dropdown">                        <a href class="fa fa-circle-o makeNarrow dropdown-toggle"></a>                        <ul class="dropdown-menu">                            <li><a data-ng-click="vm.$layerService.createScatter(item)">scatter plot</a></li>                            <li><a>add to dashboard</a></li>                        </ul>                    </span>                </td>-->            <div class="panel-group" id="accordion">                <div class="panel panel-default"                     popover="{{(item.description) ? item.description : \'\'}}"                     popover-placement="left"                     popover-trigger="mouseenter"                     popover-append-to-body="true"                     data-ng-repeat="item in section.properties">                    <div class="panel-heading" style="min-height: 36px">                        <div class="pull-left accordionIcon"><a class="fa fa-filter makeNarrow" data-ng-show="item.canFilter" data-ng-click="vm.$layerService.setPropertyFilter(item)" style="cursor: pointer"></a></div>                        <div class="pull-left accordionIcon"><a class="fa fa-eye makeNarrow" data-ng-show="item.canStyle" data-ng-click="vm.$layerService.setStyle(item)" style="cursor: pointer"></a></div>                        <div class="pull-left accordionIcon" data-ng-if="item.isSensor">                            <a class="fa fa-line-chart makeNarrow"                               data-toggle="collapse"                               data-target="#sensor{{item.property}}"                               href="#sensor{{item.property}}"                               style="cursor: pointer"></a>                        </div>                        <div class="pull-left" style="margin-left: 4px;">                            {{item.key}}                        </div>                        <div class="text-right" data-ng-bind-html="vm.toTrusted(item.value)"></div>                        <div id="sensor{{item.property}}"                             data-ng-if="item.isSensor"                             class="panel-collapse collapse" style="padding-top: 10px;">                            <sparkline-chart timestamps="item.timestamps" sensor="item.sensor" width="320" height="90" showaxis="true"></sparkline-chart>                            <!--<div class="panel-body">            <sparkline-chart timestamps="item.timestamps" sensor="item.sensor" width="320" height="90" showaxis="true"></sparkline-chart>        </div>-->                        </div>                    </div>                </div>            </div>        </div>        <!-- Treat last tab (filter) differently -->        <div data-ng-if="$last" class="tab-pane" data-ng-class="{active : $first}" id="rp-{{$index}}" data-ng-repeat="(sectionTitle, section) in callOut.sections">            <!-- Add filter panel to the last rendered element -->            <div class="has-feedback" style="padding:0 4px 4px 4px;">                <span style="direction: ltr; position: static; display: block;">                    <input id="searchbox" data-ng-model="search.key" type="text"                           placeholder="Filter" autocomplete="off" spellcheck="false"                           style="position: relative; vertical-align: top;" class="form-control tt-input">                </span>                <span id="searchicon" class="fa form-control-feedback fa-filter"></span>            </div>            <div class="panel-group" id="accordion">                <div class="panel panel-default"                     popover="{{(item.description) ? item.description : \'\'}}"                     popover-placement="left"                     popover-trigger="mouseenter"                     popover-append-to-body="true"                     data-ng-repeat="item in section.properties">                    <div class="panel-heading" style="min-height: 36px">                        <div class="pull-left accordionIcon"><a class="fa fa-filter makeNarrow" data-ng-show="item.canFilter" data-ng-click="vm.$layerService.setPropertyFilter(item)" style="cursor: pointer"></a></div>                        <div class="pull-left accordionIcon"><a class="fa fa-eye makeNarrow" data-ng-show="item.canStyle" data-ng-click="vm.$layerService.setStyle(item)" style="cursor: pointer"></a></div>                        <div class="pull-left accordionIcon" data-ng-if="item.isSensor">                            <a class="fa fa-line-chart makeNarrow"                               data-toggle="collapse"                               data-target="#fsensor{{item.property}}"                               href="#fsensor{{item.property}}"                               style="cursor: pointer"></a>                        </div>                        <div class="pull-left" style="margin-left: 4px;">                            {{item.key}}                        </div>                        <div class="text-right" data-ng-bind-html="vm.toTrusted(item.value)"></div>                        <div id="fsensor{{item.property}}"                             data-ng-if="item.isSensor"                             class="panel-collapse collapse">                            <div class="panel-body">Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt accusamus labore sustainable VHS.</div>                        </div>                    </div>                </div>            </div>            <!--<input style="padding:4px;" class=" form-control" data-ng-model="search" placeholder="...">-->            <!--<table id="searchTextResults" class="table table-condensed">                <tr popover="{{(item.description) ? item.description : \'\'}}"                    popover-placement="left"                    popover-trigger="mouseenter"                    popover-append-to-body="true"                    data-ng-repeat="item in section.properties | filter:search">                    <td><a class="fa fa-filter makeNarrow" data-ng-show="item.canFilter" data-ng-click="vm.$layerService.setFilter(item)"></a></td>                    <td><a class="fa fa-eye makeNarrow" data-ng-show="item.canStyle" data-ng-click="vm.$layerService.setStyle(item)"></a></td>                    <td>{{item.key}}</td>                    <td class="text-right" data-ng-bind-html="vm.toTrusted(item.value)"></td>                </tr>            </table>-->        </div>                <!--SimpleTimeline component-->        <div data-ng-if="vm.showSimpleTimeline" style="margin-left: 10px">            <div class="btn-group" dropdown is-open="status.isopen">                <button type="button" class="btn btn-primary dropdown-toggle" dropdown-toggle ng-disabled="disabled">                    {{vm.focusTime}} <span class="caret"></span>                </button>                <ul class="dropdown-menu" role="menu">                    <li data-ng-repeat="ts in vm.timestamps"                         data-ng-click="vm.setTime(ts)">{{ts.title}}</li>                </ul>            </div>        </div>    </div></div>';
-})(FeatureProps || (FeatureProps = {}));
-var FeatureProps;
-(function (FeatureProps) {
-    /**
-      * Config
-      */
-    var moduleName = 'csWeb.featureprops';
-    /**
-      * Module
-      */
-    FeatureProps.myModule;
-    try {
-        FeatureProps.myModule = angular.module(moduleName);
-    }
-    catch (err) {
-        // named module does not exist, so create one                                             
-        FeatureProps.myModule = angular.module(moduleName, []);
-    }
-    /**
-      * Directive to display a feature's properties in a panel.
-      *
-      * @seealso          : http://www.youtube.com/watch?v=gjJ5vLRK8R8&list=UUGD_0i6L48hucTiiyhb5QzQ
-      * @seealso          : http://plnkr.co/edit/HyBP9d?p=preview
-      */
-    FeatureProps.myModule.directive('featureprops', ['$compile', function ($compile) {
-        return {
-            terminal: true,
-            restrict: 'E',
-            scope: {},
-            template: FeatureProps.html,
-            compile: function (el) {
-                var fn = $compile(el);
-                return function (scope) {
-                    fn(scope);
-                };
-            },
-            replace: true,
-            transclude: true,
-            controller: FeatureProps.FeaturePropsCtrl
-        };
-    }]);
-})(FeatureProps || (FeatureProps = {}));
-var FeatureProps;
-(function (FeatureProps) {
-    var FeaturePropsOptions = (function () {
-        function FeaturePropsOptions(position) {
-            this.position = position;
-            this.closeButton = true;
-            this.autoPan = true;
-        }
-        return FeaturePropsOptions;
-    })();
-    var CallOutProperty = (function () {
-        function CallOutProperty(key, value, property, canFilter, canStyle, feature, isFilter, isSensor, description, meta, timestamps, sensor) {
-            this.key = key;
-            this.value = value;
-            this.property = property;
-            this.canFilter = canFilter;
-            this.canStyle = canStyle;
-            this.feature = feature;
-            this.isFilter = isFilter;
-            this.isSensor = isSensor;
-            this.description = description;
-            this.meta = meta;
-            this.timestamps = timestamps;
-            this.sensor = sensor;
-        }
-        return CallOutProperty;
-    })();
-    FeatureProps.CallOutProperty = CallOutProperty;
-    var CallOutSection = (function () {
-        function CallOutSection(sectionIcon) {
-            this.propertyTypes = {};
-            this.properties = [];
-            this.sectionIcon = sectionIcon;
-        }
-        CallOutSection.prototype.showSectionIcon = function () {
-            return !csComp.StringExt.isNullOrEmpty(this.sectionIcon);
-        };
-        CallOutSection.prototype.addProperty = function (key, value, property, canFilter, canStyle, feature, isFilter, description, meta) {
-            var isSensor = typeof feature.sensors !== 'undefined' && feature.sensors.hasOwnProperty(property);
-            if (isSensor)
-                this.properties.push(new CallOutProperty(key, value, property, canFilter, canStyle, feature, isFilter, isSensor, description ? description : null, meta, feature.timestamps, feature.sensors[property]));
-            else
-                this.properties.push(new CallOutProperty(key, value, property, canFilter, canStyle, feature, isFilter, isSensor, description ? description : null, meta));
-        };
-        CallOutSection.prototype.hasProperties = function () {
-            return this.properties != null && this.properties.length > 0;
-        };
-        return CallOutSection;
-    })();
-    FeatureProps.CallOutSection = CallOutSection;
-    var CallOut = (function () {
-        function CallOut(type, feature, propertyTypeData) {
-            var _this = this;
-            this.type = type;
-            this.feature = feature;
-            this.propertyTypeData = propertyTypeData;
-            this.sections = {};
-            //if (type == null) this.createDefaultType();
-            this.setTitle();
-            this.setIcon(feature);
-            var infoCallOutSection = new CallOutSection('fa-info');
-            var searchCallOutSection = new CallOutSection('fa-filter');
-            var displayValue;
-            if (type != null) {
-                var propertyTypes = csComp.Helpers.getPropertyTypes(type, propertyTypeData);
-                propertyTypes.forEach(function (mi) {
-                    var callOutSection = _this.getOrCreateCallOutSection(mi.section) || infoCallOutSection;
-                    callOutSection.propertyTypes[mi.label] = mi;
-                    var text = feature.properties[mi.label];
-                    displayValue = csComp.Helpers.convertPropertyInfo(mi, text);
-                    // Skip empty, non-editable values
-                    if (!mi.canEdit && csComp.StringExt.isNullOrEmpty(displayValue))
-                        return;
-                    var canFilter = (mi.type === "number" || mi.type === "text" || mi.type === "options");
-                    var canStyle = (mi.type === "number" || mi.type === "options" || mi.type === "color");
-                    if (mi.filterType != null)
-                        canFilter = mi.filterType.toLowerCase() != "none";
-                    if (mi.visibleInCallOut) {
-                        callOutSection.addProperty(mi.title, displayValue, mi.label, canFilter, canStyle, feature, false, mi.description, mi);
-                    }
-                    searchCallOutSection.addProperty(mi.title, displayValue, mi.label, canFilter, canStyle, feature, false, mi.description);
-                });
-            }
-            if (infoCallOutSection.properties.length > 0)
-                this.sections['AAA Info'] = infoCallOutSection; // The AAA is added as the sections are sorted alphabetically
-            if (searchCallOutSection.properties.length > 0)
-                this.sections['Zzz Search'] = searchCallOutSection;
-        }
-        CallOut.prototype.sectionCount = function () {
-            return Object.keys(this.sections).length;
-        };
-        CallOut.prototype.firstSection = function () {
-            return this.sections[Object.keys(this.sections)[this.sectionCount() - 2]];
-        };
-        CallOut.prototype.lastSection = function () {
-            return this.sections[Object.keys(this.sections)[this.sectionCount() - 1]];
-        };
-        CallOut.prototype.getOrCreateCallOutSection = function (sectionTitle) {
-            if (!sectionTitle) {
-                return null;
-            }
-            if (sectionTitle in this.sections)
-                return this.sections[sectionTitle];
-            this.sections[sectionTitle] = new CallOutSection();
-            return this.sections[sectionTitle];
-        };
-        /**
-         * Set the title of the callout to the title of the feature.
-         */
-        CallOut.prototype.setTitle = function () {
-            this.title = CallOut.title(this.type, this.feature);
-        };
-        CallOut.prototype.setIcon = function (feature) {
-            this.icon = (this.type == null || this.type.style == null || !this.type.style.hasOwnProperty('iconUri') || this.type.style.iconUri.toLowerCase().indexOf('_media') >= 0) ? '' : this.type.style.iconUri.indexOf('{') >= 0 ? csComp.Helpers.convertStringFormat(feature, this.type.style.iconUri) : this.type.style.iconUri;
-        };
-        CallOut.title = function (type, feature) {
-            var title = '';
-            if (type != null && type.style != null && type.style.nameLabel)
-                title = feature.properties[type.style.nameLabel];
-            else {
-                if (feature.properties.hasOwnProperty('Name'))
-                    title = feature.properties['Name'];
-                else if (feature.properties.hasOwnProperty('name'))
-                    title = feature.properties['name'];
-            }
-            if (!csComp.StringExt.isNullOrEmpty(title) && !$.isNumeric(title))
-                title = title.replace(/&amp;/g, '&');
-            return title;
-        };
-        return CallOut;
-    })();
-    FeatureProps.CallOut = CallOut;
-    var FeaturePropsCtrl = (function () {
-        // dependencies are injected via AngularJS $injector
-        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
-        function FeaturePropsCtrl($scope, $location, $sce, $mapService, $layerService, $messageBusService) {
-            var _this = this;
-            this.$scope = $scope;
-            this.$location = $location;
-            this.$sce = $sce;
-            this.$mapService = $mapService;
-            this.$layerService = $layerService;
-            this.$messageBusService = $messageBusService;
-            /**
-             * Callback function
-             * @see {http://stackoverflow.com/questions/12756423/is-there-an-alias-for-this-in-typescript}
-             * @see {http://stackoverflow.com/questions/20627138/typescript-this-scoping-issue-when-called-in-jquery-callback}
-             * @todo {notice the strange syntax using a fat arrow =>, which is to preserve the this reference in a callback!}
-             */
-            this.sidebarMessageReceived = function (title) {
-                switch (title) {
-                    case "toggle":
-                        _this.$scope.showMenu = !_this.$scope.showMenu;
-                        break;
-                    case "show":
-                        _this.$scope.showMenu = true;
-                        break;
-                    case "hide":
-                        _this.$scope.showMenu = false;
-                        break;
-                    default:
-                }
-                // NOTE EV: You need to call apply only when an event is received outside the angular scope.
-                // However, make sure you are not calling this inside an angular apply cycle, as it will generate an error.
-                if (_this.$scope.$root.$$phase != '$apply' && _this.$scope.$root.$$phase != '$digest') {
-                    _this.$scope.$apply();
-                }
-            };
-            this.featureMessageReceived = function (title, feature) {
-                switch (title) {
-                    case "onFeatureSelect":
-                        _this.setShowSimpleTimeline();
-                        _this.displayFeature(feature);
-                        _this.$scope.poi = feature;
-                        _this.$scope.autocollapse(true);
-                        break;
-                    case "onFeatureUpdated":
-                        _this.displayFeature(_this.$layerService.lastSelectedFeature);
-                        _this.$scope.poi = _this.$layerService.lastSelectedFeature;
-                        break;
-                    default:
-                }
-                if (_this.$scope.$root.$$phase != '$apply' && _this.$scope.$root.$$phase != '$digest') {
-                    _this.$scope.$apply();
-                }
-            };
-            this.timestamps = new Array();
-            this.scope = $scope;
-            $scope.vm = this;
-            $scope.showMenu = false;
-            $scope.featureTabActivated = function (sectionTitle, section) {
-                $messageBusService.publish('FeatureTab', 'activated', { sectionTitle: sectionTitle, section: section });
-            };
-            $messageBusService.subscribe("sidebar", this.sidebarMessageReceived);
-            $messageBusService.subscribe("feature", this.featureMessageReceived);
-            var widthOfList = function () {
-                var itemsWidth = 0;
-                $('#featureTabs>li').each(function () {
-                    var itemWidth = $(this).outerWidth();
-                    itemsWidth += itemWidth;
-                });
-                return itemsWidth;
-            };
-            $scope.autocollapse = function (initializeTabPosition) {
-                if (initializeTabPosition === void 0) { initializeTabPosition = false; }
-                //                console.log('autocollapse');
-                var tabs = $('#featureTabs');
-                //                console.log('#ft.ow(): ' + tabs.outerWidth());
-                //                console.log('wol: ' + widthOfList());
-                //                console.log('ml: ' + tabs.css('margin-left'));
-                if (tabs.outerWidth() < widthOfList() || parseFloat(tabs.css('margin-left')) < 0) {
-                    $('#leftArr').show();
-                    $('#rightArr').show();
-                    if (initializeTabPosition) {
-                        tabs.animate({ 'margin-left': '20px' }, 'slow');
-                    }
-                }
-                else {
-                    $('#leftArr').hide();
-                    $('#rightArr').hide();
-                    if (initializeTabPosition) {
-                        tabs.animate({ 'margin-left': '0px' }, 'slow');
-                    }
-                }
-            };
-            $scope.autocollapse(true); // when document first loads
-            $scope.tabs = $('#featureTabs');
-            $scope.tabScrollDelta = $scope.tabs.outerWidth();
-            $('#leftArr').click(function () {
-                //console.log('leftArr');
-                //var tabs = $('#featureTabs');
-                var current = parseFloat($scope.tabs.css('margin-left'));
-                var min = 20;
-                var nextPos = $scope.tabScrollDelta;
-                if (current + nextPos > min) {
-                    nextPos = min - current;
-                }
-                $scope.tabs.animate({ 'margin-left': '+=' + nextPos + 'px' }, 'slow', function () {
-                    //                    console.log('rightarr hide');
-                    $('#rightArr').show();
-                    $('#leftArr').show();
-                    $scope.autocollapse(false);
-                });
-            });
-            $('#rightArr').click(function () {
-                //var tabs = $('#featureTabs');
-                var max = widthOfList() - $scope.tabs.outerWidth() + 30;
-                //var current = Math.abs(parseFloat($scope.tabs.css('margin-left')));
-                var nextPos = $scope.tabScrollDelta;
-                nextPos = Math.min(max, nextPos);
-                $scope.tabs.animate({ 'margin-left': '-=' + nextPos + 'px' }, 'slow', function () {
-                    $('#leftArr').show();
-                    $('#rightArr').show();
-                    $scope.autocollapse(false);
-                });
-            });
-        }
-        FeaturePropsCtrl.prototype.toTrusted = function (html) {
-            try {
-                if (html === undefined || html === null)
-                    return this.$sce.trustAsHtml(html);
-                return this.$sce.trustAsHtml(html.toString());
-            }
-            catch (e) {
-                console.log(e + ': ' + html);
-                return '';
-            }
-        };
-        FeaturePropsCtrl.prototype.createScatter = function (property) {
-            var sc = new csComp.Services.GroupFilter();
-            sc.property = property.property;
-            sc.property2 = "opp_land";
-            sc.id = csComp.Helpers.getGuid();
-            sc.filterType = "scatter";
-            sc.title = sc.property;
-            var l = this.$layerService.findLayer(this.$scope.poi.layerId);
-            this.$layerService.setFilter(sc, l.group);
-            //alert('scatter ' + property.property);
-        };
-        FeaturePropsCtrl.prototype.displayFeature = function (feature) {
-            if (!feature)
-                return;
-            var featureType = this.$layerService.featureTypes[feature.featureTypeName];
-            // If we are dealing with a sensor, make sure that the feature's timestamps are valid so we can add it to a chart
-            if (typeof feature.sensors !== 'undefined' && typeof feature.timestamps === 'undefined')
-                feature.timestamps = this.$layerService.findLayer(feature.layerId).timestamps;
-            this.$scope.callOut = new CallOut(featureType, feature, this.$layerService.propertyTypeData);
-        };
-        FeaturePropsCtrl.prototype.showSensorData = function (property) {
-            console.log(property);
-        };
-        FeaturePropsCtrl.prototype.setShowSimpleTimeline = function () {
-            if (this.$mapService.timelineVisible || typeof this.$layerService.lastSelectedFeature === 'undefined' || this.$layerService.lastSelectedFeature == null) {
-                this.showSimpleTimeline = false;
-                return;
-            }
-            var feature = this.$layerService.lastSelectedFeature;
-            this.showSimpleTimeline = (typeof feature.sensors !== 'undefined' && feature.sensors !== null);
-            if (this.showSimpleTimeline)
-                this.setTimestamps();
-        };
-        FeaturePropsCtrl.prototype.setTimestamps = function () {
-            var feature = this.$layerService.lastSelectedFeature;
-            var layer = this.$layerService.findLayer(feature.layerId);
-            if ((typeof layer.timestamps === 'undefined' || layer.timestamps == null) && (typeof feature.timestamps === 'undefined' || feature.timestamps == null))
-                return [];
-            var time = this.timestamps = new Array();
-            (layer.timestamps || feature.timestamps).forEach(function (ts) {
-                var date = new Date(ts);
-                var dateString = String.format("{0}-{1:00}-{2:00}", date.getFullYear(), date.getUTCMonth() + 1, date.getUTCDate());
-                if (date.getUTCHours() > 0 || date.getUTCMinutes() > 0)
-                    dateString += String.format(" {0:00}:{1:00}", date.getUTCHours(), date.getUTCMinutes());
-                time.push({ title: dateString, timestamp: ts });
-            });
-            // Set focus time
-            var focus = this.$layerService.project.timeLine.focus;
-            if (focus > time[time.length - 1].timestamp) {
-                this.focusTime = time[time.length - 1].title;
-                this.setTime(time[time.length - 1]);
-            }
-            else if (focus < time[0].timestamp) {
-                this.focusTime = time[0].title;
-                this.setTime(time[0]);
-            }
-            else {
-                for (var i = 1; i < time.length; i++) {
-                    if (focus > time[i].timestamp)
-                        continue;
-                    this.focusTime = time[i].title;
-                    this.setTime(time[i]);
-                    break;
-                }
-            }
-            return time;
-        };
-        FeaturePropsCtrl.prototype.setTime = function (time) {
-            this.focusTime = time.title;
-            this.$layerService.project.timeLine.setFocus(new Date(time.timestamp));
-            this.$messageBusService.publish("timeline", "focusChange", time.timestamp);
-        };
-        // $inject annotation.
-        // It provides $injector with information about dependencies to be injected into constructor
-        // it is better to have it close to the constructor, because the parameters must match in count and type.
-        // See http://docs.angularjs.org/guide/di
-        FeaturePropsCtrl.$inject = [
-            '$scope',
-            '$location',
-            '$sce',
-            'mapService',
-            'layerService',
-            'messageBusService'
-        ];
-        return FeaturePropsCtrl;
-    })();
-    FeatureProps.FeaturePropsCtrl = FeaturePropsCtrl;
-})(FeatureProps || (FeatureProps = {}));
-var DataTable;
-(function (DataTable) {
-    /**
-     * Represents a field in the table.
-     * The value is the actual displayValue shown, the type is the propertyType type (e.g. number or text, useful when aligning the data), and the header is used for sorting.
-     */
-    var TableField = (function () {
-        function TableField(displayValue, originalValue, type, header) {
-            this.displayValue = displayValue;
-            this.originalValue = originalValue;
-            this.type = type;
-            this.header = header;
-        }
-        return TableField;
-    })();
-    DataTable.TableField = TableField;
-    var DataTableCtrl = (function () {
-        // dependencies are injected via AngularJS $injector
-        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
-        function DataTableCtrl($scope, $http, $sce, $translate, $layerService, $localStorageService, $messageBusService) {
-            var _this = this;
-            this.$scope = $scope;
-            this.$http = $http;
-            this.$sce = $sce;
-            this.$translate = $translate;
-            this.$layerService = $layerService;
-            this.$localStorageService = $localStorageService;
-            this.$messageBusService = $messageBusService;
-            this.mapLabel = "map";
-            this.numberOfItems = 10;
-            this.layerOptions = [];
-            this.propertyTypes = [];
-            this.headers = [];
-            this.rows = [];
-            // 'vm' stands for 'view model'. We're adding a reference to the controller to the scope
-            // for its methods to be accessible from view / HTML
-            $scope.vm = this;
-            $translate('MAP_FEATURES').then(function (translation) {
-                _this.layerOptions[0].title = translation;
-            });
-            this.bindToStorage('vm.numberOfItems', 10);
-            this.numberOfItems = $localStorageService.get('vm.numberOfItems');
-            this.bindToStorage('vm.selectedLayerId', this.mapLabel);
-            if (this.$layerService.project == null || this.$layerService.project.groups == null)
-                return;
-            this.updateLayerOptions();
-            this.loadLayer();
-            $messageBusService.publish('timeline', 'isEnabled', 'false');
-        }
-        /**
-         * Add a label to local storage and bind it to the scope.
-         */
-        DataTableCtrl.prototype.bindToStorage = function (label, defaultValue) {
-            if (this.$localStorageService.get(label) === null)
-                this.$localStorageService.set(label, defaultValue); // You first need to set the key
-            this.$localStorageService.bind(this.$scope, label);
-        };
-        /**
-         * Create a list of layer options and select the one used previously.
-         */
-        DataTableCtrl.prototype.updateLayerOptions = function () {
-            var _this = this;
-            this.layerOptions.push({
-                "group": '',
-                "id": this.mapLabel,
-                "title": this.mapFeatureTitle
-            });
-            if (this.$layerService.project == null || this.$layerService.project.groups == null)
-                return;
-            this.$layerService.project.groups.forEach(function (group) {
-                group.layers.forEach(function (layer) {
-                    _this.layerOptions.push({
-                        "group": group.title,
-                        "id": layer.id,
-                        "title": layer.title
-                    });
-                });
-            });
-            this.selectedLayerId = this.$localStorageService.get('vm.selectedLayerId');
-        };
-        DataTableCtrl.prototype.loadLayer = function () {
-            var _this = this;
-            if (!this.selectedLayerId || this.selectedLayerId === this.mapLabel)
-                return this.loadMapLayers();
-            var selectedLayer = this.findLayerById(this.selectedLayerId);
-            if (selectedLayer == null)
-                return this.loadMapLayers();
-            this.$http.get(selectedLayer.url).success(function (data) {
-                _this.dataset = data;
-                if (data.featureTypes == null)
-                    data.featureTypes = {};
-                data.features.forEach(function (f) {
-                    f.featureTypeName = f.properties['FeatureTypeId'];
-                    if (!(f.featureTypeName in data.featureTypes))
-                        data.featureTypes[f.featureTypeName] = _this.$layerService.featureTypes[f.featureTypeName];
-                });
-                _this.updatepropertyType(data);
-            }).error(function (data, status, headers, config) {
-                _this.$messageBusService.notify("ERROR opening " + selectedLayer.title, "Could not get the data.");
-            });
-        };
-        /**
-         * Load the features as visible on the map.
-         */
-        DataTableCtrl.prototype.loadMapLayers = function () {
-            var _this = this;
-            this.selectedLayerId = this.mapLabel;
-            var data = {
-                type: '',
-                features: [],
-                featureTypes: {}
-            };
-            // If we are filtering, load the filter results
-            this.$layerService.project.groups.forEach(function (group) {
-                if (group.filterResult != null)
-                    group.filterResult.forEach(function (f) { return data.features.push(f); });
-            });
-            // Otherwise, take all loaded features
-            if (data.features.length === 0)
-                data.features = this.$layerService.project.features;
-            data.features.forEach(function (f) {
-                if (!(f.featureTypeName in data.featureTypes))
-                    data.featureTypes[f.featureTypeName] = _this.$layerService.featureTypes[f.featureTypeName];
-            });
-            this.dataset = data;
-            this.updatepropertyType(data);
-        };
-        DataTableCtrl.prototype.updatepropertyType = function (data) {
-            var _this = this;
-            this.propertyTypes = [];
-            this.headers = [];
-            this.rows = [];
-            var titles = [];
-            var mis = [];
-            // Push the Name, so it always appears on top.
-            mis.push({
-                label: "Name",
-                visibleInCallOut: true,
-                title: "Naam",
-                type: "text",
-                filterType: "text",
-                isSearchable: true
-            });
-            var featureType;
-            for (var key in data.featureTypes) {
-                featureType = data.featureTypes[key];
-                if (featureType.propertyTypeKeys != null) {
-                    var keys = featureType.propertyTypeKeys.split(';');
-                    keys.forEach(function (k) {
-                        if (k in _this.$layerService.propertyTypeData)
-                            mis.push(_this.$layerService.propertyTypeData[k]);
-                        else if (featureType.propertyTypeData != null) {
-                            var result = $.grep(featureType.propertyTypeData, function (e) { return e.label === k; });
-                            if (result.length >= 1)
-                                mis.push(result);
-                        }
-                    });
-                }
-                else if (featureType.propertyTypeData != null) {
-                    featureType.propertyTypeData.forEach(function (mi) { return mis.push(mi); });
-                }
-                mis.forEach(function (mi) {
-                    if ((mi.visibleInCallOut || mi.label === "Name") && titles.indexOf(mi.title) < 0) {
-                        titles.push(mi.title);
-                        _this.propertyTypes.push(mi);
-                    }
-                });
-            }
-            // Select the first couple of headers
-            var nmbrOfDefaultSelectedHeaders = 3;
-            for (var i = 0; i < nmbrOfDefaultSelectedHeaders; i++) {
-                this.headers.push(titles[i]);
-            }
-            this.rows = this.getRows();
-        };
-        DataTableCtrl.prototype.toggleSelection = function (propertyTypeTitle) {
-            var idx = this.headers.indexOf(propertyTypeTitle);
-            // is currently selected
-            if (idx > -1) {
-                this.headers.splice(idx, 1);
-            }
-            else {
-                this.headers.push(propertyTypeTitle);
-            }
-            this.rows = this.getRows();
-        };
-        DataTableCtrl.prototype.findLayerById = function (id) {
-            for (var i = 0; i < this.$layerService.project.groups.length; i++) {
-                var group = this.$layerService.project.groups[i];
-                for (var j = 0; j < group.layers.length; j++) {
-                    var layer = group.layers[j];
-                    if (layer.id != id)
-                        continue;
-                    return layer;
-                }
-            }
-            return null;
-        };
-        /**
-         * Returns the data rows that are relevant for the current selection.
-         */
-        DataTableCtrl.prototype.getRows = function () {
-            var _this = this;
-            var meta = [this.headers.length];
-            this.propertyTypes.forEach(function (mi) {
-                // Keep headers and mi in the right order
-                var index = _this.headers.indexOf(mi.title);
-                if (index >= 0)
-                    meta[index] = mi;
-            });
-            var props = [];
-            var displayValue;
-            this.dataset.features.forEach(function (f) {
-                var row = [];
-                meta.forEach(function (mi) {
-                    var text = f.properties[mi.label];
-                    displayValue = csComp.Helpers.convertPropertyInfo(mi, text);
-                    //if (!text)
-                    //    text = ' ';
-                    //else if (!$.isNumeric(text))
-                    //    text = text.replace(/&amp;/g, '&');
-                    //switch (mi.type) {
-                    //    case "bbcode":
-                    //        displayValue = XBBCODE.process({ text: text }).html;
-                    //        break;
-                    //    case "number":
-                    //        if (!$.isNumeric(text)) displayValue ='??';
-                    //        else if (!mi.stringFormat)
-                    //            displayValue = text.toString();
-                    //        else
-                    //            displayValue = String.format(mi.stringFormat, parseFloat(text));
-                    //        break;
-                    //    default:
-                    //        displayValue = text;
-                    //        break;
-                    //}
-                    row.push(new TableField(displayValue, text, mi.type, mi.title));
-                });
-                props.push(row);
-            });
-            return props;
-        };
-        /**
-         * Generate a font awesome class based on the order.
-         */
-        DataTableCtrl.prototype.sortOrderClass = function (headerIndex, reverseOrder) {
-            var t;
-            if (reverseOrder != null && headerIndex == this.sortingColumn) {
-                t = ('fa fa-sort-' + ((reverseOrder) ? 'desc' : 'asc'));
-            }
-            else {
-                t = 'fa fa-sort';
-            }
-            return t;
-        };
-        /**
-         * Order the rows based on the header index and the order.
-         */
-        DataTableCtrl.prototype.orderBy = function (headerIndex, reverseOrder) {
-            this.sortingColumn = headerIndex;
-            this.rows = this.rows.sort(function (a, b) {
-                var order; // Original sort order
-                if (a[headerIndex].type == 'number')
-                    order = a[headerIndex].originalValue > b[headerIndex].originalValue;
-                else
-                    order = a[headerIndex].originalValue.toLowerCase() > b[headerIndex].originalValue.toLowerCase();
-                if (order == reverseOrder)
-                    return 1;
-                else
-                    return -1;
-            });
-        };
-        DataTableCtrl.prototype.downloadCsv = function () {
-            var csvRows = [];
-            csvRows.push(this.headers.join(';'));
-            for (var i = 0; i < this.rows.length; i++) {
-                csvRows.push(this.rows[i].map(function (f) {
-                    return f.originalValue;
-                }).join(';'));
-            }
-            var csvString = csvRows.join('\r\n');
-            var filename = this.mapLabel;
-            if (this.selectedLayerId !== this.mapLabel) {
-                var layer = this.findLayerById(this.selectedLayerId);
-                if (layer)
-                    filename = layer.title.replace(' ', '_');
-            }
-            this.saveData(csvString, filename + '.csv');
-        };
-        DataTableCtrl.prototype.saveData = function (csvData, filename) {
-            if (navigator.msSaveBlob) {
-                // IE 10+
-                var link = document.createElement('a');
-                link.addEventListener("click", function (event) {
-                    var blob = new Blob([csvData], { "type": "text/csv;charset=utf-8;" });
-                    navigator.msSaveBlob(blob, filename);
-                }, false);
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            }
-            else if (!csComp.Helpers.supportsDataUri()) {
-                // Older versions of IE: show the data in a new window
-                var popup = window.open('', 'csv', '');
-                popup.document.body.innerHTML = '<pre>' + csvData + '</pre>';
-            }
-            else {
-                // Support for browsers that support the data uri.
-                var a = document.createElement('a');
-                document.body.appendChild(a);
-                a.href = 'data:text/csv;charset=utf-8,' + encodeURI(csvData);
-                a.target = '_blank';
-                a.download = filename;
-                a.click();
-                document.body.removeChild(a);
-            }
-        };
-        /**
-         * Convert to trusted html string.
-         */
-        DataTableCtrl.prototype.toTrusted = function (html) {
-            try {
-                if (html === undefined || html === null)
-                    return this.$sce.trustAsHtml(html);
-                return this.$sce.trustAsHtml(html.toString());
-            }
-            catch (e) {
-                console.log(e + ': ' + html);
-                return '';
-            }
-        };
-        // $inject annotation.
-        // It provides $injector with information about dependencies to be injected into constructor
-        // it is better to have it close to the constructor, because the parameters must match in count and type.
-        // See http://docs.angularjs.org/guide/di
-        DataTableCtrl.$inject = [
-            '$scope',
-            '$http',
-            '$sce',
-            '$translate',
-            'layerService',
-            'localStorageService',
-            'messageBusService'
-        ];
-        return DataTableCtrl;
-    })();
-    DataTable.DataTableCtrl = DataTableCtrl;
-})(DataTable || (DataTable = {}));
-var DataTable;
-(function (DataTable) {
-    DataTable.html = '<div>    <div style="width:100%; margin: 10px auto;">        <div style="float: left; width: 15%; margin: 0; padding: 1em">            <!-- Pull down of map layers -->            <select data-ng-model="vm.selectedLayerId"                    data-ng-change="vm.loadLayer()"                    data-ng-options="layer.id as layer.title group by layer.group for layer in vm.layerOptions"                    class="form-control tt-input"></select>            <!-- List of headers -->            <ul class="form-group" style="margin-top: 1em; margin-left: -2em; overflow-y: auto; overflow-x: hidden;"                resize resize-y="150">                <li ng-repeat="mi in vm.propertyTypes" class="list-unstyled" style="white-space: nowrap; text-overflow: ellipsis">                    <label>                        <input type="checkbox" name="vm.selectedTitles[]" value="{{mi.title}}"                               data-ng-checked="vm.headers.indexOf(mi.title) > -1"                               data-ng-click="vm.toggleSelection(mi.title)">&nbsp;&nbsp;{{mi.title}}                    </label>                    <!--<div class="checkbox">                        <label>                            <input type="checkbox" name="vm.selectedTitles[]" value="{{mi.title}}"                                   data-ng-checked="vm.headers.indexOf(mi.title) > -1"                                   data-ng-click="vm.toggleSelection(mi.title)">&nbsp;&nbsp;{{mi.title}}                        </label>                    </div>-->                </li>            </ul>            <!--       <pre>{{vm.headers|json}}</pre>-->        </div>        <!-- Right side of the table view -->        <div style="margin-left: 16%; border-left: 1px solid gray; padding: 1em;" ng-init="poiTypeFilter">            <!-- Filter -->            <div class="has-feedback" style="margin-bottom: 1em; float: right; width: 16%; min-width: 200px;">                <span style="direction: ltr; position: static; display: block;">                    <input id="searchbox" data-ng-model="featureFilter" type="text"                           placeholder="Filter" autocomplete="off" spellcheck="false"                           style="position: relative; vertical-align: top;" class="form-control tt-input">                </span>                <span id="searchicon" class="fa form-control-feedback fa-filter" style="padding-top: 0px;"></span>            </div>            <!--Download to CSV option-->            <a href="" data-ng-click="vm.downloadCsv()" alt="Download CSV" style="margin-top: 5px; margin-right: 1em; float: right;"><i class="fa fa-download fa-2x"></i></a>            <!-- Specify how many items to show -->            <select data-ng-model="vm.numberOfItems" style="margin-bottom: 1em; margin-right: 10px; float: left; width: 16%; min-width: 200px;" class="form-control tt-input">                <option value="5" translate="SHOW5"></option>                <option value="10" translate="SHOW10"></option>                <option value="15" translate="SHOW15"></option>                <option value="20" translate="SHOW20"></option>                <option value="25" translate="SHOW25"></option>                <option value="30" translate="SHOW30"></option>                <option value="35" translate="SHOW35"></option>                <option value="40" translate="SHOW40"></option>            </select>            <!-- Data table -->            <table class="table table-striped table-condensed">                <tr>                    <th data-ng-repeat="header in vm.headers track by $index">                        {{header}}&nbsp;                        <a data-ng-click="reverseSort = !reverseSort; vm.orderBy($index, reverseSort);"><i data-ng-class="vm.sortOrderClass($index, reverseSort)">&nbsp;&nbsp;</i></a>                    </th>                </tr>                <tr dir-paginate="row in vm.rows | filter:featureFilter | itemsPerPage: vm.numberOfItems"                    style="cursor: pointer; vertical-align: central">                    <td data-ng-class="{\'text-right\': field.type == \'number\'}" data-ng-repeat="field in row track by $index" data-ng-bind-html="vm.toTrusted(field.displayValue)"></td>                </tr>            </table>            <dir-pagination-controls style="" max-size="10" boundary-links="true" direction-links="true"                                     template-url="bower_components/angular-utils-pagination/dirPagination.tpl.html"></dir-pagination-controls>        </div>    </div>    <div style="clear: both; margin: 0; padding: .5em"></div></div>';
-})(DataTable || (DataTable = {}));
-var DataTable;
-(function (DataTable) {
-    /**
-      * Config
-      */
-    var moduleName = 'csWeb.datatable';
-    /**
-      * Module
-      */
-    DataTable.myModule;
-    try {
-        DataTable.myModule = angular.module(moduleName);
-    }
-    catch (err) {
-        // named module does not exist, so create one
-        DataTable.myModule = angular.module(moduleName, []);
-    }
-    /**
-      * Directive to display a feature's properties in a panel.
-      *
-      * @seealso : http://www.youtube.com/watch?v=gjJ5vLRK8R8&list=UUGD_0i6L48hucTiiyhb5QzQ
-      * @seealso : http://plnkr.co/edit/HyBP9d?p=preview
-      */
-    DataTable.myModule.directive('datatable', ['$compile', function ($compile) {
-        return {
-            terminal: false,
-            restrict: 'E',
-            scope: {},
-            template: DataTable.html,
-            //compile   : el => {     // I need to explicitly compile it in order to use interpolation like {{xxx}}
-            //    var fn = $compile(el);
-            //    return scope => {
-            //        fn(scope);
-            //    };
-            //},
-            replace: true,
-            transclude: true,
-            controller: DataTable.DataTableCtrl
-        };
-    }]);
-})(DataTable || (DataTable = {}));
 var csComp;
 (function (csComp) {
     var Services;
@@ -8128,7 +8622,10 @@ var Translations;
             WHITE_ORANGE: 'white - orange',
             ORANGE_WHITE: 'orange - white',
             EXPERTMODE: {
-                EXPLANATION: 'By selecting more stars, more functionality will be available (3 stars = expert mode).'
+                BEGINNER: 'Beginner',
+                INTERMEDIATE: 'Intermediate',
+                EXPERT: 'Expert',
+                EXPLANATION: 'Select your expertise in order to unlock more functionality.'
             },
             LAYER_SERVICE: {
                 RELOAD_PROJECT_TITLE: 'Data is reloaded',
@@ -8215,7 +8712,10 @@ var Translations;
             WHITE_ORANGE: 'wit - oranje',
             ORANGE_WHITE: 'oranje - wit',
             EXPERTMODE: {
-                EXPLANATION: 'Door meer sterren te selecteren komt er meer functionaliteit beschikbaar (3 sterren = expert mode).'
+                BEGINNER: 'Novice',
+                INTERMEDIATE: 'Gevorderd',
+                EXPERT: 'Expert',
+                EXPLANATION: 'Selecteer uw expertise om meer functionaliteit te kunnen gebruiken.'
             },
             LAYER_SERVICE: {
                 RELOAD_PROJECT_TITLE: 'Data wordt opnieuw geladen',
