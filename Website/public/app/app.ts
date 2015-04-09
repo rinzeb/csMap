@@ -174,8 +174,8 @@
             'csWeb.expertMode',
             'ngCookies',
             //'csWeb.charts',
-            'csWeb.timeline'//, 
-            //'csWeb.heatmap'
+            'csWeb.timeline', 
+            'csWeb.heatmap'
         ])
         .config(localStorageServiceProvider => {
             localStorageServiceProvider.prefix = 'csMap';

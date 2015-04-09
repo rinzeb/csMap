@@ -134,7 +134,8 @@ var App;
         'csWeb.projectSettings',
         'csWeb.expertMode',
         'ngCookies',
-        'csWeb.timeline'
+        'csWeb.timeline',
+        'csWeb.heatmap'
     ]).config(function (localStorageServiceProvider) {
         localStorageServiceProvider.prefix = 'csMap';
     }).config(function ($translateProvider) {
@@ -250,3 +251,4 @@ var App;
         };
     });
 })(App || (App = {}));
+//# sourceMappingURL=app.js.map
