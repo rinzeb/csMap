@@ -33,7 +33,6 @@
         "./public/app/app.ts",
         "./public/app/search/SearchCtrl.ts",
         "./public/bower_components/angular-ui-router/api/angular-ui-router.d.ts",
-        "./public/views/map/MapViewCtrl.ts",
         "./server.ts"
     ]
 }

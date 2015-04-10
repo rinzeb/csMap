@@ -4,7 +4,7 @@ import path    = require('path');
 
 var server = express();
 // all environments
-server.set('port', '3003');
+server.set('port', '3002');
 server.set('views', path.join(__dirname, 'views'));
 server.set('view engine', 'jade');
 //server.set('view engine', 'html');
