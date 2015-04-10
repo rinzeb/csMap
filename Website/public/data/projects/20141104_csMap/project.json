@@ -3,6 +3,7 @@
     "description": "csMap is developed by the Dutch Research Organisation TNO, in first instance for the Dutch Ministry of Health (VWS).",
     "url": "https://github.com/TNOCS/csMap",
     "logo": "images/CommonSenseRound.png",
+        "connected": true,
     "timeLine": {
         "start": 1375315200000,
         "end": 1425168000000,
@@ -2647,6 +2648,18 @@
     },
     "groups": [
         {
+            "title": "Flight Radar",
+            "description": "Demonstrates WMS layers.",
+            "clustering": false,
+            "layers": [
+                {
+                    "id": "FlightRadar",
+                    "type": "dynamicgeojson",
+                    "url" :  "/fr"
+                }
+            ]
+        },
+        {
             "languages": {
                 "nl": {
                     "title": "Locaties",
@@ -2744,7 +2757,7 @@
                 {
                     "id": "us",
                     "reference": "us",
-                    "title" : "US",
+                    "title": "US",
                     "type": "wms",
                     "wmsLayers": "NoiseTrafficLden55dB",
                     "url": "http://practice.tno.nl:8080/geoserver/rasters/wms?",
@@ -2849,16 +2862,16 @@
             ]
         },
         {
-          "title" : "us test",
-          "layers" :[
-            {
-              "description"      : "US test",
-              "type"             : "tilelayer",
-              "title"            : "US",
-              "url"              : "http://airapp.lohman-solutions.com/Tiles/{z}/{x}/{y}/hour_0.png"              
-            }
+            "title": "us test",
+            "layers": [
+                {
+                    "description": "US test",
+                    "type": "tilelayer",
+                    "title": "US",
+                    "url": "http://airapp.lohman-solutions.com/Tiles/{z}/{x}/{y}/hour_0.png"
+                }
 
-          ]
+            ]
         },
         {
             "languages": {
@@ -2874,15 +2887,16 @@
             "clustering": false,
             "oneLayerActive": true,
             "layers": [
+
                 {
-                  "id"               : "9d1dc210f8f5474f977c9d0f24df2ff8",
-                  "reference"        : "zorgkantoor",
-                  "title"            : "Health regions",
-                  "description"      : "Data at the health office regions. (Source: CBS, BAG, TNO, DigiMV.)",
-                  "type"             : "GeoJson",
-                  "url"              : "data/projects/20141104_csMap/Regio ZK ZZP CBS.json",
-                  "enabled"          : false,
-                  "opacity"          : 100
+                    "id": "9d1dc210f8f5474f977c9d0f24df2ff8",
+                    "reference": "zorgkantoor",
+                    "title": "Health regions",
+                    "description": "Data at the health office regions. (Source: CBS, BAG, TNO, DigiMV.)",
+                    "type": "GeoJson",
+                    "url": "data/projects/20141104_csMap/Regio ZK ZZP CBS.json",
+                    "enabled": false,
+                    "opacity": 100
                 },
                 {
                     "id": "veiligheidsregio",
