@@ -19,7 +19,7 @@
             "subdomains"  :  ["a", "b", "c"],
             "attribution" :  "Tiles courtesy of <a href='http://hot.openstreetmap.org/' target='_blank'>Humanitarian OpenStreetMap Team</a>",
             "preview"     :  "http://b.tile.openstreetmap.fr/hot/11/1048/675.png"
-        },        
+        },
         {
            "title"       :  "OpenStreetMap",
            "subtitle"    :  "Road",
@@ -123,6 +123,10 @@
     "projects" :  [
         {
             "title": "csMap",
+            "url": "data/projects/20141104_csMap/project.json"
+        },
+        {
+            "title": "test",
             "url": "data/projects/20141104_csMap/project.json"
         }
     ]
