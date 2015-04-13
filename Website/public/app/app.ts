@@ -136,8 +136,12 @@
             window.console.log("Publish toggle sidebar");
         }
 
-        public showTable(tableVisible: boolean) {
-            this.$mapService.mapVisible = !tableVisible;
+        //public showTable(tableVisible: boolean) {
+        //    this.$mapService.mapVisible = !tableVisible;
+        //}
+
+        showTable() {
+          this.$mapService.mapVisible = false;
         }
 
         isActive(viewLocation: string) {
@@ -156,7 +160,9 @@
             'LocalStorageModule',
             'angularUtils.directives.dirPagination',
             'pascalprecht.translate',
+            'csWeb.mapElement',
             'csWeb.featureprops',
+            'csWeb.featurerelations',
             'csWeb.layersDirective',
             'csWeb.featureList',
             'csWeb.filterList',
@@ -174,7 +180,7 @@
             'csWeb.expertMode',
             'csWeb.offlineSearch',
             'ngCookies',
-            'csWeb.timeline',
+            'csWeb.timeline'
             //'csWeb.heatmap'
         ])
         .config(localStorageServiceProvider => {
@@ -268,9 +274,7 @@
         .service('messageBusService', csComp.Services.MessageBusService)
         .service('mapService', csComp.Services.MapService)
         .service('layerService', csComp.Services.LayerService)
-        .controller('appCtrl', AppCtrl)
-        .controller('mapLayersCtrl', csComp.Services.MapCtrl)
-        .controller('mapViewCtrl', MapView.MapViewCtrl)
+        .controller('appCtrl', AppCtrl)        
         .controller('searchCtrl', Search.SearchCtrl)
         .controller('mcaEditorCtrl', Mca.McaEditorCtrl)
         .filter('csmillions', [

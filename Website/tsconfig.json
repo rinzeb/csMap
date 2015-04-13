@@ -33,7 +33,6 @@
         "./Scripts/typings/xbbcode/xbbcode.d.ts",
         "./public/app/app.ts",
         "./public/app/search/SearchCtrl.ts",
-        "./public/views/map/MapViewCtrl.ts",
         "./server.ts"
     ]
 }

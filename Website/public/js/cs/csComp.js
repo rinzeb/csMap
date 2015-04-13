@@ -1,5 +1,65 @@
 var csComp;
 (function (csComp) {
+    var GeoJson;
+    (function (GeoJson) {
+        var Feature = (function () {
+            function Feature() {
+            }
+            return Feature;
+        })();
+        GeoJson.Feature = Feature;
+        (function (DrawingModeType) {
+            DrawingModeType[DrawingModeType["None"] = 0] = "None";
+            DrawingModeType[DrawingModeType["Image"] = 1] = "Image";
+            DrawingModeType[DrawingModeType["Point"] = 2] = "Point";
+            DrawingModeType[DrawingModeType["Square"] = 3] = "Square";
+            DrawingModeType[DrawingModeType["Rectangle"] = 4] = "Rectangle";
+            DrawingModeType[DrawingModeType["Line"] = 5] = "Line";
+            DrawingModeType[DrawingModeType["Circle"] = 6] = "Circle";
+            DrawingModeType[DrawingModeType["Freehand"] = 7] = "Freehand";
+            DrawingModeType[DrawingModeType["Polyline"] = 8] = "Polyline";
+            DrawingModeType[DrawingModeType["Polygon"] = 9] = "Polygon";
+            DrawingModeType[DrawingModeType["MultiPolygon"] = 10] = "MultiPolygon";
+        })(GeoJson.DrawingModeType || (GeoJson.DrawingModeType = {}));
+        var DrawingModeType = GeoJson.DrawingModeType;
+        //export enum MetaInfoType {
+        //    Text,
+        //    TextArea,
+        //    Rating,
+        //    Number,
+        //    Bbcode,
+        //    Boolean,
+        //    Bit,
+        //    Sensor,
+        //    Xml,
+        //    Options,
+        //    Unknown,
+        //    Image,
+        //    DateTime,
+        //    Mediafolder
+        //}
+        (function (featureFilterType) {
+            /** Turn filtering off */
+            featureFilterType[featureFilterType["none"] = 0] = "none";
+            /** Default for numbers: histogram */
+            featureFilterType[featureFilterType["bar"] = 1] = "bar";
+            /** Default for text */
+            featureFilterType[featureFilterType["text"] = 2] = "text";
+        })(GeoJson.featureFilterType || (GeoJson.featureFilterType = {}));
+        var featureFilterType = GeoJson.featureFilterType;
+        var MetaInfo = (function () {
+            function MetaInfo() {
+                this.visibleInCallOut = true;
+                this.canEdit = false;
+                this.isSearchable = true;
+            }
+            return MetaInfo;
+        })();
+        GeoJson.MetaInfo = MetaInfo;
+    })(GeoJson = csComp.GeoJson || (csComp.GeoJson = {}));
+})(csComp || (csComp = {}));
+var csComp;
+(function (csComp) {
     var Services;
     (function (Services) {
         var Widget = (function () {
@@ -197,12 +257,11 @@ var csComp;
             LayerType[LayerType["Kml"] = 1] = "Kml";
         })(Services.LayerType || (Services.LayerType = {}));
         var LayerType = Services.LayerType;
-        /**
-         * A project group contains a list of layers that can be grouped together.
-         * Filters, styles and clustering is always defined on the group level.
+        /** a project group contains a list of layers that can be grouped together.
+         * Filters, styles can clustering is always defined on the group level.
          * If a filter is selected (e.g. show only the features within a certain property range)
          * this filter is applied to all layers within this group.
-         * If clustering is enabled all features in all layers are grouped together.
+         * If clustering is enabled all features in all layers are grouped together
          */
         var ProjectGroup = (function () {
             function ProjectGroup() {
@@ -486,361 +545,9 @@ var BaseMapList;
     })();
     BaseMapList.BaseMapListCtrl = BaseMapListCtrl;
 })(BaseMapList || (BaseMapList = {}));
-var Charts;
-(function (Charts) {
-    'use strict';
-    var ChartHelpers = (function () {
-        function ChartHelpers() {
-        }
-        /**
-        * Returns the index and value of the maximum.
-        */
-        ChartHelpers.max = function (arr) {
-            var max = arr[0];
-            var maxIndex = 0;
-            for (var i = 1; i < arr.length; i++) {
-                if (arr[i] > max) {
-                    maxIndex = i;
-                    max = arr[i];
-                }
-            }
-            return { maxIndex: maxIndex, max: max };
-        };
-        /**
-        * Returns the index and value of the minimum.
-        */
-        ChartHelpers.min = function (arr) {
-            var min = arr[0];
-            var minIndex = 0;
-            for (var i = 1; i < arr.length; i++) {
-                if (arr[i] < min) {
-                    minIndex = i;
-                    min = arr[i];
-                }
-            }
-            return { minIndex: minIndex, min: min };
-        };
-        /**
-        * Convert a timestamp to string.
-        */
-        ChartHelpers.timestampToString = function (ts) {
-            var date = new Date(ts);
-            var dateString = String.format("{0}-{1:00}-{2:00}", date.getFullYear(), date.getUTCMonth() + 1, date.getUTCDate());
-            if (date.getUTCHours() > 0 || date.getUTCMinutes() > 0)
-                dateString += String.format(" {0:00}:{1:00}", date.getUTCHours(), date.getUTCMinutes());
-            return dateString;
-        };
-        // Easy way to bind multiple functions to window.onresize
-        // TODO: give a way to remove a function after its bound, other than removing all of them
-        ChartHelpers.windowResize = function (fun) {
-            if (fun === undefined)
-                return;
-            var oldresize = window.onresize;
-            window.onresize = function (e) {
-                if (typeof oldresize == 'function')
-                    oldresize(e);
-                fun(e);
-            };
-        };
-        ChartHelpers.initializeMargin = function (scope, attrs) {
-            var margin = scope.$eval(attrs.margin) || {
-                left: 50,
-                top: 50,
-                bottom: 50,
-                right: 50
-            };
-            if (typeof margin !== 'object') {
-                // we were passed a vanilla int, convert to full margin object
-                margin = {
-                    left: margin,
-                    top: margin,
-                    bottom: margin,
-                    right: margin
-                };
-            }
-            scope.margin = margin;
-        };
-        ChartHelpers.getD3Selector = function (attrs, element) {
-            if (!attrs.id) {
-                //if an id is not supplied, create a random id.
-                var dataAttributeChartID;
-                if (!attrs['data-chartid']) {
-                    dataAttributeChartID = 'chartid' + Math.floor(Math.random() * 1000000001);
-                    angular.element(element).attr('data-chartid', dataAttributeChartID);
-                }
-                else {
-                    dataAttributeChartID = attrs['data-chartid'];
-                }
-                return '[data-chartid=' + dataAttributeChartID + ']';
-            }
-            else {
-                return '#' + attrs.id;
-            }
-        };
-        ChartHelpers.initializeLegendMargin = function (scope, attrs) {
-            var margin = (scope.$eval(attrs.legendmargin) || {
-                left: 0,
-                top: 5,
-                bottom: 5,
-                right: 0
-            });
-            if (typeof (margin) !== 'object') {
-                // we were passed a vanilla int, convert to full margin object
-                margin = {
-                    left: margin,
-                    top: margin,
-                    bottom: margin,
-                    right: margin
-                };
-            }
-            scope.legendmargin = margin;
-        };
-        ChartHelpers.defaultColor = function () {
-            var colors = d3.scale.category20().range();
-            return function (d, i) {
-                return d.color || colors[i % colors.length];
-            };
-        };
-        ChartHelpers.configureLegend = function (chart, scope, attrs) {
-            if (chart.legend && attrs.showlegend && (attrs.showlegend === 'true')) {
-                ChartHelpers.initializeLegendMargin(scope, attrs);
-                chart.legend.margin(scope.legendmargin);
-                chart.legend.width(attrs.legendwidth === undefined ? 400 : (+attrs.legendwidth));
-                chart.legend.height(attrs.legendheight === undefined ? 20 : (+attrs.legendheight));
-                chart.legend.key(attrs.legendkey === undefined ? function (d) {
-                    return d.key;
-                } : scope.legendkey());
-                chart.legend.color(attrs.legendcolor === undefined ? ChartHelpers.defaultColor() : scope.legendcolor());
-                chart.legend.align(attrs.legendalign === undefined ? true : (attrs.legendalign === 'true'));
-                chart.legend.rightAlign(attrs.legendrightalign === undefined ? true : (attrs.legendrightalign === 'true'));
-                chart.legend.updateState(attrs.legendupdatestate === undefined ? true : (attrs.legendupdatestate === 'true'));
-                chart.legend.radioButtonMode(attrs.legendradiobuttonmode === undefined ? false : (attrs.legendradiobuttonmode === 'true'));
-            }
-        };
-        ChartHelpers.checkElementID = function (scope, attrs, element, chart, data) {
-            //ChartHelpers.configureXaxis(chart, scope, attrs);
-            //ChartHelpers.configureX2axis(chart, scope, attrs);
-            //ChartHelpers.configureYaxis(chart, scope, attrs);
-            //ChartHelpers.configureY1axis(chart, scope, attrs);
-            //ChartHelpers.configureY2axis(chart, scope, attrs);
-            ChartHelpers.configureLegend(chart, scope, attrs);
-            //ChartHelpers.processEvents(chart, scope);
-            var d3Select = ChartHelpers.getD3Selector(attrs, element);
-            if (angular.isArray(data) && data.length === 0) {
-                d3.select(d3Select + ' svg').remove();
-            }
-            if (d3.select(d3Select + ' svg').empty()) {
-                d3.select(d3Select).append('svg');
-            }
-            d3.select(d3Select + ' svg').attr('viewBox', '0 0 ' + scope.width + ' ' + scope.height).datum(data).transition().duration(attrs.transitionduration === undefined ? 250 : +attrs.transitionduration).call(chart);
-        };
-        ChartHelpers.updateDimensions = function (scope, attrs, element, chart) {
-            if (chart) {
-                chart.width(scope.width).height(scope.height);
-                var d3Select = ChartHelpers.getD3Selector(attrs, element);
-                d3.select(d3Select + ' svg').attr('viewBox', '0 0 ' + scope.width + ' ' + scope.height);
-                ChartHelpers.windowResize(chart);
-                scope.chart.update();
-            }
-        };
-        return ChartHelpers;
-    })();
-    Charts.ChartHelpers = ChartHelpers;
-})(Charts || (Charts = {}));
-var Charts;
-(function (Charts) {
-    'use strict';
-    /**
-      * Config
-      */
-    var moduleName = 'csWeb.charts';
-    /**
-      * Module
-      */
-    Charts.myModule;
-    try {
-        Charts.myModule = angular.module(moduleName);
-    }
-    catch (err) {
-        // named module does not exist, so create one                                             
-        Charts.myModule = angular.module(moduleName, []);
-    }
-    /**
-      * Directive to create a sparkline chart.
-      *
-      * @seealso: http://odiseo.net/angularjs/proper-use-of-d3-js-with-angular-directives
-      * @seealso: http://cmaurer.github.io/angularjs-nvd3-directives/sparkline.chart.html
-      * @seealso: http://www.tnoda.com/blog/2013-12-19
-      */
-    Charts.myModule.directive('sparklineChart', ['$filter', function ($filter) {
-        return {
-            terminal: true,
-            restrict: 'EA',
-            scope: {
-                timestamps: '=',
-                sensor: '=',
-                showaxis: '=',
-                width: '@',
-                height: '@',
-                margin: '@'
-            },
-            //controller: [
-            //    '$scope',
-            //    '$element',
-            //    '$attrs',
-            //    function ($scope, $element, $attrs) {
-            //        $scope.d3Call    = function (data, chart) {
-            //            ChartHelpers.checkElementID($scope, $attrs, $element, chart, data);
-            //        };
-            //    }
-            //],
-            link: function (scope, element, attrs) {
-                var margin = scope.margin || { top: 15, right: 5, bottom: 0, left: 10 };
-                var width = scope.width || 100;
-                var height = scope.height || 70;
-                var showAxis = typeof scope.showaxis !== 'undefined' && scope.showaxis;
-                var cursorTextHeight = 12; // + (showAxis ? 5 : 0); // leave room for the cursor text (timestamp | measurement)
-                var chart = d3.select(element[0]).append('svg:svg').attr('width', width).attr('height', height);
-                var marginAxis = showAxis ? { top: 0, right: 0, bottom: 20, left: 10 } : { top: 0, right: 0, bottom: 0, left: 0 };
-                var x = d3.scale.linear().range([margin.left + marginAxis.left, width - margin.left - margin.right - marginAxis.left - marginAxis.right]);
-                var y = d3.scale.linear().range([height - margin.bottom - marginAxis.bottom, margin.top + marginAxis.top + cursorTextHeight]);
-                var bisect = d3.bisector(function (d) {
-                    return d.time;
-                }).left;
-                var line = d3.svg.line().interpolate("cardinal").x(function (d) {
-                    return x(d.time);
-                }).y(function (d) {
-                    return y(d.measurement);
-                });
-                var data = [];
-                for (var i = 0; i < scope.timestamps.length; i++) {
-                    data.push({ time: scope.timestamps[i], measurement: scope.sensor[i] });
-                }
-                x.domain(d3.extent(data, function (d) {
-                    return d.time;
-                }));
-                y.domain(d3.extent(data, function (d) {
-                    return d.measurement;
-                }));
-                var path = chart.append("svg:path").attr("d", line(data)).attr('class', 'sparkline-path');
-                // draw a circle around the max and min value
-                var measurements = data.map(function (d) {
-                    return d.measurement;
-                });
-                var min = Charts.ChartHelpers.min(measurements);
-                var max = Charts.ChartHelpers.max(measurements);
-                chart.append('circle').attr('class', 'sparkcircle-max').attr('cx', x(data[max.maxIndex].time)).attr('cy', y(max.max)).attr('r', 4);
-                chart.append('circle').attr('class', 'sparkcircle-min').attr('cx', x(data[min.minIndex].time)).attr('cy', y(min.min)).attr('r', 4);
-                if (showAxis) {
-                    //var xAxis = d3.svg.axis()
-                    //    .scale(x)
-                    //    .orient("bottom")
-                    //    .ticks(d3.time.months, 2);  //Set rough # of ticks
-                    //chart.append("g")
-                    //    .attr("class", "sparkline-axis")
-                    //    .attr("transform", "translate(0," + (height - margin.bottom - marginAxis.bottom) + ")")
-                    //    .call(xAxis);
-                    var strokeLength = 6;
-                    // Draw min/max at x and y axis
-                    var xbor = d3.min(x.range()), xmin = xbor - strokeLength, xmax = d3.max(x.range()), ybor = d3.max(y.range()), ymin = d3.min(y.range()), ymax = ybor + strokeLength;
-                    // y-axis, max
-                    chart.append('line').attr("x1", xmin).attr("y1", ymin).attr("x2", xbor).attr("y2", ymin).attr("stroke", "black");
-                    chart.append("text").attr("x", xmin - 2).attr("y", ymin).attr("dy", ".35em").style("text-anchor", "end").text(d3.max(y.domain()));
-                    // y-axis, min
-                    chart.append('line').attr("x1", xmin).attr("y1", ybor).attr("x2", xbor).attr("y2", ybor).attr("stroke", "black");
-                    chart.append("text").attr("x", xmin - 2).attr("y", ybor).attr("dy", ".35em").style("text-anchor", "end").text(d3.min(y.domain()));
-                    // x-axis, min
-                    chart.append('line').attr("x1", xbor).attr("y1", ymax).attr("x2", xbor).attr("y2", ybor).attr("stroke", "black");
-                    chart.append("text").attr("x", xbor).attr("y", ymax + 9).attr("dy", ".35em").style("text-anchor", "start").text(Charts.ChartHelpers.timestampToString(d3.min(x.domain())));
-                    // x-axis, max
-                    chart.append('line').attr("x1", xmax).attr("y1", ymax).attr("x2", xmax).attr("y2", ybor).attr("stroke", "black");
-                    chart.append("text").attr("x", xmax).attr("y", ymax + 9).attr("dy", ".35em").style("text-anchor", "end").text(Charts.ChartHelpers.timestampToString(d3.max(x.domain())));
-                }
-                // draw a line at the current cursor position
-                var cursor = chart.append("line").attr("x1", 0).attr("y1", 0).attr("x2", 0).attr("y2", 0).attr("opacity", 0).attr("stroke", "black");
-                var timestampText = chart.append("text").attr("x", 0).attr("y", 0).attr("dy", ".35em").attr("opacity", 0).style("text-anchor", "end").text("");
-                var measurementText = chart.append("text").attr("x", 0).attr("y", 0).attr("dy", ".35em").attr("opacity", 0).text("");
-                var pathEl = path.node();
-                var pathLength = pathEl.getTotalLength();
-                chart.on("mouseout", function () {
-                    cursor.attr("opacity", 0);
-                    timestampText.attr("opacity", 0);
-                    measurementText.attr("opacity", 0);
-                }).on("mousemove", function () {
-                    var offsetLeft = element[0].getBoundingClientRect().left;
-                    var xpos = d3.event.clientX - offsetLeft;
-                    var beginning = xpos, end = pathLength, target;
-                    while (true) {
-                        target = Math.floor((beginning + end) / 2);
-                        var pos = pathEl.getPointAtLength(target);
-                        if ((target === end || target === beginning) && pos.x !== xpos) {
-                            break;
-                        }
-                        if (pos.x > xpos)
-                            end = target;
-                        else if (pos.x < xpos)
-                            beginning = target;
-                        else
-                            break; //position found
-                    }
-                    // using the x scale, in this case a d3 time scale
-                    // use the .invert() function to interpolate a date along the scale
-                    // given the x-coordinates of the mouse
-                    var t0 = x.invert(d3.mouse(this)[0]);
-                    // using the interpolated date, find an index in the sorted data
-                    // this would be the index suitable for insertion
-                    var i = bisect(data, t0, 1);
-                    if (0 < i && i < data.length) {
-                        // now that we know where in the data the interpolated date would "fit"
-                        // between two values, pull them both back as temporaries
-                        var d0 = data[i - 1];
-                        var d1 = data[i];
-                        // now, examine which of the two dates we are "closer" to
-                        // to do this, compare the delta values
-                        var d = t0 - d0.time > d1.time - t0 ? d1 : d0;
-                    }
-                    else if (i <= 0)
-                        d = data[0];
-                    else
-                        d = data[data.length - 1];
-                    xpos = x(d.time);
-                    // draw
-                    cursor.attr("x1", xpos).attr("y1", 0).attr("x2", xpos).attr("y2", d3.max(y.range()) + (strokeLength || 0)).attr("opacity", 1);
-                    timestampText.attr("x", xpos - 6).attr("y", 4).attr("dy", ".35em").attr("opacity", 1).text(Charts.ChartHelpers.timestampToString(d.time));
-                    measurementText.attr("x", xpos + 6).attr("y", 4).attr("dy", ".35em").attr("opacity", 1).text(d.measurement);
-                });
-            }
-        };
-    }]).directive('barChart', ['$filter', function ($filter) {
-        return {
-            terminal: true,
-            restrict: 'EA',
-            scope: {
-                data: '=',
-            },
-            link: function (scope, element, attrs) {
-                //in D3, any selection[0] contains the group
-                //selection[0][0] is the DOM node
-                //but we won't need that this time
-                var chart = d3.select(element[0]);
-                //to our original directive markup bars-chart
-                //we add a div with out chart stling and bind each
-                //data entry to the chart
-                chart.append("div").attr("class", "chart").selectAll('div').data(scope.data).enter().append("div").transition().ease("elastic").style("width", function (d) {
-                    return d + "%";
-                }).text(function (d) {
-                    return d + "%";
-                });
-                //a little of magic: setting it's width based
-                //on the data value (d) 
-                //and text all with a smooth transition
-            }
-        };
-    }]);
-})(Charts || (Charts = {}));
 var Dashboard;
 (function (Dashboard) {
-    Dashboard.html = '<div gridster="gridsterOptions" style="width:100%; height:100%;pointer-events: none;margin-top:-10px">    <div  style="position:relative;width:100%; height:100%;pointer-events: none">        <ul style="padding:0;pointer-events: none">            <li gridster-item="widget" ng-repeat="widget in dashboard.widgets" class="widget-parent">                <!--<div class="widget-title" ng-click="widget.collapse=!widget.collapse" ><span class="fa fa-area-chart" style="float:left;margin-right:4px"></span>{{widget.title}}</div>-->                <!--<div class="widget-edit" style="z-index: 1000">                    <div ng-show="widget.dashboard.editMode" ng-click="vm.$dashboardService.editWidget(widget)" class="fa fa-pencil widget-button"></div>                    <div ng-hide="widget.collapse" ng-click="widget.collapse=true"  class="fa fa-minus-square-o widget-button"></div>                    <div ng-show="widget.collapse" ng-click="widget.collapse=false"  class="fa fa-plus-square-o widget-button"></div>                    <div ng-show="widget.allowFullscreen" ng-click="vm.popup(widget)"  class="fa fa-square-o widget-button"></div>                </div>-->                    <div class="box" ng-hide="widget.collapse" style="top: 0;position: absolute;width:100%;height:100%;background: white">                        <div id="{{widget.elementId}}" class="box-content" style="width:100%;height:100%">                                                     </div>                    </div>            </li>        </ul>    </div></div>';
+    Dashboard.html = '<div gridster="gridsterOptions" style="width:100%; height:100%;pointer-events: none;margin-top:-10px">    <div  style="position:relative;width:100%; height:100%;pointer-events: none">        <ul style="padding:0;pointer-events: none">            <li gridster-item="widget" ng-repeat="widget in dashboard.widgets" class="widget-parent">                <!--<div class="widget-title" ng-click="widget.collapse=!widget.collapse" ><span class="fa fa-area-chart" style="float:left;margin-right:4px"></span>{{widget.title}}</div>-->                <!--<div class="widget-edit" style="z-index: 1000">                    <div ng-show="widget.dashboard.editMode" ng-click="vm.$dashboardService.editWidget(widget)" class="fa fa-pencil widget-button"></div>                    <div ng-hide="widget.collapse" ng-click="widget.collapse=true"  class="fa fa-minus-square-o widget-button"></div>                    <div ng-show="widget.collapse" ng-click="widget.collapse=false"  class="fa fa-plus-square-o widget-button"></div>                    <div ng-show="widget.allowFullscreen" ng-click="vm.popup(widget)"  class="fa fa-square-o widget-button"></div>                </div>-->                    <div class="box" ng-hide="widget.collapse" style="top: 0;position: absolute;width:100%;height:100%;background: white">                        <div id="{{widget.elementId}}" class="box-content" style="width:100%;height:100%">                        </div>                    </div>            </li>        </ul>    </div></div>';
 })(Dashboard || (Dashboard = {}));
 var Dashboard;
 (function (Dashboard) {
@@ -949,14 +656,17 @@ var Dashboard;
             //this.$dashboardService.updateWidget(w);
             //var newElement = this.$compile("<" + w.directive + " widget=" + w + "></" + w.directive + ">")(this.$scope);
             var widgetElement;
+            var newScope = this.$scope;
+            newScope.data = "test";
             if (w.template) {
-                widgetElement = this.$compile(this.$templateCache.get(w.template))(this.$scope);
+                widgetElement = this.$compile(this.$templateCache.get(w.template))(newScope);
             }
             else if (w.url) {
                 widgetElement = this.$compile("<div>url</div>")(this.$scope);
             }
             else if (w.directive) {
-                widgetElement = this.$compile("<" + w.directive + " widget=" + w + "></" + w.directive + ">")(this.$scope);
+                //var newScope : ng.IScope;
+                widgetElement = this.$compile("<" + w.directive + " widget=" + w + "></" + w.directive + ">")(newScope);
             }
             else {
                 widgetElement = this.$compile("<h1>hoi</h1>")(this.$scope);
@@ -997,7 +707,7 @@ var Dashboard;
                             l.enabled = false;
                         }
                         if (!l.enabled && db.visiblelayers.indexOf(l.reference) >= 0) {
-                            _this.$layerService.addLayer(l);
+                            _this.$layerService.activeMapRenderer.addLayer(l);
                             l.enabled = true;
                         }
                     });
@@ -1640,10 +1350,6 @@ var DataTable;
 })(DataTable || (DataTable = {}));
 var ExpertMode;
 (function (ExpertMode) {
-    ExpertMode.html = '<div class="navbar-collapse collapse"     tooltip-html-unsafe="{{\'EXPERTMODE.EXPLANATION\' | translate}}"     tooltip-placement="left"     tooltip-trigger="mouseenter"     tooltip-append-to-body="false">    <ul class="nav navbar-nav">        <li class="dropdown">            <a href=""               class="navbar-brand dropdown-toggle pull-left"               data-toggle="dropdown"               style="color:white; margin-left:-10px;">                <div class="circle"><span data-ng-class="vm.getCssClass()" style="width: 32px; height: 32px"></span></div>            </a>            <ul class="dropdown-menu" role="menu">                <li>                    <a data-ng-click="vm.setExpertMode(1)">                        <span class="beginnerUserIcon" style="margin-left: -10px; width: 40px; height: 32px"></span>                        <div translate>EXPERTMODE.BEGINNER</div>                    </a>                </li>                <li>                    <a data-ng-click="vm.setExpertMode(2)">                        <span class="intermediateUserIcon" style="margin-left: -10px; width: 40px; height: 32px"></span>                        <div translate>EXPERTMODE.INTERMEDIATE</div>                    </a>                </li>                <li>                    <a data-ng-click="vm.setExpertMode(3)">                        <span class="expertUserIcon" style="margin-left: -10px; width: 40px; height: 32px"></span>                        <div translate>EXPERTMODE.EXPERT</div>                    </a>                </li>            </ul>        </li>    </ul></div>';
-})(ExpertMode || (ExpertMode = {}));
-var ExpertMode;
-(function (ExpertMode) {
     /**
   * Config
   */
@@ -1678,27 +1384,19 @@ var ExpertMode;
                 terminal: true,
                 restrict: 'E',
                 scope: {},
-                template: ExpertMode.html,
-                compile: function (el) {
-                    var fn = $compile(el);
-                    return function (scope) {
-                        fn(scope);
-                    };
+                link: function (scope, element, attrs) {
+                    // Since we are wrapping the rating directive in this directive, I couldn't use transclude,
+                    // so I copy the existing attributes manually.
+                    var attributeString = '';
+                    for (var key in attrs) {
+                        if (key.substr(0, 1) !== '$' && attrs.hasOwnProperty(key))
+                            attributeString += key + '="' + attrs[key] + '" ';
+                    }
+                    var html = '<rating ng-model="expertMode" ' + attributeString + 'tooltip-html-unsafe="{{\'EXPERTMODE.EXPLANATION\' | translate}}" tooltip-placement="bottom" tooltip-trigger="mouseenter" tooltip-append-to-body="false"' + 'max="3"></rating>';
+                    var e = $compile(html)(scope);
+                    element.replaceWith(e);
                 },
-                //link: function (scope, element, attrs) {
-                //     // Since we are wrapping the rating directive in this directive, I couldn't use transclude,
-                //     // so I copy the existing attributes manually.
-                //     var attributeString = ''; 
-                //     for (var key in attrs) {
-                //         if (key.substr(0, 1) !== '$' && attrs.hasOwnProperty(key)) attributeString += key + '="' + attrs[key] + '" ';
-                //     }
-                //     var html = '<rating ng-model="expertMode" '
-                //         + attributeString
-                //         + 'tooltip-html-unsafe="{{\'EXPERTMODE.EXPLANATION\' | translate}}" tooltip-placement="bottom" tooltip-trigger="mouseenter" tooltip-append-to-body="false"'
-                //         + 'max="3"></rating>';
-                //     var e = $compile(html)(scope);
-                //     element.replaceWith(e);
-                // },  
+                //template: '<div><rating ng-model="expertise" max="3"></rating></div>',
                 replace: true,
                 transclude: true,
                 controller: ExpertMode.ExpertModeCtrl
@@ -1708,7 +1406,6 @@ var ExpertMode;
 })(ExpertMode || (ExpertMode = {}));
 var ExpertMode;
 (function (ExpertMode) {
-    var Expertise = csComp.Services.Expertise;
     var ExpertModeCtrl = (function () {
         function ExpertModeCtrl($scope, $localStorageService, $layerService, $mapService, $messageBus) {
             var _this = this;
@@ -1728,22 +1425,6 @@ var ExpertMode;
                 _this.setExpertMode($scope.expertMode);
             });
         }
-        /**
-        * Get the CSS class to render the mode.
-        */
-        ExpertModeCtrl.prototype.getCssClass = function () {
-            switch (this.$mapService.expertMode) {
-                case 1 /* Beginner */:
-                    return 'beginnerUserIcon';
-                    break;
-                case 2 /* Intermediate */:
-                    return 'intermediateUserIcon';
-                    break;
-                case 3 /* Expert */:
-                    return 'expertUserIcon';
-                    break;
-            }
-        };
         /**
         * Set the expert mode: although we assume that each directive is responsible for managing it by listening
         * to the expertMode.newExpertise message, we already set some common options here.
@@ -1861,7 +1542,7 @@ var FeatureList;
 })(FeatureList || (FeatureList = {}));
 var FeatureProps;
 (function (FeatureProps) {
-    FeatureProps.html = '<div data-ng-cloak data-ng-show="showMenu" >    <h4 class="rightpanel-header">        <img data-ng-if="callOut.icon" data-ng-src="{{callOut.icon}}" width="24" height="24" style="margin-left:5px" alt="Icon" />        &nbsp;&nbsp;{{callOut.title}}    </h4>        <div class="container-fluid rightpanel-tabs" style="position: relative">        <div class="row" style="overflow:hidden" ng-if="callOut.sectionCount() < 4">            <!-- Nav tabs -->            <span id="leftArr" style="display:block;padding:10px;margin-top:5px;position:absolute;background-color:transparent;z-index:2">                <i class="glyphicon glyphicon-chevron-left"></i>            </span>            <span id="rightArr" style="display:block;padding:10px;margin-top:5px;position:absolute;background-color:transparent;z-index:2">                <i class="glyphicon glyphicon-chevron-right"></i>            </span>            <ul class="nav nav-tabs" id="featureTabs" style="margin-left:10px">                <li data-toggle="tab" data-ng-class="{active : $first}" data-ng-repeat="(sectionTitle, section) in callOut.sections" ng-if="section.hasProperties()">                    <a ng-href="#rp-{{$index}}" data-toggle="tab" data-ng-if="section.showSectionIcon()" ng-click="featureTabActivated(sectionTitle, section)"><i class="fa {{section.sectionIcon}}"></i></a>                    <a ng-href="#rp-{{$index}}" data-toggle="tab" data-ng-if="!section.showSectionIcon()" ng-click="featureTabActivated(sectionTitle, section)">{{sectionTitle}}</a>                </li>            </ul>        </div>                <div class="row" ng-if="callOut.sectionCount() >= 4">            <ul class="nav nav-tabs" id="featureTabs" style="margin-left:10px">                <li data-toggle="tab" class="active" ng-init="firstCallOutsection=callOut.firstSection()">                    <a ng-href="#rp-0" data-toggle="tab" data-ng-if="firstCallOutsection.showSectionIcon()" >                        <i class="fa {{firstCallOutsection.sectionIcon}}"></i>                    </a>                                    </li>                <li class="dropdown" ng-init="selectedSection.title=\'...\'">                    <a style="cursor:pointer" data-toggle="dropdown">{{selectedSection.title}} <span class="caret"></span></a>                    <ul class="dropdown-menu">                        <li data-ng-repeat="(sectionTitle, section) in callOut.sections" ng-if="!$last">                            <a ng-href="#rp-{{$index}}"                               ng-click="selectedSection.title = sectionTitle"                               data-toggle="tab">{{sectionTitle}}</a>                        </li>                    </ul>                </li>                <li data-toggle="tab" ng-init="lastCallOutsection=callOut.lastSection()">                    <a ng-href="#rp-{{callOut.sectionCount()-1}}" data-toggle="tab"                        data-ng-if="lastCallOutsection.showSectionIcon()">                        <i class="fa {{lastCallOutsection.sectionIcon}}"></i>                    </a>                                    </li>            </ul>        </div>    </div>        <div class="tab-content" style="top:50px; width:355px; overflow-y: auto; overflow-x: hidden" resize resize-y="150">        <div data-ng-if="!$last" class="tab-pane" data-ng-class="{active : $first}"              id="rp-{{$index}}"              data-ng-repeat="(sectionTitle, section) in callOut.sections">            <!--<td>                    <span class="dropdown">                        <a href class="fa fa-circle-o makeNarrow dropdown-toggle"></a>                        <ul class="dropdown-menu">                            <li><a data-ng-click="vm.$layerService.createScatter(item)">scatter plot</a></li>                            <li><a>add to dashboard</a></li>                        </ul>                    </span>                </td>-->            <div class="panel-group" id="accordion">                <div class="panel panel-default"                     popover="{{(item.description) ? item.description : \'\'}}"                     popover-placement="left"                     popover-trigger="mouseenter"                     popover-append-to-body="true"                     data-ng-repeat="item in section.properties">                    <div class="panel-heading" style="min-height: 36px">                        <div class="pull-left accordionIcon"><a class="fa fa-filter makeNarrow" data-ng-show="item.canFilter" data-ng-click="vm.$layerService.setPropertyFilter(item)" style="cursor: pointer"></a></div>                        <div class="pull-left accordionIcon"><a class="fa fa-eye makeNarrow" data-ng-show="item.canStyle" data-ng-click="vm.$layerService.setStyle(item)" style="cursor: pointer"></a></div>                        <div class="pull-left accordionIcon" data-ng-if="item.isSensor">                            <a class="fa fa-line-chart makeNarrow"                               data-toggle="collapse"                               data-target="#sensor{{item.property}}"                               href="#sensor{{item.property}}"                               style="cursor: pointer"></a>                        </div>                        <div class="pull-left" style="margin-left: 4px;">                            {{item.key}}                        </div>                        <div class="text-right" data-ng-bind-html="vm.toTrusted(item.value)"></div>                        <div id="sensor{{item.property}}"                             data-ng-if="item.isSensor"                             class="panel-collapse collapse" style="padding-top: 10px;">                            <sparkline-chart timestamps="item.timestamps" sensor="item.sensor" width="320" height="90" showaxis="true"></sparkline-chart>                            <!--<div class="panel-body">            <sparkline-chart timestamps="item.timestamps" sensor="item.sensor" width="320" height="90" showaxis="true"></sparkline-chart>        </div>-->                        </div>                    </div>                </div>            </div>        </div>        <!-- Treat last tab (filter) differently -->        <div data-ng-if="$last" class="tab-pane" data-ng-class="{active : $first}" id="rp-{{$index}}" data-ng-repeat="(sectionTitle, section) in callOut.sections">            <!-- Add filter panel to the last rendered element -->            <div class="has-feedback" style="padding:0 4px 4px 4px;">                <span style="direction: ltr; position: static; display: block;">                    <input id="searchbox" data-ng-model="search.key" type="text"                           placeholder="Filter" autocomplete="off" spellcheck="false"                           style="position: relative; vertical-align: top;" class="form-control tt-input">                </span>                <span id="searchicon" class="fa form-control-feedback fa-filter"></span>            </div>            <div class="panel-group" id="accordion">                <div class="panel panel-default"                     popover="{{(item.description) ? item.description : \'\'}}"                     popover-placement="left"                     popover-trigger="mouseenter"                     popover-append-to-body="true"                     data-ng-repeat="item in section.properties">                    <div class="panel-heading" style="min-height: 36px">                        <div class="pull-left accordionIcon"><a class="fa fa-filter makeNarrow" data-ng-show="item.canFilter" data-ng-click="vm.$layerService.setPropertyFilter(item)" style="cursor: pointer"></a></div>                        <div class="pull-left accordionIcon"><a class="fa fa-eye makeNarrow" data-ng-show="item.canStyle" data-ng-click="vm.$layerService.setStyle(item)" style="cursor: pointer"></a></div>                        <div class="pull-left accordionIcon" data-ng-if="item.isSensor">                            <a class="fa fa-line-chart makeNarrow"                               data-toggle="collapse"                               data-target="#fsensor{{item.property}}"                               href="#fsensor{{item.property}}"                               style="cursor: pointer"></a>                        </div>                        <div class="pull-left" style="margin-left: 4px;">                            {{item.key}}                        </div>                        <div class="text-right" data-ng-bind-html="vm.toTrusted(item.value)"></div>                        <div id="fsensor{{item.property}}"                             data-ng-if="item.isSensor"                             class="panel-collapse collapse">                            <div class="panel-body">Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt accusamus labore sustainable VHS.</div>                        </div>                    </div>                </div>            </div>            <!--<input style="padding:4px;" class=" form-control" data-ng-model="search" placeholder="...">-->            <!--<table id="searchTextResults" class="table table-condensed">                <tr popover="{{(item.description) ? item.description : \'\'}}"                    popover-placement="left"                    popover-trigger="mouseenter"                    popover-append-to-body="true"                    data-ng-repeat="item in section.properties | filter:search">                    <td><a class="fa fa-filter makeNarrow" data-ng-show="item.canFilter" data-ng-click="vm.$layerService.setFilter(item)"></a></td>                    <td><a class="fa fa-eye makeNarrow" data-ng-show="item.canStyle" data-ng-click="vm.$layerService.setStyle(item)"></a></td>                    <td>{{item.key}}</td>                    <td class="text-right" data-ng-bind-html="vm.toTrusted(item.value)"></td>                </tr>            </table>-->        </div>                <!--SimpleTimeline component-->        <div data-ng-if="vm.showSimpleTimeline" style="margin-left: 10px">            <div class="btn-group" dropdown is-open="status.isopen">                <button type="button" class="btn btn-primary dropdown-toggle" dropdown-toggle ng-disabled="disabled">                    {{vm.focusTime}} <span class="caret"></span>                </button>                <ul class="dropdown-menu" role="menu">                    <li data-ng-repeat="ts in vm.timestamps"                         data-ng-click="vm.setTime(ts)">{{ts.title}}</li>                </ul>            </div>        </div>    </div></div>';
+    FeatureProps.html = '<div data-ng-cloak data-ng-show="showMenu" >    <h4 class="rightpanel-header">        <img data-ng-if="callOut.icon" data-ng-src="{{callOut.icon}}" width="24" height="24" style="margin-left:5px" alt="Icon" />        &nbsp;&nbsp;{{callOut.title}}    </h4>    <div class="container-fluid rightpanel-tabs" style="position: relative">        <div class="row" style="overflow:hidden" ng-if="callOut.sectionCount() < 4">            <!-- Nav tabs -->            <span id="leftArr" style="display:block;padding:10px;margin-top:5px;position:absolute;background-color:transparent;z-index:2">                <i class="glyphicon glyphicon-chevron-left"></i>            </span>            <span id="rightArr" style="display:block;padding:10px;margin-top:5px;position:absolute;background-color:transparent;z-index:2">                <i class="glyphicon glyphicon-chevron-right"></i>            </span>            <ul class="nav nav-tabs" id="featureTabs" style="margin-left:10px">                <li data-toggle="tab" data-ng-class="{active : $first}" data-ng-repeat="(sectionTitle, section) in callOut.sections" ng-if="section.hasProperties()">                    <a ng-href="#rp-{{$index}}" data-toggle="tab" data-ng-if="section.showSectionIcon()" ng-click="featureTabActivated(sectionTitle, section)"><i class="fa {{section.sectionIcon}}"></i></a>                    <a ng-href="#rp-{{$index}}" data-toggle="tab" data-ng-if="!section.showSectionIcon()" ng-click="featureTabActivated(sectionTitle, section)">{{sectionTitle}}</a>                </li>            </ul>        </div>        <div class="row" ng-if="callOut.sectionCount() >= 4">            <ul class="nav nav-tabs" id="featureTabs" style="margin-left:10px">                <li data-toggle="tab" class="active" ng-init="firstCallOutsection=callOut.firstSection()">                    <a ng-href="#rp-0" data-toggle="tab" data-ng-if="firstCallOutsection.showSectionIcon()" ><i class="fa {{firstCallOutsection.sectionIcon}}"></i></a>                </li>                <li class="dropdown" ng-init="selectedSection.title=\'Kies een categorie\'">                    <a style="cursor:pointer" data-toggle="dropdown">{{selectedSection.title}} <span class="caret"/></a>                    <ul class="dropdown-menu">                        <li data-ng-repeat="(sectionTitle, section) in callOut.sections" ng-if="!$last && !$first"><a ng-href="#rp-{{$index}}" ng-click="selectedSection.title = sectionTitle" data-toggle="tab">{{sectionTitle}}</a></li>                    </ul>                </li>                <li data-toggle="tab" ng-init="lastCallOutsection=callOut.lastSection()">                    <a ng-href="#rp-{{callOut.sectionCount()-1}}" data-toggle="tab" data-ng-if="lastCallOutsection.showSectionIcon()"><i class="fa {{lastCallOutsection.sectionIcon}}"></i></a>                </li>            </ul>        </div>    </div>    <div class="tab-content" style="top:50px; width:355px; overflow-y: auto; overflow-x: hidden" resize resize-y="150">        <div data-ng-if="!$last" class="tab-pane" data-ng-class="{active : $first}" id="rp-{{$index}}" data-ng-repeat="(sectionTitle, section) in callOut.sections">            <table class="table table-condensed">                <tr popover="{{(item.description) ? item.description : \'\'}}"                    popover-placement="left"                    popover-trigger="mouseenter"                    popover-append-to-body="true"                    data-ng-repeat="item in section.properties">                    <!--<td>                        <span class="dropdown">                            <a href class="fa fa-circle-o makeNarrow dropdown-toggle"></a>                            <ul class="dropdown-menu">                                <li><a data-ng-click="vm.$layerService.createScatter(item)">scatter plot</a></li>                                <li><a>add to dashboard</a></li>                            </ul>                        </span>                    </td>-->                    <td><a class="fa fa-filter makeNarrow" data-ng-show="item.canFilter" data-ng-click="vm.$layerService.setPropertyFilter(item)" style="cursor: pointer"></a></td>                    <td><a class="fa fa-eyedropper makeNarrow" data-ng-show="item.canStyle" data-ng-click="vm.$layerService.setStyle(item)" style="cursor: pointer"></a></td>                    <td>                        {{item.key}}                    </td>                    <td class="text-right" data-ng-bind-html="vm.toTrusted(item.value)"></td>                </tr>            </table>        </div>        <!-- Treat last tab (filter) differently -->        <div data-ng-if="$last" class="tab-pane" data-ng-class="{active : $first}" id="rp-{{$index}}" data-ng-repeat="(sectionTitle, section) in callOut.sections">            <!-- Add filter panel to the last rendered element -->            <div class="has-feedback" style="padding:0 4px 4px 4px;">                <span style="direction: ltr; position: static; display: block;">                    <input id="searchbox" data-ng-model="search.key" type="text"                            placeholder="Filter" autocomplete="off" spellcheck="false"                            style="position: relative; vertical-align: top;" class="form-control tt-input">                </span>                <span id="searchicon" class="fa form-control-feedback fa-filter"></span>            </div>            <!--<input style="padding:4px;" class=" form-control" data-ng-model="search" placeholder="...">-->            <table id="searchTextResults" class="table table-condensed">                <tr popover="{{(item.description) ? item.description : \'\'}}"                    popover-placement="left"                    popover-trigger="mouseenter"                    popover-append-to-body="true"                    data-ng-repeat="item in section.properties | filter:search">                    <td><a class="fa fa-filter makeNarrow" data-ng-show="item.canFilter" data-ng-click="vm.$layerService.setPropertyFilter(item)"></a></td>                    <td><a class="fa fa-eye makeNarrow" data-ng-show="item.canStyle" data-ng-click="vm.$layerService.setStyle(item)"></a></td>                    <td>{{item.key}}</td>                    <td class="text-right" data-ng-bind-html="vm.toTrusted(item.value)"></td>                </tr>            </table>        </div>    </div></div>';
 })(FeatureProps || (FeatureProps = {}));
 var FeatureProps;
 (function (FeatureProps) {
@@ -1915,7 +1596,7 @@ var FeatureProps;
         return FeaturePropsOptions;
     })();
     var CallOutProperty = (function () {
-        function CallOutProperty(key, value, property, canFilter, canStyle, feature, isFilter, isSensor, description, meta, timestamps, sensor) {
+        function CallOutProperty(key, value, property, canFilter, canStyle, feature, isFilter, description, meta) {
             this.key = key;
             this.value = value;
             this.property = property;
@@ -1923,11 +1604,8 @@ var FeatureProps;
             this.canStyle = canStyle;
             this.feature = feature;
             this.isFilter = isFilter;
-            this.isSensor = isSensor;
             this.description = description;
             this.meta = meta;
-            this.timestamps = timestamps;
-            this.sensor = sensor;
         }
         return CallOutProperty;
     })();
@@ -1942,11 +1620,7 @@ var FeatureProps;
             return !csComp.StringExt.isNullOrEmpty(this.sectionIcon);
         };
         CallOutSection.prototype.addProperty = function (key, value, property, canFilter, canStyle, feature, isFilter, description, meta) {
-            var isSensor = typeof feature.sensors !== 'undefined' && feature.sensors.hasOwnProperty(property);
-            if (isSensor)
-                this.properties.push(new CallOutProperty(key, value, property, canFilter, canStyle, feature, isFilter, isSensor, description ? description : null, meta, feature.timestamps, feature.sensors[property]));
-            else
-                this.properties.push(new CallOutProperty(key, value, property, canFilter, canStyle, feature, isFilter, isSensor, description ? description : null, meta));
+            this.properties.push(new CallOutProperty(key, value, property, canFilter, canStyle, feature, isFilter, description ? description : null, meta));
         };
         CallOutSection.prototype.hasProperties = function () {
             return this.properties != null && this.properties.length > 0;
@@ -1981,9 +1655,8 @@ var FeatureProps;
                     var canStyle = (mi.type === "number" || mi.type === "options" || mi.type === "color");
                     if (mi.filterType != null)
                         canFilter = mi.filterType.toLowerCase() != "none";
-                    if (mi.visibleInCallOut) {
+                    if (mi.visibleInCallOut)
                         callOutSection.addProperty(mi.title, displayValue, mi.label, canFilter, canStyle, feature, false, mi.description, mi);
-                    }
                     searchCallOutSection.addProperty(mi.title, displayValue, mi.label, canFilter, canStyle, feature, false, mi.description);
                 });
             }
@@ -2075,7 +1748,6 @@ var FeatureProps;
             this.featureMessageReceived = function (title, feature) {
                 switch (title) {
                     case "onFeatureSelect":
-                        _this.setShowSimpleTimeline();
                         _this.displayFeature(feature);
                         _this.$scope.poi = feature;
                         _this.$scope.autocollapse(true);
@@ -2090,7 +1762,6 @@ var FeatureProps;
                     _this.$scope.$apply();
                 }
             };
-            this.timestamps = new Array();
             this.scope = $scope;
             $scope.vm = this;
             $scope.showMenu = false;
@@ -2187,62 +1858,11 @@ var FeatureProps;
             if (!feature)
                 return;
             var featureType = this.$layerService.featureTypes[feature.featureTypeName];
-            // If we are dealing with a sensor, make sure that the feature's timestamps are valid so we can add it to a chart
-            if (typeof feature.sensors !== 'undefined' && typeof feature.timestamps === 'undefined')
-                feature.timestamps = this.$layerService.findLayer(feature.layerId).timestamps;
             this.$scope.callOut = new CallOut(featureType, feature, this.$layerService.propertyTypeData);
-        };
-        FeaturePropsCtrl.prototype.showSensorData = function (property) {
-            console.log(property);
-        };
-        FeaturePropsCtrl.prototype.setShowSimpleTimeline = function () {
-            if (this.$mapService.timelineVisible || typeof this.$layerService.lastSelectedFeature === 'undefined' || this.$layerService.lastSelectedFeature == null) {
-                this.showSimpleTimeline = false;
-                return;
-            }
-            var feature = this.$layerService.lastSelectedFeature;
-            this.showSimpleTimeline = (typeof feature.sensors !== 'undefined' && feature.sensors !== null);
-            if (this.showSimpleTimeline)
-                this.setTimestamps();
-        };
-        FeaturePropsCtrl.prototype.setTimestamps = function () {
-            var feature = this.$layerService.lastSelectedFeature;
-            var layer = this.$layerService.findLayer(feature.layerId);
-            if ((typeof layer.timestamps === 'undefined' || layer.timestamps == null) && (typeof feature.timestamps === 'undefined' || feature.timestamps == null))
-                return [];
-            var time = this.timestamps = new Array();
-            (layer.timestamps || feature.timestamps).forEach(function (ts) {
-                var date = new Date(ts);
-                var dateString = String.format("{0}-{1:00}-{2:00}", date.getFullYear(), date.getUTCMonth() + 1, date.getUTCDate());
-                if (date.getUTCHours() > 0 || date.getUTCMinutes() > 0)
-                    dateString += String.format(" {0:00}:{1:00}", date.getUTCHours(), date.getUTCMinutes());
-                time.push({ title: dateString, timestamp: ts });
-            });
-            // Set focus time
-            var focus = this.$layerService.project.timeLine.focus;
-            if (focus > time[time.length - 1].timestamp) {
-                this.focusTime = time[time.length - 1].title;
-                this.setTime(time[time.length - 1]);
-            }
-            else if (focus < time[0].timestamp) {
-                this.focusTime = time[0].title;
-                this.setTime(time[0]);
-            }
-            else {
-                for (var i = 1; i < time.length; i++) {
-                    if (focus > time[i].timestamp)
-                        continue;
-                    this.focusTime = time[i].title;
-                    this.setTime(time[i]);
-                    break;
-                }
-            }
-            return time;
-        };
-        FeaturePropsCtrl.prototype.setTime = function (time) {
-            this.focusTime = time.title;
-            this.$layerService.project.timeLine.setFocus(new Date(time.timestamp));
-            this.$messageBusService.publish("timeline", "focusChange", time.timestamp);
+            // Probably not needed
+            //if (this.$scope.$root.$$phase != '$apply' && this.$scope.$root.$$phase != '$digest') {
+            //    this.$scope.$apply();
+            //}
         };
         // $inject annotation.
         // It provides $injector with information about dependencies to be injected into constructor
@@ -2512,7 +2132,7 @@ var FilterList;
 })(FilterList || (FilterList = {}));
 var Heatmap;
 (function (Heatmap) {
-    Heatmap.html = '<div>    <div class="wide-tooltip">        <span class="pull-right fa fa-info-circle fa-2x"              tooltip-html-unsafe="{{\'HEATMAP.DESCRIPTION\' | translate}}"              tooltip-placement="bottom"              tooltip-trigger="mouseenter"              tooltip-append-to-body="false"              style="margin-right: 5px;"></span>        <h4 class="leftpanel-header" translate>HEATMAP</h4>    </div>    <div>        <select data-ng-model="vm.heatmapModel"                data-ng-options="heatmap.title for heatmap in vm.heatmapModels"                data-ng-change="vm.updateHeatmap()"                style="width: 65%; margin-bottom: 10px;"></select>        <div data-ng-if="vm.expertMode" class="pull-right">            <a href="" data-ng-click="vm.createHeatmap()" tooltip="{{\'MCA.ADD_MCA\' | translate}}" style="margin-right:5px;"><i class="fa fa-plus"></i></a>            <a href="" data-ng-click="vm.removeHeatmap(vm.heatmapModel)" tooltip="{{\'MCA.DELETE_MCA\' | translate}}" style="margin-right:5px;"><i class="fa fa-trash"></i></a>            <a href="" data-ng-click="vm.editHeatmap(vm.heatmapModel)" tooltip="{{\'MCA.EDIT_MCA\' | translate}}" tooltip-placement="right" style="margin-right:5px;"><i class="fa fa-edit"></i></a>        </div>    </div>        <div data-ng-if="vm.heatmapModel" style="overflow-y: auto; overflow-x: hidden; margin-left: -5px;" resize resize-y="140">        <div data-ng-repeat="hi in vm.heatmapModel.heatmapItems" class="wide-tooltip">            <div data-ng-if="hi.isSelected">                <div class="truncate" data-ng-class="{true: \'ignoredCriteria\'}[hi.userWeight == 0]" style="display: inline-block; width: 190px; font-weight: bold">{{hi.toString()}}</div>                <voting class="pull-right"                        data-ng-class="vm.getVotingClass(hi)"                        data-ng-change="vm.weightUpdated()"                        min="-5"                        max="5"                        ng-model="hi.userWeight"                        style="margin-right: 5px; margin-bottom: 3px;"></voting>            </div>        </div>    </div></div>';
+    Heatmap.html = '<div>    <div class="wide-tooltip">        <span class="pull-right fa fa-info-circle fa-2x"              tooltip-html-unsafe="{{\'HEATMAP.DESCRIPTION\' | translate}}"              tooltip-placement="bottom"              tooltip-trigger="mouseenter"              tooltip-append-to-body="false"              style="margin-right: 5px;"></span>        <h4 class="leftpanel-header" translate>HEATMAP</h4>    </div>    <div>        <select data-ng-model="vm.heatmapModel"                data-ng-options="heatmap.title for heatmap in vm.heatmapModels"                data-ng-change="vm.updateHeatmap()"                style="width: 65%; margin-bottom: 10px;"></select>        <div data-ng-if="vm.expertMode" class="pull-right">            <a href="" data-ng-click="vm.createHeatmap()" tooltip="{{\'HEATMAP.ADD_HEATMAP\' | translate}}" style="margin-right:5px;"><i class="fa fa-plus"></i></a>            <a href="" data-ng-click="vm.removeHeatmap(vm.heatmapModel)" tooltip="{{\'HEATMAP.DELETE_HEATMAP\' | translate}}" style="margin-right:5px;"><i class="fa fa-trash"></i></a>            <a href="" data-ng-click="vm.editHeatmap(vm.heatmapModel)" tooltip="{{\'HEATMAP.EDIT_HEATMAP\' | translate}}" tooltip-placement="right" style="margin-right:5px;"><i class="fa fa-edit"></i></a>        </div>    </div>        <div data-ng-if="vm.heatmapModel" style="margin-bottom: 20px; margin-left: -5px">            <div style="display: inline; font-weight: bold" translate>HEATMAP.INTENSITY_SCALE</div>            <voting class="pull-right"                    data-ng-change="vm.intensityScaleUpdated()"                    min="0"                    max="5"                    ng-model="vm.heatmapModel.intensityScale"                    style="margin-bottom: 3px; margin-right: 5px"></voting>        </div>    <div data-ng-if="vm.heatmapModel" style="overflow-y: auto; overflow-x: hidden; margin-left: -5px;" resize resize-y="140">        <div data-ng-repeat="hi in vm.heatmapModel.heatmapItems" class="wide-tooltip">            <div data-ng-if="hi.isSelected">                <div class="truncate" data-ng-class="{true: \'ignoredCriteria\'}[hi.userWeight == 0]" style="display: inline-block; width: 180px; font-weight: bold">{{hi.toString()}}</div>                <voting class="pull-right"                        data-ng-class="vm.getVotingClass(hi)"                        data-ng-change="vm.weightUpdated()"                        min="-5"                        max="5"                        ng-model="hi.userWeight"                        style="margin-right: 5px; margin-bottom: 3px;"></voting>            </div>        </div>    </div>    <div data-ng-if="!vm.heatmapModel">        <div data-ng-if="vm.expertMode" translate>HEATMAP.INFO_EXPERT</div>        <div data-ng-if="!vm.expertMode" translate>HEATMAP.INFO</div>    </div></div>';
 })(Heatmap || (Heatmap = {}));
 var Heatmap;
 (function (Heatmap) {
@@ -2585,13 +2205,7 @@ var Heatmap;
             messageBusService.subscribe('project', function (title) {
                 switch (title) {
                     case 'loaded':
-                        /*this.expertMode = $layerService.project != null
-                            && $layerService.project.hasOwnProperty('userPrivileges')
-                            && $layerService.project.userPrivileges.hasOwnProperty('mca')
-                            && $layerService.project.userPrivileges.mca.hasOwnProperty('expertMode')
-                            && $layerService.project.userPrivileges.mca.expertMode;*/
-                        if (typeof $layerService.project.mcas === 'undefined' || $layerService.project.mcas == null)
-                            break;
+                        break;
                 }
             });
             /*messageBusService.subscribe('feature', this.featureMessageReceived);*/
@@ -2608,6 +2222,7 @@ var Heatmap;
             this.showHeatmapEditor(heatmap);
         };
         HeatmapCtrl.prototype.editHeatmap = function (heatmap) {
+            this.showHeatmapEditor(heatmap);
         };
         HeatmapCtrl.prototype.removeHeatmap = function (heatmap) {
             var _this = this;
@@ -2620,7 +2235,8 @@ var Heatmap;
                 _this.$timeout(function () {
                     _this.deleteHeatmap(heatmap);
                     if (_this.heatmap)
-                        _this.$mapService.map.removeLayer(_this.heatmap);
+                        _this.updateHeatmap();
+                    //if (this.heatmap) this.$mapService.map.removeLayer(this.heatmap);
                 }, 0);
             });
             this.scopeApply();
@@ -2631,6 +2247,7 @@ var Heatmap;
             var index = this.heatmapModels.indexOf(heatmap);
             if (index >= 0)
                 this.heatmapModels.splice(index, 1);
+            this.$mapService.map.removeLayer(this.heatmap);
             //var mcaIndex = this.getMcaIndex(mca);
             //if (mcaIndex < 0) return;
             //var mcas = this.$layerService.project.mcas;
@@ -2658,7 +2275,7 @@ var Heatmap;
                     _this.heatmapModels.splice(i, 1);
                 _this.heatmapModels.push(heatmap);
                 _this.updateHeatmap();
-                //console.log(JSON.stringify(mca, null, 2));
+                console.log('Updated heatmap');
             }, function () {
                 //console.log('Modal dismissed at: ' + new Date());
             });
@@ -2670,7 +2287,7 @@ var Heatmap;
         };
         HeatmapCtrl.prototype.getVotingClass = function (hi) {
             if (hi == null || this.heatmapModel == null || hi.userWeight === 0 || hi.userWeight < -5 || hi.userWeight > 5)
-                return 'disabledMca';
+                return 'disabledHeatmap';
             return hi.userWeight > 0 ? 'prefer' : 'avoid';
         };
         HeatmapCtrl.prototype.weightUpdated = function () {
@@ -2678,33 +2295,77 @@ var Heatmap;
                 return;
             this.updateHeatmap();
         };
+        HeatmapCtrl.prototype.intensityScaleUpdated = function () {
+            if (!this.heatmapModel)
+                return;
+            this.heatmapModel.updateIntensityScale();
+            this.updateHeatmap();
+        };
         /**
          * Update the available pre-set heatmaps.
          */
         HeatmapCtrl.prototype.updateHeatmap = function () {
-            this.heatmapModel.updateWeights();
-            this.heatmapModel.calculate(this.$layerService, this.heatmap);
+            if (this.heatmapModel) {
+                var currentZoom = this.$mapService.getMap().getZoom();
+                if (currentZoom >= this.heatmapModel.scaleMinValue && currentZoom <= this.heatmapModel.scaleMaxValue) {
+                    this.heatmapModel.updateWeights();
+                    this.heatmapModel.calculate(this.$layerService, this.$mapService, this.heatmap);
+                }
+                else {
+                    console.log("Heatmap is not supported for the current zoom level.");
+                }
+            }
         };
-        /**
-        * Add a WebGL heatmap layer to the map.
-        */
+        ///**
+        //* Add a heatmap layer to the map.
+        //*/
         HeatmapCtrl.prototype.initializeHeatmap = function () {
             var _this = this;
-            csComp.Utils.loadJsCssfile('js/cs/webgl-heatmap.min.js', 0 /* Js */, function (event) {
-                csComp.Utils.loadJsCssfile('js/cs/webgl-heatmap-leaflet.min.js', 0 /* Js */, function (event) {
-                    //custom size for this example, and autoresize because map style has a percentage width
-                    _this.heatmap = new L.TileLayer.WebGLHeatMap({ size: 50, autoresize: false });
-                    _this.$mapService.map.addLayer(_this.heatmap);
-                    //// dataPoints is an array of arrays: [[lat, lng, intensity]...]
-                    //this.$mapService.map.setView(new L.LatLng(44.65, -63.57), 12);
-                    //var dataPoints = [[44.6674, -63.5703, 37], [44.6826, -63.7552, 34], [44.6325, -63.5852, 41], [44.6467, -63.4696, 67], [44.6804, -63.487, 64], [44.6622, -63.5364, 40], [44.603, - 63.743, 52]];
-                    //for (var i = 0, len = dataPoints.length; i < len; i++) {
-                    //    var point = dataPoints[i];
-                    //    this.heatmap.addDataPoint(point[0], point[1], point[2]);
+            this.heatmap = L.geoJson([], {
+                style: function (feature) {
+                    if (feature.properties.intensity <= 0) {
+                        var hexString = Heatmap.HeatmapCtrl.intensityToHex(feature.properties.intensity);
+                        return { color: "#FF" + hexString + hexString };
+                    }
+                    else if (feature.properties.intensity > 0) {
+                        var hexString = Heatmap.HeatmapCtrl.intensityToHex(feature.properties.intensity);
+                        return { color: "#" + hexString + hexString + "FF" };
+                    }
+                    else {
+                        return { color: "#ffffff" };
+                    }
+                    //if (feature.properties.intensity < -0.10) {
+                    //    return { color: "#ff0000" };
+                    //} else if (feature.properties.intensity < 0.10) {
+                    //    return { color: "#ffffff" };
+                    //} else {
+                    //    return { color: "#0000ff" };
                     //}
-                });
+                }
+            });
+            this.$mapService.map.setView(new L.LatLng(52.1095, 4.3275), 14);
+            this.$mapService.map.addLayer(this.heatmap);
+            //TODO: remove when deleting heatmap layer
+            this.$mapService.getMap().on('moveend', function () {
+                _this.updateHeatmap();
             });
         };
+        HeatmapCtrl.intensityToHex = function (intensity) {
+            var decreaseOverlap = 20;
+            intensity = Math.floor(Math.abs(intensity) * 255);
+            if (intensity < 0) {
+                intensity = 0;
+            }
+            else if (intensity > 255 - decreaseOverlap) {
+                intensity = 255 - decreaseOverlap;
+            }
+            var hexString = (255 - decreaseOverlap - intensity).toString(16);
+            if (hexString.length == 1) {
+                hexString = "0" + hexString;
+            }
+            return hexString;
+        };
+        HeatmapCtrl.MAX_HEATMAP_CELLS = 2500;
         HeatmapCtrl.$inject = [
             '$scope',
             '$modal',
@@ -2724,13 +2385,19 @@ var Heatmap;
     'use strict';
     var HeatmapEditorCtrl = (function () {
         function HeatmapEditorCtrl($scope, $modalInstance, $layerService, $translate, messageBusService, heatmap) {
+            var _this = this;
             this.$scope = $scope;
             this.$modalInstance = $modalInstance;
             this.$layerService = $layerService;
             this.$translate = $translate;
             this.messageBusService = messageBusService;
             this.heatmap = heatmap;
+            this.scoringFunctions = [];
             $scope.vm = this;
+            this.scoringFunctions.push(new Heatmap.ScoringFunction(0 /* LinearAscendingDescending */));
+            $translate('HEATMAP.LINEAR_ASC_DESC').then(function (translation) {
+                _this.scoringFunctions[0].title = translation;
+            });
             this.dataset = csComp.Helpers.loadMapLayers($layerService);
             if (!heatmap)
                 heatmap = new Heatmap.HeatmapModel('Heatmap');
@@ -2762,6 +2429,10 @@ var Heatmap;
         HeatmapEditorCtrl.prototype.cancel = function () {
             this.$modalInstance.dismiss('cancel');
         };
+        HeatmapEditorCtrl.prototype.toggleItemDetails = function (index) {
+            this.showItem = this.showItem == index ? -1 : index;
+            console.log("Toggle item");
+        };
         HeatmapEditorCtrl.$inject = [
             '$scope',
             '$modalInstance',
@@ -2776,7 +2447,7 @@ var Heatmap;
 })(Heatmap || (Heatmap = {}));
 var HeatmapEditorView;
 (function (HeatmapEditorView) {
-    HeatmapEditorView.html = '<div class="modal-content">    <div class="modal-header">        <button type="button" class="close" data-ng-click="vm.cancel()" aria-hidden="true">&times;</button>        <h3 class="modal-title" translate>HEATMAP.EDITOR_TITLE</h3>    </div>    <div class="modal-body container-fluid">        <div class="row-fluid">            <input type="text" class="pull-left" data-ng-model="vm.heatmap.title" style="margin: 0 5px" placeholder="{{ \'HEATMAP.TITLE\' | translate }}" />        </div>        <h4 class="row-fluid" style="margin-top: 5px;" translate>HEATMAP.MAIN_FEATURE</h4>        <!--<select data-ng-model="vm.selectedFeatureType"                data-ng-change="vm.loadPropertyTypes()"                data-ng-options="item as item.name for (key, item) in vm.dataset.featureTypes"                class="form-control row-fluid"></select>-->        <h4 class="row-fluid" translate>HEATMAP.PROPERTIES</h4>        <ul class="form-group row-fluid" style="margin-top: 1em; margin-left: -2em; overflow-y: auto; overflow-x: hidden;"            resize resize-y="450">            <li ng-repeat="hi in vm.heatmap.heatmapItems"                class="row-fluid list-unstyled truncate">                <div style="padding: 5px 0;" class="row-fluid"><!--                    name="vm.selectedTitles[]" value="{{hi.title}}"-->                    <input type="checkbox"                            data-ng-checked="hi.isSelected"                           data-ng-click="hi.select()">&nbsp;&nbsp;{{hi.toString()}}                </div>            </li>        </ul>    </div>    <div class="modal-footer">        <button type="button" class="btn btn-warning" data-ng-click="vm.cancel()" translate>CANCEL_BTN</button>        <button type="button" class="btn btn-primary" data-ng-click="vm.save()" translate>OK_BTN</button>    </div></div>';
+    HeatmapEditorView.html = '<div class="modal-content">    <div class="modal-header">        <button type="button" class="close" data-ng-click="vm.cancel()" aria-hidden="true">&times;</button>        <h3 class="modal-title" translate>HEATMAP.EDITOR_TITLE</h3>    </div>    <div class="modal-body container-fluid">        <div class="row-fluid">            <input type="text" data-ng-model="vm.heatmap.title" style="margin: 0 5px" placeholder="{{ \'HEATMAP.TITLE\' | translate }}" />        </div>        <h4 class="row-fluid" style="margin-top: 20px;" translate>HEATMAP.MAIN_FEATURE</h4>        <!--<select data-ng-model="vm.selectedFeatureType"                data-ng-change="vm.loadPropertyTypes()"                data-ng-options="item as item.name for (key, item) in vm.dataset.featureTypes"                class="form-control row-fluid"></select>        <h4 class="row-fluid" translate>HEATMAP.PROPERTIES</h4>-->        <ul class="form-group row-fluid" style="margin-top: 1em; margin-left: -2em; overflow-y: auto; overflow-x: hidden;"            resize resize-y="450">            <li ng-repeat="hi in vm.heatmap.heatmapItems"                class="row-fluid list-unstyled truncate">                <div style="padding: 5px 0;" class="row-fluid"><!--                    name="vm.selectedTitles[]" value="{{hi.title}}"-->                    <input type="checkbox"                           data-ng-checked="hi.isSelected"                           data-ng-click="hi.isSelected = !hi.isSelected">&nbsp;&nbsp;{{hi.title}}                    <div data-ng-if="hi.isSelected" class="pull-right">                        <a href="" class="pull-right"                           style="margin-right: 5px;"                           data-ng-click="vm.toggleItemDetails($index)"><i class="fa fa-2x fa-edit"></i></a>                    </div>                </div>                <div class="row-fluid" data-ng-show="vm.showItem == {{$index}}" id="scoringFunction">                    <select class="col-xs-10"                            style="margin-right: 5px; margin-bottom: 5px;"                            data-ng-init="hi.scoringFunctionType = hi.scoringFunctionType || vm.scoringFunctions[0]"                            data-ng-model="hi.scoringFunctionType"                            data-ng-options="sf as sf.title for sf in vm.scoringFunctions"></select>                    <div class="pull-right" data-ng-class="hi.scoringFunctionType.cssClass" style="width: 40px; height: 28px; margin-top: -5px;"></div>                    <div class="row-fluid" >                        <input type="text" class="col-xs-3" style="padding: 0; margin-right: 5px;" data-ng-model="hi.idealityMeasure.atLocation" placeholder="{{ \'HEATMAP.AT_LOCATION_VALUE\' | translate }}" />                        <input type="text" class="col-xs-3" style="padding: 0; margin-right: 5px;" data-ng-model="hi.idealityMeasure.idealDistance" placeholder="{{ \'HEATMAP.DISTANCE_MAX_VALUE\' | translate }}" />                        <input type="text" class="col-xs-3" style="padding: 0;" data-ng-model="hi.idealityMeasure.lostInterestDistance" placeholder="{{ \'HEATMAP.LOST_INTEREST_VALUE\' | translate }}" />                    </div>                </div>            </li>        </ul>    </div>    <div class="modal-footer">        <button type="button" class="btn btn-warning" data-ng-click="vm.cancel()" translate>CANCEL_BTN</button>        <button type="button" class="btn btn-primary" data-ng-click="vm.save()" translate>OK_BTN</button>    </div></div>';
 })(HeatmapEditorView || (HeatmapEditorView = {}));
 var Heatmap;
 (function (Heatmap) {
@@ -2788,10 +2459,10 @@ var Heatmap;
              * The user weight specifies how much you like this item, e.g. the maximum value.
              * @type {number}, range [-5..5].
              */
-            this.userWeight = 5;
+            this.userWeight = 1;
             /**
              * The weight specifies how much you like this item, relative to others.
-             * @type {number}, range [0..1].
+             * @type {number}, range [-1..1].
              */
             this.weight = 0;
             /**
@@ -2803,23 +2474,23 @@ var Heatmap;
             this.heatspots = [];
             /** Represents the number of items that are needed to obtain an ideal location. */
             this.isSelected = false;
-            this.intensityScale = 5;
+            this.intensityScale = 1;
             // TODO Needs improvement based on actual location
             this.setScale(52);
         }
-        HeatmapItem.prototype.calculateHeatspots = function (feature, cellSize) {
+        HeatmapItem.prototype.calculateHeatspots = function (feature, cellWidth, cellHeight, horizCells, vertCells, mapBounds) {
             // right type?
             if (!this.isSelected || this.featureType !== feature.fType)
                 return null;
-            if (this.heatspots.length === 0 && this.weight > 0)
-                this.calculateHeatspot(cellSize);
+            if (this.heatspots.length === 0)
+                this.calculateHeatspot(cellWidth, cellHeight);
             // create heatspot solely based on feature type?
             if (!this.propertyLabel) {
-                return this.pinHeatspotToLocation(feature);
+                return this.pinHeatspotToGrid(feature, horizCells, vertCells, mapBounds);
             }
             // create heatspot based on the preferred option?
             if (feature.properties.hasOwnProperty(this.propertyLabel) && feature.properties[this.propertyLabel] === this.optionIndex) {
-                return this.pinHeatspotToLocation(feature);
+                return this.pinHeatspotToGrid(feature, horizCells, vertCells, mapBounds);
             }
             return null;
         };
@@ -2827,21 +2498,22 @@ var Heatmap;
         * Calculate the intensity around the location.
         * NOTE We are performing a relative computation around location (0,0) in a rectangular grid.
         */
-        HeatmapItem.prototype.calculateHeatspot = function (cellSize) {
+        HeatmapItem.prototype.calculateHeatspot = function (cellWidth, cellHeight) {
             var maxRadius = this.idealityMeasure.lostInterestDistance;
-            var cells = Math.floor(maxRadius / cellSize);
-            var sCellSize = cellSize * cellSize;
+            var horizCells = Math.floor(maxRadius / cellWidth);
+            var vertCells = Math.floor(maxRadius / cellHeight);
+            var sCellSize = cellWidth * cellHeight;
             var scaledWeight = this.weight * this.intensityScale;
-            this.heatspots = new Array(cells * cells + 1);
+            var arrayLength = horizCells * vertCells;
+            this.heatspots = new Array(arrayLength);
             this.heatspots.push(new Heatmap.Heatspot(0, 0, scaledWeight * this.idealityMeasure.atLocation));
-            for (var i = 1; i <= cells; i++) {
-                for (var j = 1; j <= cells; j++) {
+            for (var i = -vertCells; i <= vertCells; i++) {
+                for (var j = -horizCells; j <= horizCells; j++) {
                     var radius = Math.sqrt(i * i * sCellSize + j * j * sCellSize);
                     var weightedIntensity = scaledWeight * this.idealityMeasure.computeIdealityAtDistance(radius);
-                    this.heatspots.push(new Heatmap.Heatspot(i, j, weightedIntensity));
-                    this.heatspots.push(new Heatmap.Heatspot(i, -j, weightedIntensity));
-                    this.heatspots.push(new Heatmap.Heatspot(-i, j, weightedIntensity));
-                    this.heatspots.push(new Heatmap.Heatspot(-i, -j, weightedIntensity));
+                    if (!(i == 0 && j == 0) && weightedIntensity != 0) {
+                        this.heatspots.push(new Heatmap.Heatspot(i, j, weightedIntensity));
+                    }
                 }
             }
             //var latRadius = radius * HeatmapItem.meterToLatDegree; 
@@ -2906,14 +2578,21 @@ var Heatmap;
         /**
         * Translate the heatspot (at (0,0)) to the actual location.
         */
-        HeatmapItem.prototype.pinHeatspotToLocation = function (feature) {
+        HeatmapItem.prototype.pinHeatspotToGrid = function (feature, horizCells, vertCells, mapBounds) {
             if (feature.geometry.type !== 'Point')
                 return null;
+            var latlong = new L.LatLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
+            //TODO add a padding that takes the current zoom into account
+            var paddedBounds = mapBounds.pad(1.1);
+            if (!paddedBounds.contains(latlong))
+                return null; //Only draw features that are visible in the map
             var actualHeatspots = [];
-            var lat = feature.geometry.coordinates[1];
-            var lon = feature.geometry.coordinates[0];
+            //Find the indices of the feature in the grid
+            var hCell = Math.floor(((latlong.lng - mapBounds.getNorthWest().lng) / (mapBounds.getNorthEast().lng - mapBounds.getNorthWest().lng)) * horizCells);
+            var vCell = Math.floor(((latlong.lat - mapBounds.getSouthWest().lat) / (mapBounds.getNorthWest().lat - mapBounds.getSouthWest().lat)) * vertCells);
             this.heatspots.forEach(function (hs) {
                 //TODO actualHeatspots.push(hs.AddLocation(lat, lon));
+                actualHeatspots.push(hs.AddLocation(hCell, vCell));
             });
             return actualHeatspots;
         };
@@ -2960,30 +2639,91 @@ var Heatmap;
         function HeatmapModel(title) {
             this.title = title;
             this.heatmapItems = [];
+            this.scaleMaxValue = 16;
+            this.scaleMinValue = 9;
+            this.intensityScale = 1;
+            this.title = title;
         }
         /**
          * Calculate the heatmap.
          */
-        HeatmapModel.prototype.calculate = function (layerService, heatmap) {
+        HeatmapModel.prototype.calculate = function (layerService, mapService, heatmap) {
             var _this = this;
             console.log('Calculating heatmap');
+            var mapBounds = mapService.map.getBounds();
+            var NW = mapBounds.getNorthWest();
+            var NE = mapBounds.getNorthEast();
+            var SW = mapBounds.getSouthWest();
+            var width = NW.distanceTo(NE); //Width of the map as it is currently visible on the screen, including padding
+            var height = NW.distanceTo(SW); //Height ...
             var heatspots = [];
-            // Iterate over all applicable features on the map and add them to the list of heat spots.
+            // Iterate over all applicable features on the map and find the one with the largest interest distance.
             var dataset = csComp.Helpers.loadMapLayers(layerService);
-            heatmap.clearData();
+            var maxInterestDistance = 0;
+            //heatmap.clearData();
             dataset.features.forEach(function (f) {
                 _this.heatmapItems.forEach(function (hi) {
-                    var heatspot = hi.calculateHeatspots(f, 0.00001, 0.00001);
+                    if (hi.idealityMeasure.lostInterestDistance > maxInterestDistance) {
+                        maxInterestDistance = hi.idealityMeasure.lostInterestDistance;
+                    }
+                });
+            });
+            //Calculate a grid based on the maximum number of cells and the map ratio.
+            var mapRatio = width / height;
+            var maxCellCount = Heatmap.HeatmapCtrl.MAX_HEATMAP_CELLS;
+            var horizCells = Math.floor(Math.sqrt(maxCellCount * mapRatio));
+            var vertCells = Math.floor(horizCells / mapRatio);
+            var cellWidth = width / horizCells;
+            var cellHeight = height / vertCells;
+            var dLat = (NE.lat - SW.lat) / vertCells;
+            var dLng = (NE.lng - SW.lng) / horizCells;
+            var count = 0;
+            var intensityGrid = [];
+            for (var i = 0; i < horizCells; i++) {
+                intensityGrid[i] = [];
+                for (var j = 0; j < vertCells; j++) {
+                    intensityGrid[i][j] = 0;
+                }
+            }
+            // Iterate over all applicable features on the map and create a intensity "stamp" for each feature
+            dataset.features.forEach(function (f) {
+                _this.heatmapItems.forEach(function (hi) {
+                    var heatspot = hi.calculateHeatspots(f, cellWidth, cellHeight, horizCells, vertCells, mapBounds);
                     if (heatspot) {
                         //heatspots = heatspots.concat(heatspot);
                         //console.log('Created ' + heatspot.length + ' heatspots');
                         heatspot.forEach(function (hs) {
-                            //heatmap.addDataPoint(hs.latitude, hs.longitude, hs.intensity);
+                            //heatmap.addDataPoint(hs.i, hs.j, hs.intensity);
+                            if (hs.intensity != 0 && hs.i >= 0 && hs.i < horizCells && hs.j >= 0 && hs.j < vertCells) {
+                                intensityGrid[hs.i][hs.j] = intensityGrid[hs.i][hs.j] + hs.intensity;
+                                count = count + 1;
+                            }
                         });
                     }
                 });
             });
-            //console.log('Created ' + heatspots.length + ' heatspots');
+            console.log('Created ' + count + ' heatspots');
+            heatmap.clearLayers();
+            for (var i = 0; i < horizCells; i++) {
+                for (var j = 0; j < vertCells; j++) {
+                    if (intensityGrid[i][j] != 0) {
+                        var polyCoord = [[SW.lng + dLng * i, SW.lat + dLat * j], [SW.lng + dLng * (i + 1), SW.lat + dLat * j], [SW.lng + dLng * (i + 1), SW.lat + dLat * (j + 1)], [SW.lng + dLng * i, SW.lat + dLat * (j + 1)], [SW.lng + dLng * i, SW.lat + dLat * j]];
+                        var feature = {
+                            "type": "Feature",
+                            "geometry": {
+                                "type": "Polygon",
+                                "coordinates": [polyCoord]
+                            },
+                            "properties": {
+                                "gridX": i,
+                                "gridY": j,
+                                "intensity": intensityGrid[i][j]
+                            }
+                        };
+                        heatmap.addData(feature);
+                    }
+                }
+            }
         };
         /**
          * Update the weights of all heatmap items.
@@ -2996,9 +2736,23 @@ var Heatmap;
             });
             this.heatmapItems.forEach(function (hi) {
                 if (hi.isSelected) {
-                    hi.weight = hi.userWeight / totalUserWeight;
+                    if (totalUserWeight != 0) {
+                        hi.weight = hi.userWeight / totalUserWeight;
+                    }
+                    else {
+                        hi.weight = 0;
+                    }
                     hi.reset();
                 }
+            });
+        };
+        /**
+        * Update the intensity scale of all heatmap items.
+        */
+        HeatmapModel.prototype.updateIntensityScale = function () {
+            var _this = this;
+            this.heatmapItems.forEach(function (hi) {
+                hi.intensityScale = _this.intensityScale;
             });
         };
         /**
@@ -3029,29 +2783,60 @@ var Heatmap;
             this.j = j;
             this.intensity = intensity;
         }
+        Heatspot.prototype.AddLocation = function (i, j) {
+            // TODO
+            //return new Heatspot(this.latitude + lat, this.longitude + lon, this.intensity);
+            return new Heatspot(this.i + i, this.j + j, this.intensity);
+        };
         return Heatspot;
     })();
     Heatmap.Heatspot = Heatspot;
 })(Heatmap || (Heatmap = {}));
 var Heatmap;
 (function (Heatmap) {
+    (function (ScoringFunctionType) {
+        ScoringFunctionType[ScoringFunctionType["LinearAscendingDescending"] = 0] = "LinearAscendingDescending";
+    })(Heatmap.ScoringFunctionType || (Heatmap.ScoringFunctionType = {}));
+    var ScoringFunctionType = Heatmap.ScoringFunctionType;
+    var ScoringFunction = (function () {
+        function ScoringFunction(scoringFunctionType) {
+            if (typeof scoringFunctionType != 'undefined' && scoringFunctionType != null)
+                this.type = scoringFunctionType;
+            this.title = ScoringFunctionType[scoringFunctionType].toString();
+        }
+        Object.defineProperty(ScoringFunction.prototype, "cssClass", {
+            get: function () {
+                return ScoringFunctionType[this.type].toLowerCase();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        return ScoringFunction;
+    })();
+    Heatmap.ScoringFunction = ScoringFunction;
+    var ScoringFunctions = (function () {
+        function ScoringFunctions() {
+        }
+        return ScoringFunctions;
+    })();
+    Heatmap.ScoringFunctions = ScoringFunctions;
     var IdealityMeasure = (function () {
         function IdealityMeasure() {
             /**
             * The distance with respect to my location where I would like to find the item.
             * @type {number}, in meters
             */
-            this.idealDistance = 100;
+            this.idealDistance = 500;
             /**
             * How happy would I be if the item would be at my location.
             * @type {number}, range [0..1]
             */
-            this.atLocation = 0.2;
+            this.atLocation = 0.1;
             /**
              * At what distance would the item no longer be of value to me.
              * @type {number}, range in meters
              */
-            this.lostInterestDistance = 1000;
+            this.lostInterestDistance = 2000;
         }
         IdealityMeasure.prototype.computeIdealityAtDistance = function (distance) {
             if (distance < this.idealDistance) {
@@ -3068,7 +2853,7 @@ var Heatmap;
 })(Heatmap || (Heatmap = {}));
 var LanguageSwitch;
 (function (LanguageSwitch) {
-    LanguageSwitch.html = '<div class="navbar-collapse collapse">    <ul class="nav navbar-nav">        <li class="dropdown">            <a href=""               class="navbar-brand dropdown-toggle pull-left"               data-toggle="dropdown"               style="color:white; margin-left:-10px;">                <img data-ng-src="{{vm.language.img}}" />                <span class="caret" data-ng-if="vm.$languages.length > 1"></span>            </a>            <ul data-ng-if="vm.$languages.length > 1" class="dropdown-menu" role="menu">                <li ng-repeat="language in vm.$languages">                    <a ng-click="vm.switchLanguage(language)">                        <span>                            <img data-ng-src="{{language.img}}" />                            &nbsp;{{language.name}}                        </span>                    </a>                </li>            </ul>        </li>    </ul></div>';
+    LanguageSwitch.html = '<div class="navbar-collapse collapse">    <ul class="nav navbar-nav">        <li class="dropdown">            <a href=""               class="navbar-brand dropdown-toggle pull-left"               style="color:white; margin-left:-10px;">                <img data-ng-src="{{vm.language.img}}" />                <span class="caret" data-ng-if="vm.$languages.length > 1"></span>            </a>            <ul data-ng-if="vm.$languages.length > 1" class="dropdown-menu" role="menu">                <li ng-repeat="language in vm.$languages">                    <a ng-click="vm.switchLanguage(language)">                        <span>                            <img data-ng-src="{{language.img}}" />                            &nbsp;{{language.name}}                        </span>                    </a>                </li>            </ul>        </li>    </ul></div>';
 })(LanguageSwitch || (LanguageSwitch = {}));
 var LanguageSwitch;
 (function (LanguageSwitch) {
@@ -3122,26 +2907,32 @@ var LanguageSwitch;
 var LanguageSwitch;
 (function (LanguageSwitch) {
     var LanguageSwitchCtrl = (function () {
-        function LanguageSwitchCtrl($scope, $translate, $languages, $layerService, $messageBus) {
+        // dependencies are injected via AngularJS $injector
+        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
+        function LanguageSwitchCtrl($scope, $translate, $languages, $messageBus) {
             this.$scope = $scope;
             this.$translate = $translate;
             this.$languages = $languages;
-            this.$layerService = $layerService;
             this.$messageBus = $messageBus;
             $scope.vm = this;
+            //this.guiLanguages = $languages;
+            //this.languages.push({ key: 'en', name: 'English', img: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAALCAIAAAD5gJpuAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAflJREFUeNpinDRzn5qN3uFDt16+YWBg+Pv339+KGN0rbVP+//2rW5tf0Hfy/2+mr99+yKpyOl3Ydt8njEWIn8f9zj639NC7j78eP//8739GVUUhNUNuhl8//ysKeZrJ/v7z10Zb2PTQTIY1XZO2Xmfad+f7XgkXxuUrVB6cjPVXef78JyMjA8PFuwyX7gAZj97+T2e9o3d4BWNp84K1NzubTjAB3fH0+fv6N3qP/ir9bW6ozNQCijB8/8zw/TuQ7r4/ndvN5mZgkpPXiis3Pv34+ZPh5t23//79Rwehof/9/NDEgMrOXHvJcrllgpoRN8PFOwy/fzP8+gUlgZI/f/5xcPj/69e/37//AUX+/mXRkN555gsOG2xt/5hZQMwF4r9///75++f3nz8nr75gSms82jfvQnT6zqvXPjC8e/srJQHo9P9fvwNtAHmG4f8zZ6dDc3bIyM2LTNlsbtfM9OPHH3FhtqUz3eXX9H+cOy9ZMB2o6t/Pn0DHMPz/b+2wXGTvPlPGFxdcD+mZyjP8+8MUE6sa7a/xo6Pykn1s4zdzIZ6///8zMGpKM2pKAB0jqy4UE7/msKat6Jw5mafrsxNtWZ6/fjvNLW29qv25pQd///n+5+/fxDDVbcc//P/zx/36m5Ub9zL8+7t66yEROcHK7q5bldMBAgwADcRBCuVLfoEAAAAASUVORK5CYII=' });
+            //this.languages.push({ key: 'nl', name: 'Nederlands', img: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAALCAIAAAD5gJpuAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAFXSURBVHjaYvzPgAD/UNlYEUAAkuTgCAAIBgJggq5VoAs1qM0vdzmMz362vezjokxPGimkEQ5WoAQEKuK71zwCCKyB4c//J8+BShn+/vv/+w/D399AEox+//8FJH/9/wUU+cUoKw20ASCAWBhEDf/LyDOw84BU//kDtgGI/oARmAHRDJQSFwVqAAggxo8fP/Ly8oKc9P8/AxjiAoyMjA8ePAAIIJZ///5BVIM0MOBWDpRlZPzz5w9AALH8gyvCbz7QBrCJAAHEyKDYX15r/+j1199//v35++/Xn7+///77DST/wMl/f4Dk378K4jx7O2cABBALw7NP77/+ev3xB0gOpOHfr99AdX9/gTVASKCGP//+8XCyMjC8AwggFoZfIHWSwpwQk4CW/AYjsKlA8u+ff////v33998/YPgBnQQQQIzAaGNg+AVGf5AYf5BE/oCjGEIyAQQYAGvKZ4C6+xXRAAAAAElFTkSuQmCC' });
             this.language = $languages[0];
-            $layerService.currentLocale = this.language.key;
         }
         LanguageSwitchCtrl.prototype.switchLanguage = function (language) {
             this.language = language;
             this.$translate.use(language.key);
             this.$messageBus.publish('language', 'newLanguage', language.key);
         };
+        // $inject annotation.
+        // It provides $injector with information about dependencies to be injected into constructor
+        // it is better to have it close to the constructor, because the parameters must match in count and type.
+        // See http  ://docs.angularjs.org/guide/di
         LanguageSwitchCtrl.$inject = [
             '$scope',
             '$translate',
             '$languages',
-            'layerService',
             'messageBusService'
         ];
         return LanguageSwitchCtrl;
@@ -3150,7 +2941,7 @@ var LanguageSwitch;
 })(LanguageSwitch || (LanguageSwitch = {}));
 var LayersDirective;
 (function (LayersDirective) {
-    LayersDirective.html = '<div>    <h4 class="leftpanel-header" translate="LAYERS"></h4>    <div style="overflow-y: auto; overflow-x: hidden; margin-top: -10px" resize resize-y="95">        <div data-ng-repeat="group in vm.$layerService.project.groups" style="margin-left: 5px">            <div style="float: left; margin-left: -5px; margin-top: 5px"                  data-toggle="collapse"                  data-target="#layergroup_{{group.id}}">                <i class="fa fa-chevron-down togglebutton toggle-arrow-down"></i>                <i class="fa fa-chevron-up togglebutton toggle-arrow-up"></i>            </div>            <div popover="{{(group.description) ? group.description : \'\'}}"                 popover-placement="right"                 popover-width="400"                 popover-trigger="mouseenter"                 class="group-title">{{group.title}}</div>            <div id="layergroup_{{group.id}}" class="collapse in">                <div popover="{{(layer.description) ? layer.description : \'\'}}"                     popover-placement="right"                     popover-trigger="mouseenter"                     data-ng-repeat="layer in group.layers">                    <!--bs-popover>-->                    <div style="list-style-type: none; padding: 0;" data-ng-class="{indent: layer.isSublayer}">                        <!--<button type="button" class="btn btn-default" data-container="body" data-toggle="popover" data-placement="right" data-content="Vivamus sagittis lacus vel augue laoreet rutrum faucibus." data-original-title="" title="">Right</button>-->                        <div ng-hide="group.oneLayerActive" class="checkbox checkbox-primary" style="margin-left: 20px">                            <input type="checkbox" id="cblayer{{layer.id}}"                                   data-ng-model="layer.enabled"                                    data-ng-click="vm.toggleLayer(layer);">                            <label for="cblayer{{layer.id}}">                                {{layer.title}}                            </label>                            <div ng-show="layer.isLoading" class="spinner">                                <div class="bounce1"></div>                                <div class="bounce2"></div>                                <div class="bounce3"></div>                            </div>                        </div>                        <div ng-show="group.oneLayerActive" class="radio radio-primary" style="margin-left: 20px">                            <input type="radio" id="rblayer{{layer.id}}"                                   data-ng-value="true"                                    data-ng-model="layer.enabled"                                    data-ng-click="vm.toggleLayer(layer);">                            <label for="rblayer{{layer.id}}">                                {{layer.title}}                            </label>                            <div ng-show="layer.isLoading" class="spinner">                                <div class="bounce1"></div>                                <div class="bounce2"></div>                                <div class="bounce3"></div>                            </div>                        </div>                    </div>                </div>            </div>        </div>    </div></div>';
+    LayersDirective.html = '<div>    <h4 class="leftpanel-header" translate="LAYERS"></h4>    <div style="overflow-y: auto; overflow-x: hidden; margin-top: -10px" resize resize-y="95">        <div data-ng-repeat="group in vm.$layerService.project.groups" style="margin-left: 5px">            <div style="float: left; margin-left: -5px; margin-top: 5px" data-toggle="collapse" data-target="#layergroup_{{group.id}}"><i class="fa fa-chevron-down togglebutton toggle-arrow-down"></i><i class="fa fa-chevron-up togglebutton toggle-arrow-up"></i></div>            <div popover="{{(group.description) ? group.description : \'\'}}"                 popover-placement="right"                 popover-width="400"                 popover-trigger="mouseenter"                 class="group-title">{{group.title}}</div>            <div id="layergroup_{{group.id}}" class="collapse in">                <div popover="{{(layer.description) ? layer.description : \'\'}}"                     popover-placement="right"                     popover-trigger="mouseenter"                     data-ng-repeat="layer in group.layers">                    <!--bs-popover>-->                    <div style="list-style-type: none; padding: 0;" data-ng-class="{indent: layer.isSublayer}">                        <!--<button type="button" class="btn btn-default" data-container="body" data-toggle="popover" data-placement="right" data-content="Vivamus sagittis lacus vel augue laoreet rutrum faucibus." data-original-title="" title="">Right</button>-->                        <div ng-hide="group.oneLayerActive" class="checkbox checkbox-primary" style="margin-left: 20px">                            <input type="checkbox" id="cblayer{{layer.id}}" ng-model="layer.enabled" data-ng-click="vm.toggleLayer(layer);">                            <label for="cblayer{{layer.id}}">                                {{layer.title}}                            </label>                            <div ng-show="layer.isLoading" class="spinner">                            <div class="bounce1"></div>                            <div class="bounce2"></div>                            <div class="bounce3"></div>                        </div>                        </div>                        <div ng-show="group.oneLayerActive" class="radio radio-primary" style="margin-left: 20px">                            <input type="radio" ng-value="true" id="rblayer{{layer.id}}" ng-model="layer.enabled" data-ng-click="vm.toggleLayer(layer);">                            <label for="rblayer{{layer.id}}">                                {{layer.title}}                            </label>                            <div ng-show="layer.isLoading" class="spinner">                            <div class="bounce1"></div>                            <div class="bounce2"></div>                            <div class="bounce3"></div>                        </div>                        </div>                    </div>                </div>            </div>        </div>    </div></div>';
 })(LayersDirective || (LayersDirective = {}));
 var LayersDirective;
 (function (LayersDirective) {
@@ -3208,11 +2999,7 @@ var LayersDirective;
             $scope.vm = this;
         }
         LayersDirectiveCtrl.prototype.toggleLayer = function (layer) {
-            //Uncommented after updating the bower packages: the behaviour changed between angular versions.
-            // layer.enabled = !layer.enabled;
-            // Unselect when dealing with a radio group, so you can turn a loaded layer off again.
-            if (layer.group.oneLayerActive && this.$layerService.findLayer(layer.id))
-                layer.enabled = false;
+            //layer.enabled = !layer.enabled;
             if (layer.enabled) {
                 this.$layerService.addLayer(layer);
             }
@@ -3390,345 +3177,6 @@ var LegendList;
     })();
     LegendList.LegendListCtrl = LegendListCtrl;
 })(LegendList || (LegendList = {}));
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Mca;
-(function (_Mca) {
-    var Models;
-    (function (Models) {
-        (function (ScoringFunctionType) {
-            ScoringFunctionType[ScoringFunctionType["Manual"] = 0] = "Manual";
-            ScoringFunctionType[ScoringFunctionType["Ascending"] = 1] = "Ascending";
-            ScoringFunctionType[ScoringFunctionType["Descending"] = 2] = "Descending";
-            ScoringFunctionType[ScoringFunctionType["AscendingSigmoid"] = 3] = "AscendingSigmoid";
-            ScoringFunctionType[ScoringFunctionType["DescendingSigmoid"] = 4] = "DescendingSigmoid";
-            ScoringFunctionType[ScoringFunctionType["GaussianPeak"] = 5] = "GaussianPeak";
-            ScoringFunctionType[ScoringFunctionType["GaussianValley"] = 6] = "GaussianValley";
-        })(Models.ScoringFunctionType || (Models.ScoringFunctionType = {}));
-        var ScoringFunctionType = Models.ScoringFunctionType;
-        /**
-        * Scoring function creates a PLA of the scoring algorithm.
-        */
-        var ScoringFunction = (function () {
-            //get img(): string {
-            //    return '/includes/images/plot' + csComp.StringExt.Utils.toUnderscore(ScoringFunctionType[this.type]) + '.png';
-            //}
-            function ScoringFunction(scoringFunctionType) {
-                if (typeof scoringFunctionType != 'undefined' && scoringFunctionType != null)
-                    this.type = scoringFunctionType;
-                this.title = ScoringFunctionType[scoringFunctionType].toString();
-            }
-            Object.defineProperty(ScoringFunction.prototype, "cssClass", {
-                get: function () {
-                    return ScoringFunctionType[this.type].toLowerCase();
-                },
-                enumerable: true,
-                configurable: true
-            });
-            /**
-             * Create a score based on the type, in which x in [0,10] and y in [0.1].
-             * Before applying it, you need to scale the x-axis based on your actual range.
-             * Typically, you would map x=0 to the min(x)+0.1*range(x) and x(10)-0.1*range(x) to max(x),
-             * i.e. x' = ax+b, where a=100/(8r) and b=-100(min+0.1r)/(8r) and r=max-min
-             */
-            ScoringFunction.createScores = function (type) {
-                var scores;
-                switch (type) {
-                    default:
-                    case 1 /* Ascending */:
-                        scores = '[0,0 10,1]';
-                        break;
-                    case 2 /* Descending */:
-                        scores = '[0,1 10,0]';
-                        break;
-                    case 3 /* AscendingSigmoid */:
-                        // http://mathnotepad.com/: f(x) = (3.5+2*atan(x-5))/7
-                        // f([0,1,2,3,4,5,6,7,8,9,10])
-                        // round(100*f([0,1,2,3,4,5,6,7,8,9,10]))/100
-                        // [0.11 0.12 0.14 0.18 0.28 0.5 0.72 0.82 0.86 0.88 0.89]
-                        scores = '[0,0.11 1,0.12 2,0.14 3,0.18 4,0.28 5,0.5 6,0.72 7,0.82 8,0.86 9,0.88 10,0.89]';
-                        break;
-                    case 4 /* DescendingSigmoid */:
-                        // 1-f(x)
-                        scores = '[0,0.89 1,0.88 2,0.86 3,0.82 4,0.72 5,0.5 6,0.28 7,0.18 8,0.14 9,0.12 10,0.11]';
-                        break;
-                    case 5 /* GaussianPeak */:
-                        // h(x)=3*exp(-((x-u)^2)/(2s^2))/(s*sqrt(2pi))
-                        scores = '[0,0 2,0.04 3,0.25 4,0.7 5,1 6,0.7 7,0.25 8,0.04 9,0]';
-                        break;
-                    case 6 /* GaussianValley */:
-                        // 1-h(x)
-                        scores = '[0,1 2,0.96 3,0.75 4,0.3 5,0 6,0.3 7,0.75 8,0.96 9,0]';
-                        break;
-                }
-                return scores;
-            };
-            return ScoringFunction;
-        })();
-        Models.ScoringFunction = ScoringFunction;
-        var ScoringFunctions = (function () {
-            function ScoringFunctions() {
-            }
-            return ScoringFunctions;
-        })();
-        Models.ScoringFunctions = ScoringFunctions;
-        var Criterion = (function () {
-            function Criterion() {
-                /** Specified weight by the user */
-                this.userWeight = 1;
-                this.propValues = [];
-                this.criteria = [];
-                /** Piece-wise linear approximation of the scoring function by a set of x and y points */
-                this.isPlaUpdated = false;
-                /** Piece-wise linear approximation must be scaled:x' = ax+b, where a=100/(8r) and b=-100(min+0.1r)/(8r) and r=max-min */
-                this.isPlaScaled = false;
-                this.x = [];
-                this.y = [];
-            }
-            Criterion.prototype.deserialize = function (input) {
-                var _this = this;
-                this.title = input.title;
-                this.description = input.description;
-                this.label = input.label;
-                this.color = input.color;
-                this.userWeight = input.userWeight;
-                this.weight = input.weight;
-                this.isPlaScaled = input.isPlaScaled;
-                this.scores = input.scores;
-                this.minCutoffValue = input.minCutoffValue;
-                this.maxCutoffValue = input.maxCutoffValue;
-                this.minValue = input.minValue;
-                this.maxValue = input.maxValue;
-                input.criteria.forEach(function (c) {
-                    _this.criteria.push(new Criterion().deserialize(c));
-                });
-                return this;
-            };
-            Criterion.prototype.requiresMinimum = function () {
-                return this.scores && this.scores.indexOf('min') >= 0;
-            };
-            Criterion.prototype.requiresMaximum = function () {
-                return this.scores && this.scores.indexOf('max') >= 0;
-            };
-            Criterion.prototype.getTitle = function () {
-                if (this.title)
-                    return this.title;
-                return this.label;
-            };
-            /**
-             * Update the piecewise linear approximation (PLA) of the scoring (a.k.a. user) function,
-             * which translates a property value to a MCA value in the range [0,1] using all features.
-             */
-            Criterion.prototype.updatePla = function (features) {
-                var _this = this;
-                if (this.isPlaUpdated)
-                    return;
-                if (this.criteria.length > 0) {
-                    this.criteria.forEach(function (c) {
-                        c.updatePla(features);
-                    });
-                    this.isPlaUpdated = true;
-                    return;
-                }
-                // Replace min and max by their values:
-                if (this.scores == null)
-                    return;
-                var scores = this.scores;
-                this.propValues = [];
-                if (this.requiresMaximum() || this.requiresMinimum() || this.isPlaScaled) {
-                    features.forEach(function (feature) {
-                        if (feature.properties.hasOwnProperty(_this.label)) {
-                            // The property is available. I use the '+' to convert the string value to a number.
-                            var prop = feature.properties[_this.label];
-                            if ($.isNumeric(prop))
-                                _this.propValues.push(prop);
-                        }
-                    });
-                }
-                var max = this.maxValue, min = this.minValue;
-                if (this.isPlaScaled || this.requiresMaximum()) {
-                    max = max || Math.max.apply(null, this.propValues);
-                    scores.replace('max', max.toPrecision(3));
-                }
-                if (this.isPlaScaled || this.requiresMinimum()) {
-                    min = min || Math.min.apply(null, this.propValues);
-                    scores.replace('min', min.toPrecision(3));
-                }
-                if (this.isPlaScaled) {
-                    var stats = csComp.Helpers.standardDeviation(this.propValues);
-                    max = max || Math.min(max, stats.avg + 2 * stats.stdDev);
-                    min = min || Math.max(min, stats.avg - 2 * stats.stdDev);
-                }
-                // Regex to split the scores: [^\d\.]+ and remove empty entries
-                var pla = scores.split(/[^\d\.]+/).filter(function (item) { return item.length > 0; });
-                // Test that we have an equal number of x and y,
-                var range = max - min, a, b;
-                if (this.minValue != null || this.maxValue != null) {
-                    a = range / 10;
-                    b = min;
-                }
-                else {
-                    a = 0.08 * range, b = min + 0.1 * range;
-                }
-                if (pla.length % 2 !== 0)
-                    throw Error(this.label + ' does not have an even (x,y) pair in scores.');
-                for (var i = 0; i < pla.length / 2; i++) {
-                    var x = parseFloat(pla[2 * i]);
-                    if (this.isPlaScaled) {
-                        // Scale x, i.e. x'=ax+b with x'(0)=min+0.1r and x'(10)=max-0.1r, r=max-min
-                        // min+0.1r=b
-                        // max-0.1r=10a+b=10a+min+0.1r <=> max-min-0.2r=10a <=> 0.8r=10a <=> a=0.08r
-                        x = a * x + b;
-                    }
-                    if (i > 0 && this.x[i - 1] > x)
-                        throw Error(this.label + ': x should increment continuously.');
-                    this.x.push(x);
-                    // Test that y in [0, 1].
-                    var y = parseFloat(pla[2 * i + 1]);
-                    if (y < 0)
-                        y = 0;
-                    else if (y > 1)
-                        y = 1;
-                    this.y.push(y);
-                }
-                this.isPlaUpdated = true;
-            };
-            Criterion.prototype.getScore = function (feature) {
-                if (!this.isPlaUpdated)
-                    throw ('Error: PLA must be updated for criterion ' + this.title + '!');
-                if (this.criteria.length === 0) {
-                    // End point: compute the score for each feature
-                    if (feature.properties.hasOwnProperty(this.label)) {
-                        // The property is available
-                        var x = feature.properties[this.label];
-                        if (this.maxCutoffValue <= x || x <= this.minCutoffValue)
-                            return 0;
-                        if (x < this.x[0])
-                            return this.y[0];
-                        var last = this.x.length - 1;
-                        if (x > this.x[last])
-                            return this.y[last];
-                        for (var k = 0; k < this.x.length; k++) {
-                            if (x < this.x[k]) {
-                                // Found relative position of x in this.x
-                                var x0 = this.x[k - 1];
-                                var x1 = this.x[k];
-                                var y0 = this.y[k - 1];
-                                var y1 = this.y[k];
-                                // Use linear interpolation
-                                return (y1 - y0) * (x - x0) / (x1 - x0);
-                            }
-                        }
-                    }
-                    else {
-                        return 0;
-                    }
-                }
-                else {
-                    // Sum all the sub-criteria.
-                    var finalScore = 0;
-                    this.criteria.forEach(function (crit) {
-                        finalScore += crit.weight > 0 ? crit.weight * crit.getScore(feature) : Math.abs(crit.weight) * (1 - crit.getScore(feature));
-                    });
-                    return this.weight > 0 ? this.weight * finalScore : Math.abs(this.weight) * (1 - finalScore);
-                }
-                return 0;
-            };
-            return Criterion;
-        })();
-        Models.Criterion = Criterion;
-        // NOTE: When extending a base class, make sure that the base class has been defined already.
-        var Mca = (function (_super) {
-            __extends(Mca, _super);
-            function Mca() {
-                _super.call(this);
-                /** Maximum number of star ratings to use to set the weight */
-                this.userWeightMax = 5;
-                /** Applicable feature ids as a string[]. */
-                this.featureIds = [];
-                this.weight = 1;
-                this.isPlaUpdated = false;
-            }
-            Object.defineProperty(Mca.prototype, "rankLabel", {
-                get: function () {
-                    return this.label + '#';
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Mca.prototype.deserialize = function (input) {
-                this.section = input.section;
-                this.stringFormat = input.stringFormat;
-                this.rankTitle = input.rankTitle;
-                this.rankDescription = input.rankDescription;
-                this.rankFormat = input.rankFormat;
-                this.userWeightMax = input.userWeightMax;
-                this.featureIds = input.featureIds;
-                this.minCutoffValue = input.minCutoffValue;
-                this.maxCutoffValue = input.maxCutoffValue;
-                this.minValue = input.minValue;
-                this.maxValue = input.maxValue;
-                this.scaleMinValue = input.scaleMinValue;
-                this.scaleMaxValue = input.scaleMaxValue;
-                _super.prototype.deserialize.call(this, input);
-                return this;
-            };
-            /**
-            * Update the MCA by calculating the weights and setting the colors.
-            */
-            Mca.prototype.update = function () {
-                this.calculateWeights();
-                this.setColors();
-            };
-            Mca.prototype.calculateWeights = function (criteria) {
-                if (!criteria)
-                    criteria = this.criteria;
-                var totalWeight = 0;
-                for (var k in criteria) {
-                    if (!criteria.hasOwnProperty(k))
-                        continue;
-                    var crit = criteria[k];
-                    if (crit.criteria.length > 0)
-                        this.calculateWeights(crit.criteria);
-                    totalWeight += Math.abs(crit.userWeight);
-                }
-                if (totalWeight > 0) {
-                    for (var j in criteria) {
-                        if (!criteria.hasOwnProperty(j))
-                            continue;
-                        var critj = criteria[j];
-                        critj.weight = critj.userWeight / totalWeight;
-                    }
-                }
-            };
-            /** Set the colors of all criteria and sub-criteria */
-            Mca.prototype.setColors = function () {
-                var redColors = chroma.scale('RdYlBu').domain([0, this.criteria.length - 1], this.criteria.length);
-                var totalSubcrit = 0;
-                var i = 0;
-                this.criteria.forEach(function (c) {
-                    totalSubcrit += c.criteria.length;
-                    if (!c.color)
-                        c.color = redColors(i++).hex();
-                });
-                var blueColors = chroma.scale('PRGn').domain([0, totalSubcrit - 1], totalSubcrit);
-                i = 0;
-                this.criteria.forEach(function (c) {
-                    c.criteria.forEach(function (crit) {
-                        if (!crit.color)
-                            crit.color = blueColors(i++).hex();
-                    });
-                });
-            };
-            return Mca;
-        })(Criterion);
-        Models.Mca = Mca;
-    })(Models = _Mca.Models || (_Mca.Models = {}));
-})(Mca || (Mca = {}));
 var Mca;
 (function (Mca) {
     Mca.html = '<div>    <div class="wide-tooltip">        <span class="pull-right fa fa-info-circle fa-2x"              tooltip-html-unsafe="{{\'MCA.DESCRIPTION\' | translate}}"              tooltip-placement="bottom"              tooltip-trigger="mouseenter"              tooltip-append-to-body="false"              style="margin-right: 5px;"></span>        <h4 class="leftpanel-header">MCA</h4>    </div>    <div>        <select data-ng-model="vm.mca"                data-ng-options="mca.title for mca in vm.availableMcas"                data-ng-change="vm.updateMca()"                style="width: 65%; margin-bottom: 10px;"></select>        <div data-ng-if="vm.expertMode" class="pull-right">            <a href="" data-ng-click="vm.createMca()" tooltip="{{\'MCA.ADD_MCA\' | translate}}" style="margin-right:5px;"><i class="fa fa-plus"></i></a>            <a href="" data-ng-click="vm.removeMca(vm.mca)" tooltip="{{\'MCA.DELETE_MCA\' | translate}}" style="margin-right:5px;"><i class="fa fa-trash"></i></a>            <a href="" data-ng-click="vm.editMca(vm.mca)" tooltip="{{\'MCA.EDIT_MCA\' | translate}}" tooltip-placement="right" style="margin-right:5px;"><i class="fa fa-edit"></i></a>        </div>        <a href=""           tooltip="{{\'MCA.TOGGLE_SPARKLINE\' | translate}}"           data-ng-init="sparkLineStyle = vm.showSparkline ? {} : {color:\'lightgray\'}"           data-ng-click="vm.toggleSparkline(); sparkLineStyle = vm.showSparkline ? {} : {color:\'lightgray\'}"           data-ng-style="sparkLineStyle"           class="pull-right" style="margin-right:5px;"><i class="fa fa-bar-chart"></i></a>    </div>        <div data-ng-if="!vm.mca">        <div data-ng-if="vm.expertMode"  translate>MCA.INFO_EXPERT</div>        <div data-ng-if="!vm.expertMode" translate>MCA.INFO</div>    </div>    <div data-ng-if="vm.mca" style="overflow-y: auto; overflow-x: hidden; margin-left: -5px;" resize resize-y="140">        <div data-ng-repeat="criterion in vm.mca.criteria" class="wide-tooltip">            <div data-ng-if="criterion.criteria.length > 0 && criterion.userWeight != 0" class="collapsed pull-left" style="margin: 0 5px 0 0" data-toggle="collapse" data-target="#criterion_{{$index}}"><i class="fa fa-chevron-down togglebutton toggle-arrow-down"></i><i class="fa fa-chevron-up togglebutton toggle-arrow-up"></i></div>            <div data-ng-style="{\'display\': \'inline-block\', \'margin-bottom\': \'6px\', \'width\':\'10px\', \'height\':\'10px\', \'border\':\'solid 1px black\', \'background-color\': criterion.color}"></div>            <div class="truncate" data-ng-class="{true: \'ignoredCriteria\'}[criterion.userWeight == 0]" style="display: inline-block; width: 150px; font-weight: bold">{{criterion.getTitle()}}</div>            <voting class="pull-right"                    data-ng-class="vm.getVotingClass(criterion)"                    data-ng-change="vm.weightUpdated(criterion)"                    min="-vm.mca.userWeightMax"                    max="vm.mca.userWeightMax"                    ng-model="criterion.userWeight"                    style="margin-right: 5px; margin-bottom: 3px;"></voting>            <div id="histogram_{{$index}}" data-ng-show="vm.showSparkline && criterion.criteria.length == 0" style="margin-top: 5px;"></div>            <div data-ng-if="criterion.criteria.length > 0" id="criterion_{{$parent.$index}}" class="collapse out" style="margin-left: 19px">                <div data-ng-repeat="crit in criterion.criteria">                    <div data-ng-style="{\'display\': \'inline-block\', \'margin-bottom\': \'6px\', \'width\':\'10px\', \'height\':\'10px\', \'border\':\'solid 1px black\', \'background-color\': crit.color}"></div>                    <div class="truncate" data-ng-class="{true: \'ignoredCriteria\'}[crit.userWeight == 0 || criterion.userWeight == 0]" style="display: inline-block; width: 150px;">{{crit.getTitle()}}</div>                    <div class="pull-right" style="margin-right: 15px;">{{Math.abs(crit.userWeight)}}</div>                    <voting class="pull-right"                            data-ng-class="vm.getVotingClass(criterion)"                            data-ng-change="vm.weightUpdated(crit)"                            min="0"                            max="vm.mca.userWeightMax"                            ng-model="crit.userWeight"                            style="margin-right: 5px;"></voting>                    <div id="histogram_{{$parent.$index}}_{{$index}}" data-ng-show="vm.showSparkline" style="margin-top: 5px;"></div>                </div>            </div>        </div>        <!--<a href="" style="display: inline-block; width: 100%; text-transform: uppercase"               data-ng-click="vm.calculateMca()" translate="MCA.COMPUTE_MGS" translate-values="{ mcaTitle: vm.mca.title }"></a>-->        <h4 data-ng-if="vm.showChart">            <a href="" data-ng-click="vm.weightUpdated(vm.mca)" translate="MCA.TOTAL_RESULT"></a>            <a href="" data-ng-if="vm.selectedCriterion">&gt;&nbsp;{{vm.selectedCriterion.title}}</a>        </h4>                <a href="" data-ng-if="vm.showFeature" class="pull-right" data-ng-click="vm.toggleMcaChartType();" style="margin-right: 10px">            <i class="fa" data-ng-class="{true: \'fa-bar-chart\', false: \'fa-pie-chart\'}[vm.showAsterChart]"></i>        </a>        <div style="margin-top: 5px; margin-left: auto; margin-right: auto; width: 95%;" id="mcaChart"></div>        <div data-ng-if="vm.showFeature">            <h4>                <img data-ng-if="vm.featureIcon" data-ng-src="{{vm.featureIcon}}" width="24" height="24" style="margin:0 5px" alt="Icon" />                {{vm.selectedFeature.properties[\'Name\']}}            </h4>            <table class="table table-condensed">                <tr data-ng-repeat="item in vm.properties"                    popover="{{item.description}}"                    popover-placement="right"                    popover-trigger="mouseenter"                    popover-append-to-body="true">                    <td><a class="fa fa-filter makeNarrow" data-ng-if="item.canFilter" data-ng-click="vm.$layerService.setFilter(item)" style="cursor: pointer"></a></td>                    <td><a class="fa fa-eye makeNarrow" data-ng-if="item.canStyle" data-ng-click="vm.setStyle(item)" style="cursor: pointer"></a></td>                    <td>{{item.key}}</td>                    <td class="text-right">{{item.value}}</td>                </tr>            </table>        </div>        <i data-ng-if="!vm.showFeature"><div translate="MCA.SHOW_FEATURE_MSG"></div></i>    </div>    <!--<div rating class="pull-right"             data-ng-style="{\'margin\': \'0 10px\', \'background\':\'rgba(0, 0, 0, 0.1)\', \'border-radius\': \'8px\', \'padding\': \'0 4px\', \'color\': criterion.color}"             ng-model="criterion.userWeight" max="11" readonly="isReadonly"             rating-states="ratingStates"             data-ng-click="vm.weightUpdated(criterion)"             on-hover="hoveringOver(value)" on-leave="overStar = null"></div>--></div>';
@@ -4034,11 +3482,11 @@ var Mca;
             this.properties = [];
             var mi = McaCtrl.createPropertyType(this.mca);
             var displayValue = csComp.Helpers.convertPropertyInfo(mi, feature.properties[mi.label]);
-            this.properties.push(new FeatureProps.CallOutProperty(mi.title, displayValue, mi.label, true, true, feature, false, false, mi.description, mi));
+            this.properties.push(new FeatureProps.CallOutProperty(mi.title, displayValue, mi.label, true, true, feature, false, mi.description, mi));
             if (this.mca.rankTitle) {
                 mi = McaCtrl.createRankPropertyType(this.mca);
                 displayValue = csComp.Helpers.convertPropertyInfo(mi, feature.properties[mi.label]);
-                this.properties.push(new FeatureProps.CallOutProperty(mi.title, displayValue, mi.label, false, false, feature, false, false, mi.description, mi));
+                this.properties.push(new FeatureProps.CallOutProperty(mi.title, displayValue, mi.label, false, false, feature, false, mi.description, mi));
             }
             if (drawCharts)
                 this.drawChart();
@@ -4178,15 +3626,17 @@ var Mca;
             this.showChart = false;
             this.mca = mca;
             this.availableMcas = [];
-            this.$layerService.project.mcas.forEach(function (m) {
-                m.featureIds.forEach(function (featureId) {
-                    if (_this.availableMcas.indexOf(m) < 0 && _this.$layerService.featureTypes.hasOwnProperty(featureId)) {
-                        _this.availableMcas.push(m);
-                        var featureType = _this.$layerService.featureTypes[featureId];
-                        _this.applyPropertyInfoToCriteria(m, featureType);
-                    }
+            if (this.$layerService.project.mcas != null) {
+                this.$layerService.project.mcas.forEach(function (m) {
+                    m.featureIds.forEach(function (featureId) {
+                        if (_this.availableMcas.indexOf(m) < 0 && _this.$layerService.featureTypes.hasOwnProperty(featureId)) {
+                            _this.availableMcas.push(m);
+                            var featureType = _this.$layerService.featureTypes[featureId];
+                            _this.applyPropertyInfoToCriteria(m, featureType);
+                        }
+                    });
                 });
-            });
+            }
             if (mca == null && this.availableMcas.length > 0) {
                 this.mca = this.availableMcas[0];
                 this.updateMca();
@@ -4218,7 +3668,7 @@ var Mca;
                         tempScores.push(tempItem);
                     }
                     feature.properties[mca.label] = score * 100;
-                    _this.$layerService.updateFeature(feature);
+                    _this.$layerService.activeMapRenderer.updateFeature(feature);
                 });
                 if (mca.rankTitle) {
                     // Add rank information
@@ -4282,11 +3732,8 @@ var Mca;
             }
             if (forceUpdate || labelIndex < 0) {
                 var pt = McaCtrl.createPropertyType(mca);
-                if (labelIndex < 0) {
-                    if (featureType.propertyTypeData === null)
-                        featureType.propertyTypeData = [];
+                if (labelIndex < 0)
                     featureType.propertyTypeData.push(pt); // NOTE: propertyTypes refers to a new list, so you cannot add to it.
-                }
                 else
                     propertyTypes[labelIndex] = pt; // NOTE: but you should be able to overwrite an existing property.
             }
@@ -4638,346 +4085,431 @@ var McaEditorView;
 (function (McaEditorView) {
     McaEditorView.html = '<div class="modal-content">    <div class="modal-header">        <button type="button" class="close" data-ng-click="vm.cancel()" aria-hidden="true">&times;</button>        <h3 class="modal-title" translate>MCA.EDITOR_TITLE</h3>    </div>    <div class="modal-body container-fluid">        <div class="row-fluid">            <input type="text" class="pull-left" data-ng-model="vm.mcaTitle" style="margin: 0 5px" placeholder="{{ \'MCA.TITLE\' | translate }}" />            <!-- <span><input type="checkbox" data-ng-model="vm.hasRank" style="margin-left: 10px;" /><span translate>MCA.INCLUDE_RANK</span></span>-->            <input type="text" class="pull-left" data-ng-model="vm.rankTitle" style="margin: 0 5px"  placeholder="{{ \'MCA.RANK_TITLE\' | translate }}" />            <input type="text" class="pull-left" data-ng-model="vm.scaleMin" style="width: 100px; margin: 0 5px" placeholder="{{ \'MCA.SCALE_MIN_TITLE\' | translate }}" />            <input type="text" class="pull-left" data-ng-model="vm.scaleMax" style="width: 100px; margin: 0 5px" placeholder="{{ \'MCA.SCALE_MAX_TITLE\' | translate }}" />        </div>        <h4 class="row-fluid" style="margin-top: 5px;" translate>MCA.MAIN_FEATURE</h4>        <select data-ng-model="vm.selectedFeatureType"                data-ng-change="vm.loadPropertyTypes()"                data-ng-options="item as item.name for (key, item) in vm.dataset.featureTypes"                class="form-control row-fluid"></select>        <h4 class="row-fluid" translate>MCA.PROPERTIES</h4>        <ul class="form-group row-fluid" style="margin-top: 1em; margin-left: -2em; overflow-y: auto; overflow-x: hidden;"            resize resize-y="450">            <li ng-repeat="mi in vm.propInfos"                class="row-fluid list-unstyled truncate">                <div style="padding: 5px 0;" class="row-fluid">                    <input type="checkbox" name="vm.selectedTitles[]" value="{{mi.title}}"                           data-ng-checked="mi.isSelected"                           data-ng-click="mi.isSelected = !mi.isSelected">&nbsp;&nbsp;{{mi.title}}                    <div data-ng-if="mi.isSelected" class="pull-right">                        <a href="" class="pull-right"                           style="margin-right: 5px;"                           data-ng-click="vm.toggleItemDetails($index)"><i class="fa fa-2x fa-edit"></i></a>                        <input type="text" class="pull-right"                               style="margin: -2px 5px -2px 0;"                               data-ng-model="mi.category"                               placeholder="{{\'MCA.CATEGORY_MSG\' | translate}}" />                    </div>                    <!--<form data-ng-if="mi.isSelected" name="myForm" style="margin-left: 20px;">                <label id="scoringFunctions" data-ng-repeat="sf in vm.scoringFunctions">                    <input type="radio" data-ng-model="mi.scoringFunctionType" value="{{sf.type}}">                    <a data-ng-href="" data-ng-class="sf.cssClass" data-ng-click="mi.isSelected = !mi.isSelected"></a>                </label>            </form>            <div data-ng-if="mi.scoringFunctionType == 0" style="margin-left: 20px;">                input -> score:&nbsp;<input type="text" data-ng-model="mi.scores" placeholder="[x0,y0 x1,y1 ...]"/>            </div>-->                </div>                <div class="row-fluid" data-ng-show="vm.showItem == {{$index}}" id="scoringFunctions">                    <select class="col-xs-10"                            style="margin-right: 5px; margin-bottom: 5px;"                            data-ng-init="mi.scoringFunctionType = mi.scoringFunctionType || vm.scoringFunctions[0]"                            data-ng-model="mi.scoringFunctionType"                            data-ng-options="sf as sf.title for sf in vm.scoringFunctions"></select>                    <div class="pull-right" data-ng-class="mi.scoringFunctionType.cssClass" style="width: 40px; height: 28px; margin-top: -5px;"></div>                    <div class="row-fluid">                        <input type="text" class="col-xs-3" style="padding: 0;" data-ng-model="mi.minValue" placeholder="{{ \'MCA.MIN_VALUE\' | translate }}" />                        <input type="text" class="col-xs-3" style="padding: 0;" data-ng-model="mi.maxValue" placeholder="{{ \'MCA.MAX_VALUE\' | translate }}" />                        <input type="text" class="col-xs-3" style="padding: 0;" data-ng-model="mi.minCutoffValue" placeholder="{{ \'MCA.MIN_CUTOFF_VALUE\' | translate }}" />                        <input type="text" class="col-xs-3" style="padding: 0;" data-ng-model="mi.maxCutoffValue" placeholder="{{ \'MCA.MAX_CUTOFF_VALUE\' | translate }}" />                    </div>                </div>            </li>        </ul>    </div>    <div class="modal-footer">        <button type="button" class="btn btn-warning" data-ng-click="vm.cancel()" translate>CANCEL_BTN</button>        <button type="button" class="btn btn-primary" data-ng-click="vm.save()" translate>OK_BTN</button>    </div></div>';
 })(McaEditorView || (McaEditorView = {}));
-var OfflineSearch;
-(function (OfflineSearch) {
-    OfflineSearch.html = '<form role="search">    <style>        .typeahead-group-header {            margin-left: 10px;            font-weight: bold;            font-size: 120%;        }    </style>    <script type="text/ng-template" id="typeahead-item.html">     <div class="typeahead-group-header" ng-if="match.model.firstInGroup">{{match.model.groupTitle}} >> {{match.model.layerTitle}}</div>     <a>       <span ng-bind-html="match.label.title"></span>     </a>   </script>   <div id="scrollable-dropdown-menu" data-ng-disabled="!vm.isReady" class="form-group has-feedback navbar-right">        <input data-ng-model="vm.searchText"               typeahead="address for address in vm.getLocation($viewValue)"               typeahead-loading="loadingLocations"               typeahead-min-length="3"               typeahead-highlight="true"               typeahead-editable="false"               typeahead-template-url="typeahead-item.html"               typeahead-on-select="vm.onSelect($item, $model, $label)"               id="searchbox"               type="text"               style="width:300px"               class="typeahead form-control">               <!-- placeholder="Zoek in kaartlagen" -->        <!-- <span ng-if="loadingLocations"  id="searchicon" class="fa fa-refresh fa-spin"></span>-->        <span id="searchicon" class="fa fa-search form-control-feedback"></span>    </div></form>';
-})(OfflineSearch || (OfflineSearch = {}));
-var OfflineSearch;
-(function (OfflineSearch) {
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Mca;
+(function (_Mca) {
+    var Models;
+    (function (Models) {
+        (function (ScoringFunctionType) {
+            ScoringFunctionType[ScoringFunctionType["Manual"] = 0] = "Manual";
+            ScoringFunctionType[ScoringFunctionType["Ascending"] = 1] = "Ascending";
+            ScoringFunctionType[ScoringFunctionType["Descending"] = 2] = "Descending";
+            ScoringFunctionType[ScoringFunctionType["AscendingSigmoid"] = 3] = "AscendingSigmoid";
+            ScoringFunctionType[ScoringFunctionType["DescendingSigmoid"] = 4] = "DescendingSigmoid";
+            ScoringFunctionType[ScoringFunctionType["GaussianPeak"] = 5] = "GaussianPeak";
+            ScoringFunctionType[ScoringFunctionType["GaussianValley"] = 6] = "GaussianValley";
+        })(Models.ScoringFunctionType || (Models.ScoringFunctionType = {}));
+        var ScoringFunctionType = Models.ScoringFunctionType;
+        /**
+        * Scoring function creates a PLA of the scoring algorithm.
+        */
+        var ScoringFunction = (function () {
+            //get img(): string {
+            //    return '/includes/images/plot' + csComp.StringExt.Utils.toUnderscore(ScoringFunctionType[this.type]) + '.png';
+            //}
+            function ScoringFunction(scoringFunctionType) {
+                if (typeof scoringFunctionType != 'undefined' && scoringFunctionType != null)
+                    this.type = scoringFunctionType;
+                this.title = ScoringFunctionType[scoringFunctionType].toString();
+            }
+            Object.defineProperty(ScoringFunction.prototype, "cssClass", {
+                get: function () {
+                    return ScoringFunctionType[this.type].toLowerCase();
+                },
+                enumerable: true,
+                configurable: true
+            });
+            /**
+             * Create a score based on the type, in which x in [0,10] and y in [0.1].
+             * Before applying it, you need to scale the x-axis based on your actual range.
+             * Typically, you would map x=0 to the min(x)+0.1*range(x) and x(10)-0.1*range(x) to max(x),
+             * i.e. x' = ax+b, where a=100/(8r) and b=-100(min+0.1r)/(8r) and r=max-min
+             */
+            ScoringFunction.createScores = function (type) {
+                var scores;
+                switch (type) {
+                    default:
+                    case 1 /* Ascending */:
+                        scores = '[0,0 10,1]';
+                        break;
+                    case 2 /* Descending */:
+                        scores = '[0,1 10,0]';
+                        break;
+                    case 3 /* AscendingSigmoid */:
+                        // http://mathnotepad.com/: f(x) = (3.5+2*atan(x-5))/7
+                        // f([0,1,2,3,4,5,6,7,8,9,10])
+                        // round(100*f([0,1,2,3,4,5,6,7,8,9,10]))/100
+                        // [0.11 0.12 0.14 0.18 0.28 0.5 0.72 0.82 0.86 0.88 0.89]
+                        scores = '[0,0.11 1,0.12 2,0.14 3,0.18 4,0.28 5,0.5 6,0.72 7,0.82 8,0.86 9,0.88 10,0.89]';
+                        break;
+                    case 4 /* DescendingSigmoid */:
+                        // 1-f(x)
+                        scores = '[0,0.89 1,0.88 2,0.86 3,0.82 4,0.72 5,0.5 6,0.28 7,0.18 8,0.14 9,0.12 10,0.11]';
+                        break;
+                    case 5 /* GaussianPeak */:
+                        // h(x)=3*exp(-((x-u)^2)/(2s^2))/(s*sqrt(2pi))
+                        scores = '[0,0 2,0.04 3,0.25 4,0.7 5,1 6,0.7 7,0.25 8,0.04 9,0]';
+                        break;
+                    case 6 /* GaussianValley */:
+                        // 1-h(x)
+                        scores = '[0,1 2,0.96 3,0.75 4,0.3 5,0 6,0.3 7,0.75 8,0.96 9,0]';
+                        break;
+                }
+                return scores;
+            };
+            return ScoringFunction;
+        })();
+        Models.ScoringFunction = ScoringFunction;
+        var ScoringFunctions = (function () {
+            function ScoringFunctions() {
+            }
+            return ScoringFunctions;
+        })();
+        Models.ScoringFunctions = ScoringFunctions;
+        var Criterion = (function () {
+            function Criterion() {
+                /** Specified weight by the user */
+                this.userWeight = 1;
+                this.propValues = [];
+                this.criteria = [];
+                /** Piece-wise linear approximation of the scoring function by a set of x and y points */
+                this.isPlaUpdated = false;
+                /** Piece-wise linear approximation must be scaled:x' = ax+b, where a=100/(8r) and b=-100(min+0.1r)/(8r) and r=max-min */
+                this.isPlaScaled = false;
+                this.x = [];
+                this.y = [];
+            }
+            Criterion.prototype.deserialize = function (input) {
+                var _this = this;
+                this.title = input.title;
+                this.description = input.description;
+                this.label = input.label;
+                this.color = input.color;
+                this.userWeight = input.userWeight;
+                this.weight = input.weight;
+                this.isPlaScaled = input.isPlaScaled;
+                this.scores = input.scores;
+                this.minCutoffValue = input.minCutoffValue;
+                this.maxCutoffValue = input.maxCutoffValue;
+                this.minValue = input.minValue;
+                this.maxValue = input.maxValue;
+                input.criteria.forEach(function (c) {
+                    _this.criteria.push(new Criterion().deserialize(c));
+                });
+                return this;
+            };
+            Criterion.prototype.requiresMinimum = function () {
+                return this.scores && this.scores.indexOf('min') >= 0;
+            };
+            Criterion.prototype.requiresMaximum = function () {
+                return this.scores && this.scores.indexOf('max') >= 0;
+            };
+            Criterion.prototype.getTitle = function () {
+                if (this.title)
+                    return this.title;
+                return this.label;
+            };
+            /**
+             * Update the piecewise linear approximation (PLA) of the scoring (a.k.a. user) function,
+             * which translates a property value to a MCA value in the range [0,1] using all features.
+             */
+            Criterion.prototype.updatePla = function (features) {
+                var _this = this;
+                if (this.isPlaUpdated)
+                    return;
+                if (this.criteria.length > 0) {
+                    this.criteria.forEach(function (c) {
+                        c.updatePla(features);
+                    });
+                    this.isPlaUpdated = true;
+                    return;
+                }
+                // Replace min and max by their values:
+                if (this.scores == null)
+                    return;
+                var scores = this.scores;
+                this.propValues = [];
+                if (this.requiresMaximum() || this.requiresMinimum() || this.isPlaScaled) {
+                    features.forEach(function (feature) {
+                        if (feature.properties.hasOwnProperty(_this.label)) {
+                            // The property is available. I use the '+' to convert the string value to a number. 
+                            var prop = feature.properties[_this.label];
+                            if ($.isNumeric(prop))
+                                _this.propValues.push(prop);
+                        }
+                    });
+                }
+                var max = this.maxValue, min = this.minValue;
+                if (this.isPlaScaled || this.requiresMaximum()) {
+                    max = max || Math.max.apply(null, this.propValues);
+                    scores.replace('max', max.toPrecision(3));
+                }
+                if (this.isPlaScaled || this.requiresMinimum()) {
+                    min = min || Math.min.apply(null, this.propValues);
+                    scores.replace('min', min.toPrecision(3));
+                }
+                if (this.isPlaScaled) {
+                    var stats = csComp.Helpers.standardDeviation(this.propValues);
+                    max = max || Math.min(max, stats.avg + 2 * stats.stdDev);
+                    min = min || Math.max(min, stats.avg - 2 * stats.stdDev);
+                }
+                // Regex to split the scores: [^\d\.]+ and remove empty entries
+                var pla = scores.split(/[^\d\.]+/).filter(function (item) { return item.length > 0; });
+                // Test that we have an equal number of x and y, 
+                var range = max - min, a, b;
+                if (this.minValue != null || this.maxValue != null) {
+                    a = range / 10;
+                    b = min;
+                }
+                else {
+                    a = 0.08 * range, b = min + 0.1 * range;
+                }
+                if (pla.length % 2 !== 0)
+                    throw Error(this.label + ' does not have an even (x,y) pair in scores.');
+                for (var i = 0; i < pla.length / 2; i++) {
+                    var x = parseFloat(pla[2 * i]);
+                    if (this.isPlaScaled) {
+                        // Scale x, i.e. x'=ax+b with x'(0)=min+0.1r and x'(10)=max-0.1r, r=max-min
+                        // min+0.1r=b
+                        // max-0.1r=10a+b=10a+min+0.1r <=> max-min-0.2r=10a <=> 0.8r=10a <=> a=0.08r
+                        x = a * x + b;
+                    }
+                    if (i > 0 && this.x[i - 1] > x)
+                        throw Error(this.label + ': x should increment continuously.');
+                    this.x.push(x);
+                    // Test that y in [0, 1].
+                    var y = parseFloat(pla[2 * i + 1]);
+                    if (y < 0)
+                        y = 0;
+                    else if (y > 1)
+                        y = 1;
+                    this.y.push(y);
+                }
+                this.isPlaUpdated = true;
+            };
+            Criterion.prototype.getScore = function (feature) {
+                if (!this.isPlaUpdated)
+                    throw ('Error: PLA must be updated for criterion ' + this.title + '!');
+                if (this.criteria.length === 0) {
+                    // End point: compute the score for each feature
+                    if (feature.properties.hasOwnProperty(this.label)) {
+                        // The property is available
+                        var x = feature.properties[this.label];
+                        if (this.maxCutoffValue <= x || x <= this.minCutoffValue)
+                            return 0;
+                        if (x < this.x[0])
+                            return this.y[0];
+                        var last = this.x.length - 1;
+                        if (x > this.x[last])
+                            return this.y[last];
+                        for (var k = 0; k < this.x.length; k++) {
+                            if (x < this.x[k]) {
+                                // Found relative position of x in this.x
+                                var x0 = this.x[k - 1];
+                                var x1 = this.x[k];
+                                var y0 = this.y[k - 1];
+                                var y1 = this.y[k];
+                                // Use linear interpolation
+                                return (y1 - y0) * (x - x0) / (x1 - x0);
+                            }
+                        }
+                    }
+                    else {
+                        return 0;
+                    }
+                }
+                else {
+                    // Sum all the sub-criteria.
+                    var finalScore = 0;
+                    this.criteria.forEach(function (crit) {
+                        finalScore += crit.weight > 0 ? crit.weight * crit.getScore(feature) : Math.abs(crit.weight) * (1 - crit.getScore(feature));
+                    });
+                    return this.weight > 0 ? this.weight * finalScore : Math.abs(this.weight) * (1 - finalScore);
+                }
+                return 0;
+            };
+            return Criterion;
+        })();
+        Models.Criterion = Criterion;
+        // NOTE: When extending a base class, make sure that the base class has been defined already.
+        var Mca = (function (_super) {
+            __extends(Mca, _super);
+            function Mca() {
+                _super.call(this);
+                /** Maximum number of star ratings to use to set the weight */
+                this.userWeightMax = 5;
+                /** Applicable feature ids as a string[]. */
+                this.featureIds = [];
+                this.weight = 1;
+                this.isPlaUpdated = false;
+            }
+            Object.defineProperty(Mca.prototype, "rankLabel", {
+                get: function () {
+                    return this.label + '#';
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Mca.prototype.deserialize = function (input) {
+                this.section = input.section;
+                this.stringFormat = input.stringFormat;
+                this.rankTitle = input.rankTitle;
+                this.rankDescription = input.rankDescription;
+                this.rankFormat = input.rankFormat;
+                this.userWeightMax = input.userWeightMax;
+                this.featureIds = input.featureIds;
+                this.minCutoffValue = input.minCutoffValue;
+                this.maxCutoffValue = input.maxCutoffValue;
+                this.minValue = input.minValue;
+                this.maxValue = input.maxValue;
+                this.scaleMinValue = input.scaleMinValue;
+                this.scaleMaxValue = input.scaleMaxValue;
+                _super.prototype.deserialize.call(this, input);
+                return this;
+            };
+            /**
+            * Update the MCA by calculating the weights and setting the colors.
+            */
+            Mca.prototype.update = function () {
+                this.calculateWeights();
+                this.setColors();
+            };
+            Mca.prototype.calculateWeights = function (criteria) {
+                if (!criteria)
+                    criteria = this.criteria;
+                var totalWeight = 0;
+                for (var k in criteria) {
+                    if (!criteria.hasOwnProperty(k))
+                        continue;
+                    var crit = criteria[k];
+                    if (crit.criteria.length > 0)
+                        this.calculateWeights(crit.criteria);
+                    totalWeight += Math.abs(crit.userWeight);
+                }
+                if (totalWeight > 0) {
+                    for (var j in criteria) {
+                        if (!criteria.hasOwnProperty(j))
+                            continue;
+                        var critj = criteria[j];
+                        critj.weight = critj.userWeight / totalWeight;
+                    }
+                }
+            };
+            /** Set the colors of all criteria and sub-criteria */
+            Mca.prototype.setColors = function () {
+                var redColors = chroma.scale('RdYlBu').domain([0, this.criteria.length - 1], this.criteria.length);
+                var totalSubcrit = 0;
+                var i = 0;
+                this.criteria.forEach(function (c) {
+                    totalSubcrit += c.criteria.length;
+                    if (!c.color)
+                        c.color = redColors(i++).hex();
+                });
+                var blueColors = chroma.scale('PRGn').domain([0, totalSubcrit - 1], totalSubcrit);
+                i = 0;
+                this.criteria.forEach(function (c) {
+                    c.criteria.forEach(function (crit) {
+                        if (!crit.color)
+                            crit.color = blueColors(i++).hex();
+                    });
+                });
+            };
+            return Mca;
+        })(Criterion);
+        Models.Mca = Mca;
+    })(Models = _Mca.Models || (_Mca.Models = {}));
+})(Mca || (Mca = {}));
+var MapElement;
+(function (MapElement) {
+    MapElement.html = '<div id="map" data-ng-show="vm.$mapService.mapVisible" tabindex="0" class="leaflet-container leaflet-touch leaflet-fade-anim" style="position:absolute"></div> <!-- <div id="cesiumContainer" style="position:absolute"></div> -->';
+})(MapElement || (MapElement = {}));
+var MapElement;
+(function (MapElement) {
     /**
       * Config
       */
-    var moduleName = 'csWeb.offlineSearch';
+    var moduleName = 'csWeb.mapElement';
     /**
       * Module
       */
-    OfflineSearch.myModule;
+    MapElement.myModule;
     try {
-        OfflineSearch.myModule = angular.module(moduleName);
+        MapElement.myModule = angular.module(moduleName);
     }
     catch (err) {
         // named module does not exist, so create one
-        OfflineSearch.myModule = angular.module(moduleName, []);
+        MapElement.myModule = angular.module(moduleName, []);
     }
     /**
       * Directive to display the available map layers.
       */
-    OfflineSearch.myModule.directive('offlineSearch', [
+    MapElement.myModule.directive('map', [
+        '$window',
         '$compile',
-        function ($compile) {
+        function ($window, $compile) {
             return {
-                terminal: true,
+                terminal: false,
                 restrict: 'E',
-                scope: {},
-                template: OfflineSearch.html,
-                compile: function (el) {
-                    var fn = $compile(el);
-                    return function (scope) {
-                        fn(scope);
-                    };
+                scope: {
+                    mapid: '='
                 },
-                replace: true,
+                template: MapElement.html,
+                link: function (scope, element, attrs) {
+                    // Deal with resizing the element list
+                    angular.element($window).bind('resize', function () {
+                        //scope.onResizeFunction();
+                        scope.$apply();
+                    });
+                    scope.mapid = attrs.mapid;
+                    //var s = jQuery.parseJSON(attrs.param);
+                    //scope.initDashboard();
+                    scope.initMap();
+                },
+                replace: false,
                 transclude: true,
-                controller: OfflineSearch.OfflineSearchCtrl
+                controller: MapElement.MapElementCtrl
             };
         }
     ]);
-})(OfflineSearch || (OfflineSearch = {}));
-var OfflineSearch;
-(function (OfflineSearch) {
-    var Layer = (function () {
-        function Layer(groupTitle, index, id, title, path, type) {
-            this.groupTitle = groupTitle;
-            this.index = index;
-            this.id = id;
-            this.title = title;
-            this.path = path;
-            this.type = type;
-            /**
-             * Names of all the features.
-             * @type {string[]}
-             */
-            this.featureNames = [];
-        }
-        return Layer;
-    })();
-    OfflineSearch.Layer = Layer;
-    /**
-     * An index entry that contains a search result.
-     */
-    var Entry = (function () {
-        function Entry(layerIndexOrArray, featureIndex, propertyIndex) {
-            this.v = Array(2);
-            if (typeof layerIndexOrArray === 'number') {
-                this.v[0] = layerIndexOrArray;
-                this.v[1] = featureIndex;
-            }
-            else {
-                this.v = layerIndexOrArray;
-            }
-        }
-        Object.defineProperty(Entry.prototype, "layerIndex", {
-            get: function () {
-                return this.v[0];
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(Entry.prototype, "featureIndex", {
-            get: function () {
-                return this.v[1];
-            },
-            enumerable: true,
-            configurable: true
-        });
-        /**
-         * This function is called when serializing the Entry object to JSON, which is
-         * much less verbose than the default JSON. In the constructor, I've used a
-         * Union type to deserialize it again.
-         */
-        Entry.prototype.toJSON = function () {
-            return this.v;
-        };
-        return Entry;
-    })();
-    OfflineSearch.Entry = Entry;
-    var KeywordIndex = (function () {
-        function KeywordIndex() {
-        }
-        return KeywordIndex;
-    })();
-    OfflineSearch.KeywordIndex = KeywordIndex;
-    var OfflineSearchResult = (function () {
-        function OfflineSearchResult(project, options) {
-            this.project = project;
-            this.options = options;
-            this.layers = [];
-            this.keywordIndex = {};
-        }
-        return OfflineSearchResult;
-    })();
-    OfflineSearch.OfflineSearchResult = OfflineSearchResult;
-})(OfflineSearch || (OfflineSearch = {}));
-var OfflineSearch;
-(function (OfflineSearch) {
-    var OfflineSearchResultViewModel = (function () {
-        function OfflineSearchResultViewModel(title, layerTitle, groupTitle, entry) {
-            this.title = title;
-            this.layerTitle = layerTitle;
-            this.groupTitle = groupTitle;
-            this.entry = entry;
-            this.firstInGroup = false;
-        }
-        OfflineSearchResultViewModel.prototype.toString = function () {
-            return this.title;
-        };
-        Object.defineProperty(OfflineSearchResultViewModel.prototype, "fullTitle", {
-            get: function () {
-                return this.groupTitle + ' >> ' + this.layerTitle + ' >> ' + this.title;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        return OfflineSearchResultViewModel;
-    })();
-    OfflineSearch.OfflineSearchResultViewModel = OfflineSearchResultViewModel;
-    var OfflineSearchCtrl = (function () {
+})(MapElement || (MapElement = {}));
+var MapElement;
+(function (MapElement) {
+    var MapElementCtrl = (function () {
         // dependencies are injected via AngularJS $injector
         // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
-        function OfflineSearchCtrl($scope, $layerService, $mapService, $messageBus) {
+        function MapElementCtrl($scope, $layerService, $mapService, $messageBusService) {
             var _this = this;
             this.$scope = $scope;
             this.$layerService = $layerService;
             this.$mapService = $mapService;
-            this.$messageBus = $messageBus;
-            this.isReady = false;
+            this.$messageBusService = $messageBusService;
+            this.locale = "en-us";
             $scope.vm = this;
-            $messageBus.subscribe('project', function (title) {
-                switch (title) {
-                    case 'loaded':
-                        var offlineSearchResultUrl = $layerService.projectUrl.replace('project.json', 'offline_search_result.json');
-                        _this.loadSearchResults(offlineSearchResultUrl);
-                        break;
-                }
-            });
-            $messageBus.subscribe('language', function (title, language) {
-                switch (title) {
-                    case 'newLanguage':
-                        break;
-                }
-            });
+            //this.initMap();
+            $scope.initMap = function () { return _this.initMap(); };
         }
-        /**
-         * Load the offline search results (json file).
-         */
-        OfflineSearchCtrl.prototype.loadSearchResults = function (url) {
-            var _this = this;
-            $.getJSON(url, function (offlineSearchResult) {
-                _this.offlineSearchResult = offlineSearchResult;
-                var kwi = offlineSearchResult.keywordIndex;
-                var keywordIndex = {};
-                for (var key in kwi) {
-                    if (!kwi.hasOwnProperty(key))
-                        continue;
-                    kwi[key].forEach(function (entry) {
-                        if (!keywordIndex.hasOwnProperty(key))
-                            keywordIndex[key] = [];
-                        keywordIndex[key].push(new OfflineSearch.Entry(entry));
-                    });
-                }
-                _this.offlineSearchResult.keywordIndex = keywordIndex;
-                _this.isReady = true;
-            });
-        };
-        /**
-         * Get the locations based on the entered text.
-         */
-        OfflineSearchCtrl.prototype.getLocation = function (text, resultCount) {
-            if (resultCount === void 0) { resultCount = 15; }
-            if (!this.isReady || text === null || text.length < 3)
-                return [];
-            var searchWords = text.toLowerCase().split(' ');
-            var totResults;
-            for (var j in searchWords) {
-                var result = this.getKeywordHits(searchWords[j]);
-                totResults = !totResults ? result : this.mergeResults(totResults, result);
-            }
-            var searchResults = [];
-            var layers = this.offlineSearchResult.layers;
-            var count = resultCount;
-            var resultIndex = 0;
-            while (count > 0 && resultIndex < totResults.length) {
-                var r = totResults[resultIndex++];
-                var subCount = Math.min(count, r.entries.length);
-                for (var i = 0; i < subCount; i++) {
-                    var entry = r.entries[i];
-                    var layer = layers[entry.layerIndex];
-                    count--;
-                    searchResults.push(new OfflineSearchResultViewModel(layer.featureNames[entry.featureIndex], layer.title, layer.groupTitle, entry));
-                }
-            }
-            // Group search results by groupTitle | layerTitle
-            var groups = {};
-            searchResults.forEach(function (sr) {
-                var group = sr.groupTitle + ' >> ' + sr.layerTitle;
-                if (!groups.hasOwnProperty(group))
-                    groups[group] = [];
-                groups[group].push(sr);
-            });
-            searchResults = [];
-            for (var key in groups) {
-                if (!groups.hasOwnProperty(key))
-                    continue;
-                var firstInGroup = true;
-                groups[key].forEach(function (sr) {
-                    sr.firstInGroup = firstInGroup;
-                    searchResults.push(sr);
-                    firstInGroup = false;
-                });
-            }
-            return searchResults;
-        };
-        /**
-         * Merge the resuls of two keyword lookups by checking whether different entries refer
-         * to the same layer and feature.
-         * @result1 {ILookupResult[]}
-         * @result2 {ILookupResult[]}
-         */
-        OfflineSearchCtrl.prototype.mergeResults = function (result1, result2) {
-            var r = [];
-            result1.forEach(function (r1) {
-                result2.forEach(function (r2) {
-                    r1.entries.forEach(function (entry1) {
-                        r2.entries.forEach(function (entry2) {
-                            if (entry1.layerIndex === entry2.layerIndex && entry1.featureIndex === entry2.featureIndex)
-                                r.push({ score: r1.score * r2.score, key: r1.key + ' ' + r2.key, entries: [entry1] });
-                        });
-                    });
-                });
-            });
-            r = r.sort(function (a, b) {
-                return b.score - a.score;
-            });
-            return r;
-        };
-        /**
-         * Do a fuzzy keyword comparison between the entered text and the list of keywords,
-         * and return a subset.
-         * @text: {string}
-         */
-        OfflineSearchCtrl.prototype.getKeywordHits = function (text) {
-            var results = [];
-            var keywordIndex = this.offlineSearchResult.keywordIndex;
-            for (var key in keywordIndex) {
-                if (!keywordIndex.hasOwnProperty(key))
-                    continue;
-                var score = key.score(text);
-                if (score < 0.5)
-                    continue;
-                results.push({ score: score, key: key, entries: keywordIndex[key] });
-            }
-            results = results.sort(function (a, b) {
-                return b.score - a.score;
-            });
-            return results;
-        };
-        /**
-         * When an item is selected, optionally open the layer and jump to the selected feature.
-         */
-        OfflineSearchCtrl.prototype.onSelect = function (selectedItem) {
-            // if ($item.feature) {
-            //     this.$layerService.selectFeature($item.feature);
-            //     this.$mapService.zoomTo($item.feature);
-            // } else {
-            //     this.$mapService.zoomToLocation(new L.LatLng($item.lat, $item.lng), 12);
-            // }
-            var _this = this;
-            var layerIndex = selectedItem.entry.layerIndex;
-            var layer = this.offlineSearchResult.layers[layerIndex];
-            var projectLayer = this.$layerService.findLayer(layer.id);
-            console.log(selectedItem);
-            if (!projectLayer)
-                return;
-            if (projectLayer.enabled) {
-                this.selectFeature(layer.id, selectedItem.entry.featureIndex);
-                return;
-            }
-            else {
-                var handle = this.$messageBus.subscribe('layer', function (title, layer) {
-                    if (title !== 'activated' || projectLayer.url !== layer.url)
-                        return;
-                    _this.selectFeature(layer.id, selectedItem.entry.featureIndex);
-                    _this.$messageBus.unsubscribe(handle);
-                });
-                // projectLayer       = new csComp.Services.ProjectLayer();
-                // projectLayer.id    = layer.id;
-                // projectLayer.title = layer.title;
-                // projectLayer.url   = layer.path;
-                // projectLayer.type  = layer.type;
-                this.$layerService.addLayer(projectLayer);
-            }
-        };
-        OfflineSearchCtrl.prototype.selectFeature = function (layerId, featureIndex) {
-            var feature = this.$layerService.findFeatureById(layerId, featureIndex);
-            if (feature == null)
-                return;
-            this.$mapService.zoomTo(feature);
-            this.$layerService.selectFeature(feature);
+        MapElementCtrl.prototype.initMap = function () {
+            //alert(this.$scope.mapId);
         };
         // $inject annotation.
         // It provides $injector with information about dependencies to be injected into constructor
         // it is better to have it close to the constructor, because the parameters must match in count and type.
         // See http://docs.angularjs.org/guide/di
-        OfflineSearchCtrl.$inject = [
+        MapElementCtrl.$inject = [
             '$scope',
             'layerService',
             'mapService',
             'messageBusService'
         ];
-        return OfflineSearchCtrl;
+        return MapElementCtrl;
     })();
-    OfflineSearch.OfflineSearchCtrl = OfflineSearchCtrl;
-})(OfflineSearch || (OfflineSearch = {}));
+    MapElement.MapElementCtrl = MapElementCtrl;
+})(MapElement || (MapElement = {}));
 var ProjectSettings;
 (function (ProjectSettings) {
     ProjectSettings.html = '<div>    <div class="wide-tooltip">        <span class="pull-right fa fa-info-circle fa-2x"              tooltip-html-unsafe="{{\'PROJECTSETTINGS.DESCRIPTION\' | translate}}"              tooltip-placement="bottom"              tooltip-trigger="mouseenter"              tooltip-append-to-body="false"              style="margin-right: 5px;"></span>        <h4 class="leftpanel-header" translate="PROJECTSETTINGS.TITLE"></h4>    </div>    <div style="overflow-y: auto; overflow-x: hidden; margin-top: -10px" resize resize-y="95">    </div></div>';
@@ -5260,41 +4792,13 @@ var StyleList;
 })(StyleList || (StyleList = {}));
 var Timeline;
 (function (Timeline) {
-    Timeline.html = '<div>    <div id="timelinecontainer">        <div id="timeline"></div>    </div>    <div class="callout top" id="focustimeContainer" ng-class="{showControl : vm.showControl}" ng-mouseenter="vm.mouseEnter()" ng-mouseleave="vm.mouseLeave()">        <div ng-show="vm.showControl" class="timelineControl" ng-class="{isPlaying : vm.isPlaying}">            <span ng-hide="vm.$layerService.project.timeLine.isLive" class="focustimeButton">                <div ng-hide="vm.isPlaying" class="fa fa-play focustimeButton" ng-click="vm.start()"></div>                <div ng-show="vm.isPlaying" class="fa fa-stop focustimeButton" ng-click="vm.stop()"></div>            </span>            <div style="float: right">{{vm.$layerService.project.timeLine.levelName}}</div>            <div ng-click="vm.toggleLive()" class="islivebutton" ng-show="vm.$layerService.project.timeLine.isLive" style="float: right">live</div>            <div ng-click="vm.toggleLive()" class="livebutton" ng-hide="vm.$layerService.project.timeLine.isLive" style="float: right">go live</div>            <!--<div ng-hide="vm.isPinned" class="fa fa-thumb-tack focustimeButton pinButton" ng-class="{isPinned : vm.isPinned}" ng-click="vm.pinToNow()"></div>-->        </div>        <div class="focustimeText">            <span style="font-weight: bold">{{vm.line1}}</span><br />            <span>{{vm.line2}}</span>        </div>    </div></div>';
+    Timeline.html = '<div>    <style>        #timeline {            position: absolute;            bottom: 0;            height: 100px;            width: 100%;            background: white;        }        .callout.top::before {            left: 45%;            bottom: -20px;            border-top: 10px solid #444;        }        .callout::before {            content: "";            width: 0px;            height: 0px;            border: 0.8em solid transparent;            position: absolute;        }        .focustimeButton {            margin: 3px;            cursor: pointer;        }        #focustimeContainer {            width: 150px;            cursor: e-resize;            height: 75px;            right: 200px;            bottom: 105px;            color: white;            position: absolute;            z-index: 1000;            /* float: right; */            display: block;        }        .timelineControl {            background: black;            height: 23px;        }        .isPlaying {            background: gray;        }        .showControl {            height: 75px;        }        .focustimeText {            text-align: center;            background: #444;            bottom: 0;            position: absolute;            width: 100%;            height: 52px;        }        .pinButton {            color: red;        }         .livebutton {  display: inline-block;-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;padding: 4px;margin-right: 0;border: none;font: 16px;color: rgba(255,255,255,1);text-decoration: normal;text-align: center;-o-text-overflow: clip;text-overflow: clip;white-space: pre;cursor: pointer;transition: all 200ms cubic-bezier(0.42, 0, 0.58, 1);}        @keyframes flickerAnimation {  0%   { opacity:1; }  50%  { opacity:0.2; }  100% { opacity:1; }}@-o-keyframes flickerAnimation{  0%   { opacity:1; }  50%  { opacity:0.2; }  100% { opacity:1; }}@-moz-keyframes flickerAnimation{  0%   { opacity:1; }  50%  { opacity:00.2; }  100% { opacity:1; }}@-webkit-keyframes flickerAnimation{  0%   { opacity:1; }  50%  { opacity:0.2; }  100% { opacity:1; }} .islivebutton {     display: inline-block;-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;padding: 4px;margin-right: 0;border: none;font: 16px;color: rgba(255,255,255,1);text-decoration: normal;text-align: center;-o-text-overflow: clip;text-overflow: clip;white-space: pre;cursor: pointer;           text-shadow: 0 0 2.5px rgba(255,255,255,1) , 0 0 5px rgba(255,255,255,1) , 0 0 7.5px rgba(255,255,255,1) , 0 0 10px #ff0000, 0 0 15px #ff0000 , 0 0 20px #ff0000, 0 0 25px #ff0000;-webkit-transition: all 200ms cubic-bezier(0.42, 0, 0.58, 1);-moz-transition: all 200ms cubic-bezier(0.42, 0, 0.58, 1);-o-transition: all 200ms cubic-bezier(0.42, 0, 0.58, 1);-webkit-animation: flickerAnimation 1s infinite;   -moz-animation: flickerAnimation 1s infinite;   -o-animation: flickerAnimation 1s infinite;    animation: flickerAnimation 1s infinite;    cursor: pointer;        }    </style>    <div>        <div id="timelinecontainer">            <div id="timeline"></div>        </div>        <div class="callout top" id="focustimeContainer" ng-class="{showControl : vm.showControl}" ng-mouseenter="vm.mouseEnter()" ng-mouseleave="vm.mouseLeave()">            <div ng-show="vm.showControl" class="timelineControl" ng-class="{isPlaying : vm.isPlaying}">                <span ng-hide="vm.$layerService.project.timeLine.isLive" class="focustimeButton">                    <div ng-hide="vm.isPlaying" class="fa fa-play focustimeButton" ng-click="vm.start()"></div>                    <div ng-show="vm.isPlaying" class="fa fa-stop focustimeButton" ng-click="vm.stop()"></div>                </span>                <div style="float: right">{{vm.$layerService.project.timeLine.levelName}}</div>                <div ng-click="vm.toggleLive()" class="islivebutton" ng-show="vm.$layerService.project.timeLine.isLive" style="float: right">live</div>                <div ng-click="vm.toggleLive()" class="livebutton" ng-hide="vm.$layerService.project.timeLine.isLive" style="float: right">go live</div>                <!--<div ng-hide="vm.isPinned" class="fa fa-thumb-tack focustimeButton pinButton" ng-class="{isPinned : vm.isPinned}" ng-click="vm.pinToNow()"></div>-->            </div>            <div class="focustimeText">                <span style="font-weight: bold">{{vm.line1}}</span><br />                <span>{{vm.line2}}</span>            </div>        </div>    </div></div>';
 })(Timeline || (Timeline = {}));
 var Timeline;
 (function (Timeline) {
-    // The following class represents the provider
-    var TimelineService = (function () {
-        function TimelineService() {
-            this.timelineOptions = {
-                'width': '100%',
-                'height': '100px',
-                'editable': false,
-                'layout': 'box'
-            };
-        }
-        // Configuration function
-        TimelineService.prototype.setTimelineOptions = function (options) {
-            this.timelineOptions = options;
-        };
-        // Provider's factory function
-        TimelineService.prototype.$get = function () {
-            var _this = this;
-            return {
-                getTimelineOptions: function () {
-                    return _this.timelineOptions;
-                },
-                setTimelineOptions: function (options) {
-                    return _this.setTimelineOptions;
-                }
-            };
-        };
-        return TimelineService;
-    })();
     /**
-     * Config
-     */
+      * Config
+      */
     var moduleName = 'csWeb.timeline';
     /**
       * Module
@@ -5309,18 +4813,8 @@ var Timeline;
     }
     /**
       * Directive to display the available map layers.
-      *
-      * When turning of the event margins in app.ts (see below), also set the #focustimeContainer { bottom: 45px; }
-      * $layerService.timelineOptions = {
-      *     'width': '100%',
-      *     "eventMargin": 0,
-      *     "eventMarginAxis": 0,
-      *     'editable': false,
-      *     'layout': 'box'
-      * };
-      * @seealso: http://almende.github.io/chap-links-library/downloads.html
       */
-    Timeline.myModule.provider('TimelineService', TimelineService).directive('timeline', [
+    Timeline.myModule.directive('timeline', [
         '$compile',
         function ($compile) {
             return {
@@ -5346,59 +4840,42 @@ var Timeline;
     var TimelineCtrl = (function () {
         // dependencies are injected via AngularJS $injector
         // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
-        function TimelineCtrl($scope, $layerService, $mapService, $messageBusService, TimelineService) {
+        function TimelineCtrl($scope, $layerService, $mapService, $messageBusService) {
             var _this = this;
             this.$scope = $scope;
             this.$layerService = $layerService;
             this.$mapService = $mapService;
             this.$messageBusService = $messageBusService;
-            this.TimelineService = TimelineService;
             this.locale = "en-us";
-            this.loadLocales();
             $scope.vm = this;
-            this.initTimeline();
             this.$messageBusService.subscribe("timeline", function (s, data) {
                 switch (s) {
                     case "updateTimerange":
                         _this.$scope.timeline.setVisibleChartRange(data.start, data.end);
                         _this.updateFocusTime();
                         break;
-                    case "loadProjectTimeRange":
-                        if (typeof $layerService.project === 'undefined' || $layerService.project === null || typeof $layerService.project.timeLine === 'undefined' || $layerService.project.timeLine === null)
-                            return;
-                        _this.$scope.timeline.setVisibleChartRange($layerService.project.timeLine.start, $layerService.project.timeLine.end);
-                        _this.updateFocusTime();
-                        break;
                 }
-                //if ($scope.$$phase != '$apply' && $scope.$$phase != '$digest') { $scope.$apply(); }
             });
             //$scope.focusDate = $layerService.project.timeLine.focusDate();
             // Options voor de timeline
-            this.$messageBusService.subscribe("language", function (s, newLanguage) {
-                switch (s) {
-                    case "newLanguage":
-                        _this.initTimeline();
-                        break;
-                }
-            });
-        }
-        TimelineCtrl.prototype.initTimeline = function () {
-            var _this = this;
-            var options = this.TimelineService.getTimelineOptions();
-            options.locale = this.$layerService.currentLocale;
-            this.$layerService.timeline = this.$scope.timeline = new links.Timeline(document.getElementById('timeline'), options);
-            this.$scope.timeline.draw();
-            links.events.addListener(this.$scope.timeline, 'rangechange', _.throttle(function (prop) { return _this.onRangeChanged(prop); }, 200));
-            links.events.addListener(this.$scope.timeline, 'rangechange', function () {
+            var options = {
+                'width': '100%',
+                'height': '100px',
+                'editable': false,
+                'layout': 'box'
+            };
+            $scope.timeline = new links.Timeline(document.getElementById('timeline'), options);
+            this.$layerService.timeline = $scope.timeline;
+            $scope.timeline.draw();
+            links.events.addListener($scope.timeline, 'rangechange', _.throttle(function (prop) { return _this.onRangeChanged(prop); }, 200));
+            links.events.addListener($scope.timeline, 'rangechange', function () {
                 if (_this.$layerService.project && _this.$layerService.project.timeLine.isLive) {
                     _this.myTimer();
                 }
             });
-            if (typeof this.$layerService.project !== 'undefined' && this.$layerService.project.timeLine !== null)
-                this.$scope.timeline.setVisibleChartRange(this.$layerService.project.timeLine.start, this.$layerService.project.timeLine.end);
             this.updateDragging();
             this.updateFocusTime();
-        };
+        }
         TimelineCtrl.prototype.updateDragging = function () {
             var _this = this;
             if (this.$layerService.project && this.$layerService.project.timeLine.isLive) {
@@ -5468,10 +4945,9 @@ var Timeline;
                 clearInterval(this.timer);
         };
         TimelineCtrl.prototype.updateFocusTime = function () {
-            //if (!this.$mapService.timelineVisible) return;
             var tl = this.$scope.timeline;
             tl.showCustomTime = true;
-            tl.setCustomTime = typeof this.$layerService.project === 'undefined' ? new Date() : this.$layerService.project.timeLine.focusDate();
+            tl.setCustomTime = new Date(2014, 11, 27, 20, 40, 0);
             var tc1 = $("#focustimeContainer").offset().left;
             var tc2 = $("#timelinecontainer").offset().left - 15; // + 55;
             var centerX = tc1 - tc2 + $("#focustimeContainer").width() / 2;
@@ -5507,84 +4983,9 @@ var Timeline;
                         this.line2 = moment(this.focusDate).format('HH:mm:ss');
                 }
             }
-            //if (this.$scope.$$phase != '$apply' && this.$scope.$$phase != '$digest') { this.$scope.$apply(); }
             this.$messageBusService.publish("timeline", "focusChange", this.focusDate);
             //this.$layerService.focusTime = new Date(this.timelineCtrl.screenToTime(centerX));
-        };
-        /**
-        * Load the locales: instead of loading them from the original timeline-locales.js distribution,
-        * add them here so you don't need to add another js dependency.
-        * @seealso: http://almende.github.io/chap-links-library/downloads.html
-        */
-        TimelineCtrl.prototype.loadLocales = function () {
-            if (typeof links === 'undefined') {
-                links = {};
-                links.locales = {};
-            }
-            else if (typeof links.locales === 'undefined') {
-                links.locales = {};
-            }
-            // English ===================================================
-            links.locales['en'] = {
-                'MONTHS': ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
-                'MONTHS_SHORT': ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-                'DAYS': ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-                'DAYS_SHORT': ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-                'ZOOM_IN': "Zoom in",
-                'ZOOM_OUT': "Zoom out",
-                'MOVE_LEFT': "Move left",
-                'MOVE_RIGHT': "Move right",
-                'NEW': "New",
-                'CREATE_NEW_EVENT': "Create new event"
-            };
-            links.locales['en_US'] = links.locales['en'];
-            links.locales['en_UK'] = links.locales['en'];
-            // French ===================================================
-            links.locales['fr'] = {
-                'MONTHS': ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"],
-                'MONTHS_SHORT': ["Jan", "Fev", "Mar", "Avr", "Mai", "Jun", "Jul", "Aou", "Sep", "Oct", "Nov", "Dec"],
-                'DAYS': ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"],
-                'DAYS_SHORT': ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"],
-                'ZOOM_IN': "Zoomer",
-                'ZOOM_OUT': "Dézoomer",
-                'MOVE_LEFT': "Déplacer à gauche",
-                'MOVE_RIGHT': "Déplacer à droite",
-                'NEW': "Nouveau",
-                'CREATE_NEW_EVENT': "Créer un nouvel évènement"
-            };
-            links.locales['fr_FR'] = links.locales['fr'];
-            links.locales['fr_BE'] = links.locales['fr'];
-            links.locales['fr_CA'] = links.locales['fr'];
-            // German ===================================================
-            links.locales['de'] = {
-                'MONTHS': ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"],
-                'MONTHS_SHORT': ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"],
-                'DAYS': ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"],
-                'DAYS_SHORT': ["Son", "Mon", "Die", "Mit", "Don", "Fre", "Sam"],
-                'ZOOM_IN': "Vergrößern",
-                'ZOOM_OUT': "Verkleinern",
-                'MOVE_LEFT': "Nach links verschieben",
-                'MOVE_RIGHT': "Nach rechts verschieben",
-                'NEW': "Neu",
-                'CREATE_NEW_EVENT': "Neues Ereignis erzeugen"
-            };
-            links.locales['de_DE'] = links.locales['de'];
-            links.locales['de_CH'] = links.locales['de'];
-            // Dutch =====================================================
-            links.locales['nl'] = {
-                'MONTHS': ["januari", "februari", "maart", "april", "mei", "juni", "juli", "augustus", "september", "oktober", "november", "december"],
-                'MONTHS_SHORT': ["jan", "feb", "mrt", "apr", "mei", "jun", "jul", "aug", "sep", "okt", "nov", "dec"],
-                'DAYS': ["zondag", "maandag", "dinsdag", "woensdag", "donderdag", "vrijdag", "zaterdag"],
-                'DAYS_SHORT': ["zo", "ma", "di", "wo", "do", "vr", "za"],
-                'ZOOM_IN': "Inzoomen",
-                'ZOOM_OUT': "Uitzoomen",
-                'MOVE_LEFT': "Naar links",
-                'MOVE_RIGHT': "Naar rechts",
-                'NEW': "Nieuw",
-                'CREATE_NEW_EVENT': "Nieuwe gebeurtenis maken"
-            };
-            links.locales['nl_NL'] = links.locales['nl'];
-            links.locales['nl_BE'] = links.locales['nl'];
+            //this.$scope.$apply();
         };
         // $inject annotation.
         // It provides $injector with information about dependencies to be injected into constructor
@@ -5594,8 +4995,7 @@ var Timeline;
             '$scope',
             'layerService',
             'mapService',
-            'messageBusService',
-            'TimelineService'
+            'messageBusService'
         ];
         return TimelineCtrl;
     })();
@@ -5755,6 +5155,21 @@ var csComp;
 (function (csComp) {
     var Helpers;
     (function (Helpers) {
+        /**
+        * Convert topojson data to geojson data.
+        */
+        function convertTopoToGeoJson(data) {
+            // Convert topojson to geojson format
+            var topo = omnivore.topojson.parse(data);
+            var newData = {};
+            newData.featureTypes = data.featureTypes;
+            newData.features = [];
+            topo.eachLayer(function (l) {
+                newData.features.push(l.feature);
+            });
+            return newData;
+        }
+        Helpers.convertTopoToGeoJson = convertTopoToGeoJson;
         function supportsDataUri() {
             var isOldIE = navigator.appName === "Microsoft Internet Explorer";
             var isIE11 = !!navigator.userAgent.match(/Trident\/7\./);
@@ -5924,7 +5339,6 @@ var csComp;
         /**
          * Load the features as visible on the map, effectively creating a virtual
          * GeoJSON file that represents all visible items.
-         * Also loads the keys into the featuretype's propertyTypeData collection.
          */
         function loadMapLayers(layerService) {
             var data = {
@@ -5946,20 +5360,255 @@ var csComp;
                     if (!featureType.name)
                         featureType.name = f.featureTypeName.replace('_Default', '');
                     data.featureTypes[f.featureTypeName] = featureType;
-                    if (featureType.propertyTypeKeys) {
-                        featureType.propertyTypeData = [];
-                        featureType.propertyTypeKeys.split(';').forEach(function (key) {
-                            if (layerService.propertyTypeData.hasOwnProperty(key)) {
-                                featureType.propertyTypeData.push(layerService.propertyTypeData[key]);
-                            }
-                        });
-                    }
                 }
             });
             return data;
         }
         Helpers.loadMapLayers = loadMapLayers;
     })(Helpers = csComp.Helpers || (csComp.Helpers = {}));
+})(csComp || (csComp = {}));
+var csComp;
+(function (csComp) {
+    var Services;
+    (function (Services) {
+        // Handle returned when subscribing to a topic
+        var MessageBusHandle = (function () {
+            function MessageBusHandle(topic, callback) {
+                this.topic = topic;
+                this.callback = callback;
+            }
+            return MessageBusHandle;
+        })();
+        Services.MessageBusHandle = MessageBusHandle;
+        (function (NotifyLocation) {
+            NotifyLocation[NotifyLocation["BottomRight"] = 0] = "BottomRight";
+            NotifyLocation[NotifyLocation["BottomLeft"] = 1] = "BottomLeft";
+            NotifyLocation[NotifyLocation["TopRight"] = 2] = "TopRight";
+            NotifyLocation[NotifyLocation["TopLeft"] = 3] = "TopLeft";
+        })(Services.NotifyLocation || (Services.NotifyLocation = {}));
+        var NotifyLocation = Services.NotifyLocation;
+        /**
+         * Simple message bus service, used for subscribing and unsubsubscribing to topics.
+         * @see {@link https://gist.github.com/floatingmonkey/3384419}
+         */
+        var MessageBusService = (function () {
+            function MessageBusService($translate) {
+                this.$translate = $translate;
+                PNotify.prototype.options.styling = "fontawesome";
+            }
+            /**
+             * Publish a notification that needs to be translated
+             * @title:       the translation key of the notification's title
+             * @text:        the translation key of the notification's content
+             * @location:    the location on the screen where the notification is shown (default bottom right)
+             */
+            MessageBusService.prototype.notifyWithTranslation = function (title, text, location) {
+                var _this = this;
+                if (location === void 0) { location = 0 /* BottomRight */; }
+                this.$translate(title).then(function (translatedTitle) {
+                    _this.$translate(text).then(function (translatedText) {
+                        _this.notify(translatedTitle, translatedText, location);
+                    });
+                });
+            };
+            /**
+             * Publish a notification
+             * @title:       the title of the notification
+             * @text:        the contents of the notification
+             * @location:    the location on the screen where the notification is shown (default bottom right)
+             */
+            MessageBusService.prototype.notify = function (title, text, location) {
+                if (location === void 0) { location = 0 /* BottomRight */; }
+                var cssLocation, dir1, dir2;
+                switch (location) {
+                    case 1 /* BottomLeft */:
+                        cssLocation = 'stack-bottomleft';
+                        dir1 = 'up';
+                        dir2 = 'right';
+                        break;
+                    case 2 /* TopRight */:
+                        cssLocation = 'stack-topright';
+                        dir1 = 'down';
+                        dir2 = 'left';
+                        break;
+                    case 3 /* TopLeft */:
+                        cssLocation = 'stack-topleft';
+                        dir1 = 'down';
+                        dir2 = 'right';
+                        break;
+                    default:
+                        cssLocation = 'stack-bottomright';
+                        dir1 = 'up';
+                        dir2 = 'left';
+                        break;
+                }
+                var options = {
+                    title: title,
+                    text: text,
+                    icon: 'fa fa-info',
+                    cornerclass: 'ui-pnotify-sharp',
+                    addclass: cssLocation,
+                    stack: { "dir1": dir1, "dir2": dir2, "firstpos1": 25, "firstpos2": 25 }
+                };
+                var pn = new PNotify(options);
+            };
+            /**
+             * Show a confirm dialog
+             * @title           : the title of the notification
+             * @text            : the contents of the notification
+             * @callback        : the callback that will be called after the confirmation has been answered.
+             */
+            MessageBusService.prototype.confirm = function (title, text, callback) {
+                var options = {
+                    title: title,
+                    text: text,
+                    hide: false,
+                    confirm: {
+                        confirm: true
+                    },
+                    buttons: {
+                        closer: false,
+                        sticker: false
+                    },
+                    history: {
+                        history: false
+                    },
+                    icon: 'fa fa-question-circle',
+                    cornerclass: 'ui-pnotify-sharp',
+                    addclass: "stack-topright",
+                    stack: { "dir1": "down", "dir2": "left", "firstpos1": 25, "firstpos2": 25 }
+                };
+                var pn = new PNotify(options).get().on('pnotify.confirm', function () {
+                    callback(true);
+                }).on('pnotify.cancel', function () {
+                    callback(false);
+                });
+            };
+            MessageBusService.prototype.notifyBottom = function (title, text) {
+                var stack_bar_bottom = { "dir1": "up", "dir2": "right", "spacing1": 0, "spacing2": 0 };
+                var options = {
+                    title: "Over Here",
+                    text: "Check me out. I'm in a different stack.",
+                    addclass: "stack-bar-bottom",
+                    cornerclass: "",
+                    width: "70%",
+                    stack: stack_bar_bottom
+                };
+                var pn = new PNotify(options);
+            };
+            /**
+             * Publish a notification
+             * @title: the title of the notification
+             * @text:  the contents of the notification
+             */
+            MessageBusService.prototype.notifyData = function (data) {
+                var pn = new PNotify(data);
+                //this.publish("notify", "", data);
+            };
+            /**
+             * Publish to a topic
+             */
+            MessageBusService.prototype.publish = function (topic, title, data) {
+                //window.console.log("publish: " + topic + ", " + title);
+                if (!MessageBusService.cache[topic])
+                    return;
+                MessageBusService.cache[topic].forEach(function (cb) { return cb(title, data); });
+            };
+            //public publish(topic: string, title: string, data?: any): void {
+            //	MessageBusService.publish(topic, title, data);
+            //}
+            /**
+             * Subscribe to a topic
+             * @param {string} topic The desired topic of the message.
+             * @param {IMessageBusCallback} callback The callback to call.
+             */
+            MessageBusService.prototype.subscribe = function (topic, callback) {
+                if (!MessageBusService.cache[topic])
+                    MessageBusService.cache[topic] = new Array();
+                MessageBusService.cache[topic].push(callback);
+                return new MessageBusHandle(topic, callback);
+            };
+            //public subscribe(topic: string, callback: IMessageBusCallback): MessageBusHandle {            
+            //	return MessageBusService.subscribe(topic, callback);
+            //}
+            /**
+             * Unsubscribe to a topic by providing its handle
+             */
+            MessageBusService.prototype.unsubscribe = function (handle) {
+                var topic = handle.topic;
+                var callback = handle.callback;
+                if (!MessageBusService.cache[topic])
+                    return;
+                MessageBusService.cache[topic].forEach(function (cb, idx) {
+                    if (cb == callback) {
+                        MessageBusService.cache[topic].splice(idx, 1);
+                        return;
+                    }
+                });
+            };
+            MessageBusService.cache = {};
+            MessageBusService.$inject = [
+                '$translate'
+            ];
+            return MessageBusService;
+        })();
+        Services.MessageBusService = MessageBusService;
+        var EventObj = (function () {
+            function EventObj() {
+            }
+            // Events primitives ======================
+            EventObj.prototype.bind = function (event, fct) {
+                this.myEvents = this.myEvents || {};
+                this.myEvents[event] = this.myEvents[event] || [];
+                this.myEvents[event].push(fct);
+            };
+            EventObj.prototype.unbind = function (event, fct) {
+                this.myEvents = this.myEvents || {};
+                if (event in this.myEvents === false)
+                    return;
+                this.myEvents[event].splice(this.myEvents[event].indexOf(fct), 1);
+            };
+            EventObj.prototype.unbindEvent = function (event) {
+                this.myEvents = this.myEvents || {};
+                this.myEvents[event] = [];
+            };
+            EventObj.prototype.unbindAll = function () {
+                this.myEvents = this.myEvents || {};
+                for (var event in this.myEvents)
+                    this.myEvents[event] = false;
+            };
+            EventObj.prototype.trigger = function (event) {
+                var args = [];
+                for (var _i = 1; _i < arguments.length; _i++) {
+                    args[_i - 1] = arguments[_i];
+                }
+                this.myEvents = this.myEvents || {};
+                if (event in this.myEvents === false)
+                    return;
+                for (var i = 0; i < this.myEvents[event].length; i++) {
+                    this.myEvents[event][i].apply(this, Array.prototype.slice.call(arguments, 1));
+                }
+            };
+            EventObj.prototype.registerEvent = function (evtname) {
+                this[evtname] = function (callback, replace) {
+                    if (typeof callback == 'function') {
+                        if (replace)
+                            this.unbindEvent(evtname);
+                        this.bind(evtname, callback);
+                    }
+                    return this;
+                };
+            };
+            EventObj.prototype.registerEvents = function (evtnames) {
+                var _this = this;
+                evtnames.forEach(function (evtname) {
+                    _this.registerEvent(evtname);
+                });
+            };
+            return EventObj;
+        })();
+        Services.EventObj = EventObj;
+    })(Services = csComp.Services || (csComp.Services = {}));
 })(csComp || (csComp = {}));
 var csComp;
 (function (csComp) {
@@ -6262,393 +5911,35 @@ var csComp;
         StringExt.isBbcode = isBbcode;
     })(StringExt = csComp.StringExt || (csComp.StringExt = {}));
 })(csComp || (csComp = {}));
-/*!
- * string_score.js: String Scoring Algorithm 0.1.22
- *
- * http://joshaven.com/string_score
- * https://github.com/joshaven/string_score
- *
- * Copyright (C) 2009-2014 Joshaven Potter <yourtech@gmail.com>
- * Special thanks to all of the contributors listed here https://github.com/joshaven/string_score
- * MIT License: http://opensource.org/licenses/MIT
- *
- * Date: Tue Mar 1 2011
- * Updated: Tue Mar 10 2015
-*/
-/*jslint nomen:true, white:true, browser:true,devel:true */
-/**
- * Scores a string against another string.
- *    'Hello World'.score('he');         //=> 0.5931818181818181
- *    'Hello World'.score('Hello');    //=> 0.7318181818181818
- */
-String.prototype.score = function (word, fuzziness) {
-    'use strict';
-    // If the string is equal to the word, perfect match.
-    if (this === word) {
-        return 1;
-    }
-    //if it's not a perfect match and is empty return 0
-    if (word === "") {
-        return 0;
-    }
-    var runningScore = 0, charScore, finalScore, string = this, lString = string.toLowerCase(), strLength = string.length, lWord = word.toLowerCase(), wordLength = word.length, idxOf, startAt = 0, fuzzies = 1, fuzzyFactor, i;
-    // Cache fuzzyFactor for speed increase
-    if (fuzziness) {
-        fuzzyFactor = 1 - fuzziness;
-    }
-    // Walk through word and add up scores.
-    // Code duplication occurs to prevent checking fuzziness inside for loop
-    if (fuzziness) {
-        for (i = 0; i < wordLength; i += 1) {
-            // Find next first case-insensitive match of a character.
-            idxOf = lString.indexOf(lWord[i], startAt);
-            if (idxOf === -1) {
-                fuzzies += fuzzyFactor;
-            }
-            else {
-                if (startAt === idxOf) {
-                    // Consecutive letter & start-of-string Bonus
-                    charScore = 0.7;
-                }
-                else {
-                    charScore = 0.1;
-                    // Acronym Bonus
-                    // Weighing Logic: Typing the first character of an acronym is as if you
-                    // preceded it with two perfect character matches.
-                    if (string[idxOf - 1] === ' ') {
-                        charScore += 0.8;
-                    }
-                }
-                // Same case bonus.
-                if (string[idxOf] === word[i]) {
-                    charScore += 0.1;
-                }
-                // Update scores and startAt position for next round of indexOf
-                runningScore += charScore;
-                startAt = idxOf + 1;
-            }
-        }
-    }
-    else {
-        for (i = 0; i < wordLength; i += 1) {
-            idxOf = lString.indexOf(lWord[i], startAt);
-            if (-1 === idxOf) {
-                return 0;
-            }
-            if (startAt === idxOf) {
-                charScore = 0.7;
-            }
-            else {
-                charScore = 0.1;
-                if (string[idxOf - 1] === ' ') {
-                    charScore += 0.8;
-                }
-            }
-            if (string[idxOf] === word[i]) {
-                charScore += 0.1;
-            }
-            runningScore += charScore;
-            startAt = idxOf + 1;
-        }
-    }
-    // Reduce penalty for longer strings.
-    finalScore = 0.5 * (runningScore / strLength + runningScore / wordLength) / fuzzies;
-    if ((lWord[0] === lString[0]) && (finalScore < 0.85)) {
-        finalScore += 0.15;
-    }
-    return finalScore;
-};
 var csComp;
 (function (csComp) {
-    (function (FileType) {
-        FileType[FileType["Js"] = 0] = "Js";
-        FileType[FileType["Css"] = 1] = "Css";
-    })(csComp.FileType || (csComp.FileType = {}));
-    var FileType = csComp.FileType;
-    var Utils = (function () {
-        function Utils() {
+    var Helpers;
+    (function (Helpers) {
+        function getColor(v, gs) {
+            if (v > gs.info.sdMax)
+                return gs.colors[gs.colors.length - 1];
+            if (v < gs.info.sdMin)
+                return gs.colors[0];
+            var bezInterpolator = chroma.interpolate.bezier(gs.colors);
+            var r = bezInterpolator((v - gs.info.sdMin) / (gs.info.sdMax - gs.info.sdMin)).hex();
+            return r;
         }
+        Helpers.getColor = getColor;
         /**
-        * Load a JavaScript or CSS file dynamically by adding it to the end of the HEAD section in your document.
-        * See also: http://www.javascriptkit.com/javatutors/loadjavascriptcss.shtml
+        * Extract a valid color string, without transparency.
         */
-        Utils.loadJsCssfile = function (filename, filetype, callback) {
-            if (Utils.loadedFiles.indexOf(filename) > 0)
-                return;
-            Utils.loadedFiles.push(filename);
-            switch (filetype) {
-                case 0 /* Js */:
-                    var fileRef = document.createElement('script');
-                    fileRef.setAttribute("type", "text/javascript");
-                    fileRef.setAttribute("src", filename);
-                    if (callback) {
-                        fileRef.onload = function (evt) {
-                            callback(evt);
-                        };
-                    }
-                    document.getElementsByTagName("head")[0].appendChild(fileRef);
-                    break;
-                case 1 /* Css */:
-                    var linkRef = document.createElement("link");
-                    linkRef.setAttribute("rel", "stylesheet");
-                    linkRef.setAttribute("type", "text/css");
-                    linkRef.setAttribute("href", filename);
-                    if (callback) {
-                        linkRef.onload = function (evt) {
-                            callback(evt);
-                        };
-                    }
-                    document.getElementsByTagName("head")[0].appendChild(linkRef);
-                    break;
-            }
-        };
-        Utils.loadedFiles = [];
-        return Utils;
-    })();
-    csComp.Utils = Utils;
-})(csComp || (csComp = {}));
-var csComp;
-(function (csComp) {
-    var Services;
-    (function (Services) {
-        // Handle returned when subscribing to a topic
-        var MessageBusHandle = (function () {
-            function MessageBusHandle(topic, callback) {
-                this.topic = topic;
-                this.callback = callback;
-            }
-            return MessageBusHandle;
-        })();
-        Services.MessageBusHandle = MessageBusHandle;
-        (function (NotifyLocation) {
-            NotifyLocation[NotifyLocation["BottomRight"] = 0] = "BottomRight";
-            NotifyLocation[NotifyLocation["BottomLeft"] = 1] = "BottomLeft";
-            NotifyLocation[NotifyLocation["TopRight"] = 2] = "TopRight";
-            NotifyLocation[NotifyLocation["TopLeft"] = 3] = "TopLeft";
-        })(Services.NotifyLocation || (Services.NotifyLocation = {}));
-        var NotifyLocation = Services.NotifyLocation;
-        /**
-         * Simple message bus service, used for subscribing and unsubsubscribing to topics.
-         * @see {@link https://gist.github.com/floatingmonkey/3384419}
-         */
-        var MessageBusService = (function () {
-            function MessageBusService($translate) {
-                this.$translate = $translate;
-                PNotify.prototype.options.styling = "fontawesome";
-            }
-            /**
-             * Publish a notification that needs to be translated
-             * @title:       the translation key of the notification's title
-             * @text:        the translation key of the notification's content
-             * @location:    the location on the screen where the notification is shown (default bottom right)
-             */
-            MessageBusService.prototype.notifyWithTranslation = function (title, text, location) {
-                var _this = this;
-                if (location === void 0) { location = 0 /* BottomRight */; }
-                this.$translate(title).then(function (translatedTitle) {
-                    _this.$translate(text).then(function (translatedText) {
-                        _this.notify(translatedTitle, translatedText, location);
-                    });
-                });
-            };
-            /**
-             * Publish a notification
-             * @title:       the title of the notification
-             * @text:        the contents of the notification
-             * @location:    the location on the screen where the notification is shown (default bottom right)
-             */
-            MessageBusService.prototype.notify = function (title, text, location) {
-                if (location === void 0) { location = 0 /* BottomRight */; }
-                var cssLocation, dir1, dir2;
-                switch (location) {
-                    case 1 /* BottomLeft */:
-                        cssLocation = 'stack-bottomleft';
-                        dir1 = 'up';
-                        dir2 = 'right';
-                        break;
-                    case 2 /* TopRight */:
-                        cssLocation = 'stack-topright';
-                        dir1 = 'down';
-                        dir2 = 'left';
-                        break;
-                    case 3 /* TopLeft */:
-                        cssLocation = 'stack-topleft';
-                        dir1 = 'down';
-                        dir2 = 'right';
-                        break;
-                    default:
-                        cssLocation = 'stack-bottomright';
-                        dir1 = 'up';
-                        dir2 = 'left';
-                        break;
-                }
-                var options = {
-                    title: title,
-                    text: text,
-                    icon: 'fa fa-info',
-                    cornerclass: 'ui-pnotify-sharp',
-                    addclass: cssLocation,
-                    stack: { "dir1": dir1, "dir2": dir2, "firstpos1": 25, "firstpos2": 25 }
-                };
-                var pn = new PNotify(options);
-            };
-            /**
-             * Show a confirm dialog
-             * @title           : the title of the notification
-             * @text            : the contents of the notification
-             * @callback        : the callback that will be called after the confirmation has been answered.
-             */
-            MessageBusService.prototype.confirm = function (title, text, callback) {
-                var options = {
-                    title: title,
-                    text: text,
-                    hide: false,
-                    confirm: {
-                        confirm: true
-                    },
-                    buttons: {
-                        closer: false,
-                        sticker: false
-                    },
-                    history: {
-                        history: false
-                    },
-                    icon: 'fa fa-question-circle',
-                    cornerclass: 'ui-pnotify-sharp',
-                    addclass: "stack-topright",
-                    stack: { "dir1": "down", "dir2": "left", "firstpos1": 25, "firstpos2": 25 }
-                };
-                var pn = new PNotify(options).get().on('pnotify.confirm', function () {
-                    callback(true);
-                }).on('pnotify.cancel', function () {
-                    callback(false);
-                });
-            };
-            MessageBusService.prototype.notifyBottom = function (title, text) {
-                var stack_bar_bottom = { "dir1": "up", "dir2": "right", "spacing1": 0, "spacing2": 0 };
-                var options = {
-                    title: "Over Here",
-                    text: "Check me out. I'm in a different stack.",
-                    addclass: "stack-bar-bottom",
-                    cornerclass: "",
-                    width: "70%",
-                    stack: stack_bar_bottom
-                };
-                var pn = new PNotify(options);
-            };
-            /**
-             * Publish a notification
-             * @title: the title of the notification
-             * @text:  the contents of the notification
-             */
-            MessageBusService.prototype.notifyData = function (data) {
-                var pn = new PNotify(data);
-                //this.publish("notify", "", data);
-            };
-            /**
-             * Publish to a topic
-             */
-            MessageBusService.prototype.publish = function (topic, title, data) {
-                //window.console.log("publish: " + topic + ", " + title);
-                if (!MessageBusService.cache[topic])
-                    return;
-                MessageBusService.cache[topic].forEach(function (cb) { return cb(title, data); });
-            };
-            //public publish(topic: string, title: string, data?: any): void {
-            //	MessageBusService.publish(topic, title, data);
-            //}
-            /**
-             * Subscribe to a topic
-             * @param {string} topic The desired topic of the message.
-             * @param {IMessageBusCallback} callback The callback to call.
-             */
-            MessageBusService.prototype.subscribe = function (topic, callback) {
-                if (!MessageBusService.cache[topic])
-                    MessageBusService.cache[topic] = new Array();
-                MessageBusService.cache[topic].push(callback);
-                return new MessageBusHandle(topic, callback);
-            };
-            //public subscribe(topic: string, callback: IMessageBusCallback): MessageBusHandle {            
-            //	return MessageBusService.subscribe(topic, callback);
-            //}
-            /**
-             * Unsubscribe to a topic by providing its handle
-             */
-            MessageBusService.prototype.unsubscribe = function (handle) {
-                var topic = handle.topic;
-                var callback = handle.callback;
-                if (!MessageBusService.cache[topic])
-                    return;
-                MessageBusService.cache[topic].forEach(function (cb, idx) {
-                    if (cb == callback) {
-                        MessageBusService.cache[topic].splice(idx, 1);
-                        return;
-                    }
-                });
-            };
-            MessageBusService.cache = {};
-            MessageBusService.$inject = [
-                '$translate'
-            ];
-            return MessageBusService;
-        })();
-        Services.MessageBusService = MessageBusService;
-        var EventObj = (function () {
-            function EventObj() {
-            }
-            // Events primitives ======================
-            EventObj.prototype.bind = function (event, fct) {
-                this.myEvents = this.myEvents || {};
-                this.myEvents[event] = this.myEvents[event] || [];
-                this.myEvents[event].push(fct);
-            };
-            EventObj.prototype.unbind = function (event, fct) {
-                this.myEvents = this.myEvents || {};
-                if (event in this.myEvents === false)
-                    return;
-                this.myEvents[event].splice(this.myEvents[event].indexOf(fct), 1);
-            };
-            EventObj.prototype.unbindEvent = function (event) {
-                this.myEvents = this.myEvents || {};
-                this.myEvents[event] = [];
-            };
-            EventObj.prototype.unbindAll = function () {
-                this.myEvents = this.myEvents || {};
-                for (var event in this.myEvents)
-                    this.myEvents[event] = false;
-            };
-            EventObj.prototype.trigger = function (event) {
-                var args = [];
-                for (var _i = 1; _i < arguments.length; _i++) {
-                    args[_i - 1] = arguments[_i];
-                }
-                this.myEvents = this.myEvents || {};
-                if (event in this.myEvents === false)
-                    return;
-                for (var i = 0; i < this.myEvents[event].length; i++) {
-                    this.myEvents[event][i].apply(this, Array.prototype.slice.call(arguments, 1));
-                }
-            };
-            EventObj.prototype.registerEvent = function (evtname) {
-                this[evtname] = function (callback, replace) {
-                    if (typeof callback == 'function') {
-                        if (replace)
-                            this.unbindEvent(evtname);
-                        this.bind(evtname, callback);
-                    }
-                    return this;
-                };
-            };
-            EventObj.prototype.registerEvents = function (evtnames) {
-                var _this = this;
-                evtnames.forEach(function (evtname) {
-                    _this.registerEvent(evtname);
-                });
-            };
-            return EventObj;
-        })();
-        Services.EventObj = EventObj;
-    })(Services = csComp.Services || (csComp.Services = {}));
+        function getColorString(color, defaultColor) {
+            if (defaultColor === void 0) { defaultColor = '#f00'; }
+            if (!color)
+                return defaultColor;
+            if (color.length == 4 || color.length == 7)
+                return color;
+            if (color.length == 9)
+                return '#' + color.substr(3, 6);
+            return defaultColor;
+        }
+        Helpers.getColorString = getColorString;
+    })(Helpers = csComp.Helpers || (csComp.Helpers = {}));
 })(csComp || (csComp = {}));
 var csComp;
 (function (csComp) {
@@ -6677,6 +5968,17 @@ var csComp;
                 this.propertyTypeData = {};
                 //this.map.map.addLayer(this.layerGroup);
                 this.noStyles = true;
+                this.currentLocale = "en";
+                // init map renderers
+                this.mapRenderers = {};
+                // add renderers
+                this.mapRenderers["leaflet"] = new Services.LeafletRenderer();
+                this.mapRenderers["leaflet"].init(this);
+                this.mapRenderers["cesium"] = new Services.CesiumRenderer();
+                this.mapRenderers["cesium"].init(this);
+                this.selectRenderer("leaflet");
+                //this.mapRenderers["leaflet"].enable();
+                this.initLayerSources();
                 $messageBusService.subscribe('timeline', function (trigger) {
                     switch (trigger) {
                         case 'focusChange':
@@ -6694,6 +5996,129 @@ var csComp;
                     }
                 });
             }
+            // initialize the available layer sources
+            LayerService.prototype.initLayerSources = function () {
+                // init layer sources
+                this.layerSources = {};
+                // add a topo/geojson source
+                var geojsonsource = new Services.GeoJsonSource();
+                geojsonsource.init(this);
+                this.layerSources["geojson"] = geojsonsource;
+                this.layerSources["topojson"] = geojsonsource;
+                //var dynamicgeojsonsource = new DynamicGeoJsonSource();
+                //dynamicgeojsonsource.init(this);
+                //this.layerSources["dynamicgeojson"] = dynamicgeojsonsource;
+                // add wms source
+                this.layerSources["wms"] = new Services.WmsSource();
+                this.layerSources["wms"].init(this);
+                //add tile layer
+                this.layerSources["tilelayer"] = new Services.TileLayerSource();
+                this.layerSources["tilelayer"].init(this);
+            };
+            LayerService.prototype.addLayer = function (layer) {
+                var _this = this;
+                var disableLayers = [];
+                async.series([
+                    function (callback) {
+                        // check if in this group only one layer can be active
+                        // make sure all existising active layers are disabled
+                        if (layer.group.oneLayerActive) {
+                            layer.group.layers.forEach(function (l) {
+                                if (l !== layer && l.enabled) {
+                                    disableLayers.push(l);
+                                }
+                            });
+                        }
+                        callback(null, null);
+                    },
+                    function (callback) {
+                        // find layer source, and activate layer
+                        var layerSource = layer.type.toLowerCase();
+                        if (_this.layerSources.hasOwnProperty(layerSource)) {
+                            async.series([
+                                function (cb) {
+                                    // load layer from source
+                                    _this.layerSources[layerSource].addLayer(layer, function (l) {
+                                        _this.activeMapRenderer.addLayer(layer);
+                                    });
+                                    cb(null, null);
+                                },
+                                function (cb) {
+                                    // update sensor data & filters
+                                    _this.updateSensorData();
+                                    _this.$messageBusService.publish('layer', 'activated', layer);
+                                    _this.updateFilters();
+                                    cb(null, null);
+                                }
+                            ]);
+                        }
+                        callback(null, null);
+                    },
+                    function (callback) {
+                        // now remove the layers that need to be disabled
+                        disableLayers.forEach(function (l) {
+                            _this.removeLayer(l);
+                            l.enabled = false;
+                        });
+                        callback(null, null);
+                    }
+                ]);
+            };
+            LayerService.prototype.removeStyle = function (style) {
+                //console.log('update style ' + style.title);
+                var g = style.group;
+                g.styles = g.styles.filter(function (s) { return s.id !== style.id; });
+                this.updateGroupFeatures(g);
+            };
+            LayerService.prototype.updateStyle = function (style) {
+                //console.log('update style ' + style.title);
+                if (style == null)
+                    return;
+                if (style.group != null) {
+                    style.info = this.calculatePropertyInfo(style.group, style.property);
+                    style.canSelectColor = style.visualAspect.toLowerCase().indexOf('color') > -1;
+                    this.updateGroupFeatures(style.group);
+                }
+            };
+            LayerService.prototype.updateGroupFeatures = function (group) {
+                var _this = this;
+                this.project.features.forEach(function (f) {
+                    if (f.layer.group == group) {
+                        _this.calculateFeatureStyle(f);
+                        _this.activeMapRenderer.updateFeature(f);
+                    }
+                });
+            };
+            LayerService.prototype.selectRenderer = function (renderer) {
+                if (this.activeMapRenderer && this.activeMapRenderer.title == renderer)
+                    return;
+                if (this.activeMapRenderer)
+                    this.activeMapRenderer.disable();
+                if (this.mapRenderers.hasOwnProperty(renderer)) {
+                    this.activeMapRenderer = this.mapRenderers[renderer];
+                    this.activeMapRenderer.enable();
+                }
+            };
+            LayerService.prototype.selectFeature = function (feature) {
+                feature.isSelected = !feature.isSelected;
+                this.calculateFeatureStyle(feature);
+                this.activeMapRenderer.updateFeature(feature);
+                // deselect last feature and also update
+                if (this.lastSelectedFeature != null && this.lastSelectedFeature !== feature) {
+                    this.lastSelectedFeature.isSelected = false;
+                    this.calculateFeatureStyle(this.lastSelectedFeature);
+                    this.activeMapRenderer.updateFeature(this.lastSelectedFeature);
+                }
+                this.lastSelectedFeature = feature;
+                if (!feature.isSelected) {
+                    this.$messageBusService.publish('sidebar', 'hide');
+                    this.$messageBusService.publish('feature', 'onFeatureDeselect');
+                }
+                else {
+                    this.$messageBusService.publish('sidebar', 'show');
+                    this.$messageBusService.publish('feature', 'onFeatureSelect', feature);
+                }
+            };
             LayerService.prototype.selectDashboard = function (dashboard, container) {
                 this.project.activeDashboard = dashboard;
                 this.$messageBusService.publish("dashboard-" + container, "activated", dashboard);
@@ -6745,231 +6170,13 @@ var csComp;
                                     var value = sensor[pos];
                                     f.properties[sensorTitle] = value;
                                 }
-                                _this.updateFeatureIcon(f, l);
+                                _this.activeMapRenderer.updateFeature(f);
                                 if (f.isSelected)
                                     _this.$messageBusService.publish("feature", "onFeatureUpdated", f);
                             }
                         }
                     }
                 });
-            };
-            /**
-             * Add a layer
-             */
-            LayerService.prototype.addLayer = function (layer) {
-                var _this = this;
-                var disableLayers = [];
-                layer.enabled = true;
-                switch (layer.type.toLowerCase()) {
-                    case 'wms':
-                        var wms = L.tileLayer.wms(layer.url, {
-                            layers: layer.wmsLayers,
-                            opacity: layer.opacity / 100,
-                            format: 'image/png',
-                            transparent: true,
-                            attribution: layer.description
-                        });
-                        layer.mapLayer = new L.LayerGroup();
-                        this.map.map.addLayer(layer.mapLayer);
-                        layer.mapLayer.addLayer(wms);
-                        wms.on('loading', function (event) {
-                            layer.isLoading = true;
-                            _this.$rootScope.$apply();
-                            if (_this.$rootScope.$$phase != '$apply' && _this.$rootScope.$$phase != '$digest') {
-                                _this.$rootScope.$apply();
-                            }
-                        });
-                        wms.on('load', function (event) {
-                            layer.isLoading = false;
-                            if (!layer.id)
-                                layer.id = csComp.Helpers.getGuid();
-                            _this.loadedLayers.add(layer.id, layer);
-                            if (_this.$rootScope.$$phase != '$apply' && _this.$rootScope.$$phase != '$digest') {
-                                _this.$rootScope.$apply();
-                            }
-                        });
-                        layer.isLoading = true;
-                        break;
-                    case 'topojson':
-                    case 'geojson':
-                        async.series([
-                            function (callback) {
-                                // If oneLayerActive: close other group layer
-                                if (layer.group.oneLayerActive) {
-                                    layer.group.layers.forEach(function (l) {
-                                        if (l !== layer && l.enabled) {
-                                            disableLayers.push(l);
-                                        }
-                                    });
-                                }
-                                callback(null, null);
-                            },
-                            function (callback) {
-                                // Open a style file
-                                if (layer.styleurl) {
-                                    d3.json(layer.styleurl, function (err, dta) {
-                                        if (err)
-                                            _this.$messageBusService.notify('ERROR loading' + layer.title, err);
-                                        else {
-                                            if (dta.featureTypes)
-                                                for (var featureTypeName in dta.featureTypes) {
-                                                    if (!dta.featureTypes.hasOwnProperty(featureTypeName))
-                                                        continue;
-                                                    var featureType = dta.featureTypes[featureTypeName];
-                                                    featureTypeName = layer.id + '_' + featureTypeName;
-                                                    _this.featureTypes[featureTypeName] = featureType;
-                                                }
-                                        }
-                                        callback(null, null);
-                                    });
-                                }
-                                else
-                                    callback(null, null);
-                            },
-                            function (callback) {
-                                // Open a layer URL
-                                layer.isLoading = true;
-                                d3.json(layer.url, function (error, data) {
-                                    layer.isLoading = false;
-                                    if (error)
-                                        _this.$messageBusService.notify('ERROR loading' + layer.title, error);
-                                    else {
-                                        if (!layer.id)
-                                            layer.id = csComp.Helpers.getGuid();
-                                        _this.loadedLayers.add(layer.id, layer);
-                                        if (layer.type.toLowerCase() === 'topojson')
-                                            data = _this.convertTopoToGeoJson(data);
-                                        if (data.events && _this.timeline) {
-                                            layer.events = data.events;
-                                            var devents = [];
-                                            layer.events.forEach(function (e) {
-                                                if (!e.id)
-                                                    e.id = csComp.Helpers.getGuid();
-                                                devents.push({
-                                                    'start': new Date(e.start),
-                                                    'content': e.title
-                                                });
-                                            });
-                                            _this.timeline.draw(devents);
-                                        }
-                                        for (var featureTypeName in data.featureTypes) {
-                                            if (!data.featureTypes.hasOwnProperty(featureTypeName))
-                                                continue;
-                                            var featureType = data.featureTypes[featureTypeName];
-                                            featureTypeName = layer.id + '_' + featureTypeName;
-                                            _this.featureTypes[featureTypeName] = featureType;
-                                            //var pt = "." + featureTypeName;
-                                            //var icon = featureType.style.iconUri;
-                                            var t = '{".style' + featureTypeName + '":';
-                                            if (featureType.style.iconUri != null) {
-                                                t += ' { "background": "url(' + featureType.style.iconUri + ') no-repeat right center",';
-                                            }
-                                            ;
-                                            t += ' "background-size": "100% 100%","border-style": "none"} }';
-                                            var json = $.parseJSON(t);
-                                            $.injectCSS(json);
-                                        }
-                                        if (data.timestamps)
-                                            layer.timestamps = data.timestamps;
-                                        if (layer.group.clustering) {
-                                            layer.count = 0;
-                                            var markers = L.geoJson(data, {
-                                                pointToLayer: function (feature, latlng) { return _this.addFeature(feature, latlng, layer); },
-                                                onEachFeature: function (feature, lay) {
-                                                    //We do not need to init the feature here: already done in style.
-                                                    //this.initFeature(feature, layer);
-                                                    layer.group.markers[feature.id] = lay;
-                                                    lay.on({
-                                                        mouseover: function (a) { return _this.showFeatureTooltip(a, layer.group); },
-                                                        mouseout: function (s) { return _this.hideFeatureTooltip(s); }
-                                                    });
-                                                }
-                                            });
-                                            layer.group.cluster.addLayer(markers);
-                                        }
-                                        else {
-                                            layer.mapLayer = new L.LayerGroup();
-                                            _this.map.map.addLayer(layer.mapLayer);
-                                            var v = L.geoJson(data, {
-                                                onEachFeature: function (feature, lay) {
-                                                    //We do not need to init the feature here: already done in style.
-                                                    //this.initFeature(feature, layer);
-                                                    layer.group.markers[feature.id] = lay;
-                                                    lay.on({
-                                                        mouseover: function (a) { return _this.showFeatureTooltip(a, layer.group); },
-                                                        mouseout: function (s) { return _this.hideFeatureTooltip(s); },
-                                                        mousemove: function (d) { return _this.updateFeatureTooltip(d); },
-                                                        click: function () { return _this.selectFeature(feature); }
-                                                    });
-                                                },
-                                                style: function (f, m) {
-                                                    _this.initFeature(f, layer);
-                                                    //this.updateSensorData();
-                                                    layer.group.markers[f.id] = m;
-                                                    return _this.style(f, layer);
-                                                },
-                                                pointToLayer: function (feature, latlng) { return _this.addFeature(feature, latlng, layer); }
-                                            });
-                                            _this.project.features.forEach(function (f) {
-                                                if (f.layerId !== layer.id)
-                                                    return;
-                                                var ft = _this.getFeatureType(f);
-                                                f.properties['Name'] = f.properties[ft.style.nameLabel];
-                                            });
-                                            layer.mapLayer.addLayer(v);
-                                        }
-                                    }
-                                    _this.updateSensorData();
-                                    _this.$messageBusService.publish('layer', 'activated', layer);
-                                    callback(null, null);
-                                    _this.updateFilters();
-                                });
-                            },
-                            // Callback
-                            function () {
-                                disableLayers.forEach(function (l) {
-                                    _this.removeLayer(l);
-                                    l.enabled = false;
-                                });
-                            }
-                        ]);
-                }
-            };
-            /**
-             * Find a feature by layerId and FeatureId.
-             * @layerId {string}
-             * @featureIndex {number}
-             */
-            LayerService.prototype.findFeatureById = function (layerId, featureIndex) {
-                for (var i = 0; i < this.project.features.length; i++) {
-                    var feature = this.project.features[i];
-                    if (featureIndex === feature.index && layerId === feature.layerId)
-                        return feature;
-                }
-            };
-            /**
-             * Find the feature by name.
-             */
-            LayerService.prototype.findFeatureByName = function (name) {
-                for (var i = 0; i < this.project.features.length; i++) {
-                    var feature = this.project.features[i];
-                    if (feature.hasOwnProperty("Name") && name === feature.properties["Name"])
-                        return feature;
-                }
-            };
-            /**
-            * Convert topojson data to geojson data.
-            */
-            LayerService.prototype.convertTopoToGeoJson = function (data) {
-                // Convert topojson to geojson format
-                var topo = omnivore.topojson.parse(data);
-                var newData = {};
-                newData.featureTypes = data.featureTypes;
-                newData.features = [];
-                topo.eachLayer(function (l) {
-                    newData.features.push(l.feature);
-                });
-                return newData;
             };
             /***
              * get list of properties that are part of the filter collection
@@ -6984,168 +6191,32 @@ var csComp;
                 ;
                 return result;
             };
-            /***
-             * Show tooltip with name, styles & filters.
-             */
-            LayerService.prototype.showFeatureTooltip = function (e, group) {
-                var layer = e.target;
-                var feature = layer.feature;
-                // add title
-                var title = layer.feature.properties.Name;
-                var rowLength = (title) ? title.length : 1;
-                var content = '<td colspan=\'3\'>' + title + '</td></tr>';
-                // add filter values
-                if (group.filters != null && group.filters.length > 0) {
-                    group.filters.forEach(function (f) {
-                        if (!feature.properties.hasOwnProperty(f.property))
-                            return;
-                        var value = feature.properties[f.property];
-                        if (value) {
-                            var valueLength = value.toString().length;
-                            if (f.meta != null) {
-                                value = csComp.Helpers.convertPropertyInfo(f.meta, value);
-                                if (f.meta.type !== 'bbcode')
-                                    valueLength = value.toString().length;
-                            }
-                            rowLength = Math.max(rowLength, valueLength + f.title.length);
-                            content += '<tr><td><div class=\'smallFilterIcon\'></td><td>' + f.title + '</td><td>' + value + '</td></tr>';
-                        }
-                    });
-                }
-                // add style values, only in case they haven't been added already as filter
-                if (group.styles != null && group.styles.length > 0) {
-                    group.styles.forEach(function (s) {
-                        if (group.filters != null && group.filters.filter(function (f) {
-                            return f.property === s.property;
-                        }).length === 0 && feature.properties.hasOwnProperty(s.property)) {
-                            var value = feature.properties[s.property];
-                            var valueLength = value.toString().length;
-                            if (s.meta != null) {
-                                value = csComp.Helpers.convertPropertyInfo(s.meta, value);
-                                if (s.meta.type !== 'bbcode')
-                                    valueLength = value.toString().length;
-                            }
-                            rowLength = Math.max(rowLength, valueLength + s.title.length);
-                            content += '<tr><td><div class=\'smallStyleIcon\'></td><td>' + s.title + '</td><td>' + value + '</td></tr>';
-                        }
-                    });
-                }
-                var widthInPixels = Math.max(Math.min(rowLength * 7 + 15, 250), 130);
-                content = '<table style=\'width:' + widthInPixels + 'px;\'>' + content + '</table>';
-                this.popup = L.popup({
-                    offset: new L.Point(-widthInPixels / 2 - 40, -5),
-                    closeOnClick: true,
-                    autoPan: false,
-                    className: 'featureTooltip'
-                }).setLatLng(e.latlng).setContent(content).openOn(this.map.map);
-            };
-            LayerService.prototype.hideFeatureTooltip = function (e) {
-                if (this.popup && this.map.map) {
-                    this.map.map.closePopup(this.popup);
-                    //this.map.map.closePopup(this.popup);
-                    this.popup = null;
-                }
-            };
-            LayerService.prototype.updateFeatureTooltip = function (e) {
-                if (this.popup != null && e.latlng != null)
-                    this.popup.setLatLng(e.latlng);
-            };
-            //Highlight polyline features on event
-            LayerService.prototype.highlightFeature = function (e) {
-                var highlightStyle = {
-                    "weight": 7
-                };
-                var layer = e.target;
-                layer.bindPopup(layer.feature.properties.Name).openPopup();
-                if (!L.Browser.ie) {
-                    layer.bringToFront();
-                }
-                // Change the style to the highlighted version
-                layer.setStyle(highlightStyle);
-                if (!L.Browser.ie) {
-                    layer.bringToFront();
-                }
-            };
-            //Reset polyline style
-            LayerService.prototype.resetHighlight = function (e) {
-                var defaultStyle = {
-                    "weight": 1
-                };
-                var layer = e.target;
-                layer.setStyle(defaultStyle);
-            };
-            LayerService.prototype.removeStyle = function (style) {
-                //console.log('update style ' + style.title);
-                var g = style.group;
-                g.styles = g.styles.filter(function (s) { return s.id !== style.id; });
-                this.updateGroupFeatures(g);
-            };
-            LayerService.prototype.updateStyle = function (style) {
-                //console.log('update style ' + style.title);
-                if (style == null)
-                    return;
-                if (style.group != null) {
-                    style.info = this.calculatePropertyInfo(style.group, style.property);
-                    style.canSelectColor = style.visualAspect.toLowerCase().indexOf('color') > -1;
-                    this.updateGroupFeatures(style.group);
-                }
-            };
-            LayerService.prototype.updateFeature = function (feature, group) {
-                var layer = this.findLayer(feature.layerId);
-                if (layer == null)
-                    return;
-                if (feature.geometry.type === 'Point') {
-                    this.updateFeatureIcon(feature, layer);
-                }
-                else {
-                    if (group == null) {
-                        group = layer.group;
-                    }
-                    if (group == null)
-                        return;
-                    var m = group.markers[feature.id];
-                    this.updatePolygonStyle(m, feature);
-                }
-            };
-            LayerService.prototype.updateGroupFeatures = function (group) {
-                var _this = this;
-                this.project.features.forEach(function (f) {
-                    if (group.markers.hasOwnProperty(f.id)) {
-                        _this.updateFeature(f, group);
-                    }
-                });
-            };
-            LayerService.prototype.getDefaultMarkerStyle = function (feature) {
-            };
-            LayerService.prototype.updatePolygonStyle = function (m, feature) {
-                var layer = this.findLayer(feature.layerId);
-                var s = this.style(feature, layer);
-                m.setStyle(s);
-            };
-            LayerService.prototype.getColor = function (v, gs) {
-                if (v > gs.info.sdMax)
-                    return gs.colors[gs.colors.length - 1];
-                if (v < gs.info.sdMin)
-                    return gs.colors[0];
-                var bezInterpolator = chroma.interpolate.bezier(gs.colors);
-                var r = bezInterpolator((v - gs.info.sdMin) / (gs.info.sdMax - gs.info.sdMin)).hex();
-                return r;
-            };
             /**
-            * Extract a valid color string, without transparency.
-            */
-            LayerService.prototype.getColorString = function (color, defaultColor) {
-                if (defaultColor === void 0) { defaultColor = '#f00'; }
-                if (!color)
-                    return defaultColor;
-                if (color.length == 4 || color.length == 7)
-                    return color;
-                if (color.length == 9)
-                    return '#' + color.substr(3, 6);
-                return defaultColor;
+             * init feature (add to feature list, crossfilter)
+             */
+            LayerService.prototype.initFeature = function (feature, layer) {
+                if (!feature.isInitialized) {
+                    feature.isInitialized = true;
+                    // make sure it has an id
+                    if (feature.id == null)
+                        feature.id = csComp.Helpers.getGuid();
+                    feature.layerId = layer.id;
+                    feature.layer = layer;
+                    // add feature to global list of features
+                    this.project.features.push(feature);
+                    // add to crossfilter
+                    layer.group.ndx.add([feature]);
+                    // resolve feature type
+                    feature.fType = this.getFeatureType(feature);
+                    this.initFeatureType(feature.fType);
+                    // Do we have a name?
+                    if (!feature.properties.hasOwnProperty('Name'))
+                        csComp.Helpers.setFeatureName(feature);
+                    this.calculateFeatureStyle(feature);
+                }
+                return feature.type;
             };
-            LayerService.prototype.style = function (feature, layer) {
-                var _this = this;
+            LayerService.prototype.calculateFeatureStyle = function (feature) {
                 var s = {
                     fillColor: 'red',
                     weight: 2,
@@ -7156,23 +6227,23 @@ var csComp;
                 var ft = this.getFeatureType(feature);
                 if (ft.style) {
                     if (ft.style.fillColor != null)
-                        s['fillColor'] = this.getColorString(ft.style.fillColor);
+                        s['fillColor'] = csComp.Helpers.getColorString(ft.style.fillColor);
                     if (ft.style.strokeColor != null)
-                        s['color'] = this.getColorString(ft.style.strokeColor, '#fff');
+                        s['color'] = csComp.Helpers.getColorString(ft.style.strokeColor, '#fff');
                     if (ft.style.strokeWidth != null)
                         s['weight'] = ft.style.strokeWidth;
                 }
                 //var layer = this.findLayer(feature.layerId);
-                layer.group.styles.forEach(function (gs) {
+                feature.layer.group.styles.forEach(function (gs) {
                     if (gs.enabled && feature.properties.hasOwnProperty(gs.property)) {
                         var v = Number(feature.properties[gs.property]);
                         if (!isNaN(v)) {
                             switch (gs.visualAspect) {
                                 case 'strokeColor':
-                                    s['color'] = _this.getColor(v, gs);
+                                    s['color'] = csComp.Helpers.getColor(v, gs);
                                     break;
                                 case 'fillColor':
-                                    s[gs.visualAspect] = _this.getColor(v, gs);
+                                    s[gs.visualAspect] = csComp.Helpers.getColor(v, gs);
                                     break;
                                 case 'strokeWidth':
                                     s['weight'] = ((v - gs.info.sdMin) / (gs.info.sdMax - gs.info.sdMin) * 10) + 1;
@@ -7185,26 +6256,7 @@ var csComp;
                     s['weight'] = 5;
                     s['color'] = 'black';
                 }
-                return s;
-            };
-            /**
-             * init feature (add to feature list, crossfilter)
-             */
-            LayerService.prototype.initFeature = function (feature, layer) {
-                //if (!feature.isInitialized)
-                feature.isInitialized = true;
-                feature.index = layer.count++;
-                if (feature.id == null)
-                    feature.id = csComp.Helpers.getGuid();
-                feature.layerId = layer.id;
-                this.project.features.push(feature);
-                layer.group.ndx.add([feature]);
-                feature.fType = this.getFeatureType(feature);
-                this.initFeatureType(feature.fType);
-                // Do we have a name?
-                if (!feature.properties.hasOwnProperty('Name'))
-                    csComp.Helpers.setFeatureName(feature);
-                return feature.type;
+                feature.effectiveStyle = s;
             };
             /**
             * Initialize the feature type and its property types by setting default property values, and by localizing it.
@@ -7261,141 +6313,6 @@ var csComp;
                 }
                 ;
             };
-            //removeFeature(feature: IFeature, layer: ProjectLayer) {
-            //}
-            /**
-             * create icon based of feature style
-             */
-            LayerService.prototype.getPointIcon = function (feature, layer) {
-                var icon;
-                if (feature.htmlStyle != null) {
-                    icon = new L.DivIcon({
-                        className: '',
-                        iconSize: new L.Point(32, 32),
-                        html: feature.htmlStyle
-                    });
-                }
-                else {
-                    var html = '<div ';
-                    var props = {};
-                    var ft = this.getFeatureType(feature);
-                    //if (feature.poiTypeName != null) html += "class='style" + feature.poiTypeName + "'";
-                    var iconUri = ft.style.iconUri;
-                    if (ft.style.fillColor == null && iconUri == null)
-                        ft.style.fillColor = 'lightgray';
-                    // TODO refactor to object
-                    props['background'] = ft.style.fillColor;
-                    props['width'] = '32px';
-                    props['height'] = '32px';
-                    props['border-radius'] = '20%';
-                    props['border-style'] = 'solid';
-                    props['border-color'] = 'black';
-                    props['border-width'] = '0';
-                    layer.group.styles.forEach(function (gs) {
-                        if (gs.enabled && feature.properties.hasOwnProperty(gs.property)) {
-                            var v = feature.properties[gs.property];
-                            switch (gs.visualAspect) {
-                                case 'fillColor':
-                                    if (typeof gs.meta !== 'undefined' && gs.meta.type === 'color') {
-                                        props['background-color'] = v;
-                                    }
-                                    else {
-                                        var bezInterpolator = chroma.interpolate.bezier(gs.colors);
-                                        props['background-color'] = bezInterpolator((v - gs.info.sdMin) / (gs.info.sdMax - gs.info.sdMin)).hex();
-                                    }
-                                    break;
-                            }
-                        }
-                    });
-                    if (feature.isSelected) {
-                        props['border-width'] = '3px';
-                    }
-                    html += ' style=\'display: inline-block;vertical-align: middle;text-align: center;';
-                    for (var key in props) {
-                        if (!props.hasOwnProperty(key))
-                            continue;
-                        html += key + ':' + props[key] + ';';
-                    }
-                    html += '\'>';
-                    if (iconUri != null) {
-                        // Must the iconUri be formatted?
-                        if (iconUri != null && iconUri.indexOf('{') >= 0)
-                            iconUri = csComp.Helpers.convertStringFormat(feature, iconUri);
-                        html += '<img src=' + iconUri + ' style=\'width:' + (ft.style.iconWidth - 2) + 'px;height:' + (ft.style.iconHeight - 2) + 'px\' />';
-                    }
-                    html += '</div>';
-                    icon = new L.DivIcon({
-                        className: '',
-                        iconSize: new L.Point(ft.style.iconWidth, ft.style.iconHeight),
-                        html: html
-                    });
-                }
-                return icon;
-            };
-            /**
-             * Update icon for features
-             */
-            LayerService.prototype.updateFeatureIcon = function (feature, layer) {
-                var geomType = feature.geometry.type.toLowerCase();
-                switch (geomType) {
-                    case "point":
-                        var marker = layer.group.markers[feature.id];
-                        if (marker != null)
-                            marker.setIcon(this.getPointIcon(feature, layer));
-                        break;
-                    case "polygon":
-                    case "multipolygon":
-                        this.updateFeature(feature);
-                        break;
-                }
-            };
-            /**
-             * Add a feature.
-             */
-            LayerService.prototype.addFeature = function (feature, latlng, layer) {
-                var _this = this;
-                this.initFeature(feature, layer);
-                //var style = type.style;
-                var marker;
-                switch (feature.geometry.type) {
-                    case 'Point':
-                        var icon = this.getPointIcon(feature, layer);
-                        marker = new L.Marker(latlng, { icon: icon });
-                        marker.on('click', function () {
-                            _this.selectFeature(feature);
-                        });
-                        break;
-                    default:
-                        var polyoptions = {
-                            fillColor: 'Green'
-                        };
-                        marker = L.multiPolygon(latlng, polyoptions);
-                        break;
-                }
-                layer.group.markers[feature.id] = marker;
-                return marker;
-            };
-            /**
-             * Select or deselect a feature and zoom to it on the map.
-             */
-            LayerService.prototype.selectFeature = function (feature) {
-                feature.isSelected = !feature.isSelected;
-                this.updateFeature(feature);
-                // deselect last feature and also update
-                if (this.lastSelectedFeature != null && this.lastSelectedFeature !== feature) {
-                    this.lastSelectedFeature.isSelected = false;
-                    this.updateFeature(this.lastSelectedFeature);
-                }
-                this.lastSelectedFeature = feature;
-                if (!feature.isSelected) {
-                    this.$messageBusService.publish('sidebar', 'hide');
-                    this.$messageBusService.publish('feature', 'onFeatureDeselect');
-                }
-                else {
-                    this.$messageBusService.publish('sidebar', 'show');
-                    this.$messageBusService.publish('feature', 'onFeatureSelect', feature);
-                }
-            };
             /**
              * find a filter for a specific group/property combination
              */
@@ -7413,7 +6330,7 @@ var csComp;
             LayerService.prototype.findLayer = function (id) {
                 if (this.loadedLayers.containsKey(id))
                     return this.loadedLayers[id];
-                //return null;
+                return null;
                 //var r: ProjectLayer;
                 //this.project.groups.forEach(g => {
                 //    g.layers.forEach(l => {
@@ -7437,7 +6354,7 @@ var csComp;
                 var f = property.feature;
                 if (f != null) {
                     this.noStyles = false;
-                    var layer = this.findLayer(f.layerId);
+                    var layer = f.layer;
                     var gs = new Services.GroupStyle(this.$translate);
                     gs.id = csComp.Helpers.getGuid();
                     gs.title = property.key;
@@ -7458,16 +6375,19 @@ var csComp;
                         gs.colors = ['white', 'orange'];
                     }
                     this.saveStyle(layer.group, gs);
-                    if (f.geometry.type.toLowerCase() === 'point') {
-                        this.project.features.forEach(function (fe) {
-                            if (layer.group.markers.hasOwnProperty(fe.id)) {
-                                _this.updateFeatureIcon(fe, layer);
-                            }
-                        });
-                    }
-                    else {
-                        this.updateStyle(gs);
-                    }
+                    //if (f.geometry.type.toLowerCase() === 'point') {
+                    this.project.features.forEach(function (fe) {
+                        if (fe.layer.group == layer.group) {
+                            _this.calculateFeatureStyle(fe);
+                            _this.activeMapRenderer.updateFeature(fe);
+                        }
+                        // if (layer.group.markers.hasOwnProperty(fe.id)) {
+                        //
+                        // }
+                    });
+                    // } else {
+                    //     this.updateStyle(gs);
+                    // }
                     if (openStyleTab)
                         $('#leftPanelTab a[href="#styles"]').tab('show'); // Select tab by name
                     return gs;
@@ -7516,7 +6436,7 @@ var csComp;
                 var prop = property.property;
                 var f = property.feature;
                 if (f != null) {
-                    var layer = this.findLayer(f.layerId);
+                    var layer = f.layer;
                     if (layer != null) {
                         var filter = this.findFilter(layer.group, prop);
                         if (filter == null) {
@@ -7859,7 +6779,7 @@ var csComp;
                             layer.group = group;
                             if (layer.enabled || layerIds.indexOf(layer.reference.toLowerCase()) >= 0) {
                                 layer.enabled = true;
-                                _this.addLayer(layer);
+                                _this.activeMapRenderer.addLayer(layer);
                             }
                         });
                         group.styles.forEach(function (style) {
@@ -8286,6 +7206,158 @@ var csComp;
 (function (csComp) {
     var Services;
     (function (Services) {
+        'use strict';
+        var GeoJsonSource = (function () {
+            function GeoJsonSource() {
+                this.title = "geojson";
+            }
+            GeoJsonSource.prototype.init = function (service) {
+                this.service = service;
+            };
+            GeoJsonSource.prototype.addLayer = function (layer, callback) {
+                var _this = this;
+                async.series([
+                    function (cb) {
+                        layer.layerRenderer = "svg";
+                        // Open a layer URL
+                        layer.isLoading = true;
+                        // get data
+                        d3.json(layer.url, function (error, data) {
+                            layer.isLoading = false;
+                            // check if loaded correctly
+                            if (error)
+                                _this.service.$messageBusService.notify('ERROR loading' + layer.title, error);
+                            else {
+                                // if this is a topojson layer, convert to geojson first
+                                if (layer.type.toLowerCase() === 'topojson') {
+                                    data = csComp.Helpers.convertTopoToGeoJson(data);
+                                }
+                                // check if there are events definined
+                                if (data.events && _this.service.timeline) {
+                                    layer.events = data.events;
+                                    var devents = [];
+                                    layer.events.forEach(function (e) {
+                                        if (!e.id)
+                                            e.id = csComp.Helpers.getGuid();
+                                        devents.push({
+                                            'start': new Date(e.start),
+                                            'content': e.title
+                                        });
+                                    });
+                                    _this.service.timeline.draw(devents);
+                                }
+                                // add featuretypes to global featuretype list
+                                if (data.featureTypes)
+                                    for (var featureTypeName in data.featureTypes) {
+                                        if (!data.featureTypes.hasOwnProperty(featureTypeName))
+                                            continue;
+                                        var featureType = data.featureTypes[featureTypeName];
+                                        // give it a unique name
+                                        featureTypeName = layer.id + '_' + featureTypeName;
+                                        _this.service.featureTypes[featureTypeName] = featureType;
+                                    }
+                                if (data.timestamps)
+                                    layer.timestamps = data.timestamps;
+                                // store raw result in layer
+                                layer.data = data;
+                                (layer.data).features.forEach(function (f) {
+                                    _this.service.initFeature(f, layer);
+                                });
+                            }
+                            cb(null, null);
+                        });
+                    },
+                    // Callback
+                    function () {
+                        callback(layer);
+                    }
+                ]);
+            };
+            GeoJsonSource.prototype.removeLayer = function (layer) {
+                //alert('remove layer');
+            };
+            return GeoJsonSource;
+        })();
+        Services.GeoJsonSource = GeoJsonSource;
+    })(Services = csComp.Services || (csComp.Services = {}));
+})(csComp || (csComp = {}));
+var csComp;
+(function (csComp) {
+    var Services;
+    (function (Services) {
+        'use strict';
+        var TileLayerSource = (function () {
+            function TileLayerSource() {
+                this.title = "tilelayer";
+            }
+            TileLayerSource.prototype.init = function (service) {
+                this.service = service;
+            };
+            TileLayerSource.prototype.addLayer = function (layer, callback) {
+                var _this = this;
+                var tileLayer = L.tileLayer(layer.url, {
+                    attribution: layer.description
+                });
+                layer.mapLayer = new L.LayerGroup();
+                this.service.map.map.addLayer(layer.mapLayer);
+                layer.mapLayer.addLayer(tileLayer);
+                tileLayer.on('loading', function (event) {
+                    layer.isLoading = true;
+                    _this.service.$rootScope.$apply();
+                    if (_this.service.$rootScope.$$phase != '$apply' && _this.service.$rootScope.$$phase != '$digest') {
+                        _this.service.$rootScope.$apply();
+                    }
+                });
+                tileLayer.on('load', function (event) {
+                    layer.isLoading = false;
+                    if (_this.service.$rootScope.$$phase != '$apply' && _this.service.$rootScope.$$phase != '$digest') {
+                        _this.service.$rootScope.$apply();
+                    }
+                });
+                layer.isLoading = true;
+                //this.$rootScope.$apply();
+            };
+            TileLayerSource.prototype.removeLayer = function (layer) {
+            };
+            return TileLayerSource;
+        })();
+        Services.TileLayerSource = TileLayerSource;
+    })(Services = csComp.Services || (csComp.Services = {}));
+})(csComp || (csComp = {}));
+var csComp;
+(function (csComp) {
+    var Services;
+    (function (Services) {
+        'use strict';
+        var WmsSource = (function () {
+            function WmsSource() {
+                this.title = "wms";
+            }
+            WmsSource.prototype.init = function (service) {
+                this.service = service;
+            };
+            WmsSource.prototype.addLayer = function (layer, callback) {
+                var wms = L.tileLayer.wms(layer.url, {
+                    layers: layer.wmsLayers,
+                    opacity: layer.opacity / 100,
+                    format: 'image/png',
+                    transparent: true,
+                    attribution: layer.description
+                });
+                callback(layer);
+                //this.$rootScope.$apply();
+            };
+            WmsSource.prototype.removeLayer = function (layer) {
+            };
+            return WmsSource;
+        })();
+        Services.WmsSource = WmsSource;
+    })(Services = csComp.Services || (csComp.Services = {}));
+})(csComp || (csComp = {}));
+var csComp;
+(function (csComp) {
+    var Services;
+    (function (Services) {
         var MapCtrl = (function () {
             // dependencies are injected via AngularJS $injector
             // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
@@ -8368,25 +7440,25 @@ var csComp;
          * In case other controllers need access to the map, they can inject this service.
          */
         var MapService = (function () {
-            function MapService($localStorageService, $timeout, $messageBus) {
+            function MapService($localStorageService, $timeout, $messageBusService) {
                 var _this = this;
                 this.$localStorageService = $localStorageService;
                 this.$timeout = $timeout;
-                this.$messageBus = $messageBus;
+                this.$messageBusService = $messageBusService;
                 this.mapVisible = true;
                 this.timelineVisible = true;
                 this.rightMenuVisible = true;
                 this.initExpertMode();
                 this.baseLayers = {};
                 this.initMap();
-                $messageBus.subscribe('timeline', function (title, data) {
+                $messageBusService.subscribe('timeline', function (title, data) {
                     switch (title) {
                         case 'isEnabled':
                             _this.timelineVisible = data;
                             break;
                     }
                 });
-                $messageBus.subscribe('leftmenu', function (title, data) {
+                $messageBusService.subscribe('leftmenu', function (title, data) {
                     switch (title.toLowerCase()) {
                         case "toggle":
                             if ($('body').hasClass("leftpanel-collapsed")) {
@@ -8408,30 +7480,30 @@ var csComp;
                 });
             }
             /**
-            * The expert mode can either be set manually, e.g. using this directive, or by setting the expertMode property in the
-            * project.json file. In neither are set, we assume that we are dealing with an expert, so all features should be enabled.
-            *
-            * Precedence:
-            * - when a declaration is absent, assume Expert.
-            * - when the mode is set in local storage, take that value.
-            * - when the mode is set in the project.json file, take that value.
-            */
+          * The expert mode can either be set manually, e.g. using this directive, or by setting the expertMode property in the
+          * project.json file. In neither are set, we assume that we are dealing with an expert, so all features should be enabled.
+          *
+          * Precedence:
+          * - when a declaration is absent, assume Expert.
+          * - when the mode is set in local storage, take that value.
+          * - when the mode is set in the project.json file, take that value.
+          */
             MapService.prototype.initExpertMode = function () {
                 var _this = this;
                 this.expertMode = this.$localStorageService.get(MapService.expertModeKey);
                 if (!this.expertMode) {
                     this.expertMode = 3 /* Expert */; // Default behaviour
                     // When a project defines the expert mode, overrules default behaviour
-                    this.$messageBus.subscribe('project', function (title, project) {
+                    this.$messageBusService.subscribe('project', function (title, project) {
                         switch (title) {
                             case 'loaded':
                                 if (project != null && typeof project.expertMode !== 'undefined')
-                                    _this.$messageBus.publish('expertMode', 'newExpertise', project.expertMode);
+                                    _this.$messageBusService.publish('expertMode', 'newExpertise', project.expertMode);
                                 break;
                         }
                     });
                 }
-                this.$messageBus.subscribe('expertMode', function (title, expertMode) {
+                this.$messageBusService.subscribe('expertMode', function (title, expertMode) {
                     if (title !== 'newExpertise')
                         return;
                     _this.expertMode = expertMode;
@@ -8441,7 +7513,7 @@ var csComp;
                         case 3 /* Expert */:
                             _this.timelineVisible = true;
                             _this.$timeout(function () {
-                                _this.$messageBus.publish('timeline', 'loadProjectTimeRange');
+                                _this.$messageBusService.publish('timeline', 'loadProjectTimeRange');
                             }, 100);
                             break;
                         default:
@@ -8450,11 +7522,26 @@ var csComp;
                     }
                 });
             };
+            Object.defineProperty(MapService.prototype, "isExpert", {
+                get: function () {
+                    return this.expertMode === 3 /* Expert */;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(MapService.prototype, "isIntermediate", {
+                get: function () {
+                    return this.expertMode === 3 /* Expert */ || this.expertMode === 2 /* Intermediate */;
+                },
+                enumerable: true,
+                configurable: true
+            });
             MapService.prototype.initMap = function () {
-                this.map = L.map("map", {
-                    zoomControl: false,
-                    attributionControl: true
-                });
+                // alert('map service');
+                // this.map = L.map("map", {
+                //     zoomControl: false,
+                //     attributionControl: true
+                // });
             };
             MapService.prototype.changeBaseLayer = function (layerObj) {
                 this.map.addLayer(layerObj);
@@ -8500,8 +7587,8 @@ var csComp;
                     var northEast = L.latLng(Math.max(bb[2], bb[3]), Math.max(bb[0], bb[1]) + spacingLon);
                     this.map.fitBounds(new L.LatLngBounds(southWest, northEast));
                 }
-                this.$messageBus.publish("sidebar", "show");
-                this.$messageBus.publish("feature", "onFeatureSelect", feature);
+                this.$messageBusService.publish("sidebar", "show");
+                this.$messageBusService.publish("feature", "onFeatureSelect", feature);
             };
             //private getCentroid(arr) {
             //    return arr.reduce((x, y) => [x[0] + y[0] / arr.length, x[1] + y[1] / arr.length], [0, 0]);
@@ -8517,15 +7604,425 @@ var csComp;
             MapService.prototype.getMap = function () {
                 return this.map;
             };
-            MapService.expertModeKey = 'expertMode';
             MapService.$inject = [
                 'localStorageService',
                 '$timeout',
                 'messageBusService'
             ];
+            MapService.expertModeKey = 'expertMode';
             return MapService;
         })();
         Services.MapService = MapService;
+    })(Services = csComp.Services || (csComp.Services = {}));
+})(csComp || (csComp = {}));
+var csComp;
+(function (csComp) {
+    var Services;
+    (function (Services) {
+        var CesiumRenderer = (function () {
+            function CesiumRenderer() {
+                this.title = "cesium";
+            }
+            CesiumRenderer.prototype.init = function (service) {
+                this.service = service;
+            };
+            CesiumRenderer.prototype.enable = function () {
+                this.viewer = new Cesium.Viewer('map');
+                this.camera = this.viewer.camera;
+                this.camera.setView({
+                    position: Cesium.Cartesian3.fromDegrees(5, 52, 1000000)
+                });
+                //console.log(this.service.project);
+                $(".cesium-viewer-toolbar").hide();
+            };
+            CesiumRenderer.prototype.disable = function () {
+                this.viewer.destroy();
+                //$("#map").empty();
+            };
+            CesiumRenderer.prototype.addLayer = function (layer) {
+                if (layer.type == "GeoJson") {
+                    var object = layer.data;
+                    if (object.type == null)
+                        object.type = "FeatureCollection";
+                    var geoJSONPromise = Cesium.GeoJsonDataSource.load(object);
+                    Cesium.when(geoJSONPromise, function (dataSource) {
+                        layer.cesiumDatasource = dataSource;
+                    });
+                    this.viewer.dataSources.add(geoJSONPromise);
+                }
+                if (layer.type == "wms") {
+                }
+            };
+            CesiumRenderer.prototype.removeLayer = function (layer) {
+                if (layer.type == "GeoJson") {
+                    this.viewer.dataSources.remove(layer.cesiumDatasource);
+                }
+                if (layer.type == "wms") {
+                }
+            };
+            CesiumRenderer.prototype.updateMapFilter = function (group) {
+            };
+            CesiumRenderer.prototype.addGroup = function (group) {
+            };
+            CesiumRenderer.prototype.removeGroup = function (group) {
+            };
+            CesiumRenderer.prototype.addFeature = function (feature) {
+            };
+            CesiumRenderer.prototype.removeFeature = function (feature) {
+            };
+            CesiumRenderer.prototype.updateFeature = function (feature) {
+            };
+            return CesiumRenderer;
+        })();
+        Services.CesiumRenderer = CesiumRenderer;
+    })(Services = csComp.Services || (csComp.Services = {}));
+})(csComp || (csComp = {}));
+var csComp;
+(function (csComp) {
+    var Services;
+    (function (Services) {
+        var LeafletRenderer = (function () {
+            function LeafletRenderer() {
+                this.title = "leaflet";
+            }
+            LeafletRenderer.prototype.init = function (service) {
+                this.service = service;
+                this.$messageBusService = service.$messageBusService;
+            };
+            LeafletRenderer.prototype.enable = function () {
+                this.service.$mapService.map = L.map("map", {
+                    //var tl  = L.map("mapleft", {
+                    zoomControl: false,
+                    attributionControl: true
+                });
+            };
+            LeafletRenderer.prototype.disable = function () {
+                this.service.$mapService.map.remove();
+                this.service.$mapService.map = null;
+                $("#map").empty();
+            };
+            LeafletRenderer.prototype.addGroup = function (group) {
+                // for clustering use a cluster layer
+                if (group.clustering) {
+                    group.cluster = new L.MarkerClusterGroup({
+                        maxClusterRadius: group.maxClusterRadius || 80,
+                        disableClusteringAtZoom: group.clusterLevel || 0
+                    });
+                    this.service.map.map.addLayer(group.cluster);
+                }
+                else {
+                    group.vectors = new L.LayerGroup();
+                    this.service.map.map.addLayer(group.vectors);
+                }
+            };
+            LeafletRenderer.prototype.removeLayer = function (layer) {
+                switch (layer.layerRenderer) {
+                    case "svg":
+                        var g = layer.group;
+                        //m = layer.group.vectors;
+                        if (g.clustering) {
+                            var m = g.cluster;
+                            this.service.project.features.forEach(function (feature) {
+                                if (feature.layerId === layer.id) {
+                                    try {
+                                        m.removeLayer(layer.group.markers[feature.id]);
+                                        delete layer.group.markers[feature.id];
+                                    }
+                                    catch (error) {
+                                    }
+                                }
+                            });
+                        }
+                        else {
+                            this.service.map.map.removeLayer(layer.mapLayer);
+                        }
+                        break;
+                    case "wms":
+                        break;
+                }
+            };
+            LeafletRenderer.prototype.addLayer = function (layer) {
+                var _this = this;
+                switch (layer.layerRenderer) {
+                    case "wms":
+                        var wms = L.tileLayer.wms(layer.url, {
+                            layers: layer.wmsLayers,
+                            opacity: layer.opacity / 100,
+                            format: 'image/png',
+                            transparent: true,
+                            attribution: layer.description
+                        });
+                        layer.mapLayer = new L.LayerGroup();
+                        this.service.map.map.addLayer(layer.mapLayer);
+                        layer.mapLayer.addLayer(wms);
+                        wms.on('loading', function (event) {
+                            layer.isLoading = true;
+                            _this.service.$rootScope.$apply();
+                            if (_this.service.$rootScope.$$phase != '$apply' && _this.service.$rootScope.$$phase != '$digest') {
+                                _this.service.$rootScope.$apply();
+                            }
+                        });
+                        wms.on('load', function (event) {
+                            layer.isLoading = false;
+                            if (_this.service.$rootScope.$$phase != '$apply' && _this.service.$rootScope.$$phase != '$digest') {
+                                _this.service.$rootScope.$apply();
+                            }
+                        });
+                        layer.isLoading = true;
+                        break;
+                    case "svg":
+                        // create leaflet layers
+                        if (layer.group.clustering) {
+                            var markers = L.geoJson(layer.data, {
+                                pointToLayer: function (feature, latlng) { return _this.addFeature(feature); },
+                                onEachFeature: function (feature, lay) {
+                                    //We do not need to init the feature here: already done in style.
+                                    //this.initFeature(feature, layer);
+                                    layer.group.markers[feature.id] = lay;
+                                    lay.on({
+                                        mouseover: function (a) { return _this.showFeatureTooltip(a, layer.group); },
+                                        mouseout: function (s) { return _this.hideFeatureTooltip(s); }
+                                    });
+                                }
+                            });
+                            layer.group.cluster.addLayer(markers);
+                        }
+                        else {
+                            layer.mapLayer = new L.LayerGroup();
+                            this.service.map.map.addLayer(layer.mapLayer);
+                            var v = L.geoJson(layer.data, {
+                                onEachFeature: function (feature, lay) {
+                                    //We do not need to init the feature here: already done in style.
+                                    //this.initFeature(feature, layer);
+                                    layer.group.markers[feature.id] = lay;
+                                    lay.on({
+                                        mouseover: function (a) { return _this.showFeatureTooltip(a, layer.group); },
+                                        mouseout: function (s) { return _this.hideFeatureTooltip(s); },
+                                        mousemove: function (d) { return _this.updateFeatureTooltip(d); },
+                                        click: function () { return _this.service.selectFeature(feature); }
+                                    });
+                                },
+                                style: function (f, m) {
+                                    layer.group.markers[f.id] = m;
+                                    return f.effectiveStyle;
+                                },
+                                pointToLayer: function (feature, latlng) { return _this.addFeature(feature); }
+                            });
+                            this.service.project.features.forEach(function (f) {
+                                if (f.layerId !== layer.id)
+                                    return;
+                                var ft = _this.service.getFeatureType(f);
+                                f.properties['Name'] = f.properties[ft.style.nameLabel];
+                            });
+                            layer.mapLayer.addLayer(v);
+                            break;
+                        }
+                }
+            };
+            /***
+             * Update map markers in cluster after changing filter
+             */
+            LeafletRenderer.prototype.updateMapFilter = function (group) {
+                $.each(group.markers, function (key, marker) {
+                    var included = group.filterResult.filter(function (f) { return f.id === key; }).length > 0;
+                    if (group.clustering) {
+                        var incluster = group.cluster.hasLayer(marker);
+                        if (!included && incluster)
+                            group.cluster.removeLayer(marker);
+                        if (included && !incluster)
+                            group.cluster.addLayer(marker);
+                    }
+                    else {
+                        var onmap = group.vectors.hasLayer(marker);
+                        if (!included && onmap)
+                            group.vectors.removeLayer(marker);
+                        if (included && !onmap)
+                            group.vectors.addLayer(marker);
+                    }
+                });
+            };
+            LeafletRenderer.prototype.removeGroup = function (group) {
+            };
+            LeafletRenderer.prototype.removeFeature = function (feature) {
+            };
+            LeafletRenderer.prototype.updateFeature = function (feature) {
+                if (feature.geometry.type === 'Point') {
+                    var marker = feature.layer.group.markers[feature.id];
+                    if (marker != null)
+                        marker.setIcon(this.getPointIcon(feature));
+                }
+                else {
+                    if (feature.layer.group == null)
+                        return;
+                    var m = feature.layer.group.markers[feature.id];
+                    var layer = this.service.findLayer(feature.layerId);
+                    //var s = this.style(feature);
+                    m.setStyle(feature.effectiveStyle);
+                }
+            };
+            /**
+             * add a feature
+             */
+            LeafletRenderer.prototype.addFeature = function (feature) {
+                var _this = this;
+                //this.service.initFeature(feature,layer);
+                //var style = type.style;
+                var marker;
+                switch (feature.geometry.type) {
+                    case 'Point':
+                        var icon = this.getPointIcon(feature);
+                        marker = new L.Marker(new L.LatLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]), { icon: icon });
+                        marker.on('click', function () {
+                            _this.service.selectFeature(feature);
+                        });
+                        break;
+                    default:
+                        var polyoptions = {
+                            fillColor: 'Green'
+                        };
+                        break;
+                }
+                feature.layer.group.markers[feature.id] = marker;
+                return marker;
+            };
+            /**
+             * create icon based of feature style
+             */
+            LeafletRenderer.prototype.getPointIcon = function (feature) {
+                var icon;
+                if (feature.htmlStyle != null) {
+                    icon = new L.DivIcon({
+                        className: '',
+                        iconSize: new L.Point(32, 32),
+                        html: feature.htmlStyle
+                    });
+                }
+                else {
+                    var html = '<div ';
+                    var props = {};
+                    var ft = this.service.getFeatureType(feature);
+                    //if (feature.poiTypeName != null) html += "class='style" + feature.poiTypeName + "'";
+                    var iconUri = ft.style.iconUri;
+                    if (ft.style.fillColor == null && iconUri == null)
+                        ft.style.fillColor = 'lightgray';
+                    // TODO refactor to object
+                    props['background'] = ft.style.fillColor;
+                    props['width'] = '32px';
+                    props['height'] = '32px';
+                    props['border-radius'] = '20%';
+                    props['border-style'] = 'solid';
+                    props['border-color'] = 'black';
+                    props['border-width'] = '0';
+                    feature.layer.group.styles.forEach(function (gs) {
+                        if (gs.enabled && feature.properties.hasOwnProperty(gs.property)) {
+                            var v = feature.properties[gs.property];
+                            switch (gs.visualAspect) {
+                                case 'fillColor':
+                                    if (gs.meta.type === 'color') {
+                                        props['background-color'] = v;
+                                    }
+                                    else {
+                                        var bezInterpolator = chroma.interpolate.bezier(gs.colors);
+                                        props['background-color'] = bezInterpolator((v - gs.info.sdMin) / (gs.info.sdMax - gs.info.sdMin)).hex();
+                                    }
+                                    break;
+                            }
+                        }
+                    });
+                    if (feature.isSelected) {
+                        props['border-width'] = '3px';
+                    }
+                    html += ' style=\'display: inline-block;vertical-align: middle;text-align: center;';
+                    for (var key in props) {
+                        if (!props.hasOwnProperty(key))
+                            continue;
+                        html += key + ':' + props[key] + ';';
+                    }
+                    html += '\'>';
+                    if (iconUri != null) {
+                        // Must the iconUri be formatted?
+                        if (iconUri != null && iconUri.indexOf('{') >= 0)
+                            iconUri = csComp.Helpers.convertStringFormat(feature, iconUri);
+                        html += '<img src=' + iconUri + ' style=\'width:' + (ft.style.iconWidth - 2) + 'px;height:' + (ft.style.iconHeight - 2) + 'px\' />';
+                    }
+                    html += '</div>';
+                    icon = new L.DivIcon({
+                        className: '',
+                        iconSize: new L.Point(ft.style.iconWidth, ft.style.iconHeight),
+                        html: html
+                    });
+                }
+                return icon;
+            };
+            /***
+             * Show tooltip with name, styles & filters.
+             */
+            LeafletRenderer.prototype.showFeatureTooltip = function (e, group) {
+                var layer = e.target;
+                var feature = layer.feature;
+                // add title
+                var title = layer.feature.properties.Name;
+                var rowLength = (title) ? title.length : 1;
+                var content = '<td colspan=\'3\'>' + title + '</td></tr>';
+                // add filter values
+                if (group.filters != null && group.filters.length > 0) {
+                    group.filters.forEach(function (f) {
+                        if (!feature.properties.hasOwnProperty(f.property))
+                            return;
+                        var value = feature.properties[f.property];
+                        if (value) {
+                            var valueLength = value.toString().length;
+                            if (f.meta != null) {
+                                value = csComp.Helpers.convertPropertyInfo(f.meta, value);
+                                if (f.meta.type !== 'bbcode')
+                                    valueLength = value.toString().length;
+                            }
+                            rowLength = Math.max(rowLength, valueLength + f.title.length);
+                            content += '<tr><td><div class=\'smallFilterIcon\'></td><td>' + f.title + '</td><td>' + value + '</td></tr>';
+                        }
+                    });
+                }
+                // add style values, only in case they haven't been added already as filter
+                if (group.styles != null && group.styles.length > 0) {
+                    group.styles.forEach(function (s) {
+                        if (group.filters != null && group.filters.filter(function (f) {
+                            return f.property === s.property;
+                        }).length === 0 && feature.properties.hasOwnProperty(s.property)) {
+                            var value = feature.properties[s.property];
+                            var valueLength = value.toString().length;
+                            if (s.meta != null) {
+                                value = csComp.Helpers.convertPropertyInfo(s.meta, value);
+                                if (s.meta.type !== 'bbcode')
+                                    valueLength = value.toString().length;
+                            }
+                            rowLength = Math.max(rowLength, valueLength + s.title.length);
+                            content += '<tr><td><div class=\'smallStyleIcon\'></td><td>' + s.title + '</td><td>' + value + '</td></tr>';
+                        }
+                    });
+                }
+                var widthInPixels = Math.max(Math.min(rowLength * 7 + 15, 250), 130);
+                content = '<table style=\'width:' + widthInPixels + 'px;\'>' + content + '</table>';
+                this.popup = L.popup({
+                    offset: new L.Point(-widthInPixels / 2 - 40, -5),
+                    closeOnClick: true,
+                    autoPan: false,
+                    className: 'featureTooltip'
+                }).setLatLng(e.latlng).setContent(content).openOn(this.service.map.map);
+            };
+            LeafletRenderer.prototype.hideFeatureTooltip = function (e) {
+                if (this.popup && this.service.map.map) {
+                    this.service.map.map.closePopup(this.popup);
+                    //this.map.map.closePopup(this.popup);
+                    this.popup = null;
+                }
+            };
+            LeafletRenderer.prototype.updateFeatureTooltip = function (e) {
+                if (this.popup != null && e.latlng != null)
+                    this.popup.setLatLng(e.latlng);
+            };
+            return LeafletRenderer;
+        })();
+        Services.LeafletRenderer = LeafletRenderer;
     })(Services = csComp.Services || (csComp.Services = {}));
 })(csComp || (csComp = {}));
 var csComp;
@@ -8621,12 +8118,6 @@ var Translations;
             GREEN_WHITE: 'green - white',
             WHITE_ORANGE: 'white - orange',
             ORANGE_WHITE: 'orange - white',
-            EXPERTMODE: {
-                BEGINNER: 'Beginner',
-                INTERMEDIATE: 'Intermediate',
-                EXPERT: 'Expert',
-                EXPLANATION: 'Select your expertise in order to unlock more functionality.'
-            },
             LAYER_SERVICE: {
                 RELOAD_PROJECT_TITLE: 'Data is reloaded',
                 RELOAD_PROJECT_MSG: 'After switching the language, we need to reload all the map data. Our appologies for the inconvenience.'
@@ -8711,12 +8202,6 @@ var Translations;
             GREEN_WHITE: 'groen - wit',
             WHITE_ORANGE: 'wit - oranje',
             ORANGE_WHITE: 'oranje - wit',
-            EXPERTMODE: {
-                BEGINNER: 'Novice',
-                INTERMEDIATE: 'Gevorderd',
-                EXPERT: 'Expert',
-                EXPLANATION: 'Selecteer uw expertise om meer functionaliteit te kunnen gebruiken.'
-            },
             LAYER_SERVICE: {
                 RELOAD_PROJECT_TITLE: 'Data wordt opnieuw geladen',
                 RELOAD_PROJECT_MSG: 'Na het wisselen van de taal moet de kaartdata opnieuw ingelezen worden. Excuses voor het ongemak.'
