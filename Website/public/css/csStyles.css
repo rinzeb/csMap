@@ -727,6 +727,7 @@
     border: none;
     /*font: 16px;*/
     color: rgba(255,255,255,1);
+    /*text-decoration: normal;*/
     text-align: center;
     -o-text-overflow: clip;
     text-overflow: clip;
@@ -798,7 +799,9 @@
     padding: 4px;
     margin-right: 0;
     border: none;
+    /*font: 16px;*/
     color: rgba(255,255,255,1);
+    /*text-decoration: normal;*/
     text-align: center;
     -o-text-overflow: clip;
     text-overflow: clip;

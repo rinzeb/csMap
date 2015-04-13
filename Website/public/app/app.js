@@ -90,8 +90,11 @@ var App;
             this.$messageBusService.publish("sidebar", "toggle");
             window.console.log("Publish toggle sidebar");
         };
-        AppCtrl.prototype.showTable = function (tableVisible) {
-            this.$mapService.mapVisible = !tableVisible;
+        //public showTable(tableVisible: boolean) {
+        //    this.$mapService.mapVisible = !tableVisible;
+        //}
+        AppCtrl.prototype.showTable = function () {
+            this.$mapService.mapVisible = false;
         };
         AppCtrl.prototype.isActive = function (viewLocation) {
             return viewLocation === this.$location.path();
@@ -117,7 +120,9 @@ var App;
         'LocalStorageModule',
         'angularUtils.directives.dirPagination',
         'pascalprecht.translate',
+        'csWeb.mapElement',
         'csWeb.featureprops',
+        'csWeb.featurerelations',
         'csWeb.layersDirective',
         'csWeb.featureList',
         'csWeb.filterList',
@@ -135,7 +140,7 @@ var App;
         'csWeb.expertMode',
         'csWeb.offlineSearch',
         'ngCookies',
-        'csWeb.timeline',
+        'csWeb.timeline'
     ]).config(function (localStorageServiceProvider) {
         localStorageServiceProvider.prefix = 'csMap';
     }).config(function (TimelineServiceProvider) {
@@ -206,7 +211,7 @@ var App;
             template: "<datatable id='datatable'></datatable>",
             sticky: true
         });
-    }).service('messageBusService', csComp.Services.MessageBusService).service('mapService', csComp.Services.MapService).service('layerService', csComp.Services.LayerService).controller('appCtrl', AppCtrl).controller('mapLayersCtrl', csComp.Services.MapCtrl).controller('mapViewCtrl', MapView.MapViewCtrl).controller('searchCtrl', Search.SearchCtrl).controller('mcaEditorCtrl', Mca.McaEditorCtrl).filter('csmillions', [
+    }).service('messageBusService', csComp.Services.MessageBusService).service('mapService', csComp.Services.MapService).service('layerService', csComp.Services.LayerService).controller('appCtrl', AppCtrl).filter('csmillions', [
         '$filter',
         '$locale',
         function (filter, locale) {

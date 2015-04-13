@@ -22,9 +22,9 @@
         io: SocketIO.Server;
 
         constructor(httpServer: any) {
-            io = require('socket.io')(httpServer);
+            this.io = require('socket.io')(httpServer);
 
-            io.on('connection',(socket: SocketIO.Socket) => {
+            this.io.on('connection',(socket: SocketIO.Socket) => {
 
                 // store user
                 console.log('user ' + socket.id + ' has connected');

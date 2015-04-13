@@ -275,8 +275,8 @@
         .service('mapService', csComp.Services.MapService)
         .service('layerService', csComp.Services.LayerService)
         .controller('appCtrl', AppCtrl)        
-        .controller('searchCtrl', Search.SearchCtrl)
-        .controller('mcaEditorCtrl', Mca.McaEditorCtrl)
+        //.controller('searchCtrl', Search.SearchCtrl)
+        //.controller('mcaEditorCtrl', Mca.McaEditorCtrl)
         .filter('csmillions', [
             '$filter', '$locale', function(filter, locale) {
                 return function(amount, currencySymbol) {

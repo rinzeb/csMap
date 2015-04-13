@@ -37,12 +37,13 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="ClientConnection.ts" />
+    <TypeScriptCompile Include="layers\flightradar.ts" />
     <TypeScriptCompile Include="public\app\search\SearchCtrl.ts" />
     <TypeScriptCompile Include="Scripts\typings\angular-translate\angular-translate.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\angular-ui\angular-ui-router.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular-cookies.d.ts" />
     <TypeScriptCompile Include="public\app\app.ts" />
-    <TypeScriptCompile Include="public\views\map\MapViewCtrl.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularLocalStorage\angularLocalStorage.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\chroma-js\chroma-js.d.ts" />
@@ -74,12 +75,13 @@
     <Content Include="public\includes\ROsanswebtextregular.eot" />
     <Content Include="public\includes\ROsanswebtextregular.ttf" />
     <Content Include="public\index.html" />
-    <Content Include="public\views\map\map.html" />
     <TypeScriptCompile Include="Scripts\typings\q\Q.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\socketio\socket.io.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\xbbcode\xbbcode.d.ts" />
     <TypeScriptCompile Include="server.ts" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="layers\" />
     <Folder Include="public\" />
     <Folder Include="public\app\search\" />
     <Folder Include="public\css\" />
@@ -91,8 +93,6 @@
     <Folder Include="public\includes\" />
     <Folder Include="public\js\" />
     <Folder Include="public\js\cs\" />
-    <Folder Include="public\views\" />
-    <Folder Include="public\views\map\" />
     <Folder Include="Scripts\" />
     <Folder Include="Scripts\typings\" />
     <Folder Include="Scripts\typings\angular-translate\" />
@@ -110,6 +110,7 @@
     <Folder Include="Scripts\typings\leaflet\" />
     <Folder Include="Scripts\typings\node\" />
     <Folder Include="Scripts\typings\q\" />
+    <Folder Include="Scripts\typings\socketio\" />
     <Folder Include="Scripts\typings\xbbcode\" />
   </ItemGroup>
   <ItemGroup>
