@@ -885,9 +885,12 @@ declare module FeatureProps {
         canStyle: boolean;
         feature: IFeature;
         isFilter: boolean;
+        isSensor: boolean;
         description: string;
         meta: IPropertyType;
-        constructor(key: string, value: string, property: string, canFilter: boolean, canStyle: boolean, feature: IFeature, isFilter: boolean, description?: string, meta?: IPropertyType);
+        timestamps: number[];
+        sensor: number[];
+        constructor(key: string, value: string, property: string, canFilter: boolean, canStyle: boolean, feature: IFeature, isFilter: boolean, isSensor: boolean, description?: string, meta?: IPropertyType, timestamps?: number[], sensor?: number[]);
     }
     interface ICallOutSection {
         propertyTypes: {
@@ -951,6 +954,22 @@ declare module FeatureProps {
         private sidebarMessageReceived;
         private featureMessageReceived;
         private displayFeature(feature);
+        showSensorData(property: ICallOutProperty): void;
+        timestamps: {
+            title: string;
+            timestamp: number;
+        }[];
+        showSimpleTimeline: boolean;
+        focusTime: string;
+        setShowSimpleTimeline(): void;
+        setTimestamps(): {
+            title: string;
+            timestamp: number;
+        }[];
+        setTime(time: {
+            title: string;
+            timestamp: number;
+        }): void;
     }
 }
 declare module FeatureRelations {
@@ -1440,6 +1459,105 @@ declare module MapElement {
         initMap(): void;
     }
 }
+declare module Mca.Models {
+    import IFeature = csComp.Services.IFeature;
+    enum ScoringFunctionType {
+        Manual = 0,
+        Ascending = 1,
+        Descending = 2,
+        AscendingSigmoid = 3,
+        DescendingSigmoid = 4,
+        GaussianPeak = 5,
+        GaussianValley = 6,
+    }
+    /**
+    * Scoring function creates a PLA of the scoring algorithm.
+    */
+    class ScoringFunction {
+        title: string;
+        type: ScoringFunctionType;
+        scores: string;
+        cssClass: string;
+        constructor(scoringFunctionType?: ScoringFunctionType);
+        /**
+         * Create a score based on the type, in which x in [0,10] and y in [0.1].
+         * Before applying it, you need to scale the x-axis based on your actual range.
+         * Typically, you would map x=0 to the min(x)+0.1*range(x) and x(10)-0.1*range(x) to max(x),
+         * i.e. x' = ax+b, where a=100/(8r) and b=-100(min+0.1r)/(8r) and r=max-min
+         */
+        static createScores(type: ScoringFunctionType): string;
+    }
+    class ScoringFunctions {
+        static scoringFunctions: ScoringFunctions[];
+    }
+    class Criterion {
+        title: string;
+        description: string;
+        /**
+        * Top level label will be used to add a property to a feature, mca_LABELNAME, with the MCA value.
+        * Lower level children will be used to obtain the property value.
+        */
+        label: string;
+        /** Color of the pie chart */
+        color: string;
+        /** Specified weight by the user */
+        userWeight: number;
+        /** Derived weight based on the fact that the sum of weights in a group of criteria needs to be 1. */
+        weight: number;
+        /** Scoring function y = f(x), which translates a specified measurement x to a value y, where y in [0,1].
+         * Format [x1,y1 x2,y2], and may contain special characters, such as min or max to define the minimum or maximum.
+         */
+        scores: string;
+        propValues: number[];
+        criteria: Criterion[];
+        /** Piece-wise linear approximation of the scoring function by a set of x and y points */
+        isPlaUpdated: boolean;
+        /** Piece-wise linear approximation must be scaled:x' = ax+b, where a=100/(8r) and b=-100(min+0.1r)/(8r) and r=max-min */
+        isPlaScaled: boolean;
+        minValue: number;
+        maxValue: number;
+        minCutoffValue: number;
+        maxCutoffValue: number;
+        x: number[];
+        y: number[];
+        deserialize(input: Criterion): Criterion;
+        private requiresMinimum();
+        private requiresMaximum();
+        getTitle(): string;
+        /**
+         * Update the piecewise linear approximation (PLA) of the scoring (a.k.a. user) function,
+         * which translates a property value to a MCA value in the range [0,1] using all features.
+         */
+        updatePla(features: IFeature[]): void;
+        getScore(feature: IFeature): number;
+    }
+    class Mca extends Criterion implements csComp.Services.ISerializable<Mca> {
+        /** Section of the callout */
+        section: string;
+        stringFormat: string;
+        /** Optionally, export the result also as a rank */
+        rankTitle: string;
+        rankDescription: string;
+        /** Optionally, stringFormat for the ranked result */
+        rankFormat: string;
+        /** Maximum number of star ratings to use to set the weight */
+        userWeightMax: number;
+        /** Applicable feature ids as a string[]. */
+        featureIds: string[];
+        scaleMaxValue: number;
+        scaleMinValue: number;
+        rankLabel: string;
+        constructor();
+        deserialize(input: Mca): Mca;
+        /**
+        * Update the MCA by calculating the weights and setting the colors.
+        */
+        update(): void;
+        private calculateWeights(criteria?);
+        /** Set the colors of all criteria and sub-criteria */
+        private setColors();
+    }
+}
 declare module Mca {
     var html: string;
 }
@@ -1570,105 +1688,6 @@ declare module Mca {
 }
 declare module McaEditorView {
     var html: string;
-}
-declare module Mca.Models {
-    import IFeature = csComp.Services.IFeature;
-    enum ScoringFunctionType {
-        Manual = 0,
-        Ascending = 1,
-        Descending = 2,
-        AscendingSigmoid = 3,
-        DescendingSigmoid = 4,
-        GaussianPeak = 5,
-        GaussianValley = 6,
-    }
-    /**
-    * Scoring function creates a PLA of the scoring algorithm.
-    */
-    class ScoringFunction {
-        title: string;
-        type: ScoringFunctionType;
-        scores: string;
-        cssClass: string;
-        constructor(scoringFunctionType?: ScoringFunctionType);
-        /**
-         * Create a score based on the type, in which x in [0,10] and y in [0.1].
-         * Before applying it, you need to scale the x-axis based on your actual range.
-         * Typically, you would map x=0 to the min(x)+0.1*range(x) and x(10)-0.1*range(x) to max(x),
-         * i.e. x' = ax+b, where a=100/(8r) and b=-100(min+0.1r)/(8r) and r=max-min
-         */
-        static createScores(type: ScoringFunctionType): string;
-    }
-    class ScoringFunctions {
-        static scoringFunctions: ScoringFunctions[];
-    }
-    class Criterion {
-        title: string;
-        description: string;
-        /**
-        * Top level label will be used to add a property to a feature, mca_LABELNAME, with the MCA value.
-        * Lower level children will be used to obtain the property value.
-        */
-        label: string;
-        /** Color of the pie chart */
-        color: string;
-        /** Specified weight by the user */
-        userWeight: number;
-        /** Derived weight based on the fact that the sum of weights in a group of criteria needs to be 1. */
-        weight: number;
-        /** Scoring function y = f(x), which translates a specified measurement x to a value y, where y in [0,1].
-         * Format [x1,y1 x2,y2], and may contain special characters, such as min or max to define the minimum or maximum.
-         */
-        scores: string;
-        propValues: number[];
-        criteria: Criterion[];
-        /** Piece-wise linear approximation of the scoring function by a set of x and y points */
-        isPlaUpdated: boolean;
-        /** Piece-wise linear approximation must be scaled:x' = ax+b, where a=100/(8r) and b=-100(min+0.1r)/(8r) and r=max-min */
-        isPlaScaled: boolean;
-        minValue: number;
-        maxValue: number;
-        minCutoffValue: number;
-        maxCutoffValue: number;
-        x: number[];
-        y: number[];
-        deserialize(input: Criterion): Criterion;
-        private requiresMinimum();
-        private requiresMaximum();
-        getTitle(): string;
-        /**
-         * Update the piecewise linear approximation (PLA) of the scoring (a.k.a. user) function,
-         * which translates a property value to a MCA value in the range [0,1] using all features.
-         */
-        updatePla(features: IFeature[]): void;
-        getScore(feature: IFeature): number;
-    }
-    class Mca extends Criterion implements csComp.Services.ISerializable<Mca> {
-        /** Section of the callout */
-        section: string;
-        stringFormat: string;
-        /** Optionally, export the result also as a rank */
-        rankTitle: string;
-        rankDescription: string;
-        /** Optionally, stringFormat for the ranked result */
-        rankFormat: string;
-        /** Maximum number of star ratings to use to set the weight */
-        userWeightMax: number;
-        /** Applicable feature ids as a string[]. */
-        featureIds: string[];
-        scaleMaxValue: number;
-        scaleMinValue: number;
-        rankLabel: string;
-        constructor();
-        deserialize(input: Mca): Mca;
-        /**
-        * Update the MCA by calculating the weights and setting the colors.
-        */
-        update(): void;
-        private calculateWeights(criteria?);
-        /** Set the colors of all criteria and sub-criteria */
-        private setColors();
-    }
 }
 declare module OfflineSearch {
     var html: string;
@@ -2022,6 +2041,7 @@ declare module csComp.Helpers {
     /**
      * Load the features as visible on the map, effectively creating a virtual
      * GeoJSON file that represents all visible items.
+     * Also loads the keys into the featuretype's propertyTypeData collection.
      */
     function loadMapLayers(layerService: Services.LayerService): Services.IGeoJsonFile;
 }
@@ -2400,7 +2420,11 @@ declare module csComp.Services {
          */
         findFeatureByName(name: string): IFeature;
         /**
-         * Find a layer with a specific id
+        * Find a loaded layer with a specific id.
+        */
+        findLoadedLayer(id: string): ProjectLayer;
+        /**
+         * Find a layer with a specific id.
          */
         findLayer(id: string): ProjectLayer;
         /**

@@ -1883,7 +1883,7 @@ var FeatureList;
 })(FeatureList || (FeatureList = {}));
 var FeatureProps;
 (function (FeatureProps) {
-    FeatureProps.html = '<div data-ng-cloak data-ng-show="showMenu" >    <h4 class="rightpanel-header">        <img data-ng-if="callOut.icon" data-ng-src="{{callOut.icon}}" width="24" height="24" style="margin-left:5px" alt="Icon" />        &nbsp;&nbsp;{{callOut.title}}    </h4>    <div class="container-fluid rightpanel-tabs" style="position: relative">        <div class="row" style="overflow:hidden" ng-if="callOut.sectionCount() < 4">            <!-- Nav tabs -->            <span id="leftArr" style="display:block;padding:10px;margin-top:5px;position:absolute;background-color:transparent;z-index:2">                <i class="glyphicon glyphicon-chevron-left"></i>            </span>            <span id="rightArr" style="display:block;padding:10px;margin-top:5px;position:absolute;background-color:transparent;z-index:2">                <i class="glyphicon glyphicon-chevron-right"></i>            </span>            <ul class="nav nav-tabs" id="featureTabs" style="margin-left:10px">                <li data-toggle="tab" data-ng-class="{active : $first}" data-ng-repeat="(sectionTitle, section) in callOut.sections" ng-if="section.hasProperties()">                    <a ng-href="#rp-{{$index}}" data-toggle="tab" data-ng-if="section.showSectionIcon()" ng-click="featureTabActivated(sectionTitle, section)"><i class="fa {{section.sectionIcon}}"></i></a>                    <a ng-href="#rp-{{$index}}" data-toggle="tab" data-ng-if="!section.showSectionIcon()" ng-click="featureTabActivated(sectionTitle, section)">{{sectionTitle}}</a>                </li>            </ul>        </div>        <div class="row" ng-if="callOut.sectionCount() >= 4">            <ul class="nav nav-tabs" id="featureTabs" style="margin-left:10px">                <li data-toggle="tab" class="active" ng-init="firstCallOutsection=callOut.firstSection()">                    <a ng-href="#rp-0" data-toggle="tab" data-ng-if="firstCallOutsection.showSectionIcon()" ><i class="fa {{firstCallOutsection.sectionIcon}}"></i></a>                </li>                <li class="dropdown" ng-init="selectedSection.title=\'Kies een categorie\'">                    <a style="cursor:pointer" data-toggle="dropdown">{{selectedSection.title}} <span class="caret"/></a>                    <ul class="dropdown-menu">                        <li data-ng-repeat="(sectionTitle, section) in callOut.sections" ng-if="!$last && !$first"><a ng-href="#rp-{{$index}}" ng-click="selectedSection.title = sectionTitle" data-toggle="tab">{{sectionTitle}}</a></li>                    </ul>                </li>                <li data-toggle="tab" ng-init="lastCallOutsection=callOut.lastSection()">                    <a ng-href="#rp-{{callOut.sectionCount()-1}}" data-toggle="tab" data-ng-if="lastCallOutsection.showSectionIcon()"><i class="fa {{lastCallOutsection.sectionIcon}}"></i></a>                </li>            </ul>        </div>    </div>    <div class="tab-content" style="top:50px; width:355px; overflow-y: auto; overflow-x: hidden" resize resize-y="150">        <div data-ng-if="!$last" class="tab-pane" data-ng-class="{active : $first}" id="rp-{{$index}}" data-ng-repeat="(sectionTitle, section) in callOut.sections">            <table class="table table-condensed">                <tr popover="{{(item.description) ? item.description : \'\'}}"                    popover-placement="left"                    popover-trigger="mouseenter"                    popover-append-to-body="true"                    data-ng-repeat="item in section.properties">                    <!--<td>                        <span class="dropdown">                            <a href class="fa fa-circle-o makeNarrow dropdown-toggle"></a>                            <ul class="dropdown-menu">                                <li><a data-ng-click="vm.$layerService.createScatter(item)">scatter plot</a></li>                                <li><a>add to dashboard</a></li>                            </ul>                        </span>                    </td>-->                    <td><a class="fa fa-filter makeNarrow" data-ng-show="item.canFilter" data-ng-click="vm.$layerService.setPropertyFilter(item)" style="cursor: pointer"></a></td>                    <td><a class="fa fa-eyedropper makeNarrow" data-ng-show="item.canStyle" data-ng-click="vm.$layerService.setStyle(item)" style="cursor: pointer"></a></td>                    <td>                        {{item.key}}                    </td>                    <td class="text-right" data-ng-bind-html="vm.toTrusted(item.value)"></td>                </tr>            </table>        </div>        <!-- Treat last tab (filter) differently -->        <div data-ng-if="$last" class="tab-pane" data-ng-class="{active : $first}" id="rp-{{$index}}" data-ng-repeat="(sectionTitle, section) in callOut.sections">            <!-- Add filter panel to the last rendered element -->            <div class="has-feedback" style="padding:0 4px 4px 4px;">                <span style="direction: ltr; position: static; display: block;">                    <input id="searchbox" data-ng-model="search.key" type="text"                            placeholder="Filter" autocomplete="off" spellcheck="false"                            style="position: relative; vertical-align: top;" class="form-control tt-input">                </span>                <span id="searchicon" class="fa form-control-feedback fa-filter"></span>            </div>            <!--<input style="padding:4px;" class=" form-control" data-ng-model="search" placeholder="...">-->            <table id="searchTextResults" class="table table-condensed">                <tr popover="{{(item.description) ? item.description : \'\'}}"                    popover-placement="left"                    popover-trigger="mouseenter"                    popover-append-to-body="true"                    data-ng-repeat="item in section.properties | filter:search">                    <td><a class="fa fa-filter makeNarrow" data-ng-show="item.canFilter" data-ng-click="vm.$layerService.setPropertyFilter(item)"></a></td>                    <td><a class="fa fa-eye makeNarrow" data-ng-show="item.canStyle" data-ng-click="vm.$layerService.setStyle(item)"></a></td>                    <td>{{item.key}}</td>                    <td class="text-right" data-ng-bind-html="vm.toTrusted(item.value)"></td>                </tr>            </table>        </div>    </div></div>';
+    FeatureProps.html = '<div data-ng-cloak data-ng-show="showMenu" >    <h4 class="rightpanel-header">        <img data-ng-if="callOut.icon" data-ng-src="{{callOut.icon}}" width="24" height="24" style="margin-left:5px" alt="Icon" />        &nbsp;&nbsp;{{callOut.title}}    </h4>        <div class="container-fluid rightpanel-tabs" style="position: relative">        <div class="row" style="overflow:hidden" ng-if="callOut.sectionCount() < 4">            <!-- Nav tabs -->            <span id="leftArr" style="display:block;padding:10px;margin-top:5px;position:absolute;background-color:transparent;z-index:2">                <i class="glyphicon glyphicon-chevron-left"></i>            </span>            <span id="rightArr" style="display:block;padding:10px;margin-top:5px;position:absolute;background-color:transparent;z-index:2">                <i class="glyphicon glyphicon-chevron-right"></i>            </span>            <ul class="nav nav-tabs" id="featureTabs" style="margin-left:10px">                <li data-toggle="tab" data-ng-class="{active : $first}" data-ng-repeat="(sectionTitle, section) in callOut.sections" ng-if="section.hasProperties()">                    <a ng-href="#rp-{{$index}}" data-toggle="tab" data-ng-if="section.showSectionIcon()" ng-click="featureTabActivated(sectionTitle, section)"><i class="fa {{section.sectionIcon}}"></i></a>                    <a ng-href="#rp-{{$index}}" data-toggle="tab" data-ng-if="!section.showSectionIcon()" ng-click="featureTabActivated(sectionTitle, section)">{{sectionTitle}}</a>                </li>            </ul>        </div>                <div class="row" ng-if="callOut.sectionCount() >= 4">            <ul class="nav nav-tabs" id="featureTabs" style="margin-left:10px">                <li data-toggle="tab" class="active" ng-init="firstCallOutsection=callOut.firstSection()">                    <a ng-href="#rp-0" data-toggle="tab" data-ng-if="firstCallOutsection.showSectionIcon()" >                        <i class="fa {{firstCallOutsection.sectionIcon}}"></i>                    </a>                                    </li>                <li class="dropdown" ng-init="selectedSection.title=\'...\'">                    <a style="cursor:pointer" data-toggle="dropdown">{{selectedSection.title}} <span class="caret"></span></a>                    <ul class="dropdown-menu">                        <li data-ng-repeat="(sectionTitle, section) in callOut.sections" ng-if="!$last">                            <a ng-href="#rp-{{$index}}"                               ng-click="selectedSection.title = sectionTitle"                               data-toggle="tab">{{sectionTitle}}</a>                        </li>                    </ul>                </li>                <li data-toggle="tab" ng-init="lastCallOutsection=callOut.lastSection()">                    <a ng-href="#rp-{{callOut.sectionCount()-1}}" data-toggle="tab"                        data-ng-if="lastCallOutsection.showSectionIcon()">                        <i class="fa {{lastCallOutsection.sectionIcon}}"></i>                    </a>                                    </li>            </ul>        </div>    </div>        <div class="tab-content" style="top:50px; width:355px; overflow-y: auto; overflow-x: hidden" resize resize-y="150">        <div data-ng-if="!$last" class="tab-pane" data-ng-class="{active : $first}"              id="rp-{{$index}}"              data-ng-repeat="(sectionTitle, section) in callOut.sections">            <!--<td>                    <span class="dropdown">                        <a href class="fa fa-circle-o makeNarrow dropdown-toggle"></a>                        <ul class="dropdown-menu">                            <li><a data-ng-click="vm.$layerService.createScatter(item)">scatter plot</a></li>                            <li><a>add to dashboard</a></li>                        </ul>                    </span>                </td>-->            <div class="panel-group" id="accordion">                <div class="panel panel-default"                     popover="{{(item.description) ? item.description : \'\'}}"                     popover-placement="left"                     popover-trigger="mouseenter"                     popover-append-to-body="true"                     data-ng-repeat="item in section.properties">                    <div class="panel-heading" style="min-height: 36px">                        <div class="pull-left accordionIcon"><a class="fa fa-filter makeNarrow" data-ng-show="item.canFilter" data-ng-click="vm.$layerService.setPropertyFilter(item)" style="cursor: pointer"></a></div>                        <div class="pull-left accordionIcon"><a class="fa fa-eye makeNarrow" data-ng-show="item.canStyle" data-ng-click="vm.$layerService.setStyle(item)" style="cursor: pointer"></a></div>                        <div class="pull-left accordionIcon" data-ng-if="item.isSensor">                            <a class="fa fa-line-chart makeNarrow"                               data-toggle="collapse"                               data-target="#sensor{{item.property}}"                               href="#sensor{{item.property}}"                               style="cursor: pointer"></a>                        </div>                        <div class="pull-left" style="margin-left: 4px;">                            {{item.key}}                        </div>                        <div class="text-right" data-ng-bind-html="vm.toTrusted(item.value)"></div>                        <div id="sensor{{item.property}}"                             data-ng-if="item.isSensor"                             class="panel-collapse collapse" style="padding-top: 10px;">                            <sparkline-chart timestamps="item.timestamps" sensor="item.sensor" width="320" height="90" showaxis="true"></sparkline-chart>                            <!--<div class="panel-body">            <sparkline-chart timestamps="item.timestamps" sensor="item.sensor" width="320" height="90" showaxis="true"></sparkline-chart>        </div>-->                        </div>                    </div>                </div>            </div>        </div>        <!-- Treat last tab (filter) differently -->        <div data-ng-if="$last" class="tab-pane" data-ng-class="{active : $first}" id="rp-{{$index}}" data-ng-repeat="(sectionTitle, section) in callOut.sections">            <!-- Add filter panel to the last rendered element -->            <div class="has-feedback" style="padding:0 4px 4px 4px;">                <span style="direction: ltr; position: static; display: block;">                    <input id="searchbox" data-ng-model="search.key" type="text"                           placeholder="Filter" autocomplete="off" spellcheck="false"                           style="position: relative; vertical-align: top;" class="form-control tt-input">                </span>                <span id="searchicon" class="fa form-control-feedback fa-filter"></span>            </div>            <div class="panel-group" id="accordion">                <div class="panel panel-default"                     popover="{{(item.description) ? item.description : \'\'}}"                     popover-placement="left"                     popover-trigger="mouseenter"                     popover-append-to-body="true"                     data-ng-repeat="item in section.properties">                    <div class="panel-heading" style="min-height: 36px">                        <div class="pull-left accordionIcon"><a class="fa fa-filter makeNarrow" data-ng-show="item.canFilter" data-ng-click="vm.$layerService.setPropertyFilter(item)" style="cursor: pointer"></a></div>                        <div class="pull-left accordionIcon"><a class="fa fa-eye makeNarrow" data-ng-show="item.canStyle" data-ng-click="vm.$layerService.setStyle(item)" style="cursor: pointer"></a></div>                        <div class="pull-left accordionIcon" data-ng-if="item.isSensor">                            <a class="fa fa-line-chart makeNarrow"                               data-toggle="collapse"                               data-target="#fsensor{{item.property}}"                               href="#fsensor{{item.property}}"                               style="cursor: pointer"></a>                        </div>                        <div class="pull-left" style="margin-left: 4px;">                            {{item.key}}                        </div>                        <div class="text-right" data-ng-bind-html="vm.toTrusted(item.value)"></div>                        <div id="fsensor{{item.property}}"                             data-ng-if="item.isSensor"                             class="panel-collapse collapse">                            <div class="panel-body">Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt accusamus labore sustainable VHS.</div>                        </div>                    </div>                </div>            </div>            <!--<input style="padding:4px;" class=" form-control" data-ng-model="search" placeholder="...">-->            <!--<table id="searchTextResults" class="table table-condensed">                <tr popover="{{(item.description) ? item.description : \'\'}}"                    popover-placement="left"                    popover-trigger="mouseenter"                    popover-append-to-body="true"                    data-ng-repeat="item in section.properties | filter:search">                    <td><a class="fa fa-filter makeNarrow" data-ng-show="item.canFilter" data-ng-click="vm.$layerService.setFilter(item)"></a></td>                    <td><a class="fa fa-eye makeNarrow" data-ng-show="item.canStyle" data-ng-click="vm.$layerService.setStyle(item)"></a></td>                    <td>{{item.key}}</td>                    <td class="text-right" data-ng-bind-html="vm.toTrusted(item.value)"></td>                </tr>            </table>-->        </div>                <!--SimpleTimeline component-->        <div data-ng-if="vm.showSimpleTimeline" style="margin-left: 10px">            <div class="btn-group" dropdown is-open="status.isopen">                <button type="button" class="btn btn-primary dropdown-toggle" dropdown-toggle ng-disabled="disabled">                    {{vm.focusTime}} <span class="caret"></span>                </button>                <ul class="dropdown-menu" role="menu">                    <li data-ng-repeat="ts in vm.timestamps"                         data-ng-click="vm.setTime(ts)">{{ts.title}}</li>                </ul>            </div>        </div>    </div></div>';
 })(FeatureProps || (FeatureProps = {}));
 var FeatureProps;
 (function (FeatureProps) {
@@ -1937,7 +1937,7 @@ var FeatureProps;
         return FeaturePropsOptions;
     })();
     var CallOutProperty = (function () {
-        function CallOutProperty(key, value, property, canFilter, canStyle, feature, isFilter, description, meta) {
+        function CallOutProperty(key, value, property, canFilter, canStyle, feature, isFilter, isSensor, description, meta, timestamps, sensor) {
             this.key = key;
             this.value = value;
             this.property = property;
@@ -1945,8 +1945,11 @@ var FeatureProps;
             this.canStyle = canStyle;
             this.feature = feature;
             this.isFilter = isFilter;
+            this.isSensor = isSensor;
             this.description = description;
             this.meta = meta;
+            this.timestamps = timestamps;
+            this.sensor = sensor;
         }
         return CallOutProperty;
     })();
@@ -1961,7 +1964,11 @@ var FeatureProps;
             return !csComp.StringExt.isNullOrEmpty(this.sectionIcon);
         };
         CallOutSection.prototype.addProperty = function (key, value, property, canFilter, canStyle, feature, isFilter, description, meta) {
-            this.properties.push(new CallOutProperty(key, value, property, canFilter, canStyle, feature, isFilter, description ? description : null, meta));
+            var isSensor = typeof feature.sensors !== 'undefined' && feature.sensors.hasOwnProperty(property);
+            if (isSensor)
+                this.properties.push(new CallOutProperty(key, value, property, canFilter, canStyle, feature, isFilter, isSensor, description ? description : null, meta, feature.timestamps, feature.sensors[property]));
+            else
+                this.properties.push(new CallOutProperty(key, value, property, canFilter, canStyle, feature, isFilter, isSensor, description ? description : null, meta));
         };
         CallOutSection.prototype.hasProperties = function () {
             return this.properties != null && this.properties.length > 0;
@@ -1996,8 +2003,9 @@ var FeatureProps;
                     var canStyle = (mi.type === "number" || mi.type === "options" || mi.type === "color");
                     if (mi.filterType != null)
                         canFilter = mi.filterType.toLowerCase() != "none";
-                    if (mi.visibleInCallOut)
+                    if (mi.visibleInCallOut) {
                         callOutSection.addProperty(mi.title, displayValue, mi.label, canFilter, canStyle, feature, false, mi.description, mi);
+                    }
                     searchCallOutSection.addProperty(mi.title, displayValue, mi.label, canFilter, canStyle, feature, false, mi.description);
                 });
             }
@@ -2089,6 +2097,7 @@ var FeatureProps;
             this.featureMessageReceived = function (title, feature) {
                 switch (title) {
                     case "onFeatureSelect":
+                        _this.setShowSimpleTimeline();
                         _this.displayFeature(feature);
                         _this.$scope.poi = feature;
                         _this.$scope.autocollapse(true);
@@ -2103,6 +2112,7 @@ var FeatureProps;
                     _this.$scope.$apply();
                 }
             };
+            this.timestamps = new Array();
             this.scope = $scope;
             $scope.vm = this;
             $scope.showMenu = false;
@@ -2199,11 +2209,62 @@ var FeatureProps;
             if (!feature)
                 return;
             var featureType = this.$layerService.featureTypes[feature.featureTypeName];
+            // If we are dealing with a sensor, make sure that the feature's timestamps are valid so we can add it to a chart
+            if (typeof feature.sensors !== 'undefined' && typeof feature.timestamps === 'undefined')
+                feature.timestamps = this.$layerService.findLayer(feature.layerId).timestamps;
             this.$scope.callOut = new CallOut(featureType, feature, this.$layerService.propertyTypeData);
-            // Probably not needed
-            //if (this.$scope.$root.$$phase != '$apply' && this.$scope.$root.$$phase != '$digest') {
-            //    this.$scope.$apply();
-            //}
+        };
+        FeaturePropsCtrl.prototype.showSensorData = function (property) {
+            console.log(property);
+        };
+        FeaturePropsCtrl.prototype.setShowSimpleTimeline = function () {
+            if (this.$mapService.timelineVisible || typeof this.$layerService.lastSelectedFeature === 'undefined' || this.$layerService.lastSelectedFeature == null) {
+                this.showSimpleTimeline = false;
+                return;
+            }
+            var feature = this.$layerService.lastSelectedFeature;
+            this.showSimpleTimeline = (typeof feature.sensors !== 'undefined' && feature.sensors !== null);
+            if (this.showSimpleTimeline)
+                this.setTimestamps();
+        };
+        FeaturePropsCtrl.prototype.setTimestamps = function () {
+            var feature = this.$layerService.lastSelectedFeature;
+            var layer = this.$layerService.findLayer(feature.layerId);
+            if ((typeof layer.timestamps === 'undefined' || layer.timestamps == null) && (typeof feature.timestamps === 'undefined' || feature.timestamps == null))
+                return [];
+            var time = this.timestamps = new Array();
+            (layer.timestamps || feature.timestamps).forEach(function (ts) {
+                var date = new Date(ts);
+                var dateString = String.format("{0}-{1:00}-{2:00}", date.getFullYear(), date.getUTCMonth() + 1, date.getUTCDate());
+                if (date.getUTCHours() > 0 || date.getUTCMinutes() > 0)
+                    dateString += String.format(" {0:00}:{1:00}", date.getUTCHours(), date.getUTCMinutes());
+                time.push({ title: dateString, timestamp: ts });
+            });
+            // Set focus time
+            var focus = this.$layerService.project.timeLine.focus;
+            if (focus > time[time.length - 1].timestamp) {
+                this.focusTime = time[time.length - 1].title;
+                this.setTime(time[time.length - 1]);
+            }
+            else if (focus < time[0].timestamp) {
+                this.focusTime = time[0].title;
+                this.setTime(time[0]);
+            }
+            else {
+                for (var i = 1; i < time.length; i++) {
+                    if (focus > time[i].timestamp)
+                        continue;
+                    this.focusTime = time[i].title;
+                    this.setTime(time[i]);
+                    break;
+                }
+            }
+            return time;
+        };
+        FeaturePropsCtrl.prototype.setTime = function (time) {
+            this.focusTime = time.title;
+            this.$layerService.project.timeLine.setFocus(new Date(time.timestamp));
+            this.$messageBusService.publish("timeline", "focusChange", time.timestamp);
         };
         // $inject annotation.
         // It provides $injector with information about dependencies to be injected into constructor
@@ -3341,6 +3402,9 @@ var LayersDirective;
         }
         LayersDirectiveCtrl.prototype.toggleLayer = function (layer) {
             //layer.enabled = !layer.enabled;
+            // Unselect when dealing with a radio group, so you can turn a loaded layer off again.
+            if (layer.group.oneLayerActive && this.$layerService.findLoadedLayer(layer.id))
+                layer.enabled = false;
             if (layer.enabled) {
                 this.$layerService.addLayer(layer);
             }
@@ -3604,6 +3668,345 @@ var MapElement;
     })();
     MapElement.MapElementCtrl = MapElementCtrl;
 })(MapElement || (MapElement = {}));
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Mca;
+(function (_Mca) {
+    var Models;
+    (function (Models) {
+        (function (ScoringFunctionType) {
+            ScoringFunctionType[ScoringFunctionType["Manual"] = 0] = "Manual";
+            ScoringFunctionType[ScoringFunctionType["Ascending"] = 1] = "Ascending";
+            ScoringFunctionType[ScoringFunctionType["Descending"] = 2] = "Descending";
+            ScoringFunctionType[ScoringFunctionType["AscendingSigmoid"] = 3] = "AscendingSigmoid";
+            ScoringFunctionType[ScoringFunctionType["DescendingSigmoid"] = 4] = "DescendingSigmoid";
+            ScoringFunctionType[ScoringFunctionType["GaussianPeak"] = 5] = "GaussianPeak";
+            ScoringFunctionType[ScoringFunctionType["GaussianValley"] = 6] = "GaussianValley";
+        })(Models.ScoringFunctionType || (Models.ScoringFunctionType = {}));
+        var ScoringFunctionType = Models.ScoringFunctionType;
+        /**
+        * Scoring function creates a PLA of the scoring algorithm.
+        */
+        var ScoringFunction = (function () {
+            //get img(): string {
+            //    return '/includes/images/plot' + csComp.StringExt.Utils.toUnderscore(ScoringFunctionType[this.type]) + '.png';
+            //}
+            function ScoringFunction(scoringFunctionType) {
+                if (typeof scoringFunctionType != 'undefined' && scoringFunctionType != null)
+                    this.type = scoringFunctionType;
+                this.title = ScoringFunctionType[scoringFunctionType].toString();
+            }
+            Object.defineProperty(ScoringFunction.prototype, "cssClass", {
+                get: function () {
+                    return ScoringFunctionType[this.type].toLowerCase();
+                },
+                enumerable: true,
+                configurable: true
+            });
+            /**
+             * Create a score based on the type, in which x in [0,10] and y in [0.1].
+             * Before applying it, you need to scale the x-axis based on your actual range.
+             * Typically, you would map x=0 to the min(x)+0.1*range(x) and x(10)-0.1*range(x) to max(x),
+             * i.e. x' = ax+b, where a=100/(8r) and b=-100(min+0.1r)/(8r) and r=max-min
+             */
+            ScoringFunction.createScores = function (type) {
+                var scores;
+                switch (type) {
+                    default:
+                    case 1 /* Ascending */:
+                        scores = '[0,0 10,1]';
+                        break;
+                    case 2 /* Descending */:
+                        scores = '[0,1 10,0]';
+                        break;
+                    case 3 /* AscendingSigmoid */:
+                        // http://mathnotepad.com/: f(x) = (3.5+2*atan(x-5))/7
+                        // f([0,1,2,3,4,5,6,7,8,9,10])
+                        // round(100*f([0,1,2,3,4,5,6,7,8,9,10]))/100
+                        // [0.11 0.12 0.14 0.18 0.28 0.5 0.72 0.82 0.86 0.88 0.89]
+                        scores = '[0,0.11 1,0.12 2,0.14 3,0.18 4,0.28 5,0.5 6,0.72 7,0.82 8,0.86 9,0.88 10,0.89]';
+                        break;
+                    case 4 /* DescendingSigmoid */:
+                        // 1-f(x)
+                        scores = '[0,0.89 1,0.88 2,0.86 3,0.82 4,0.72 5,0.5 6,0.28 7,0.18 8,0.14 9,0.12 10,0.11]';
+                        break;
+                    case 5 /* GaussianPeak */:
+                        // h(x)=3*exp(-((x-u)^2)/(2s^2))/(s*sqrt(2pi))
+                        scores = '[0,0 2,0.04 3,0.25 4,0.7 5,1 6,0.7 7,0.25 8,0.04 9,0]';
+                        break;
+                    case 6 /* GaussianValley */:
+                        // 1-h(x)
+                        scores = '[0,1 2,0.96 3,0.75 4,0.3 5,0 6,0.3 7,0.75 8,0.96 9,0]';
+                        break;
+                }
+                return scores;
+            };
+            return ScoringFunction;
+        })();
+        Models.ScoringFunction = ScoringFunction;
+        var ScoringFunctions = (function () {
+            function ScoringFunctions() {
+            }
+            return ScoringFunctions;
+        })();
+        Models.ScoringFunctions = ScoringFunctions;
+        var Criterion = (function () {
+            function Criterion() {
+                /** Specified weight by the user */
+                this.userWeight = 1;
+                this.propValues = [];
+                this.criteria = [];
+                /** Piece-wise linear approximation of the scoring function by a set of x and y points */
+                this.isPlaUpdated = false;
+                /** Piece-wise linear approximation must be scaled:x' = ax+b, where a=100/(8r) and b=-100(min+0.1r)/(8r) and r=max-min */
+                this.isPlaScaled = false;
+                this.x = [];
+                this.y = [];
+            }
+            Criterion.prototype.deserialize = function (input) {
+                var _this = this;
+                this.title = input.title;
+                this.description = input.description;
+                this.label = input.label;
+                this.color = input.color;
+                this.userWeight = input.userWeight;
+                this.weight = input.weight;
+                this.isPlaScaled = input.isPlaScaled;
+                this.scores = input.scores;
+                this.minCutoffValue = input.minCutoffValue;
+                this.maxCutoffValue = input.maxCutoffValue;
+                this.minValue = input.minValue;
+                this.maxValue = input.maxValue;
+                input.criteria.forEach(function (c) {
+                    _this.criteria.push(new Criterion().deserialize(c));
+                });
+                return this;
+            };
+            Criterion.prototype.requiresMinimum = function () {
+                return this.scores && this.scores.indexOf('min') >= 0;
+            };
+            Criterion.prototype.requiresMaximum = function () {
+                return this.scores && this.scores.indexOf('max') >= 0;
+            };
+            Criterion.prototype.getTitle = function () {
+                if (this.title)
+                    return this.title;
+                return this.label;
+            };
+            /**
+             * Update the piecewise linear approximation (PLA) of the scoring (a.k.a. user) function,
+             * which translates a property value to a MCA value in the range [0,1] using all features.
+             */
+            Criterion.prototype.updatePla = function (features) {
+                var _this = this;
+                if (this.isPlaUpdated)
+                    return;
+                if (this.criteria.length > 0) {
+                    this.criteria.forEach(function (c) {
+                        c.updatePla(features);
+                    });
+                    this.isPlaUpdated = true;
+                    return;
+                }
+                // Replace min and max by their values:
+                if (this.scores == null)
+                    return;
+                var scores = this.scores;
+                this.propValues = [];
+                if (this.requiresMaximum() || this.requiresMinimum() || this.isPlaScaled) {
+                    features.forEach(function (feature) {
+                        if (feature.properties.hasOwnProperty(_this.label)) {
+                            // The property is available. I use the '+' to convert the string value to a number.
+                            var prop = feature.properties[_this.label];
+                            if ($.isNumeric(prop))
+                                _this.propValues.push(prop);
+                        }
+                    });
+                }
+                var max = this.maxValue, min = this.minValue;
+                if (this.isPlaScaled || this.requiresMaximum()) {
+                    max = max || Math.max.apply(null, this.propValues);
+                    scores.replace('max', max.toPrecision(3));
+                }
+                if (this.isPlaScaled || this.requiresMinimum()) {
+                    min = min || Math.min.apply(null, this.propValues);
+                    scores.replace('min', min.toPrecision(3));
+                }
+                if (this.isPlaScaled) {
+                    var stats = csComp.Helpers.standardDeviation(this.propValues);
+                    max = max || Math.min(max, stats.avg + 2 * stats.stdDev);
+                    min = min || Math.max(min, stats.avg - 2 * stats.stdDev);
+                }
+                // Regex to split the scores: [^\d\.]+ and remove empty entries
+                var pla = scores.split(/[^\d\.]+/).filter(function (item) { return item.length > 0; });
+                // Test that we have an equal number of x and y,
+                var range = max - min, a, b;
+                if (this.minValue != null || this.maxValue != null) {
+                    a = range / 10;
+                    b = min;
+                }
+                else {
+                    a = 0.08 * range, b = min + 0.1 * range;
+                }
+                if (pla.length % 2 !== 0)
+                    throw Error(this.label + ' does not have an even (x,y) pair in scores.');
+                for (var i = 0; i < pla.length / 2; i++) {
+                    var x = parseFloat(pla[2 * i]);
+                    if (this.isPlaScaled) {
+                        // Scale x, i.e. x'=ax+b with x'(0)=min+0.1r and x'(10)=max-0.1r, r=max-min
+                        // min+0.1r=b
+                        // max-0.1r=10a+b=10a+min+0.1r <=> max-min-0.2r=10a <=> 0.8r=10a <=> a=0.08r
+                        x = a * x + b;
+                    }
+                    if (i > 0 && this.x[i - 1] > x)
+                        throw Error(this.label + ': x should increment continuously.');
+                    this.x.push(x);
+                    // Test that y in [0, 1].
+                    var y = parseFloat(pla[2 * i + 1]);
+                    if (y < 0)
+                        y = 0;
+                    else if (y > 1)
+                        y = 1;
+                    this.y.push(y);
+                }
+                this.isPlaUpdated = true;
+            };
+            Criterion.prototype.getScore = function (feature) {
+                if (!this.isPlaUpdated)
+                    throw ('Error: PLA must be updated for criterion ' + this.title + '!');
+                if (this.criteria.length === 0) {
+                    // End point: compute the score for each feature
+                    if (feature.properties.hasOwnProperty(this.label)) {
+                        // The property is available
+                        var x = feature.properties[this.label];
+                        if (this.maxCutoffValue <= x || x <= this.minCutoffValue)
+                            return 0;
+                        if (x < this.x[0])
+                            return this.y[0];
+                        var last = this.x.length - 1;
+                        if (x > this.x[last])
+                            return this.y[last];
+                        for (var k = 0; k < this.x.length; k++) {
+                            if (x < this.x[k]) {
+                                // Found relative position of x in this.x
+                                var x0 = this.x[k - 1];
+                                var x1 = this.x[k];
+                                var y0 = this.y[k - 1];
+                                var y1 = this.y[k];
+                                // Use linear interpolation
+                                return (y1 - y0) * (x - x0) / (x1 - x0);
+                            }
+                        }
+                    }
+                    else {
+                        return 0;
+                    }
+                }
+                else {
+                    // Sum all the sub-criteria.
+                    var finalScore = 0;
+                    this.criteria.forEach(function (crit) {
+                        finalScore += crit.weight > 0 ? crit.weight * crit.getScore(feature) : Math.abs(crit.weight) * (1 - crit.getScore(feature));
+                    });
+                    return this.weight > 0 ? this.weight * finalScore : Math.abs(this.weight) * (1 - finalScore);
+                }
+                return 0;
+            };
+            return Criterion;
+        })();
+        Models.Criterion = Criterion;
+        // NOTE: When extending a base class, make sure that the base class has been defined already.
+        var Mca = (function (_super) {
+            __extends(Mca, _super);
+            function Mca() {
+                _super.call(this);
+                /** Maximum number of star ratings to use to set the weight */
+                this.userWeightMax = 5;
+                /** Applicable feature ids as a string[]. */
+                this.featureIds = [];
+                this.weight = 1;
+                this.isPlaUpdated = false;
+            }
+            Object.defineProperty(Mca.prototype, "rankLabel", {
+                get: function () {
+                    return this.label + '#';
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Mca.prototype.deserialize = function (input) {
+                this.section = input.section;
+                this.stringFormat = input.stringFormat;
+                this.rankTitle = input.rankTitle;
+                this.rankDescription = input.rankDescription;
+                this.rankFormat = input.rankFormat;
+                this.userWeightMax = input.userWeightMax;
+                this.featureIds = input.featureIds;
+                this.minCutoffValue = input.minCutoffValue;
+                this.maxCutoffValue = input.maxCutoffValue;
+                this.minValue = input.minValue;
+                this.maxValue = input.maxValue;
+                this.scaleMinValue = input.scaleMinValue;
+                this.scaleMaxValue = input.scaleMaxValue;
+                _super.prototype.deserialize.call(this, input);
+                return this;
+            };
+            /**
+            * Update the MCA by calculating the weights and setting the colors.
+            */
+            Mca.prototype.update = function () {
+                this.calculateWeights();
+                this.setColors();
+            };
+            Mca.prototype.calculateWeights = function (criteria) {
+                if (!criteria)
+                    criteria = this.criteria;
+                var totalWeight = 0;
+                for (var k in criteria) {
+                    if (!criteria.hasOwnProperty(k))
+                        continue;
+                    var crit = criteria[k];
+                    if (crit.criteria.length > 0)
+                        this.calculateWeights(crit.criteria);
+                    totalWeight += Math.abs(crit.userWeight);
+                }
+                if (totalWeight > 0) {
+                    for (var j in criteria) {
+                        if (!criteria.hasOwnProperty(j))
+                            continue;
+                        var critj = criteria[j];
+                        critj.weight = critj.userWeight / totalWeight;
+                    }
+                }
+            };
+            /** Set the colors of all criteria and sub-criteria */
+            Mca.prototype.setColors = function () {
+                var redColors = chroma.scale('RdYlBu').domain([0, this.criteria.length - 1], this.criteria.length);
+                var totalSubcrit = 0;
+                var i = 0;
+                this.criteria.forEach(function (c) {
+                    totalSubcrit += c.criteria.length;
+                    if (!c.color)
+                        c.color = redColors(i++).hex();
+                });
+                var blueColors = chroma.scale('PRGn').domain([0, totalSubcrit - 1], totalSubcrit);
+                i = 0;
+                this.criteria.forEach(function (c) {
+                    c.criteria.forEach(function (crit) {
+                        if (!crit.color)
+                            crit.color = blueColors(i++).hex();
+                    });
+                });
+            };
+            return Mca;
+        })(Criterion);
+        Models.Mca = Mca;
+    })(Models = _Mca.Models || (_Mca.Models = {}));
+})(Mca || (Mca = {}));
 var Mca;
 (function (Mca) {
     Mca.html = '<div>    <div class="wide-tooltip">        <span class="pull-right fa fa-info-circle fa-2x"              tooltip-html-unsafe="{{\'MCA.DESCRIPTION\' | translate}}"              tooltip-placement="bottom"              tooltip-trigger="mouseenter"              tooltip-append-to-body="false"              style="margin-right: 5px;"></span>        <h4 class="leftpanel-header">MCA</h4>    </div>    <div>        <select data-ng-model="vm.mca"                data-ng-options="mca.title for mca in vm.availableMcas"                data-ng-change="vm.updateMca()"                style="width: 65%; margin-bottom: 10px;"></select>        <div data-ng-if="vm.expertMode" class="pull-right">            <a href="" data-ng-click="vm.createMca()" tooltip="{{\'MCA.ADD_MCA\' | translate}}" style="margin-right:5px;"><i class="fa fa-plus"></i></a>            <a href="" data-ng-click="vm.removeMca(vm.mca)" tooltip="{{\'MCA.DELETE_MCA\' | translate}}" style="margin-right:5px;"><i class="fa fa-trash"></i></a>            <a href="" data-ng-click="vm.editMca(vm.mca)" tooltip="{{\'MCA.EDIT_MCA\' | translate}}" tooltip-placement="right" style="margin-right:5px;"><i class="fa fa-edit"></i></a>        </div>        <a href=""           tooltip="{{\'MCA.TOGGLE_SPARKLINE\' | translate}}"           data-ng-init="sparkLineStyle = vm.showSparkline ? {} : {color:\'lightgray\'}"           data-ng-click="vm.toggleSparkline(); sparkLineStyle = vm.showSparkline ? {} : {color:\'lightgray\'}"           data-ng-style="sparkLineStyle"           class="pull-right" style="margin-right:5px;"><i class="fa fa-bar-chart"></i></a>    </div>        <div data-ng-if="!vm.mca">        <div data-ng-if="vm.expertMode"  translate>MCA.INFO_EXPERT</div>        <div data-ng-if="!vm.expertMode" translate>MCA.INFO</div>    </div>    <div data-ng-if="vm.mca" style="overflow-y: auto; overflow-x: hidden; margin-left: -5px;" resize resize-y="140">        <div data-ng-repeat="criterion in vm.mca.criteria" class="wide-tooltip">            <div data-ng-if="criterion.criteria.length > 0 && criterion.userWeight != 0" class="collapsed pull-left" style="margin: 0 5px 0 0" data-toggle="collapse" data-target="#criterion_{{$index}}"><i class="fa fa-chevron-down togglebutton toggle-arrow-down"></i><i class="fa fa-chevron-up togglebutton toggle-arrow-up"></i></div>            <div data-ng-style="{\'display\': \'inline-block\', \'margin-bottom\': \'6px\', \'width\':\'10px\', \'height\':\'10px\', \'border\':\'solid 1px black\', \'background-color\': criterion.color}"></div>            <div class="truncate" data-ng-class="{true: \'ignoredCriteria\'}[criterion.userWeight == 0]" style="display: inline-block; width: 150px; font-weight: bold">{{criterion.getTitle()}}</div>            <voting class="pull-right"                    data-ng-class="vm.getVotingClass(criterion)"                    data-ng-change="vm.weightUpdated(criterion)"                    min="-vm.mca.userWeightMax"                    max="vm.mca.userWeightMax"                    ng-model="criterion.userWeight"                    style="margin-right: 5px; margin-bottom: 3px;"></voting>            <div id="histogram_{{$index}}" data-ng-show="vm.showSparkline && criterion.criteria.length == 0" style="margin-top: 5px;"></div>            <div data-ng-if="criterion.criteria.length > 0" id="criterion_{{$parent.$index}}" class="collapse out" style="margin-left: 19px">                <div data-ng-repeat="crit in criterion.criteria">                    <div data-ng-style="{\'display\': \'inline-block\', \'margin-bottom\': \'6px\', \'width\':\'10px\', \'height\':\'10px\', \'border\':\'solid 1px black\', \'background-color\': crit.color}"></div>                    <div class="truncate" data-ng-class="{true: \'ignoredCriteria\'}[crit.userWeight == 0 || criterion.userWeight == 0]" style="display: inline-block; width: 150px;">{{crit.getTitle()}}</div>                    <div class="pull-right" style="margin-right: 15px;">{{Math.abs(crit.userWeight)}}</div>                    <voting class="pull-right"                            data-ng-class="vm.getVotingClass(criterion)"                            data-ng-change="vm.weightUpdated(crit)"                            min="0"                            max="vm.mca.userWeightMax"                            ng-model="crit.userWeight"                            style="margin-right: 5px;"></voting>                    <div id="histogram_{{$parent.$index}}_{{$index}}" data-ng-show="vm.showSparkline" style="margin-top: 5px;"></div>                </div>            </div>        </div>        <!--<a href="" style="display: inline-block; width: 100%; text-transform: uppercase"               data-ng-click="vm.calculateMca()" translate="MCA.COMPUTE_MGS" translate-values="{ mcaTitle: vm.mca.title }"></a>-->        <h4 data-ng-if="vm.showChart">            <a href="" data-ng-click="vm.weightUpdated(vm.mca)" translate="MCA.TOTAL_RESULT"></a>            <a href="" data-ng-if="vm.selectedCriterion">&gt;&nbsp;{{vm.selectedCriterion.title}}</a>        </h4>                <a href="" data-ng-if="vm.showFeature" class="pull-right" data-ng-click="vm.toggleMcaChartType();" style="margin-right: 10px">            <i class="fa" data-ng-class="{true: \'fa-bar-chart\', false: \'fa-pie-chart\'}[vm.showAsterChart]"></i>        </a>        <div style="margin-top: 5px; margin-left: auto; margin-right: auto; width: 95%;" id="mcaChart"></div>        <div data-ng-if="vm.showFeature">            <h4>                <img data-ng-if="vm.featureIcon" data-ng-src="{{vm.featureIcon}}" width="24" height="24" style="margin:0 5px" alt="Icon" />                {{vm.selectedFeature.properties[\'Name\']}}            </h4>            <table class="table table-condensed">                <tr data-ng-repeat="item in vm.properties"                    popover="{{item.description}}"                    popover-placement="right"                    popover-trigger="mouseenter"                    popover-append-to-body="true">                    <td><a class="fa fa-filter makeNarrow" data-ng-if="item.canFilter" data-ng-click="vm.$layerService.setFilter(item)" style="cursor: pointer"></a></td>                    <td><a class="fa fa-eye makeNarrow" data-ng-if="item.canStyle" data-ng-click="vm.setStyle(item)" style="cursor: pointer"></a></td>                    <td>{{item.key}}</td>                    <td class="text-right">{{item.value}}</td>                </tr>            </table>        </div>        <i data-ng-if="!vm.showFeature"><div translate="MCA.SHOW_FEATURE_MSG"></div></i>    </div>    <!--<div rating class="pull-right"             data-ng-style="{\'margin\': \'0 10px\', \'background\':\'rgba(0, 0, 0, 0.1)\', \'border-radius\': \'8px\', \'padding\': \'0 4px\', \'color\': criterion.color}"             ng-model="criterion.userWeight" max="11" readonly="isReadonly"             rating-states="ratingStates"             data-ng-click="vm.weightUpdated(criterion)"             on-hover="hoveringOver(value)" on-leave="overStar = null"></div>--></div>';
@@ -3909,11 +4312,11 @@ var Mca;
             this.properties = [];
             var mi = McaCtrl.createPropertyType(this.mca);
             var displayValue = csComp.Helpers.convertPropertyInfo(mi, feature.properties[mi.label]);
-            this.properties.push(new FeatureProps.CallOutProperty(mi.title, displayValue, mi.label, true, true, feature, false, mi.description, mi));
+            this.properties.push(new FeatureProps.CallOutProperty(mi.title, displayValue, mi.label, true, true, feature, false, false, mi.description, mi));
             if (this.mca.rankTitle) {
                 mi = McaCtrl.createRankPropertyType(this.mca);
                 displayValue = csComp.Helpers.convertPropertyInfo(mi, feature.properties[mi.label]);
-                this.properties.push(new FeatureProps.CallOutProperty(mi.title, displayValue, mi.label, false, false, feature, false, mi.description, mi));
+                this.properties.push(new FeatureProps.CallOutProperty(mi.title, displayValue, mi.label, false, false, feature, false, false, mi.description, mi));
             }
             if (drawCharts)
                 this.drawChart();
@@ -4053,17 +4456,15 @@ var Mca;
             this.showChart = false;
             this.mca = mca;
             this.availableMcas = [];
-            if (this.$layerService.project.mcas != null) {
-                this.$layerService.project.mcas.forEach(function (m) {
-                    m.featureIds.forEach(function (featureId) {
-                        if (_this.availableMcas.indexOf(m) < 0 && _this.$layerService.featureTypes.hasOwnProperty(featureId)) {
-                            _this.availableMcas.push(m);
-                            var featureType = _this.$layerService.featureTypes[featureId];
-                            _this.applyPropertyInfoToCriteria(m, featureType);
-                        }
-                    });
+            this.$layerService.project.mcas.forEach(function (m) {
+                m.featureIds.forEach(function (featureId) {
+                    if (_this.availableMcas.indexOf(m) < 0 && _this.$layerService.featureTypes.hasOwnProperty(featureId)) {
+                        _this.availableMcas.push(m);
+                        var featureType = _this.$layerService.featureTypes[featureId];
+                        _this.applyPropertyInfoToCriteria(m, featureType);
+                    }
                 });
-            }
+            });
             if (mca == null && this.availableMcas.length > 0) {
                 this.mca = this.availableMcas[0];
                 this.updateMca();
@@ -4096,6 +4497,7 @@ var Mca;
                     }
                     feature.properties[mca.label] = score * 100;
                     _this.$layerService.activeMapRenderer.updateFeature(feature);
+                    //this.$layerService.updateFeature(feature);
                 });
                 if (mca.rankTitle) {
                     // Add rank information
@@ -4159,8 +4561,11 @@ var Mca;
             }
             if (forceUpdate || labelIndex < 0) {
                 var pt = McaCtrl.createPropertyType(mca);
-                if (labelIndex < 0)
+                if (labelIndex < 0) {
+                    if (featureType.propertyTypeData === null)
+                        featureType.propertyTypeData = [];
                     featureType.propertyTypeData.push(pt); // NOTE: propertyTypes refers to a new list, so you cannot add to it.
+                }
                 else
                     propertyTypes[labelIndex] = pt; // NOTE: but you should be able to overwrite an existing property.
             }
@@ -4512,345 +4917,6 @@ var McaEditorView;
 (function (McaEditorView) {
     McaEditorView.html = '<div class="modal-content">    <div class="modal-header">        <button type="button" class="close" data-ng-click="vm.cancel()" aria-hidden="true">&times;</button>        <h3 class="modal-title" translate>MCA.EDITOR_TITLE</h3>    </div>    <div class="modal-body container-fluid">        <div class="row-fluid">            <input type="text" class="pull-left" data-ng-model="vm.mcaTitle" style="margin: 0 5px" placeholder="{{ \'MCA.TITLE\' | translate }}" />            <!-- <span><input type="checkbox" data-ng-model="vm.hasRank" style="margin-left: 10px;" /><span translate>MCA.INCLUDE_RANK</span></span>-->            <input type="text" class="pull-left" data-ng-model="vm.rankTitle" style="margin: 0 5px"  placeholder="{{ \'MCA.RANK_TITLE\' | translate }}" />            <input type="text" class="pull-left" data-ng-model="vm.scaleMin" style="width: 100px; margin: 0 5px" placeholder="{{ \'MCA.SCALE_MIN_TITLE\' | translate }}" />            <input type="text" class="pull-left" data-ng-model="vm.scaleMax" style="width: 100px; margin: 0 5px" placeholder="{{ \'MCA.SCALE_MAX_TITLE\' | translate }}" />        </div>        <h4 class="row-fluid" style="margin-top: 5px;" translate>MCA.MAIN_FEATURE</h4>        <select data-ng-model="vm.selectedFeatureType"                data-ng-change="vm.loadPropertyTypes()"                data-ng-options="item as item.name for (key, item) in vm.dataset.featureTypes"                class="form-control row-fluid"></select>        <h4 class="row-fluid" translate>MCA.PROPERTIES</h4>        <ul class="form-group row-fluid" style="margin-top: 1em; margin-left: -2em; overflow-y: auto; overflow-x: hidden;"            resize resize-y="450">            <li ng-repeat="mi in vm.propInfos"                class="row-fluid list-unstyled truncate">                <div style="padding: 5px 0;" class="row-fluid">                    <input type="checkbox" name="vm.selectedTitles[]" value="{{mi.title}}"                           data-ng-checked="mi.isSelected"                           data-ng-click="mi.isSelected = !mi.isSelected">&nbsp;&nbsp;{{mi.title}}                    <div data-ng-if="mi.isSelected" class="pull-right">                        <a href="" class="pull-right"                           style="margin-right: 5px;"                           data-ng-click="vm.toggleItemDetails($index)"><i class="fa fa-2x fa-edit"></i></a>                        <input type="text" class="pull-right"                               style="margin: -2px 5px -2px 0;"                               data-ng-model="mi.category"                               placeholder="{{\'MCA.CATEGORY_MSG\' | translate}}" />                    </div>                    <!--<form data-ng-if="mi.isSelected" name="myForm" style="margin-left: 20px;">                <label id="scoringFunctions" data-ng-repeat="sf in vm.scoringFunctions">                    <input type="radio" data-ng-model="mi.scoringFunctionType" value="{{sf.type}}">                    <a data-ng-href="" data-ng-class="sf.cssClass" data-ng-click="mi.isSelected = !mi.isSelected"></a>                </label>            </form>            <div data-ng-if="mi.scoringFunctionType == 0" style="margin-left: 20px;">                input -> score:&nbsp;<input type="text" data-ng-model="mi.scores" placeholder="[x0,y0 x1,y1 ...]"/>            </div>-->                </div>                <div class="row-fluid" data-ng-show="vm.showItem == {{$index}}" id="scoringFunctions">                    <select class="col-xs-10"                            style="margin-right: 5px; margin-bottom: 5px;"                            data-ng-init="mi.scoringFunctionType = mi.scoringFunctionType || vm.scoringFunctions[0]"                            data-ng-model="mi.scoringFunctionType"                            data-ng-options="sf as sf.title for sf in vm.scoringFunctions"></select>                    <div class="pull-right" data-ng-class="mi.scoringFunctionType.cssClass" style="width: 40px; height: 28px; margin-top: -5px;"></div>                    <div class="row-fluid">                        <input type="text" class="col-xs-3" style="padding: 0;" data-ng-model="mi.minValue" placeholder="{{ \'MCA.MIN_VALUE\' | translate }}" />                        <input type="text" class="col-xs-3" style="padding: 0;" data-ng-model="mi.maxValue" placeholder="{{ \'MCA.MAX_VALUE\' | translate }}" />                        <input type="text" class="col-xs-3" style="padding: 0;" data-ng-model="mi.minCutoffValue" placeholder="{{ \'MCA.MIN_CUTOFF_VALUE\' | translate }}" />                        <input type="text" class="col-xs-3" style="padding: 0;" data-ng-model="mi.maxCutoffValue" placeholder="{{ \'MCA.MAX_CUTOFF_VALUE\' | translate }}" />                    </div>                </div>            </li>        </ul>    </div>    <div class="modal-footer">        <button type="button" class="btn btn-warning" data-ng-click="vm.cancel()" translate>CANCEL_BTN</button>        <button type="button" class="btn btn-primary" data-ng-click="vm.save()" translate>OK_BTN</button>    </div></div>';
 })(McaEditorView || (McaEditorView = {}));
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Mca;
-(function (_Mca) {
-    var Models;
-    (function (Models) {
-        (function (ScoringFunctionType) {
-            ScoringFunctionType[ScoringFunctionType["Manual"] = 0] = "Manual";
-            ScoringFunctionType[ScoringFunctionType["Ascending"] = 1] = "Ascending";
-            ScoringFunctionType[ScoringFunctionType["Descending"] = 2] = "Descending";
-            ScoringFunctionType[ScoringFunctionType["AscendingSigmoid"] = 3] = "AscendingSigmoid";
-            ScoringFunctionType[ScoringFunctionType["DescendingSigmoid"] = 4] = "DescendingSigmoid";
-            ScoringFunctionType[ScoringFunctionType["GaussianPeak"] = 5] = "GaussianPeak";
-            ScoringFunctionType[ScoringFunctionType["GaussianValley"] = 6] = "GaussianValley";
-        })(Models.ScoringFunctionType || (Models.ScoringFunctionType = {}));
-        var ScoringFunctionType = Models.ScoringFunctionType;
-        /**
-        * Scoring function creates a PLA of the scoring algorithm.
-        */
-        var ScoringFunction = (function () {
-            //get img(): string {
-            //    return '/includes/images/plot' + csComp.StringExt.Utils.toUnderscore(ScoringFunctionType[this.type]) + '.png';
-            //}
-            function ScoringFunction(scoringFunctionType) {
-                if (typeof scoringFunctionType != 'undefined' && scoringFunctionType != null)
-                    this.type = scoringFunctionType;
-                this.title = ScoringFunctionType[scoringFunctionType].toString();
-            }
-            Object.defineProperty(ScoringFunction.prototype, "cssClass", {
-                get: function () {
-                    return ScoringFunctionType[this.type].toLowerCase();
-                },
-                enumerable: true,
-                configurable: true
-            });
-            /**
-             * Create a score based on the type, in which x in [0,10] and y in [0.1].
-             * Before applying it, you need to scale the x-axis based on your actual range.
-             * Typically, you would map x=0 to the min(x)+0.1*range(x) and x(10)-0.1*range(x) to max(x),
-             * i.e. x' = ax+b, where a=100/(8r) and b=-100(min+0.1r)/(8r) and r=max-min
-             */
-            ScoringFunction.createScores = function (type) {
-                var scores;
-                switch (type) {
-                    default:
-                    case 1 /* Ascending */:
-                        scores = '[0,0 10,1]';
-                        break;
-                    case 2 /* Descending */:
-                        scores = '[0,1 10,0]';
-                        break;
-                    case 3 /* AscendingSigmoid */:
-                        // http://mathnotepad.com/: f(x) = (3.5+2*atan(x-5))/7
-                        // f([0,1,2,3,4,5,6,7,8,9,10])
-                        // round(100*f([0,1,2,3,4,5,6,7,8,9,10]))/100
-                        // [0.11 0.12 0.14 0.18 0.28 0.5 0.72 0.82 0.86 0.88 0.89]
-                        scores = '[0,0.11 1,0.12 2,0.14 3,0.18 4,0.28 5,0.5 6,0.72 7,0.82 8,0.86 9,0.88 10,0.89]';
-                        break;
-                    case 4 /* DescendingSigmoid */:
-                        // 1-f(x)
-                        scores = '[0,0.89 1,0.88 2,0.86 3,0.82 4,0.72 5,0.5 6,0.28 7,0.18 8,0.14 9,0.12 10,0.11]';
-                        break;
-                    case 5 /* GaussianPeak */:
-                        // h(x)=3*exp(-((x-u)^2)/(2s^2))/(s*sqrt(2pi))
-                        scores = '[0,0 2,0.04 3,0.25 4,0.7 5,1 6,0.7 7,0.25 8,0.04 9,0]';
-                        break;
-                    case 6 /* GaussianValley */:
-                        // 1-h(x)
-                        scores = '[0,1 2,0.96 3,0.75 4,0.3 5,0 6,0.3 7,0.75 8,0.96 9,0]';
-                        break;
-                }
-                return scores;
-            };
-            return ScoringFunction;
-        })();
-        Models.ScoringFunction = ScoringFunction;
-        var ScoringFunctions = (function () {
-            function ScoringFunctions() {
-            }
-            return ScoringFunctions;
-        })();
-        Models.ScoringFunctions = ScoringFunctions;
-        var Criterion = (function () {
-            function Criterion() {
-                /** Specified weight by the user */
-                this.userWeight = 1;
-                this.propValues = [];
-                this.criteria = [];
-                /** Piece-wise linear approximation of the scoring function by a set of x and y points */
-                this.isPlaUpdated = false;
-                /** Piece-wise linear approximation must be scaled:x' = ax+b, where a=100/(8r) and b=-100(min+0.1r)/(8r) and r=max-min */
-                this.isPlaScaled = false;
-                this.x = [];
-                this.y = [];
-            }
-            Criterion.prototype.deserialize = function (input) {
-                var _this = this;
-                this.title = input.title;
-                this.description = input.description;
-                this.label = input.label;
-                this.color = input.color;
-                this.userWeight = input.userWeight;
-                this.weight = input.weight;
-                this.isPlaScaled = input.isPlaScaled;
-                this.scores = input.scores;
-                this.minCutoffValue = input.minCutoffValue;
-                this.maxCutoffValue = input.maxCutoffValue;
-                this.minValue = input.minValue;
-                this.maxValue = input.maxValue;
-                input.criteria.forEach(function (c) {
-                    _this.criteria.push(new Criterion().deserialize(c));
-                });
-                return this;
-            };
-            Criterion.prototype.requiresMinimum = function () {
-                return this.scores && this.scores.indexOf('min') >= 0;
-            };
-            Criterion.prototype.requiresMaximum = function () {
-                return this.scores && this.scores.indexOf('max') >= 0;
-            };
-            Criterion.prototype.getTitle = function () {
-                if (this.title)
-                    return this.title;
-                return this.label;
-            };
-            /**
-             * Update the piecewise linear approximation (PLA) of the scoring (a.k.a. user) function,
-             * which translates a property value to a MCA value in the range [0,1] using all features.
-             */
-            Criterion.prototype.updatePla = function (features) {
-                var _this = this;
-                if (this.isPlaUpdated)
-                    return;
-                if (this.criteria.length > 0) {
-                    this.criteria.forEach(function (c) {
-                        c.updatePla(features);
-                    });
-                    this.isPlaUpdated = true;
-                    return;
-                }
-                // Replace min and max by their values:
-                if (this.scores == null)
-                    return;
-                var scores = this.scores;
-                this.propValues = [];
-                if (this.requiresMaximum() || this.requiresMinimum() || this.isPlaScaled) {
-                    features.forEach(function (feature) {
-                        if (feature.properties.hasOwnProperty(_this.label)) {
-                            // The property is available. I use the '+' to convert the string value to a number. 
-                            var prop = feature.properties[_this.label];
-                            if ($.isNumeric(prop))
-                                _this.propValues.push(prop);
-                        }
-                    });
-                }
-                var max = this.maxValue, min = this.minValue;
-                if (this.isPlaScaled || this.requiresMaximum()) {
-                    max = max || Math.max.apply(null, this.propValues);
-                    scores.replace('max', max.toPrecision(3));
-                }
-                if (this.isPlaScaled || this.requiresMinimum()) {
-                    min = min || Math.min.apply(null, this.propValues);
-                    scores.replace('min', min.toPrecision(3));
-                }
-                if (this.isPlaScaled) {
-                    var stats = csComp.Helpers.standardDeviation(this.propValues);
-                    max = max || Math.min(max, stats.avg + 2 * stats.stdDev);
-                    min = min || Math.max(min, stats.avg - 2 * stats.stdDev);
-                }
-                // Regex to split the scores: [^\d\.]+ and remove empty entries
-                var pla = scores.split(/[^\d\.]+/).filter(function (item) { return item.length > 0; });
-                // Test that we have an equal number of x and y, 
-                var range = max - min, a, b;
-                if (this.minValue != null || this.maxValue != null) {
-                    a = range / 10;
-                    b = min;
-                }
-                else {
-                    a = 0.08 * range, b = min + 0.1 * range;
-                }
-                if (pla.length % 2 !== 0)
-                    throw Error(this.label + ' does not have an even (x,y) pair in scores.');
-                for (var i = 0; i < pla.length / 2; i++) {
-                    var x = parseFloat(pla[2 * i]);
-                    if (this.isPlaScaled) {
-                        // Scale x, i.e. x'=ax+b with x'(0)=min+0.1r and x'(10)=max-0.1r, r=max-min
-                        // min+0.1r=b
-                        // max-0.1r=10a+b=10a+min+0.1r <=> max-min-0.2r=10a <=> 0.8r=10a <=> a=0.08r
-                        x = a * x + b;
-                    }
-                    if (i > 0 && this.x[i - 1] > x)
-                        throw Error(this.label + ': x should increment continuously.');
-                    this.x.push(x);
-                    // Test that y in [0, 1].
-                    var y = parseFloat(pla[2 * i + 1]);
-                    if (y < 0)
-                        y = 0;
-                    else if (y > 1)
-                        y = 1;
-                    this.y.push(y);
-                }
-                this.isPlaUpdated = true;
-            };
-            Criterion.prototype.getScore = function (feature) {
-                if (!this.isPlaUpdated)
-                    throw ('Error: PLA must be updated for criterion ' + this.title + '!');
-                if (this.criteria.length === 0) {
-                    // End point: compute the score for each feature
-                    if (feature.properties.hasOwnProperty(this.label)) {
-                        // The property is available
-                        var x = feature.properties[this.label];
-                        if (this.maxCutoffValue <= x || x <= this.minCutoffValue)
-                            return 0;
-                        if (x < this.x[0])
-                            return this.y[0];
-                        var last = this.x.length - 1;
-                        if (x > this.x[last])
-                            return this.y[last];
-                        for (var k = 0; k < this.x.length; k++) {
-                            if (x < this.x[k]) {
-                                // Found relative position of x in this.x
-                                var x0 = this.x[k - 1];
-                                var x1 = this.x[k];
-                                var y0 = this.y[k - 1];
-                                var y1 = this.y[k];
-                                // Use linear interpolation
-                                return (y1 - y0) * (x - x0) / (x1 - x0);
-                            }
-                        }
-                    }
-                    else {
-                        return 0;
-                    }
-                }
-                else {
-                    // Sum all the sub-criteria.
-                    var finalScore = 0;
-                    this.criteria.forEach(function (crit) {
-                        finalScore += crit.weight > 0 ? crit.weight * crit.getScore(feature) : Math.abs(crit.weight) * (1 - crit.getScore(feature));
-                    });
-                    return this.weight > 0 ? this.weight * finalScore : Math.abs(this.weight) * (1 - finalScore);
-                }
-                return 0;
-            };
-            return Criterion;
-        })();
-        Models.Criterion = Criterion;
-        // NOTE: When extending a base class, make sure that the base class has been defined already.
-        var Mca = (function (_super) {
-            __extends(Mca, _super);
-            function Mca() {
-                _super.call(this);
-                /** Maximum number of star ratings to use to set the weight */
-                this.userWeightMax = 5;
-                /** Applicable feature ids as a string[]. */
-                this.featureIds = [];
-                this.weight = 1;
-                this.isPlaUpdated = false;
-            }
-            Object.defineProperty(Mca.prototype, "rankLabel", {
-                get: function () {
-                    return this.label + '#';
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Mca.prototype.deserialize = function (input) {
-                this.section = input.section;
-                this.stringFormat = input.stringFormat;
-                this.rankTitle = input.rankTitle;
-                this.rankDescription = input.rankDescription;
-                this.rankFormat = input.rankFormat;
-                this.userWeightMax = input.userWeightMax;
-                this.featureIds = input.featureIds;
-                this.minCutoffValue = input.minCutoffValue;
-                this.maxCutoffValue = input.maxCutoffValue;
-                this.minValue = input.minValue;
-                this.maxValue = input.maxValue;
-                this.scaleMinValue = input.scaleMinValue;
-                this.scaleMaxValue = input.scaleMaxValue;
-                _super.prototype.deserialize.call(this, input);
-                return this;
-            };
-            /**
-            * Update the MCA by calculating the weights and setting the colors.
-            */
-            Mca.prototype.update = function () {
-                this.calculateWeights();
-                this.setColors();
-            };
-            Mca.prototype.calculateWeights = function (criteria) {
-                if (!criteria)
-                    criteria = this.criteria;
-                var totalWeight = 0;
-                for (var k in criteria) {
-                    if (!criteria.hasOwnProperty(k))
-                        continue;
-                    var crit = criteria[k];
-                    if (crit.criteria.length > 0)
-                        this.calculateWeights(crit.criteria);
-                    totalWeight += Math.abs(crit.userWeight);
-                }
-                if (totalWeight > 0) {
-                    for (var j in criteria) {
-                        if (!criteria.hasOwnProperty(j))
-                            continue;
-                        var critj = criteria[j];
-                        critj.weight = critj.userWeight / totalWeight;
-                    }
-                }
-            };
-            /** Set the colors of all criteria and sub-criteria */
-            Mca.prototype.setColors = function () {
-                var redColors = chroma.scale('RdYlBu').domain([0, this.criteria.length - 1], this.criteria.length);
-                var totalSubcrit = 0;
-                var i = 0;
-                this.criteria.forEach(function (c) {
-                    totalSubcrit += c.criteria.length;
-                    if (!c.color)
-                        c.color = redColors(i++).hex();
-                });
-                var blueColors = chroma.scale('PRGn').domain([0, totalSubcrit - 1], totalSubcrit);
-                i = 0;
-                this.criteria.forEach(function (c) {
-                    c.criteria.forEach(function (crit) {
-                        if (!crit.color)
-                            crit.color = blueColors(i++).hex();
-                    });
-                });
-            };
-            return Mca;
-        })(Criterion);
-        Models.Mca = Mca;
-    })(Models = _Mca.Models || (_Mca.Models = {}));
-})(Mca || (Mca = {}));
 var OfflineSearch;
 (function (OfflineSearch) {
     OfflineSearch.html = '<form role="search">    <style>        .typeahead-group-header {            margin-left: 10px;            font-weight: bold;            font-size: 120%;        }    </style>    <script type="text/ng-template" id="typeahead-item.html">     <div class="typeahead-group-header" ng-if="match.model.firstInGroup">{{match.model.groupTitle}} >> {{match.model.layerTitle}}</div>     <a>       <span ng-bind-html="match.label.title"></span>     </a>   </script>   <div id="scrollable-dropdown-menu" data-ng-disabled="!vm.isReady" class="form-group has-feedback navbar-right">        <input data-ng-model="vm.searchText"               typeahead="address for address in vm.getLocation($viewValue)"               typeahead-loading="loadingLocations"               typeahead-min-length="3"               typeahead-highlight="true"               typeahead-editable="false"               typeahead-template-url="typeahead-item.html"               typeahead-on-select="vm.onSelect($item, $model, $label)"               id="searchbox"               type="text"               style="width:300px"               class="typeahead form-control">               <!-- placeholder="Zoek in kaartlagen" -->        <!-- <span ng-if="loadingLocations"  id="searchicon" class="fa fa-refresh fa-spin"></span>-->        <span id="searchicon" class="fa fa-search form-control-feedback"></span>    </div></form>';
@@ -6152,6 +6218,7 @@ var csComp;
         /**
          * Load the features as visible on the map, effectively creating a virtual
          * GeoJSON file that represents all visible items.
+         * Also loads the keys into the featuretype's propertyTypeData collection.
          */
         function loadMapLayers(layerService) {
             var data = {
@@ -6173,6 +6240,14 @@ var csComp;
                     if (!featureType.name)
                         featureType.name = f.featureTypeName.replace('_Default', '');
                     data.featureTypes[f.featureTypeName] = featureType;
+                    if (featureType.propertyTypeKeys) {
+                        featureType.propertyTypeData = [];
+                        featureType.propertyTypeKeys.split(';').forEach(function (key) {
+                            if (layerService.propertyTypeData.hasOwnProperty(key)) {
+                                featureType.propertyTypeData.push(layerService.propertyTypeData[key]);
+                            }
+                        });
+                    }
                 }
             });
             return data;
@@ -7331,22 +7406,14 @@ var csComp;
                         // find layer source, and activate layer
                         var layerSource = layer.type.toLowerCase();
                         if (_this.layerSources.hasOwnProperty(layerSource)) {
-                            async.series([
-                                function (cb) {
-                                    // load layer from source
-                                    _this.layerSources[layerSource].addLayer(layer, function (l) {
-                                        _this.activeMapRenderer.addLayer(layer);
-                                    });
-                                    cb(null, null);
-                                },
-                                function (cb) {
-                                    // update sensor data & filters
-                                    _this.updateSensorData();
-                                    _this.$messageBusService.publish('layer', 'activated', layer);
-                                    _this.updateFilters();
-                                    cb(null, null);
-                                }
-                            ]);
+                            // load layer from source
+                            _this.layerSources[layerSource].addLayer(layer, function (l) {
+                                _this.loadedLayers[layer.id] = l;
+                                _this.updateSensorData();
+                                _this.$messageBusService.publish('layer', 'activated', layer);
+                                _this.updateFilters();
+                                _this.activeMapRenderer.addLayer(layer);
+                            });
                         }
                         callback(null, null);
                     },
@@ -7684,19 +7751,20 @@ var csComp;
                 }
             };
             /**
-             * Find a layer with a specific id
+            * Find a loaded layer with a specific id.
+            */
+            LayerService.prototype.findLoadedLayer = function (id) {
+                if (this.loadedLayers.containsKey(id))
+                    return this.loadedLayers[id];
+                return null;
+            };
+            /**
+             * Find a layer with a specific id.
              */
             LayerService.prototype.findLayer = function (id) {
                 if (this.loadedLayers.containsKey(id))
                     return this.loadedLayers[id];
-                return null;
-                //var r: ProjectLayer;
-                //this.project.groups.forEach(g => {
-                //    g.layers.forEach(l => {
-                //        if (l.id === id) r = l;
-                //    });
-                //});
-                //return r;
+                //return null;
                 var r;
                 this.project.groups.forEach(function (g) {
                     g.layers.forEach(function (l) {
