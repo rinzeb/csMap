@@ -136,6 +136,10 @@
             window.console.log("Publish toggle sidebar");
         }
 
+        //public showTable(tableVisible: boolean) {
+        //    this.$mapService.mapVisible = !tableVisible;
+        //}
+
         showTable() {
           this.$mapService.mapVisible = false;
         }
@@ -150,6 +154,7 @@
 
     // Start the application
     angular.module('csWebApp', [
+            'ngSanitize',
             'ui.router',
             'ui.bootstrap',
             'LocalStorageModule',
@@ -171,7 +176,9 @@
             'csWeb.datatable',
             'csWeb.languageSwitch',
             'csWeb.projectSettings',
+            'csWeb.charts',
             'csWeb.expertMode',
+            'csWeb.offlineSearch',
             'ngCookies',
             //'csWeb.charts',
             'csWeb.timeline', 
@@ -179,6 +186,15 @@
         ])
         .config(localStorageServiceProvider => {
             localStorageServiceProvider.prefix = 'csMap';
+        })
+        .config(TimelineServiceProvider => {
+            TimelineServiceProvider.setTimelineOptions({
+                'width': '100%',
+                "eventMargin": 0,
+                "eventMarginAxis": 0,
+                'editable': false,
+                'layout': 'box'
+            });
         })
         .config($translateProvider => {
             // TODO ADD YOUR LOCAL TRANSLATIONS HERE, OR ALTERNATIVELY, CHECK OUT
@@ -260,8 +276,8 @@
         .service('mapService', csComp.Services.MapService)
         .service('layerService', csComp.Services.LayerService)
         .controller('appCtrl', AppCtrl)        
-        .controller('searchCtrl', Search.SearchCtrl)
-        .controller('mcaEditorCtrl', Mca.McaEditorCtrl)
+        //.controller('searchCtrl', Search.SearchCtrl)
+        //.controller('mcaEditorCtrl', Mca.McaEditorCtrl)
         .filter('csmillions', [
             '$filter', '$locale', function(filter, locale) {
                 return function(amount, currencySymbol) {

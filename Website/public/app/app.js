@@ -90,6 +90,9 @@ var App;
             this.$messageBusService.publish("sidebar", "toggle");
             window.console.log("Publish toggle sidebar");
         };
+        //public showTable(tableVisible: boolean) {
+        //    this.$mapService.mapVisible = !tableVisible;
+        //}
         AppCtrl.prototype.showTable = function () {
             this.$mapService.mapVisible = false;
         };
@@ -111,6 +114,7 @@ var App;
     App.AppCtrl = AppCtrl;
     // Start the application
     angular.module('csWebApp', [
+        'ngSanitize',
         'ui.router',
         'ui.bootstrap',
         'LocalStorageModule',
@@ -132,12 +136,22 @@ var App;
         'csWeb.datatable',
         'csWeb.languageSwitch',
         'csWeb.projectSettings',
+        'csWeb.charts',
         'csWeb.expertMode',
+        'csWeb.offlineSearch',
         'ngCookies',
         'csWeb.timeline',
         'csWeb.heatmap'
     ]).config(function (localStorageServiceProvider) {
         localStorageServiceProvider.prefix = 'csMap';
+    }).config(function (TimelineServiceProvider) {
+        TimelineServiceProvider.setTimelineOptions({
+            'width': '100%',
+            "eventMargin": 0,
+            "eventMarginAxis": 0,
+            'editable': false,
+            'layout': 'box'
+        });
     }).config(function ($translateProvider) {
         // TODO ADD YOUR LOCAL TRANSLATIONS HERE, OR ALTERNATIVELY, CHECK OUT
         // http://angular-translate.github.io/docs/#/guide/12_asynchronous-loading
@@ -198,7 +212,7 @@ var App;
             template: "<datatable id='datatable'></datatable>",
             sticky: true
         });
-    }).service('messageBusService', csComp.Services.MessageBusService).service('mapService', csComp.Services.MapService).service('layerService', csComp.Services.LayerService).controller('appCtrl', AppCtrl).controller('searchCtrl', Search.SearchCtrl).controller('mcaEditorCtrl', Mca.McaEditorCtrl).filter('csmillions', [
+    }).service('messageBusService', csComp.Services.MessageBusService).service('mapService', csComp.Services.MapService).service('layerService', csComp.Services.LayerService).controller('appCtrl', AppCtrl).filter('csmillions', [
         '$filter',
         '$locale',
         function (filter, locale) {
@@ -251,4 +265,8 @@ var App;
         };
     });
 })(App || (App = {}));
+<<<<<<< HEAD
 //# sourceMappingURL=app.js.map
+=======
+//# sourceMappingURL=app.js.map
+>>>>>>> upstream/master

@@ -71,7 +71,7 @@ var Search;
         };
         SearchCtrl.prototype.onSelect = function ($item) {
             if ($item.feature) {
-                this.$layerService.selectFeature($item.feature);
+                //this.$layerService.selectFeature($item.feature);
                 this.$mapService.zoomTo($item.feature);
             }
             else {

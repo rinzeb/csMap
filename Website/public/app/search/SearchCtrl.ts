@@ -106,7 +106,7 @@
 
         public onSelect($item: ILookupAddress) {
             if ($item.feature) {
-                this.$layerService.selectFeature($item.feature);
+                //this.$layerService.selectFeature($item.feature);
                 this.$mapService.zoomTo($item.feature);
             } else {
                 this.$mapService.zoomToLocation(new L.LatLng($item.lat, $item.lng), 12);
