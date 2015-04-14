@@ -120,6 +120,37 @@ var csComp;
 (function (csComp) {
     var Services;
     (function (Services) {
+        var SensorSet = (function () {
+            function SensorSet() {
+            }
+            return SensorSet;
+        })();
+        Services.SensorSet = SensorSet;
+        var DataSource = (function () {
+            function DataSource() {
+            }
+            DataSource.LoadData = function (ds, callback) {
+                if (ds.url != null) {
+                    $.getJSON(ds.url, function (temp) {
+                        if (temp != null) {
+                            ds.id = temp.id;
+                            ds.sensors = temp.sensors;
+                            ds.title = temp.title;
+                            callback();
+                        }
+                        //var projects = data;
+                    });
+                }
+            };
+            return DataSource;
+        })();
+        Services.DataSource = DataSource;
+    })(Services = csComp.Services || (csComp.Services = {}));
+})(csComp || (csComp = {}));
+var csComp;
+(function (csComp) {
+    var Services;
+    (function (Services) {
         var Event = (function () {
             function Event() {
                 var _this = this;
@@ -227,6 +258,7 @@ var csComp;
                 this.availableAspects = ['strokeColor', 'fillColor', 'strokeWidth'];
                 this.colorScales = {};
                 this.legends = {};
+                this.fixedColorRange = false;
                 $translate('WHITE_RED').then(function (translation) {
                     _this.colorScales[translation] = ['white', 'red'];
                 });
@@ -262,6 +294,9 @@ var csComp;
                 });
                 $translate('ORANGE_WHITE').then(function (translation) {
                     _this.colorScales[translation] = ['orange', 'white'];
+                });
+                $translate('RED_WHITE_BLUE').then(function (translation) {
+                    _this.colorScales[translation] = ['red', 'white', 'blue'];
                 });
             }
             return GroupStyle;
@@ -858,7 +893,7 @@ var Charts;
 })(Charts || (Charts = {}));
 var Dashboard;
 (function (Dashboard) {
-    Dashboard.html = '<div gridster="gridsterOptions" style="width:1024px; height:100%;pointer-events: none;margin-top:-10px;">    <div  style="position:relative;width:100%; height:100%;pointer-events: none">        <ul style="padding:0;pointer-events: none">            <li gridster-item="widget" ng-repeat="widget in dashboard.widgets" class="widget-parent">                                 <!--<div class="widget-title" ng-click="widget.collapse=!widget.collapse" ><span class="fa fa-area-chart" style="float:left;margin-right:4px"></span>{{widget.title}}</div>-->                <!--<div class="widget-edit" style="z-index: 1000">                    <div ng-show="widget.dashboard.editMode" ng-click="vm.$dashboardService.editWidget(widget)" class="fa fa-pencil widget-button"></div>                    <div ng-hide="widget.collapse" ng-click="widget.collapse=true"  class="fa fa-minus-square-o widget-button"></div>                    <div ng-show="widget.collapse" ng-click="widget.collapse=false"  class="fa fa-plus-square-o widget-button"></div>                    <div ng-show="widget.allowFullscreen" ng-click="vm.popup(widget)"  class="fa fa-square-o widget-button"></div>                </div>-->                    <div class="widget-container" ng-hide="widget.collapse" style="top: 0;position: absolute;width:100%;height:100%;background: white">                        <div id="{{widget.elementId}}" class="box-content" style="width:100%;height:100%">                        </div>                    </div>            </li>        </ul>    </div></div>';
+    Dashboard.html = '<div style="width:100%; height:100%;pointer-events: none;margin-top:-10px;">  <!--gridster="gridsterOptions"-->     <div  style="position:relative;width:100%; height:100%;pointer-events: none">        <ul style="padding:0;pointer-events: none">            <li ng-repeat="widget in dashboard.widgets" class="widget-parent"> <!--gridster-item="widget"-->                                  <!--<div class="widget-title" ng-click="widget.collapse=!widget.collapse" ><span class="fa fa-area-chart" style="float:left;margin-right:4px"></span>{{widget.title}}</div>-->                <!--<div class="widget-edit" style="z-index: 1000">                    <div ng-show="widget.dashboard.editMode" ng-click="vm.$dashboardService.editWidget(widget)" class="fa fa-pencil widget-button"></div>                    <div ng-hide="widget.collapse" ng-click="widget.collapse=true"  class="fa fa-minus-square-o widget-button"></div>                    <div ng-show="widget.collapse" ng-click="widget.collapse=false"  class="fa fa-plus-square-o widget-button"></div>                    <div ng-show="widget.allowFullscreen" ng-click="vm.popup(widget)"  class="fa fa-square-o widget-button"></div>                </div>-->                      <div class="widget-container" ng-hide="widget.collapse" style="top: {{widget.top}};bottom: {{widget.bottom}};left:{{widget.left}};right:{{widget.right}};position: absolute;width:{{widget.width}};height:{{widget.height}};background: white">                        <div id="{{widget.elementId}}" class="box-content" style="width:100%;height:100%">                        </div>                    </div>            </li>        </ul>    </div></div>';
 })(Dashboard || (Dashboard = {}));
 var Dashboard;
 (function (Dashboard) {
@@ -923,26 +958,26 @@ var Dashboard;
             this.$messageBusService = $messageBusService;
             this.$templateCache = $templateCache;
             $scope.vm = this;
-            $scope.gridsterOptions = {
-                margins: [10, 10],
-                columns: 20,
-                rows: 20,
-                draggable: {
-                    enabled: true
-                },
-                resizable: {
-                    enabled: true,
-                    start: function (event, uiWidget, $element) {
-                        $element.resize("start", uiWidget.width(), uiWidget.height());
-                    },
-                    stop: function (event, uiWidget, $element) {
-                        $element.resize("stop", uiWidget.width(), uiWidget.height());
-                    },
-                    resize: function (event, uiWidget, $element) {
-                        $element.resize("change", uiWidget.width(), uiWidget.height());
-                    }
-                }
-            };
+            //$scope.gridsterOptions = {
+            //    margins: [10, 10],
+            //    columns: 20,
+            //    rows: 20,
+            //    draggable: {
+            //        enabled:true
+            //    },
+            //    resizable: {
+            //        enabled: true,
+            //        start: (event, uiWidget, $element: csComp.Services.IWidget) => {
+            //            $element.resize("start", uiWidget.width(), uiWidget.height());
+            //        },
+            //        stop: (event, uiWidget, $element: csComp.Services.IWidget) => {
+            //            $element.resize("stop", uiWidget.width(), uiWidget.height());
+            //        }, 
+            //        resize: (event, uiWidget, $element: csComp.Services.IWidget) => {
+            //            $element.resize("change", uiWidget.width(),uiWidget.height());
+            //        }
+            //    }
+            //};
             $scope.initDashboard = function () {
                 $messageBusService.subscribe("dashboard-" + $scope.container, function (s, d) {
                     _this.project = $layerService.project;
@@ -969,7 +1004,7 @@ var Dashboard;
             //var newElement = this.$compile("<" + w.directive + " widget=" + w + "></" + w.directive + ">")(this.$scope);
             var widgetElement;
             var newScope = this.$scope;
-            newScope.data = "test";
+            newScope.widget = w;
             if (w.template) {
                 widgetElement = this.$compile(this.$templateCache.get(w.template))(newScope);
             }
@@ -978,7 +1013,7 @@ var Dashboard;
             }
             else if (w.directive) {
                 //var newScope : ng.IScope;
-                widgetElement = this.$compile("<" + w.directive + " widget=" + w + "></" + w.directive + ">")(newScope);
+                widgetElement = this.$compile("<" + w.directive + "></" + w.directive + ">")(newScope);
             }
             else {
                 widgetElement = this.$compile("<h1>hoi</h1>")(this.$scope);
@@ -1019,7 +1054,7 @@ var Dashboard;
                             l.enabled = false;
                         }
                         if (!l.enabled && db.visiblelayers.indexOf(l.reference) >= 0) {
-                            _this.$layerService.activeMapRenderer.addLayer(l);
+                            _this.$layerService.addLayer(l);
                             l.enabled = true;
                         }
                     });
@@ -1662,7 +1697,7 @@ var DataTable;
 })(DataTable || (DataTable = {}));
 var ExpertMode;
 (function (ExpertMode) {
-    ExpertMode.html = '<div class="navbar-collapse collapse"     tooltip-html-unsafe="{{\'EXPERTMODE.EXPLANATION\' | translate}}"     tooltip-placement="left"     tooltip-trigger="mouseenter"     tooltip-append-to-body="false">    <ul class="nav navbar-nav">        <li class="dropdown">            <a href=""               class="navbar-brand dropdown-toggle pull-left"               data-toggle="dropdown"               style="color:white; margin-left:-10px;">                <div class="circle"><span data-ng-class="vm.getCssClass()" style="width: 32px; height: 32px"></span></div>            </a>            <ul class="dropdown-menu" role="menu">                <li>                    <a data-ng-click="vm.setExpertMode(1)">                        <span class="beginnerUserIcon" style="margin-left: -10px; width: 40px; height: 32px"></span>                        <div translate>EXPERTMODE.BEGINNER</div>                    </a>                </li>                <li>                    <a data-ng-click="vm.setExpertMode(2)">                        <span class="intermediateUserIcon" style="margin-left: -10px; width: 40px; height: 32px"></span>                        <div translate>EXPERTMODE.INTERMEDIATE</div>                    </a>                </li>                <li>                    <a data-ng-click="vm.setExpertMode(3)">                        <span class="expertUserIcon" style="margin-left: -10px; width: 40px; height: 32px"></span>                        <div translate>EXPERTMODE.EXPERT</div>                    </a>                </li>            </ul>        </li>    </ul></div>';
+    ExpertMode.html = '<div class="navbar-collapse collapse"     tooltip-html-unsafe="{{\'EXPERTMODE.EXPLANATION\' | translate}}"     tooltip-placement="left"     tooltip-trigger="mouseenter"     tooltip-append-to-body="false">    <ul class="nav navbar-nav">        <li class="dropdown" style="margin-top:-15px">            <a href=""               class="navbar-brand dropdown-toggle pull-left"               data-toggle="dropdown"               style="color:white; margin-left:-10px;">                <div class="circle"><span data-ng-class="vm.getCssClass()" style="width: 32px; height: 32px"></span></div>            </a>            <ul class="dropdown-menu" role="menu">                <li>                    <a data-ng-click="vm.setExpertMode(1)">                        <span class="beginnerUserIcon" style="margin-left: -10px; width: 40px; height: 32px"></span>                        <div translate>EXPERTMODE.BEGINNER</div>                    </a>                </li>                <li>                    <a data-ng-click="vm.setExpertMode(2)">                        <span class="intermediateUserIcon" style="margin-left: -10px; width: 40px; height: 32px"></span>                        <div translate>EXPERTMODE.INTERMEDIATE</div>                    </a>                </li>                <li>                    <a data-ng-click="vm.setExpertMode(3)">                        <span class="expertUserIcon" style="margin-left: -10px; width: 40px; height: 32px"></span>                        <div translate>EXPERTMODE.EXPERT</div>                    </a>                </li>            </ul>        </li>    </ul></div>';
 })(ExpertMode || (ExpertMode = {}));
 var ExpertMode;
 (function (ExpertMode) {
@@ -2534,7 +2569,7 @@ var FilterList;
 })(FilterList || (FilterList = {}));
 var Heatmap;
 (function (Heatmap) {
-    Heatmap.html = '<div>    <div class="wide-tooltip">        <span class="pull-right fa fa-info-circle fa-2x"              tooltip-html-unsafe="{{\'HEATMAP.DESCRIPTION\' | translate}}"              tooltip-placement="bottom"              tooltip-trigger="mouseenter"              tooltip-append-to-body="false"              style="margin-right: 5px;"></span>        <h4 class="leftpanel-header" translate>HEATMAP</h4>    </div>    <div>        <select data-ng-model="vm.heatmapModel"                data-ng-options="heatmap.title for heatmap in vm.heatmapModels"                data-ng-change="vm.updateHeatmap()"                style="width: 65%; margin-bottom: 10px;"></select>        <div data-ng-if="vm.expertMode" class="pull-right">            <a href="" data-ng-click="vm.createHeatmap()" tooltip="{{\'HEATMAP.ADD_HEATMAP\' | translate}}" style="margin-right:5px;"><i class="fa fa-plus"></i></a>            <a href="" data-ng-click="vm.removeHeatmap(vm.heatmapModel)" tooltip="{{\'HEATMAP.DELETE_HEATMAP\' | translate}}" style="margin-right:5px;"><i class="fa fa-trash"></i></a>            <a href="" data-ng-click="vm.editHeatmap(vm.heatmapModel)" tooltip="{{\'HEATMAP.EDIT_HEATMAP\' | translate}}" tooltip-placement="right" style="margin-right:5px;"><i class="fa fa-edit"></i></a>        </div>    </div>        <div data-ng-if="vm.heatmapModel" style="margin-bottom: 20px; margin-left: -5px">            <div style="display: inline; font-weight: bold" translate>HEATMAP.INTENSITY_SCALE</div>            <voting class="pull-right"                    data-ng-change="vm.intensityScaleUpdated()"                    min="0"                    max="5"                    ng-model="vm.heatmapModel.intensityScale"                    style="margin-bottom: 3px; margin-right: 5px"></voting>        </div>    <div data-ng-if="vm.heatmapModel" style="overflow-y: auto; overflow-x: hidden; margin-left: -5px;" resize resize-y="140">        <div data-ng-repeat="hi in vm.heatmapModel.heatmapItems" class="wide-tooltip">            <div data-ng-if="hi.isSelected">                <div class="truncate" data-ng-class="{true: \'ignoredCriteria\'}[hi.userWeight == 0]" style="display: inline-block; width: 180px; font-weight: bold">{{hi.toString()}}</div>                <voting class="pull-right"                        data-ng-class="vm.getVotingClass(hi)"                        data-ng-change="vm.weightUpdated()"                        min="-5"                        max="5"                        ng-model="hi.userWeight"                        style="margin-right: 5px; margin-bottom: 3px;"></voting>            </div>        </div>    </div>    <div data-ng-if="!vm.heatmapModel">        <div data-ng-if="vm.expertMode" translate>HEATMAP.INFO_EXPERT</div>        <div data-ng-if="!vm.expertMode" translate>HEATMAP.INFO</div>    </div></div>';
+    Heatmap.html = '<div>    <div class="wide-tooltip">        <span class="pull-right fa fa-info-circle fa-2x"              tooltip-html-unsafe="{{\'HEATMAP.DESCRIPTION\' | translate}}"              tooltip-placement="bottom"              tooltip-trigger="mouseenter"              tooltip-append-to-body="false"              style="margin-right: 5px;"></span>        <h4 class="leftpanel-header" translate>HEATMAP</h4>    </div>    <div>        <select data-ng-model="vm.heatmapModel"                data-ng-options="heatmap.title for heatmap in vm.heatmapModels"                data-ng-change="vm.updateHeatmap()"                style="width: 65%; margin-bottom: 10px;"></select>        <div data-ng-if="vm.expertMode" class="pull-right">            <a href="" data-ng-click="vm.createHeatmap()" tooltip="{{\'HEATMAP.ADD_HEATMAP\' | translate}}" style="margin-right:5px;"><i class="fa fa-plus"></i></a>            <a href="" data-ng-click="vm.removeHeatmap(vm.heatmapModel)" tooltip="{{\'HEATMAP.DELETE_HEATMAP\' | translate}}" style="margin-right:5px;"><i class="fa fa-trash"></i></a>            <a href="" data-ng-click="vm.editHeatmap(vm.heatmapModel)" tooltip="{{\'HEATMAP.EDIT_HEATMAP\' | translate}}" style="margin-right:5px;"><i class="fa fa-edit"></i></a>            <a href="" data-ng-click="vm.exportHeatmap(vm.heatmapModel)" tooltip="{{\'HEATMAP.EXPORT_HEATMAP\' | translate}}" tooltip-placement="right" style="margin-right:5px;"><i class="fa fa-download"></i></a>        </div>    </div>        <div data-ng-if="vm.heatmapModel" style="margin-bottom: 20px; margin-left: -5px">            <div style="display: inline; font-weight: bold" translate>HEATMAP.INTENSITY_SCALE</div>            <voting class="pull-right"                    data-ng-change="vm.intensityScaleUpdated()"                    min="1"                    max="5"                    ng-model="vm.heatmapModel.heatmapSettings.intensityScale"                    style="margin-bottom: 3px; margin-right: 5px"></voting>        </div>    <div data-ng-if="vm.heatmapModel" style="overflow-y: auto; overflow-x: hidden; margin-left: -5px;" resize resize-y="140">        <div data-ng-repeat="hi in vm.heatmapModel.heatmapItems" class="wide-tooltip">            <div data-ng-if="hi.isSelected">                <div class="truncate" data-ng-class="{true: \'ignoredCriteria\'}[hi.userWeight == 0]" style="display: inline-block; width: 180px; font-weight: bold">{{hi.toString()}}</div>                <voting class="pull-right"                        data-ng-class="vm.getVotingClass(hi)"                        data-ng-change="vm.weightUpdated()"                        min="-5"                        max="5"                        ng-model="hi.userWeight"                        style="margin-right: 5px; margin-bottom: 3px;"></voting>            </div>        </div>    </div>    <div data-ng-if="!vm.heatmapModel">        <div data-ng-if="vm.expertMode" translate>HEATMAP.INFO_EXPERT</div>        <div data-ng-if="!vm.expertMode" translate>HEATMAP.INFO</div>    </div></div>';
 })(Heatmap || (Heatmap = {}));
 var Heatmap;
 (function (Heatmap) {
@@ -2586,6 +2621,7 @@ var Heatmap;
     'use strict';
     var HeatmapCtrl = (function () {
         function HeatmapCtrl($scope, $modal, $translate, $timeout, $localStorageService, $layerService, $mapService, messageBusService) {
+            var _this = this;
             this.$scope = $scope;
             this.$modal = $modal;
             this.$translate = $translate;
@@ -2594,19 +2630,34 @@ var Heatmap;
             this.$layerService = $layerService;
             this.$mapService = $mapService;
             this.messageBusService = messageBusService;
+            this.heatmap = L.geoJson([]);
             this.heatmapModels = [];
             this.expertMode = true;
+            this.moveListenerInitialized = false;
+            this.projLayer = new csComp.Services.ProjectLayer();
             $scope.vm = this;
-            messageBusService.subscribe('layer', function (title) {
+            messageBusService.subscribe('layer', function (title, layer) {
                 switch (title) {
                     case 'deactivate':
+                        /* For an explanation to the removing of layers, see the bottom of this file */
+                        if (layer.type && layer.type === "Heatmap" && layer.id === _this.projLayer.id && layer != _this.projLayer) {
+                            _this.$layerService.removeLayer(_this.projLayer);
+                            delete (_this.heatmapModel);
+                            _this.initializeHeatmap();
+                        }
+                        break;
                     case 'activated':
+                        if (layer.type && layer.type === "Heatmap")
+                            _this.updateAvailableHeatmaps();
                         break;
                 }
             });
             messageBusService.subscribe('project', function (title) {
                 switch (title) {
                     case 'loaded':
+                        _this.expertMode = $layerService.project != null && $layerService.project.hasOwnProperty('userPrivileges') && $layerService.project.userPrivileges.hasOwnProperty('heatmap') && $layerService.project.userPrivileges.heatmap.hasOwnProperty('expertMode') && $layerService.project.userPrivileges.heatmap.expertMode;
+                        _this.updateAvailableHeatmaps();
+                        _this.initializeHeatmap();
                         break;
                 }
             });
@@ -2617,14 +2668,80 @@ var Heatmap;
             $translate('HEATMAP.DELETE_MSG2').then(function (translation) {
                 HeatmapCtrl.confirmationMsg2 = translation;
             });
-            this.initializeHeatmap();
         }
+        HeatmapCtrl.prototype.updateAvailableHeatmaps = function () {
+            var _this = this;
+            if (!this.heatmapModel) {
+                this.heatmapModels = [];
+                if (this.$layerService.project.groups) {
+                    this.$layerService.project.groups.forEach(function (group) {
+                        group.layers.forEach(function (layer) {
+                            if (layer.type === "Heatmap") {
+                                var hm = new Heatmap.HeatmapModel(layer.title);
+                                hm.deserialize(layer);
+                                _this.heatmapModels.push(hm);
+                                if (layer.enabled)
+                                    _this.heatmapModel = hm;
+                            }
+                        });
+                    });
+                }
+            }
+            else {
+                for (var index = 0; index < this.heatmapModels.length; index++) {
+                    if (this.heatmapModel.id == this.heatmapModels[index].id) {
+                        this.heatmapModels.splice(index, 1);
+                        break;
+                    }
+                }
+                this.heatmapModels.push(this.heatmapModel);
+            }
+        };
         HeatmapCtrl.prototype.createHeatmap = function () {
-            var heatmap = new Heatmap.HeatmapModel('Heatmap');
-            this.showHeatmapEditor(heatmap);
+            this.heatmapModel = new Heatmap.HeatmapModel('Heatmap');
+            if (this.projLayer.data)
+                this.$layerService.removeLayer(this.projLayer);
+            //Create projectlayer for the heatmap
+            this.projLayer.type = "Heatmap";
+            this.projLayer.layerRenderer = "heatmap";
+            this.projLayer.enabled = true;
+            this.projLayer.group = new csComp.Services.ProjectGroup();
+            this.projLayer.group.oneLayerActive = true;
+            this.projLayer.group.layers = [];
+            this.projLayer.group.filters = [];
+            this.projLayer.group.styles = [];
+            this.projLayer.group.markers = [];
+            this.projLayer.heatmapSettings = new Heatmap.HeatmapSettings();
+            this.projLayer.heatmapItems = [];
+            this.projLayer.id = csComp.Helpers.getGuid();
+            this.heatmap = L.geoJson([]);
+            this.showHeatmapEditor(this.heatmapModel);
+            //this.$layerService.addLayer(this.projLayer);
         };
         HeatmapCtrl.prototype.editHeatmap = function (heatmap) {
             this.showHeatmapEditor(heatmap);
+        };
+        HeatmapCtrl.prototype.exportHeatmap = function (heatmap) {
+            var _this = this;
+            /* Add active feature layer reference to the referencelist (TODO: find reference layer through enabled features) */
+            this.heatmapModel.heatmapSettings.referenceList = [];
+            this.heatmapModel.heatmapItems.forEach(function (hi) {
+                if (hi.isSelected) {
+                    _this.$layerService.project.groups.forEach(function (group) {
+                        if (group.title == "Features") {
+                            group.layers.forEach(function (l) {
+                                if (l.enabled) {
+                                    _this.heatmapModel.heatmapSettings.referenceList.push(l.reference);
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+            /* Print the heatmap settings to the console in json format */
+            console.log("\n-----------------\n" + "Exported heatmap starts here: \n");
+            console.log("{\"id\": \"ID\",\n" + "\"reference\": \"REFERENCE\",\n" + "\"languages\": {\n" + "\"nl\": {\"title\": \"TITLE\",\n\"description\": \"BESCHRIJVING\"\n},\n" + "\"en\": {\"title\": \"TITLE\",\n\"description\": \"DESCRIPTION\"\n}\n" + "},\n" + "\"description\": \"DESCRIPTION\",\n" + heatmap.serialize());
+            console.log("\n-----------------\n" + "Exported heatmap ends here. \n");
         };
         HeatmapCtrl.prototype.removeHeatmap = function (heatmap) {
             var _this = this;
@@ -2636,27 +2753,35 @@ var Heatmap;
                     return;
                 _this.$timeout(function () {
                     _this.deleteHeatmap(heatmap);
-                    if (_this.heatmap)
-                        _this.updateHeatmap();
+                    _this.updateAvailableHeatmaps();
+                    //if (this.heatmap) this.updateHeatmap();
                     //if (this.heatmap) this.$mapService.map.removeLayer(this.heatmap);
                 }, 0);
             });
             this.scopeApply();
         };
         HeatmapCtrl.prototype.deleteHeatmap = function (heatmap) {
+            var _this = this;
             if (!heatmap)
                 return;
             var index = this.heatmapModels.indexOf(heatmap);
             if (index >= 0)
                 this.heatmapModels.splice(index, 1);
-            this.$mapService.map.removeLayer(this.heatmap);
-            //var mcaIndex = this.getMcaIndex(mca);
-            //if (mcaIndex < 0) return;
-            //var mcas = this.$layerService.project.mcas;
-            //if (mcaIndex >= 0)
-            //    mcas.splice(mcaIndex, 1);
-            //this.removeMcaFromLocalStorage(mca);
-            //this.updateAvailableMcas();
+            this.$layerService.removeLayer(this.projLayer);
+            // If the current heatmaplayer was a projectlayer, disable that one too
+            if (this.$layerService.project.groups) {
+                this.$layerService.project.groups.forEach(function (group) {
+                    group.layers.forEach(function (layer) {
+                        if (layer.type === "Heatmap" && layer.id === _this.projLayer.id) {
+                            _this.$layerService.removeLayer(layer);
+                        }
+                    });
+                });
+            }
+            delete (this.heatmapModel);
+            delete (this.projLayer);
+            this.projLayer = new csComp.Services.ProjectLayer();
+            this.initializeHeatmap();
         };
         /**
          * Show the heat map editor in a modal.
@@ -2679,7 +2804,8 @@ var Heatmap;
                 _this.updateHeatmap();
                 console.log('Updated heatmap');
             }, function () {
-                //console.log('Modal dismissed at: ' + new Date());
+                console.log('Modal dismissed at: ' + new Date());
+                delete (_this.heatmapModel);
             });
         };
         HeatmapCtrl.prototype.scopeApply = function () {
@@ -2695,27 +2821,45 @@ var Heatmap;
         HeatmapCtrl.prototype.weightUpdated = function () {
             if (!this.heatmapModel)
                 return;
+            this.heatmapModel.updateWeights();
             this.updateHeatmap();
         };
         HeatmapCtrl.prototype.intensityScaleUpdated = function () {
             if (!this.heatmapModel)
                 return;
-            this.heatmapModel.updateIntensityScale();
+            //this.heatmapModel.updateWeights();
             this.updateHeatmap();
         };
         /**
          * Update the available pre-set heatmaps.
          */
         HeatmapCtrl.prototype.updateHeatmap = function () {
+            var _this = this;
             if (this.heatmapModel) {
+                // If the current heatmapmodel comes from a projectlayer, disable that layer
+                if (this.$layerService.project.groups) {
+                    this.$layerService.project.groups.forEach(function (group) {
+                        group.layers.forEach(function (layer) {
+                            if (layer.type === "Heatmap" && layer.id === _this.heatmapModel.id && layer.mapLayer) {
+                                _this.$layerService.map.map.removeLayer(layer.mapLayer);
+                                layer.enabled = true;
+                            }
+                        });
+                    });
+                }
+                this.projLayer.heatmapItems = this.heatmapModel.heatmapItems;
+                this.projLayer.heatmapSettings = this.heatmapModel.heatmapSettings;
+                this.projLayer.id = this.heatmapModel.id;
                 var currentZoom = this.$mapService.getMap().getZoom();
-                if (currentZoom >= this.heatmapModel.scaleMinValue && currentZoom <= this.heatmapModel.scaleMaxValue) {
-                    this.heatmapModel.updateWeights();
-                    this.heatmapModel.calculate(this.$layerService, this.$mapService, this.heatmap);
+                if (currentZoom < this.heatmapModel.heatmapSettings.minZoom || currentZoom > this.heatmapModel.heatmapSettings.maxZoom) {
+                    console.log("Heatmap is not supported for the current zoom level.");
+                    this.$layerService.loadRequiredLayers(this.projLayer); // Make sure to load the required layers even if heatmap is not yet being drawn
+                    return;
                 }
                 else {
-                    console.log("Heatmap is not supported for the current zoom level.");
                 }
+                this.$layerService.removeLayer(this.projLayer);
+                this.$layerService.addLayer(this.projLayer);
             }
         };
         ///**
@@ -2723,51 +2867,28 @@ var Heatmap;
         //*/
         HeatmapCtrl.prototype.initializeHeatmap = function () {
             var _this = this;
-            this.heatmap = L.geoJson([], {
-                style: function (feature) {
-                    if (feature.properties.intensity <= 0) {
-                        var hexString = Heatmap.HeatmapCtrl.intensityToHex(feature.properties.intensity);
-                        return { color: "#FF" + hexString + hexString };
-                    }
-                    else if (feature.properties.intensity > 0) {
-                        var hexString = Heatmap.HeatmapCtrl.intensityToHex(feature.properties.intensity);
-                        return { color: "#" + hexString + hexString + "FF" };
-                    }
-                    else {
-                        return { color: "#ffffff" };
-                    }
-                    //if (feature.properties.intensity < -0.10) {
-                    //    return { color: "#ff0000" };
-                    //} else if (feature.properties.intensity < 0.10) {
-                    //    return { color: "#ffffff" };
-                    //} else {
-                    //    return { color: "#0000ff" };
-                    //}
-                }
-            });
-            this.$mapService.map.setView(new L.LatLng(52.1095, 4.3275), 14);
-            this.$mapService.map.addLayer(this.heatmap);
-            //TODO: remove when deleting heatmap layer
-            this.$mapService.getMap().on('moveend', function () {
-                _this.updateHeatmap();
-            });
+            this.projLayer.type = "Heatmap";
+            this.projLayer.layerRenderer = "heatmap";
+            this.projLayer.enabled = false;
+            this.projLayer.group = new csComp.Services.ProjectGroup();
+            this.projLayer.group.oneLayerActive = true;
+            this.projLayer.group.layers = [];
+            this.projLayer.group.filters = [];
+            this.projLayer.group.styles = [];
+            this.projLayer.group.markers = [];
+            this.projLayer.mapLayer = new L.LayerGroup();
+            this.projLayer.heatmapSettings = new Heatmap.HeatmapSettings();
+            this.projLayer.heatmapItems = [];
+            this.projLayer.data = JSON;
+            this.projLayer.id = "";
+            if (!this.moveListenerInitialized) {
+                this.$layerService.map.map.addEventListener('moveend', function (event) {
+                    _this.updateHeatmap();
+                });
+                this.moveListenerInitialized = true;
+            }
         };
-        HeatmapCtrl.intensityToHex = function (intensity) {
-            var decreaseOverlap = 20;
-            intensity = Math.floor(Math.abs(intensity) * 255);
-            if (intensity < 0) {
-                intensity = 0;
-            }
-            else if (intensity > 255 - decreaseOverlap) {
-                intensity = 255 - decreaseOverlap;
-            }
-            var hexString = (255 - decreaseOverlap - intensity).toString(16);
-            if (hexString.length == 1) {
-                hexString = "0" + hexString;
-            }
-            return hexString;
-        };
-        HeatmapCtrl.MAX_HEATMAP_CELLS = 2500;
+        HeatmapCtrl.MAX_HEATMAP_CELLS = 4000;
         HeatmapCtrl.$inject = [
             '$scope',
             '$modal',
@@ -2782,6 +2903,17 @@ var Heatmap;
     })();
     Heatmap.HeatmapCtrl = HeatmapCtrl;
 })(Heatmap || (Heatmap = {}));
+/* Heatmap layers:
+ * ---------------
+ * Two layers are used for the heatmaps, which are both very similar but different in an important way. The difference
+ * lies in the fact that one layer comes directly from the project.json file. This layer is parsed and added to the layerservice
+ * directly when it is enabled in the 'Layers' panel. The second layer is 'this.projLayer', which looks almost identical to
+ * the parsed projectLayer, but it is generated programmatically. When a new heatmap is created, or a predefined heatmap is edited,
+ * this.projLayer will be added to the layerservice. Very importantly, the MoveListener is connected to this.projLayer. That means
+ * that every time the map is moved, 'this.projLayer' will contain the current heatmap, even when it was added from project.json.
+ * Therefore, when one layer is being disabled, it needs to be checked whether the other layer is present in the layerservice,
+ * and if so, it should be removed too.
+ */
 var Heatmap;
 (function (Heatmap) {
     'use strict';
@@ -2809,7 +2941,7 @@ var Heatmap;
                     heatmap.addHeatmapItem(new Heatmap.HeatmapItem(ft.name, ft));
                     var propertyTypeData;
                     if (!ft.propertyTypeData)
-                        return;
+                        continue;
                     ft.propertyTypeData.forEach(function (pt) {
                         if (pt.type == 'options') {
                             var i = 0;
@@ -2849,50 +2981,42 @@ var Heatmap;
 })(Heatmap || (Heatmap = {}));
 var HeatmapEditorView;
 (function (HeatmapEditorView) {
-    HeatmapEditorView.html = '<div class="modal-content">    <div class="modal-header">        <button type="button" class="close" data-ng-click="vm.cancel()" aria-hidden="true">&times;</button>        <h3 class="modal-title" translate>HEATMAP.EDITOR_TITLE</h3>    </div>    <div class="modal-body container-fluid">        <div class="row-fluid">            <input type="text" data-ng-model="vm.heatmap.title" style="margin: 0 5px" placeholder="{{ \'HEATMAP.TITLE\' | translate }}" />        </div>        <h4 class="row-fluid" style="margin-top: 20px;" translate>HEATMAP.MAIN_FEATURE</h4>        <!--<select data-ng-model="vm.selectedFeatureType"                data-ng-change="vm.loadPropertyTypes()"                data-ng-options="item as item.name for (key, item) in vm.dataset.featureTypes"                class="form-control row-fluid"></select>        <h4 class="row-fluid" translate>HEATMAP.PROPERTIES</h4>-->        <ul class="form-group row-fluid" style="margin-top: 1em; margin-left: -2em; overflow-y: auto; overflow-x: hidden;"            resize resize-y="450">            <li ng-repeat="hi in vm.heatmap.heatmapItems"                class="row-fluid list-unstyled truncate">                <div style="padding: 5px 0;" class="row-fluid"><!--                    name="vm.selectedTitles[]" value="{{hi.title}}"-->                    <input type="checkbox"                           data-ng-checked="hi.isSelected"                           data-ng-click="hi.isSelected = !hi.isSelected">&nbsp;&nbsp;{{hi.title}}                    <div data-ng-if="hi.isSelected" class="pull-right">                        <a href="" class="pull-right"                           style="margin-right: 5px;"                           data-ng-click="vm.toggleItemDetails($index)"><i class="fa fa-2x fa-edit"></i></a>                    </div>                </div>                <div class="row-fluid" data-ng-show="vm.showItem == {{$index}}" id="scoringFunction">                    <select class="col-xs-10"                            style="margin-right: 5px; margin-bottom: 5px;"                            data-ng-init="hi.scoringFunctionType = hi.scoringFunctionType || vm.scoringFunctions[0]"                            data-ng-model="hi.scoringFunctionType"                            data-ng-options="sf as sf.title for sf in vm.scoringFunctions"></select>                    <div class="pull-right" data-ng-class="hi.scoringFunctionType.cssClass" style="width: 40px; height: 28px; margin-top: -5px;"></div>                    <div class="row-fluid" >                        <input type="text" class="col-xs-3" style="padding: 0; margin-right: 5px;" data-ng-model="hi.idealityMeasure.atLocation" placeholder="{{ \'HEATMAP.AT_LOCATION_VALUE\' | translate }}" />                        <input type="text" class="col-xs-3" style="padding: 0; margin-right: 5px;" data-ng-model="hi.idealityMeasure.idealDistance" placeholder="{{ \'HEATMAP.DISTANCE_MAX_VALUE\' | translate }}" />                        <input type="text" class="col-xs-3" style="padding: 0;" data-ng-model="hi.idealityMeasure.lostInterestDistance" placeholder="{{ \'HEATMAP.LOST_INTEREST_VALUE\' | translate }}" />                    </div>                </div>            </li>        </ul>    </div>    <div class="modal-footer">        <button type="button" class="btn btn-warning" data-ng-click="vm.cancel()" translate>CANCEL_BTN</button>        <button type="button" class="btn btn-primary" data-ng-click="vm.save()" translate>OK_BTN</button>    </div></div>';
+    HeatmapEditorView.html = '<div class="modal-content">    <div class="modal-header">        <button type="button" class="close" data-ng-click="vm.cancel()" aria-hidden="true">&times;</button>        <h3 class="modal-title" translate>HEATMAP.EDITOR_TITLE</h3>    </div>    <div class="modal-body container-fluid">        <div class="row-fluid">            <input type="text" data-ng-model="vm.heatmap.title" style="margin: 0 5px" placeholder="{{ \'HEATMAP.TITLE\' | translate }}" />        </div>        <h4 class="row-fluid" style="margin-top: 20px;" translate>HEATMAP.MAIN_FEATURE</h4>        <!--<select data-ng-model="vm.selectedFeatureType"                data-ng-change="vm.loadPropertyTypes()"                data-ng-options="item as item.name for (key, item) in vm.dataset.featureTypes"                class="form-control row-fluid"></select>        <h4 class="row-fluid" translate>HEATMAP.PROPERTIES</h4>-->        <ul class="form-group row-fluid" style="margin-top: 1em; margin-left: -2em; overflow-y: auto; overflow-x: hidden;"            resize resize-y="450">            <li ng-repeat="hi in vm.heatmap.heatmapItems"                class="row-fluid list-unstyled truncate">                <div style="padding: 5px 0;" class="row-fluid">                    <!--                    name="vm.selectedTitles[]" value="{{hi.title}}"-->                    <input type="checkbox"                           data-ng-checked="hi.isSelected"                           data-ng-click="hi.isSelected = !hi.isSelected">&nbsp;&nbsp;{{hi.toString()}}                    <div data-ng-if="hi.isSelected" class="pull-right">                        <a href="" class="pull-right"                           style="margin-right: 5px;"                           data-ng-click="vm.toggleItemDetails($index)"><i class="fa fa-2x fa-edit"></i></a>                    </div>                </div>                <div class="row-fluid" data-ng-show="vm.showItem == {{$index}}" id="scoringFunction">                    <select class="col-xs-10"                            style="margin-right: 5px; margin-bottom: 5px;"                            data-ng-init="hi.scoringFunctionType = hi.scoringFunctionType || vm.scoringFunctions[0]"                            data-ng-model="hi.scoringFunctionType"                            data-ng-options="sf as sf.title for sf in vm.scoringFunctions"></select>                    <div class="row-fluid">                        <div class="row-fluid">                            <div class="col-xs-3" style="margin-top: 5px; margin-right: 5px; padding-left: 0;" translate>HEATMAP.AT_LOCATION_VALUE</div>                            <div class="col-xs-3" style="margin-top: 5px; margin-right: 5px; padding-left: 0;" translate>HEATMAP.DISTANCE_MAX_VALUE</div>                            <div class="col-xs-3" style="margin-top: 5px; padding-left: 0;" translate>HEATMAP.LOST_INTEREST_VALUE</div>                        </div>                        <div class="row-fluid">                            <input type="number" class="col-xs-3" style="padding: 0; margin-right: 5px;" data-ng-model="hi.idealityMeasure.atLocation" placeholder="{{ \'HEATMAP.AT_LOCATION_VALUE\' | translate }}" />                            <input type="number" class="col-xs-3" style="padding: 0; margin-right: 5px;" data-ng-model="hi.idealityMeasure.idealDistance" placeholder="{{ \'HEATMAP.DISTANCE_MAX_VALUE\' | translate }}" />                            <input type="number" class="col-xs-3" style="padding: 0;" data-ng-model="hi.idealityMeasure.lostInterestDistance" placeholder="{{ \'HEATMAP.LOST_INTEREST_VALUE\' | translate }}" />                        </div>                        <!--<div class="pull-right" data-ng-class="hi.scoringFunctionType.cssClass" style="width: 40px; height: 28px; margin-top: -5px;"></div>-->                    </div>                </div>            </li>        </ul>    </div>    <div class="modal-footer">        <button type="button" class="btn btn-warning" data-ng-click="vm.cancel()" translate>CANCEL_BTN</button>        <button type="button" class="btn btn-primary" data-ng-click="vm.save()" translate>OK_BTN</button>    </div></div>';
 })(HeatmapEditorView || (HeatmapEditorView = {}));
 var Heatmap;
 (function (Heatmap) {
     var HeatmapItem = (function () {
-        function HeatmapItem(title, featureType) {
+        function HeatmapItem(title, featureType, weight, userWeight, isSelected, idealityMeasure, propertyTitle, propertyLabel, optionIndex) {
+            if (weight === void 0) { weight = 0; }
+            if (userWeight === void 0) { userWeight = 1; }
+            if (isSelected === void 0) { isSelected = false; }
+            if (idealityMeasure === void 0) { idealityMeasure = new Heatmap.IdealityMeasure(); }
             this.title = title;
             this.featureType = featureType;
-            /**
-             * The user weight specifies how much you like this item, e.g. the maximum value.
-             * @type {number}, range [-5..5].
-             */
-            this.userWeight = 1;
-            /**
-             * The weight specifies how much you like this item, relative to others.
-             * @type {number}, range [-1..1].
-             */
-            this.weight = 0;
-            /**
-             * The ideality measure specifies how much you like this item with respect to its
-             * distance.
-             * @type {IIdealityMeasure}
-             */
-            this.idealityMeasure = new Heatmap.IdealityMeasure();
+            this.weight = weight;
+            this.userWeight = userWeight;
+            this.isSelected = isSelected;
+            this.idealityMeasure = idealityMeasure;
+            this.propertyTitle = propertyTitle;
+            this.propertyLabel = propertyLabel;
+            this.optionIndex = optionIndex;
             this.heatspots = [];
-            /** Represents the number of items that are needed to obtain an ideal location. */
-            this.isSelected = false;
-            this.intensityScale = 1;
             // TODO Needs improvement based on actual location
             this.setScale(52);
         }
-        HeatmapItem.prototype.calculateHeatspots = function (feature, cellWidth, cellHeight, horizCells, vertCells, mapBounds) {
+        HeatmapItem.prototype.calculateHeatspots = function (feature, cellWidth, cellHeight, horizCells, vertCells, mapBounds, paddingRatio) {
             // right type?
-            if (!this.isSelected || this.featureType !== feature.fType)
+            if (!this.isSelected || this.featureType.name !== feature.fType.name)
                 return null;
             if (this.heatspots.length === 0)
                 this.calculateHeatspot(cellWidth, cellHeight);
             // create heatspot solely based on feature type?
             if (!this.propertyLabel) {
-                return this.pinHeatspotToGrid(feature, horizCells, vertCells, mapBounds);
+                return this.pinHeatspotToGrid(feature, horizCells, vertCells, mapBounds, paddingRatio);
             }
             // create heatspot based on the preferred option?
             if (feature.properties.hasOwnProperty(this.propertyLabel) && feature.properties[this.propertyLabel] === this.optionIndex) {
-                return this.pinHeatspotToGrid(feature, horizCells, vertCells, mapBounds);
+                return this.pinHeatspotToGrid(feature, horizCells, vertCells, mapBounds, paddingRatio);
             }
             return null;
         };
@@ -2905,14 +3029,13 @@ var Heatmap;
             var horizCells = Math.floor(maxRadius / cellWidth);
             var vertCells = Math.floor(maxRadius / cellHeight);
             var sCellSize = cellWidth * cellHeight;
-            var scaledWeight = this.weight * this.intensityScale;
             var arrayLength = horizCells * vertCells;
             this.heatspots = new Array(arrayLength);
-            this.heatspots.push(new Heatmap.Heatspot(0, 0, scaledWeight * this.idealityMeasure.atLocation));
+            this.heatspots.push(new Heatmap.Heatspot(0, 0, this.weight * this.idealityMeasure.atLocation));
             for (var i = -vertCells; i <= vertCells; i++) {
                 for (var j = -horizCells; j <= horizCells; j++) {
                     var radius = Math.sqrt(i * i * sCellSize + j * j * sCellSize);
-                    var weightedIntensity = scaledWeight * this.idealityMeasure.computeIdealityAtDistance(radius);
+                    var weightedIntensity = this.weight * this.idealityMeasure.computeIdealityAtDistance(radius);
                     if (!(i == 0 && j == 0) && weightedIntensity != 0) {
                         this.heatspots.push(new Heatmap.Heatspot(i, j, weightedIntensity));
                     }
@@ -2980,12 +3103,12 @@ var Heatmap;
         /**
         * Translate the heatspot (at (0,0)) to the actual location.
         */
-        HeatmapItem.prototype.pinHeatspotToGrid = function (feature, horizCells, vertCells, mapBounds) {
+        HeatmapItem.prototype.pinHeatspotToGrid = function (feature, horizCells, vertCells, mapBounds, paddingRatio) {
             if (feature.geometry.type !== 'Point')
                 return null;
             var latlong = new L.LatLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
             //TODO add a padding that takes the current zoom into account
-            var paddedBounds = mapBounds.pad(1.1);
+            var paddedBounds = mapBounds.pad(paddingRatio);
             if (!paddedBounds.contains(latlong))
                 return null; //Only draw features that are visible in the map
             var actualHeatspots = [];
@@ -2993,8 +3116,7 @@ var Heatmap;
             var hCell = Math.floor(((latlong.lng - mapBounds.getNorthWest().lng) / (mapBounds.getNorthEast().lng - mapBounds.getNorthWest().lng)) * horizCells);
             var vCell = Math.floor(((latlong.lat - mapBounds.getSouthWest().lat) / (mapBounds.getNorthWest().lat - mapBounds.getSouthWest().lat)) * vertCells);
             this.heatspots.forEach(function (hs) {
-                //TODO actualHeatspots.push(hs.AddLocation(lat, lon));
-                actualHeatspots.push(hs.AddLocation(hCell, vCell));
+                actualHeatspots.push(hs.AddLocation(hCell, vCell, feature.properties['Name'] + ': ' + hs.intensity.toFixed(3)));
             });
             return actualHeatspots;
         };
@@ -3041,16 +3163,16 @@ var Heatmap;
         function HeatmapModel(title) {
             this.title = title;
             this.heatmapItems = [];
-            this.scaleMaxValue = 16;
-            this.scaleMinValue = 9;
-            this.intensityScale = 1;
+            this.id = "";
             this.title = title;
+            this.heatmapSettings = new Heatmap.HeatmapSettings();
         }
         /**
          * Calculate the heatmap.
          */
         HeatmapModel.prototype.calculate = function (layerService, mapService, heatmap) {
             var _this = this;
+            var time = new Date().getTime();
             console.log('Calculating heatmap');
             var mapBounds = mapService.map.getBounds();
             var NW = mapBounds.getNorthWest();
@@ -3070,6 +3192,9 @@ var Heatmap;
                     }
                 });
             });
+            var widthPaddingRatio = (width + 2 * maxInterestDistance) / width;
+            var heigthPaddingRatio = (height + 2 * maxInterestDistance) / height;
+            var paddingRatio = Math.max(widthPaddingRatio, heigthPaddingRatio);
             //Calculate a grid based on the maximum number of cells and the map ratio.
             var mapRatio = width / height;
             var maxCellCount = Heatmap.HeatmapCtrl.MAX_HEATMAP_CELLS;
@@ -3081,16 +3206,19 @@ var Heatmap;
             var dLng = (NE.lng - SW.lng) / horizCells;
             var count = 0;
             var intensityGrid = [];
+            var contributorGrid = [];
             for (var i = 0; i < horizCells; i++) {
                 intensityGrid[i] = [];
+                contributorGrid[i] = [];
                 for (var j = 0; j < vertCells; j++) {
                     intensityGrid[i][j] = 0;
+                    contributorGrid[i][j] = [];
                 }
             }
             // Iterate over all applicable features on the map and create a intensity "stamp" for each feature
             dataset.features.forEach(function (f) {
                 _this.heatmapItems.forEach(function (hi) {
-                    var heatspot = hi.calculateHeatspots(f, cellWidth, cellHeight, horizCells, vertCells, mapBounds);
+                    var heatspot = hi.calculateHeatspots(f, cellWidth, cellHeight, horizCells, vertCells, mapBounds, paddingRatio);
                     if (heatspot) {
                         //heatspots = heatspots.concat(heatspot);
                         //console.log('Created ' + heatspot.length + ' heatspots');
@@ -3098,18 +3226,21 @@ var Heatmap;
                             //heatmap.addDataPoint(hs.i, hs.j, hs.intensity);
                             if (hs.intensity != 0 && hs.i >= 0 && hs.i < horizCells && hs.j >= 0 && hs.j < vertCells) {
                                 intensityGrid[hs.i][hs.j] = intensityGrid[hs.i][hs.j] + hs.intensity;
+                                contributorGrid[hs.i][hs.j].push(hs.contributor);
                                 count = count + 1;
                             }
                         });
                     }
                 });
             });
-            console.log('Created ' + count + ' heatspots');
+            var time2 = new Date().getTime();
+            console.log('Created ' + count + ' heatspots in ' + (time2 - time).toFixed(1) + ' ms');
             heatmap.clearLayers();
+            var weightedIntensityScale = ((this.heatmapSettings.intensityScale / 3) * (this.heatmapSettings.intensityScale / 3)); // Convert intensityscale from [1,...,5] to ~[0.1, 0.5, 1, 2, 3]
             for (var i = 0; i < horizCells; i++) {
                 for (var j = 0; j < vertCells; j++) {
                     if (intensityGrid[i][j] != 0) {
-                        var polyCoord = [[SW.lng + dLng * i, SW.lat + dLat * j], [SW.lng + dLng * (i + 1), SW.lat + dLat * j], [SW.lng + dLng * (i + 1), SW.lat + dLat * (j + 1)], [SW.lng + dLng * i, SW.lat + dLat * (j + 1)], [SW.lng + dLng * i, SW.lat + dLat * j]];
+                        var polyCoord = [[SW.lng + dLng * i, SW.lat + dLat * j], [SW.lng + dLng * (i + 1), SW.lat + dLat * j], [SW.lng + dLng * (i + 1), SW.lat + dLat * (j + 1)], [SW.lng + dLng * i, SW.lat + dLat * (j + 1)]];
                         var feature = {
                             "type": "Feature",
                             "geometry": {
@@ -3117,15 +3248,19 @@ var Heatmap;
                                 "coordinates": [polyCoord]
                             },
                             "properties": {
+                                "Name": "Heatmap cell (" + i.toString() + ", " + j.toString() + ")",
                                 "gridX": i,
                                 "gridY": j,
-                                "intensity": intensityGrid[i][j]
+                                "intensity": (intensityGrid[i][j] * weightedIntensityScale).toFixed(3),
+                                "contributors": JSON.stringify(contributorGrid[i][j])
                             }
                         };
                         heatmap.addData(feature);
                     }
                 }
             }
+            var time3 = new Date().getTime();
+            console.log('Calculated ' + (i * j) + ' cells in ' + (time3 - time).toFixed(1) + ' ms');
         };
         /**
          * Update the weights of all heatmap items.
@@ -3149,15 +3284,6 @@ var Heatmap;
             });
         };
         /**
-        * Update the intensity scale of all heatmap items.
-        */
-        HeatmapModel.prototype.updateIntensityScale = function () {
-            var _this = this;
-            this.heatmapItems.forEach(function (hi) {
-                hi.intensityScale = _this.intensityScale;
-            });
-        };
-        /**
         * Add a heatmap item to the list of items only in case we don't have it yet.
         */
         HeatmapModel.prototype.addHeatmapItem = function (heatmapItem) {
@@ -3165,10 +3291,46 @@ var Heatmap;
             var title = heatmapItem.title;
             for (var i = 0; i < this.heatmapItems.length; i++) {
                 var hi = this.heatmapItems[i];
-                if (hi.featureType === ft && hi.title === title)
+                if (hi.featureType.name === ft.name && hi.title === title)
                     return;
             }
             this.heatmapItems.push(heatmapItem);
+        };
+        HeatmapModel.prototype.deserialize = function (layer) {
+            var _this = this;
+            this.id = layer.id;
+            this.heatmapSettings = layer.heatmapSettings;
+            this.heatmapItems = [];
+            var heatmapitems = layer.heatmapItems;
+            heatmapitems.forEach(function (hi_info) {
+                var im = new Heatmap.IdealityMeasure(hi_info.idealityMeasure.idealDistance, hi_info.idealityMeasure.atLocation, hi_info.idealityMeasure.lostInterestDistance);
+                if (hi_info.propertyTitle) {
+                    var hi = new Heatmap.HeatmapItem(hi_info.title, hi_info.featureType, hi_info.weight, hi_info.userWeight, hi_info.isSelected, im, hi_info.propertyTitle, hi_info.propertyLabel, hi_info.optionIndex);
+                }
+                else {
+                    var hi = new Heatmap.HeatmapItem(hi_info.title, hi_info.featureType, hi_info.weight, hi_info.userWeight, hi_info.isSelected, im);
+                }
+                _this.addHeatmapItem(hi);
+            });
+        };
+        HeatmapModel.prototype.serialize = function () {
+            var minimizedHeatmapItems = [];
+            this.heatmapItems.forEach(function (hi) {
+                if (hi.isSelected) {
+                    hi.reset();
+                    minimizedHeatmapItems.push(hi);
+                }
+            });
+            var output = "\"type\":\"Heatmap\"";
+            output += ",\n\"heatmapSettings\":" + JSON.stringify(this.heatmapSettings, null, ' ');
+            output += ",\n\"heatmapItems\":";
+            output += JSON.stringify(minimizedHeatmapItems, null, ' ');
+            output += ",\n\"enabled\":";
+            output += JSON.stringify(false);
+            output += ",\n\"opacity\":";
+            output += JSON.stringify(100);
+            output += "\n}";
+            return output;
         };
         return HeatmapModel;
     })();
@@ -3176,19 +3338,31 @@ var Heatmap;
 })(Heatmap || (Heatmap = {}));
 var Heatmap;
 (function (Heatmap) {
+    var HeatmapSettings = (function () {
+        function HeatmapSettings() {
+            this.referenceList = [];
+            this.minZoom = 10;
+            this.maxZoom = 15;
+            this.intensityScale = 3;
+        }
+        return HeatmapSettings;
+    })();
+    Heatmap.HeatmapSettings = HeatmapSettings;
+})(Heatmap || (Heatmap = {}));
+var Heatmap;
+(function (Heatmap) {
     /**
      * A heat spot represents a point on the map with a certain intensity.
      */
     var Heatspot = (function () {
-        function Heatspot(i, j, intensity) {
+        function Heatspot(i, j, intensity, contributor) {
             this.i = i;
             this.j = j;
             this.intensity = intensity;
+            this.contributor = contributor;
         }
-        Heatspot.prototype.AddLocation = function (i, j) {
-            // TODO
-            //return new Heatspot(this.latitude + lat, this.longitude + lon, this.intensity);
-            return new Heatspot(this.i + i, this.j + j, this.intensity);
+        Heatspot.prototype.AddLocation = function (i, j, contributor) {
+            return new Heatspot(this.i + i, this.j + j, this.intensity, contributor);
         };
         return Heatspot;
     })();
@@ -3223,36 +3397,158 @@ var Heatmap;
     })();
     Heatmap.ScoringFunctions = ScoringFunctions;
     var IdealityMeasure = (function () {
-        function IdealityMeasure() {
-            /**
-            * The distance with respect to my location where I would like to find the item.
-            * @type {number}, in meters
-            */
-            this.idealDistance = 500;
-            /**
-            * How happy would I be if the item would be at my location.
-            * @type {number}, range [0..1]
-            */
-            this.atLocation = 0.1;
-            /**
-             * At what distance would the item no longer be of value to me.
-             * @type {number}, range in meters
-             */
-            this.lostInterestDistance = 2000;
+        function IdealityMeasure(idealDistance, atLocation, lostInterestDistance) {
+            if (idealDistance === void 0) { idealDistance = 500; }
+            if (atLocation === void 0) { atLocation = 0.1; }
+            if (lostInterestDistance === void 0) { lostInterestDistance = 2000; }
+            this.idealDistance = idealDistance;
+            this.atLocation = atLocation;
+            this.lostInterestDistance = lostInterestDistance;
         }
         IdealityMeasure.prototype.computeIdealityAtDistance = function (distance) {
+            var intensity = 0;
             if (distance < this.idealDistance) {
-                return this.atLocation + (1 - this.atLocation) * distance / this.idealDistance;
+                if (this.atLocation >= 1) {
+                    intensity = 1;
+                }
+                else {
+                    intensity = (this.atLocation + (1 - this.atLocation) * distance / this.idealDistance);
+                }
             }
             else if (distance < this.lostInterestDistance) {
-                return 1 - (distance - this.idealDistance) / (this.lostInterestDistance - this.idealDistance);
+                intensity = (1 - (distance - this.idealDistance) / (this.lostInterestDistance - this.idealDistance));
             }
-            return 0;
+            return intensity;
         };
         return IdealityMeasure;
     })();
     Heatmap.IdealityMeasure = IdealityMeasure;
 })(Heatmap || (Heatmap = {}));
+var Indicators;
+(function (Indicators) {
+    Indicators.html = '<div>    <style>        .indicator-list        {            list-style:none;            padding-left:0;        }        .indicator-group{            position: relative;            cursor:pointer;        }        /*sparkline*/        .indicator-sparkline-group {                              height: 75px;         }            .indicator-sparkline-title{            font-size:20px;            font-weight:bold;        }        .indicator-sparkline-value{            font-size: 20px;            font-weight: bold;            right: 5px;            position: absolute;            bottom:5px;        }        /*circular*/        .indicator-circular-group {                              height: 100px;         }            .indicator-circular-title{            font-size:20px;            font-weight:bold;        }        .indicator-circular-value{            font-size: 20px;            font-weight: bold;            right: 5px;            position: absolute;            bottom:5px;        }        .isActive{            background-color:yellow;        }           </style>    <div>{{data.title}}</div>    <ul class="indicator-list" data-ng-repeat="i in data.indicators" ng-switch on="i.visual">        <li ng-class="{isActive : i.isActive}" class="indicator-group indicator-sparkline-group" ng-click="vm.selectIndicator(i)" ng-switch-when="sparkline">            <div class="indicator-sparkline-title">{{i.title}}</div>            <div class="indicator-sparkline-value">{{i.sensorSet.activeValue}}</div>        </li>        <li ng-class="{isActive : i.isActive}" class="indicator-group indicator-circular-group" ng-switch-when="circular">            <div class="indicator-circular-title">{{i.title}}</div>            <div class="indicator-circular-value">{{i.activeValue}}</div>        </li>        <li ng-class="{isActive : i.isActive}" class="indicator-group" ng-switch-default>            <div>{{i.title}}</div>            <div>{{i.sensorSet.activeValue}}</div>        </li>    </ul></div>';
+})(Indicators || (Indicators = {}));
+var Indicators;
+(function (Indicators) {
+    /**
+      * Config
+      */
+    var moduleName = 'csWeb.indicators';
+    /**
+      * Module
+      */
+    Indicators.myModule;
+    try {
+        Indicators.myModule = angular.module(moduleName);
+    }
+    catch (err) {
+        // named module does not exist, so create one
+        Indicators.myModule = angular.module(moduleName, []);
+    }
+    /**
+      * Directive to display the available map layers.
+      */
+    Indicators.myModule.directive('indicators', [
+        '$compile',
+        function ($compile) {
+            return {
+                terminal: true,
+                restrict: 'E',
+                scope: {},
+                template: Indicators.html,
+                compile: function (el) {
+                    var fn = $compile(el);
+                    return function (scope) {
+                        fn(scope);
+                    };
+                },
+                replace: true,
+                transclude: true,
+                controller: Indicators.LayersDirectiveCtrl
+            };
+        }
+    ]).directive('bsPopover', function () {
+        return function (scope, element, attrs) {
+            element.find("a[rel=popover]").popover({ placement: 'right', html: 'true' });
+        };
+    });
+})(Indicators || (Indicators = {}));
+var Indicators;
+(function (Indicators) {
+    var indicatorData = (function () {
+        function indicatorData() {
+        }
+        return indicatorData;
+    })();
+    Indicators.indicatorData = indicatorData;
+    var indicator = (function () {
+        function indicator() {
+        }
+        return indicator;
+    })();
+    Indicators.indicator = indicator;
+    var LayersDirectiveCtrl = (function () {
+        // dependencies are injected via AngularJS $injector
+        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
+        function LayersDirectiveCtrl($scope, $layerService, $messageBus) {
+            var _this = this;
+            this.$scope = $scope;
+            this.$layerService = $layerService;
+            this.$messageBus = $messageBus;
+            $scope.vm = this;
+            var par = $scope.$parent;
+            this.widget = (par.widget);
+            this.checkLayers();
+            this.$messageBus.subscribe("layer", function (s) {
+                _this.checkLayers();
+            });
+            $scope.data = this.widget.data;
+            $scope.data.indicators.forEach(function (i) {
+                if (i.sensor != null) {
+                    _this.$layerService.findSensorSet(i.sensor, function (ss) {
+                        i.sensorSet = ss;
+                        if (!$scope.$$phase)
+                            $scope.$apply();
+                    });
+                }
+            });
+        }
+        LayersDirectiveCtrl.prototype.checkLayers = function () {
+            var _this = this;
+            if (!this.$scope.data || !this.$scope.data.indicators)
+                return;
+            this.$scope.data.indicators.forEach(function (i) {
+                if (i.layer != null) {
+                    var l = _this.$layerService.findLayer(i.layer);
+                    if (l != null) {
+                        i.isActive = l.enabled;
+                    }
+                }
+            });
+            //if (!this.$scope.$$phase) this.$scope.$apply()
+        };
+        LayersDirectiveCtrl.prototype.selectIndicator = function (i) {
+            if (i.layer != null) {
+                var l = this.$layerService.findLayer(i.layer);
+                if (l != null) {
+                    this.$layerService.addLayer(l);
+                }
+            }
+            //console.log(i.title);
+        };
+        // $inject annotation.
+        // It provides $injector with information about dependencies to be injected into constructor
+        // it is better to have it close to the constructor, because the parameters must match in count and type.
+        // See http://docs.angularjs.org/guide/di
+        LayersDirectiveCtrl.$inject = [
+            '$scope',
+            'layerService',
+            'messageBusService'
+        ];
+        return LayersDirectiveCtrl;
+    })();
+    Indicators.LayersDirectiveCtrl = LayersDirectiveCtrl;
+})(Indicators || (Indicators = {}));
 var LanguageSwitch;
 (function (LanguageSwitch) {
     LanguageSwitch.html = '<div class="navbar-collapse collapse">    <ul class="nav navbar-nav">        <li class="dropdown">            <a href=""               class="navbar-brand dropdown-toggle pull-left"               data-toggle="dropdown"               style="color:white; margin-left:-10px;">                <img data-ng-src="{{vm.language.img}}" />                <span class="caret" data-ng-if="vm.$languages.length > 1"></span>            </a>            <ul data-ng-if="vm.$languages.length > 1" class="dropdown-menu" role="menu">                <li ng-repeat="language in vm.$languages">                    <a ng-click="vm.switchLanguage(language)">                        <span>                            <img data-ng-src="{{language.img}}" />                            &nbsp;{{language.name}}                        </span>                    </a>                </li>            </ul>        </li>    </ul></div>';
@@ -3402,6 +3698,7 @@ var LayersDirective;
         }
         LayersDirectiveCtrl.prototype.toggleLayer = function (layer) {
             //layer.enabled = !layer.enabled;
+            //if (this.$layerService.loadedLayers.containsKey(layer.id)) {
             // Unselect when dealing with a radio group, so you can turn a loaded layer off again.
             if (layer.group.oneLayerActive && this.$layerService.findLoadedLayer(layer.id))
                 layer.enabled = false;
@@ -4496,6 +4793,7 @@ var Mca;
                         tempScores.push(tempItem);
                     }
                     feature.properties[mca.label] = score * 100;
+                    _this.$layerService.calculateFeatureStyle(feature);
                     _this.$layerService.activeMapRenderer.updateFeature(feature);
                     //this.$layerService.updateFeature(feature);
                 });
@@ -5450,7 +5748,7 @@ var ShowModal;
 })(ShowModal || (ShowModal = {}));
 var StyleList;
 (function (StyleList) {
-    StyleList.html = '<div>    <h4 class="leftpanel-header" translate="STYLES"></h4>    <div ng-show="vm.$layerService.noStyles" translate="STYLE_INFO"></div>    <div data-ng-repeat="group in vm.$layerService.project.groups" style="margin-left: 5px">        <div ng-show="group.styles.length">            <div style="float:left;margin-left: -10px; margin-top: 5px" data-toggle="collapse" data-target="#stylegroup_{{group.id}}"><i class="fa fa-chevron-down togglebutton toggle-arrow-down"></i><i class="fa fa-chevron-up togglebutton toggle-arrow-up"></i></div>            <div class="group-title">{{group.title}}</div>            <div id="stylegroup_{{group.id}}" class="collapse in">                <div data-ng-repeat="style in group.styles">                    <div class="checkbox checkbox-primary" style="margin-left:20px;float:left">                        <input type="checkbox" id="cbstyle{{style.id}}" ng-model="style.enabled" data-ng-change="vm.$layerService.updateStyle(style);">                        <label class="style-title" for="cbstyle{{style.id}}" style="width:175px">{{style.title}}</label>                    </div>                    <div style="float:right;margin-top:10px; width: 50px">                        <div data-ng-show="style.canSelectColor" style="float:left">                            <div class="dropdown">                                <div class="style-settings" data-toggle="dropdown">                                    <style>                                                                             </style>                                    <!--<img src="includes/images/fillcolor.png" style="width: 32px; height:32px" />-->                                    <div id="colors" style="border-radius: 50%;width: 20px;height:20px;border-style:solid;border-color: black;border-width: 1px;background: linear-gradient(to right, {{style.colors[0]}} , {{style.colors[1]}})">                                                                        </div>                                    <b class="caret"></b>                                </div>                                <!--<a class="btn btn-primary btn-sm" ng-model="style.visualAspect"  style="padding-left: 10px" href="#"> {{ style.visualAspect }} </a>-->                                <ul class="dropdown-menu" role="menu">                                    <li ng-repeat="(key,val) in style.colorScales" style="margin:3px;cursor: pointer">                                        <span ng-click="vm.$layerService.updatePropertyStyle(key,val,$parent);                                              $parent.style.colors = val;                                              vm.$layerService.updateStyle($parent.style)"> {{key}} </span>                                    </li>                                </ul>                            </div>                        </div>                        <div style="float:right">                            <div class="dropdown">                                <div class="style-settings" data-toggle="dropdown">                                    <!--<img src="includes/images/fillcolor.png" style="width: 32px; height:32px" />-->                                    <div class="style-aspect style-{{style.visualAspect}}"></div><b class="caret"></b>                                </div>                                <!--<a class="btn btn-primary btn-sm" ng-model="style.visualAspect"  style="padding-left: 10px" href="#"> {{ style.visualAspect }} </a>-->                                <ul class="dropdown-menu" role="menu">                                    <li ng-repeat="title in style.availableAspects" style="margin:3px;cursor: pointer">                                        <i class="style-aspect style-{{title}}" style="float:left" /><span ng-click="$parent.style.visualAspect = title;vm.$layerService.updateStyle($parent.style)"><img class="fa fa-search" style="margin-right: 8px" /> {{title}} </span>                                    </li>                                    <li class="divider"></li>                                    <li style="margin:3px;cursor: pointer"><i class="fa fa-remove" style="margin-right: 8px" style=" float:left" /><span ng-click="vm.$layerService.removeStyle(style)">Verwijder</span></li>                                </ul>                            </div>                        </div>                    </div>                </div>                <!--<div style="right:5px; position:absolute; margin-top: -15px"><a href="#" id="stylepop{{style.id}}" rel="popover" popover-template="template.html"><img src="includes/images/settings.png" width="20px"></a></div>-->            </div>        </div>    </div></div>';
+    StyleList.html = '<div>    <h4 class="leftpanel-header" translate="STYLES"></h4>    <div ng-show="vm.$layerService.noStyles" translate="STYLE_INFO"></div>    <div data-ng-repeat="group in vm.$layerService.project.groups" style="margin-left: 5px">        <div ng-show="group.styles.length">            <div style="float:left;margin-left: -10px; margin-top: 5px" data-toggle="collapse" data-target="#stylegroup_{{group.id}}"><i class="fa fa-chevron-down togglebutton toggle-arrow-down"></i><i class="fa fa-chevron-up togglebutton toggle-arrow-up"></i></div>            <div class="group-title">{{group.title}}</div>            <div id="stylegroup_{{group.id}}" class="collapse in">                <div data-ng-repeat="style in group.styles">                    <div class="checkbox checkbox-primary" style="margin-left:20px;float:left">                        <input type="checkbox" id="cbstyle{{style.id}}" ng-model="style.enabled" data-ng-change="vm.$layerService.updateStyle(style);">                        <label class="style-title" for="cbstyle{{style.id}}" style="width:175px">{{style.title}}</label>                    </div>                    <div style="float:right;margin-top:10px; width: 50px">                        <div data-ng-show="style.canSelectColor" style="float:left">                            <div class="dropdown">                                <div class="style-settings" data-toggle="dropdown">                                    <style>                                    </style>                                    <!--<img src="includes/images/fillcolor.png" style="width: 32px; height:32px" />-->                                    <div id="colors" style="border-radius: 50%;width: 20px;height:20px;border-style:solid;border-color: black;border-width: 1px;background: linear-gradient(to right, {{style.colors[0]}} , {{style.colors[1]}})">                                    </div>                                    <b class="caret"></b>                                </div>                                <!--<a class="btn btn-primary btn-sm" ng-model="style.visualAspect"  style="padding-left: 10px" href="#"> {{ style.visualAspect }} </a>-->                                <ul class="dropdown-menu" role="menu">                                    <li ng-repeat="(key,val) in style.colorScales" style="margin:3px;cursor: pointer">                                        <span ng-click="vm.$layerService.updatePropertyStyle(key,val,$parent);                                              $parent.style.colors = val;                                              vm.$layerService.updateStyle($parent.style)">{{key}}</span>                                    </li>                                </ul>                            </div>                        </div>                        <div style="float:right">                            <div class="dropdown">                                <div class="style-settings" data-toggle="dropdown">                                    <!--<img src="includes/images/fillcolor.png" style="width: 32px; height:32px" />-->                                    <div class="style-aspect style-{{style.visualAspect}}"></div><b class="caret"></b>                                </div>                                <!--<a class="btn btn-primary btn-sm" ng-model="style.visualAspect"  style="padding-left: 10px" href="#"> {{ style.visualAspect }} </a>-->                                <ul class="dropdown-menu" role="menu">                                    <li ng-repeat="title in style.availableAspects" style="margin:3px;cursor: pointer">                                        <i class="style-aspect style-{{title}}" style="float:left" /><span ng-click="$parent.style.visualAspect = title;vm.$layerService.updateStyle($parent.style)"><img class="fa fa-search" style="margin-right: 8px" /> {{title}} </span>                                    </li>                                    <li class="divider"></li>                                    <li style="margin:3px;cursor: pointer"><i class="fa fa-remove" style="margin-right: 8px; float:left" /><span ng-click="vm.$layerService.removeStyle(style)">Verwijder</span></li>                                </ul>                            </div>                        </div>                    </div>                    <style>                        .legend-description {                            display: block;                            font-size: 16px;                            color: blue;                        }                        .legend-entry-item-d {                            list-style-type: none;                            height: 25px;                        }                        .legend-entry-item-i {                            list-style-type: none;                            height: 40px;                        }                        .legend-color-square {                            display: inline;                            width: 20px;                            height: 20px;                            background: #4cff00;                            position: relative;                            left: -40px;                        }                        .legend-color-gradient-rect {                            display: inline;                            width: 30px;                            height: 40px;                            background: #4cff00;                            position: relative;                            left: -40px;                        }                        .legend-label-d {                            display: inline;                            font-size: 13px;                            position: relative;                            top:    2px;                            left: -25px;                        }                        .legend-label-i {                            display: inline;                            font-size: 13px;                            position: absolute;                            left: 55px;                        }                    </style>                    <div data-ng-if="style.activeLegend">                        <div data-ng-if="style.activeLegend.legendKind==\'discrete\' ||  style.activeLegend.legendKind==\'discretestrings\'  ">                            <div class="legend-description">{{style.activeLegend.description}}</div>                            <!--<div class="legend-description">22:24</div>-->                            <ul class="legend-entry-list">                                <li data-ng-repeat="le in style.activeLegend.legendEntries | reverse" class="legend-entry-item-d">                                    <div class="legend-color-square" style="float: left; background: {{le.color}}"></div>                                    <div class="legend-label-d" style="float: left">{{le.label}}</div>                                    <div>&nbsp;</div>   <!-- die &nbsp; is echt nodig... -->                                </li>                            </ul>                        </div>                        <div data-ng-if="style.activeLegend.legendKind==\'interpolated\'">                            <div class="legend-description">{{style.activeLegend.description}}</div>                            <ul class="legend-entry-list">                                <li data-ng-repeat="(key, le) in style.activeLegend.legendEntries | reverse" class="legend-entry-item-i">                                    <div ng-if="key < style.activeLegend.legendEntries.length-1" class="legend-color-gradient-rect" style="float: left; position: relative; top: 10px; background: linear-gradient(to bottom, {{le.color}}, {{style.activeLegend.legendEntries[style.activeLegend.legendEntries.length-key-2].color}}"></div>                                    <!--<div class="legend-label" style="float: left">{{key}} </div>-->                                    <!--<div ng-if="key < style.activeLegend.legendEntries.length-1" class="legend-label" style="float: left">{{le.label}}</div>                                    <div ng-if="key == style.activeLegend.legendEntries.length-1" class="legend-label" style="float: left; left: 0px">{{le.label}}</div>-->                                    <div class="legend-label-i">{{le.label}}</div>                                    <div>&nbsp;</div>   <!-- die &nbsp; is echt nodig... -->                                </li>                            </ul>                        </div>                    </div>                </div>            </div>        </div>    </div></div>';
 })(StyleList || (StyleList = {}));
 var StyleList;
 (function (StyleList) {
@@ -5992,6 +6290,20 @@ var csComp;
         var GeoExtensions = (function () {
             function GeoExtensions() {
             }
+            /**
+            * Convert topojson data to geojson data.
+            */
+            GeoExtensions.convertTopoToGeoJson = function (data) {
+                // Convert topojson to geojson format
+                var topo = omnivore.topojson.parse(data);
+                var newData = {};
+                newData.featureTypes = data.featureTypes;
+                newData.features = [];
+                topo.eachLayer(function (l) {
+                    newData.features.push(l.feature);
+                });
+                return newData;
+            };
             GeoExtensions.deg2rad = function (degree) {
                 var conv_factor = (2.0 * Math.PI) / 360.0;
                 return (degree * conv_factor);
@@ -6034,21 +6346,6 @@ var csComp;
 (function (csComp) {
     var Helpers;
     (function (Helpers) {
-        /**
-        * Convert topojson data to geojson data.
-        */
-        function convertTopoToGeoJson(data) {
-            // Convert topojson to geojson format
-            var topo = omnivore.topojson.parse(data);
-            var newData = {};
-            newData.featureTypes = data.featureTypes;
-            newData.features = [];
-            topo.eachLayer(function (l) {
-                newData.features.push(l.feature);
-            });
-            return newData;
-        }
-        Helpers.convertTopoToGeoJson = convertTopoToGeoJson;
         function supportsDataUri() {
             var isOldIE = navigator.appName === "Microsoft Internet Explorer";
             var isIE11 = !!navigator.userAgent.match(/Trident\/7\./);
@@ -6729,9 +7026,11 @@ var csComp;
                 return gs.colors[gs.colors.length - 1];
             if (v < gs.info.sdMin)
                 return gs.colors[0];
-            var bezInterpolator = chroma.interpolate.bezier(gs.colors);
-            var r = bezInterpolator((v - gs.info.sdMin) / (gs.info.sdMax - gs.info.sdMin)).hex();
-            return r;
+            //var bezInterpolator = chroma.interpolate.bezier(gs.colors);
+            //var r = bezInterpolator((v - gs.info.sdMin) / (gs.info.sdMax - gs.info.sdMin)).hex();
+            var color = d3.scale.linear().domain([gs.info.sdMin, gs.info.mean, gs.info.sdMax]).range(gs.colors);
+            var hexColor = color(v).toString();
+            return hexColor;
         }
         Helpers.getColor = getColor;
         /**
@@ -7385,9 +7684,27 @@ var csComp;
                 this.layerSources["wms"] = new Services.WmsSource(this);
                 //add tile layer
                 this.layerSources["tilelayer"] = new Services.TileLayerSource(this);
+                //add heatmap layer
+                this.layerSources["heatmap"] = new Services.HeatmapSource(this);
+            };
+            LayerService.prototype.loadRequiredLayers = function (layer) {
+                var _this = this;
+                // find layer source, and activate layer
+                var layerSource = layer.type.toLowerCase();
+                // if a layer is depends on other layers, load those first
+                if (this.layerSources.hasOwnProperty(layerSource)) {
+                    if (this.layerSources[layerSource].requiresLayer) {
+                        var requiredLayers = this.layerSources[layerSource].getRequiredLayers(layer);
+                        requiredLayers.forEach(function (l) {
+                            _this.addLayer(l);
+                        });
+                    }
+                }
             };
             LayerService.prototype.addLayer = function (layer) {
                 var _this = this;
+                if (this.loadedLayers.containsKey(layer.id))
+                    return;
                 var disableLayers = [];
                 async.series([
                     function (callback) {
@@ -7403,16 +7720,19 @@ var csComp;
                         callback(null, null);
                     },
                     function (callback) {
+                        // load required feature layers, if applicable
+                        _this.loadRequiredLayers(layer);
                         // find layer source, and activate layer
                         var layerSource = layer.type.toLowerCase();
                         if (_this.layerSources.hasOwnProperty(layerSource)) {
                             // load layer from source
                             _this.layerSources[layerSource].addLayer(layer, function (l) {
+                                l.enabled = true;
                                 _this.loadedLayers[layer.id] = l;
                                 _this.updateSensorData();
-                                _this.$messageBusService.publish('layer', 'activated', layer);
                                 _this.updateFilters();
                                 _this.activeMapRenderer.addLayer(layer);
+                                _this.$messageBusService.publish('layer', 'activated', layer);
                             });
                         }
                         callback(null, null);
@@ -7428,7 +7748,6 @@ var csComp;
                 ]);
             };
             LayerService.prototype.removeStyle = function (style) {
-                //console.log('update style ' + style.title);
                 var g = style.group;
                 g.styles = g.styles.filter(function (s) { return s.id !== style.id; });
                 this.updateGroupFeatures(g);
@@ -7457,8 +7776,13 @@ var csComp;
                 //console.log('update style ' + style.title);
                 if (style == null)
                     return;
-                if (style.group != null) {
-                    style.info = this.calculatePropertyInfo(style.group, style.property);
+                if (style.group != null && style.group.styles[0] != null) {
+                    if (style.group.styles[0].fixedColorRange) {
+                        style.info = style.group.styles[0].info;
+                    }
+                    else {
+                        style.info = this.calculatePropertyInfo(style.group, style.property);
+                    }
                     style.canSelectColor = style.visualAspect.toLowerCase().indexOf('color') > -1;
                     this.updateGroupFeatures(style.group);
                 }
@@ -7549,6 +7873,7 @@ var csComp;
                                     var value = sensor[pos];
                                     f.properties[sensorTitle] = value;
                                 }
+                                _this.calculateFeatureStyle(f);
                                 _this.activeMapRenderer.updateFeature(f);
                                 if (f.isSelected)
                                     _this.$messageBusService.publish("feature", "onFeatureUpdated", f);
@@ -7576,6 +7901,7 @@ var csComp;
             LayerService.prototype.initFeature = function (feature, layer) {
                 if (!feature.isInitialized) {
                     feature.isInitialized = true;
+                    feature.index = layer.count++;
                     // make sure it has an id
                     if (feature.id == null)
                         feature.id = csComp.Helpers.getGuid();
@@ -7602,14 +7928,21 @@ var csComp;
                 feature.layer.group.ndx.remove([feature]);
                 this.activeMapRenderer.removeFeature(feature);
             };
+            /**
+            * Calculate the effective feature style.
+            */
             LayerService.prototype.calculateFeatureStyle = function (feature) {
                 var s = {};
-                //s.fillColor = 'red';            
-                s.strokeWidth = 1;
+                //TODO: check compatibility for both heatmaps and other features
+                //s.fillColor = 'red';
+                //s.strokeWidth = 1;            
+                s.stroke = false;
+                s.fillOpacity = 0.75;
                 s.rotate = 0;
-                s.strokeColor = 'black';
-                s.iconHeight = 32;
-                s.iconWidth = 32;
+                //s.strokeColor = 'black';
+                //s.iconHeight = 32;
+                //s.iconWidth = 32;
+                //s.cornerRadius = 20;
                 var ft = this.getFeatureType(feature);
                 if (ft.style) {
                     if (ft.style.fillColor != null)
@@ -7622,10 +7955,49 @@ var csComp;
                         s.iconWidth = ft.style.iconWidth;
                     if (ft.style.iconHeight != null)
                         s.iconHeight = ft.style.iconHeight;
+                    if (ft.style.innerTextProperty != null)
+                        s.innerTextProperty = ft.style.innerTextProperty;
+                    if (ft.style.innerTextSize != null)
+                        s.innerTextSize = ft.style.innerTextSize;
+                    if (ft.style.cornerRadius != null)
+                        s.cornerRadius = ft.style.cornerRadius;
                     if (ft.style.rotateProperty && feature.properties.hasOwnProperty(ft.style.rotateProperty)) {
                         s.rotate = Number(feature.properties[ft.style.rotateProperty]);
                     }
                 }
+                feature.layer.group.styles.forEach(function (gs) {
+                    if (gs.enabled && feature.properties.hasOwnProperty(gs.property)) {
+                        if (gs.activeLegend) {
+                            if ((gs.activeLegend.legendKind == 'discrete') || (gs.activeLegend.legendKind == 'interpolated')) {
+                                var v = Number(feature.properties[gs.property]);
+                                if (!isNaN(v)) {
+                                    switch (gs.visualAspect) {
+                                        case 'strokeColor':
+                                            s.strokeColor = csComp.Helpers.getColor(v, gs);
+                                            break;
+                                        case 'fillColor':
+                                            s.fillColor = csComp.Helpers.getColor(v, gs);
+                                            break;
+                                        case 'strokeWidth':
+                                            s.strokeWidth = ((v - gs.info.sdMin) / (gs.info.sdMax - gs.info.sdMin) * 10) + 1;
+                                            break;
+                                    }
+                                }
+                            } // discrete or interpolated
+                            if (gs.activeLegend.legendKind == 'discretestrings') {
+                                var ss = feature.properties[gs.property];
+                                switch (gs.visualAspect) {
+                                    case 'strokeColor':
+                                        s.strokeColor = csComp.Helpers.getColorFromStringValue(ss, gs);
+                                        break;
+                                    case 'fillColor':
+                                        s.fillColor = csComp.Helpers.getColorFromStringValue(ss, gs);
+                                        break;
+                                }
+                            } // discrete strings
+                        } // activelegend
+                    }
+                });
                 //var layer = this.findLayer(feature.layerId);
                 feature.layer.group.styles.forEach(function (gs) {
                     if (gs.enabled && feature.properties.hasOwnProperty(gs.property)) {
@@ -7696,6 +8068,8 @@ var csComp;
             LayerService.prototype.setDefaultPropertyType = function (pt) {
                 if (!pt.type)
                     pt.type = "text";
+                if (typeof pt.title == 'undefined')
+                    pt.title = pt.label;
                 if (typeof pt.canEdit == 'undefined')
                     pt.canEdit = false;
                 if (typeof pt.visibleInCallOut == 'undefined')
@@ -7780,7 +8154,7 @@ var csComp;
              * If the group already has a style which contains legends, those legends are copied into the newly created group.
              * Already existing groups (for the same visualAspect) are replaced by the new group
              */
-            LayerService.prototype.setStyle = function (property, openStyleTab) {
+            LayerService.prototype.setStyle = function (property, openStyleTab, customStyleInfo) {
                 var _this = this;
                 if (openStyleTab === void 0) { openStyleTab = true; }
                 var f = property.feature;
@@ -7820,8 +8194,14 @@ var csComp;
                     gs.visualAspect = (ft.style && ft.style.drawingMode && ft.style.drawingMode.toLowerCase() == 'polyline') ? 'strokeColor' : 'fillColor';
                     gs.canSelectColor = gs.visualAspect.toLowerCase().indexOf('color') > -1;
                     gs.property = property.property;
-                    if (gs.info == null)
-                        gs.info = this.calculatePropertyInfo(layer.group, property.property);
+                    if (customStyleInfo) {
+                        gs.info = customStyleInfo;
+                        gs.fixedColorRange = true;
+                    }
+                    else {
+                        if (gs.info == null)
+                            gs.info = this.calculatePropertyInfo(layer.group, property.property);
+                    }
                     gs.enabled = true;
                     gs.group = layer.group;
                     gs.meta = property.meta;
@@ -7829,7 +8209,7 @@ var csComp;
                         gs.colors = ['white', 'orange'];
                     }
                     else {
-                        gs.colors = ['white', 'orange'];
+                        gs.colors = ['red', 'white', 'blue'];
                     }
                     this.saveStyle(layer.group, gs);
                     var NS = lg.styles.length;
@@ -8014,7 +8394,15 @@ var csComp;
             LayerService.prototype.removeLayer = function (layer) {
                 var m;
                 var g = layer.group;
+                layer.enabled = false;
+                //if (layer.refreshTimer) layer.stop();
                 this.loadedLayers.remove(layer.id);
+                // find layer source, and remove layer
+                var layerSource = layer.type.toLowerCase();
+                // if a layersource is available, remove layer there
+                if (this.layerSources.hasOwnProperty(layerSource)) {
+                    this.layerSources[layerSource].removeLayer(layer);
+                }
                 if (this.lastSelectedFeature != null && this.lastSelectedFeature.layerId === layer.id) {
                     this.lastSelectedFeature = null;
                     this.$messageBusService.publish('sidebar', 'hide');
@@ -8035,7 +8423,8 @@ var csComp;
                     });
                 }
                 else {
-                    this.map.map.removeLayer(layer.mapLayer);
+                    if (layer.mapLayer)
+                        this.map.map.removeLayer(layer.mapLayer);
                 }
                 this.project.features = this.project.features.filter(function (k) { return k.layerId !== layer.id; });
                 var layerName = layer.id + '_';
@@ -8058,6 +8447,7 @@ var csComp;
                     g.styles = [];
                 }
                 this.rebuildFilters(g);
+                layer.enabled = false;
                 this.$messageBusService.publish('layer', 'deactivate', layer);
             };
             /***
@@ -8186,6 +8576,19 @@ var csComp;
                         d.widgets = [];
                         _this.project.dashboards.push(d);
                     }
+                    if (_this.project.datasources) {
+                        _this.project.datasources.forEach(function (ds) {
+                            if (ds.url) {
+                                Services.DataSource.LoadData(ds, function () {
+                                    for (var s in ds.sensors) {
+                                        var ss = ds.sensors[s];
+                                        ss.activeValue = ss.values[ss.values.length - 1];
+                                        console.log(ss.activeValue);
+                                    }
+                                });
+                            }
+                        });
+                    }
                     if (!_this.project.dataSets)
                         _this.project.dataSets = [];
                     _this.project.features = [];
@@ -8272,6 +8675,21 @@ var csComp;
                         }
                     });
                 });
+            };
+            LayerService.prototype.findSensorSet = function (key, callback) {
+                var kk = key.split('/');
+                if (kk.length == 2) {
+                    var source = kk[0];
+                    var sensorset = kk[1];
+                    this.project.datasources.forEach(function (ds) {
+                        if (ds.id === source) {
+                            if (ds.sensors.hasOwnProperty(sensorset)) {
+                                callback(ds.sensors[sensorset]);
+                            }
+                        }
+                    });
+                }
+                return null;
             };
             //private zoom(data: any) {
             //    //var a = data;
@@ -8674,7 +9092,10 @@ var csComp;
             function GeoJsonSource(service) {
                 this.service = service;
                 this.title = "geojson";
+                this.requiresLayer = false;
             }
+            GeoJsonSource.prototype.refreshLayer = function (layer) {
+            };
             GeoJsonSource.prototype.addLayer = function (layer, callback) {
                 this.baseAddLayer(layer, callback);
             };
@@ -8688,14 +9109,15 @@ var csComp;
                         layer.isLoading = true;
                         // get data
                         d3.json(layer.url, function (error, data) {
+                            layer.count = 0;
                             layer.isLoading = false;
                             // check if loaded correctly
                             if (error)
-                                _this.service.$messageBusService.notify('ERROR loading' + layer.title, error);
+                                _this.service.$messageBusService.notify('ERROR loading ' + layer.title, error);
                             else {
                                 // if this is a topojson layer, convert to geojson first
                                 if (layer.type.toLowerCase() === 'topojson') {
-                                    data = csComp.Helpers.convertTopoToGeoJson(data);
+                                    data = csComp.Helpers.GeoExtensions.convertTopoToGeoJson(data);
                                 }
                                 // check if there are events definined
                                 if (data.events && _this.service.timeline) {
@@ -8839,9 +9261,7 @@ var csComp;
                     }
                 });
                 this.connection = this.service.$messageBusService.getConnection("");
-                this.connection.events.add(function (status) { return _this.connectionEvent; });
-                //this.addLayer(layer, callback);
-                //this.service.$messageBusService.    
+                //this.connection.events.add((status: string) => this.connectionEvent);
             };
             DynamicGeoJsonSource.prototype.connectionEvent = function (status) {
                 console.log("connected event");
@@ -8867,13 +9287,146 @@ var csComp;
     var Services;
     (function (Services) {
         'use strict';
+        var HeatmapSource = (function () {
+            function HeatmapSource(service) {
+                this.service = service;
+                this.title = "heatmap";
+                this.requiresLayer = true;
+                //service: LayerService;
+                this.heatmapModel = new Heatmap.HeatmapModel("ProjectHeatmap");
+            }
+            //public init(service: LayerService) {
+            //    this.service = service;
+            //}
+            HeatmapSource.prototype.refreshLayer = function (layer) {
+                this.generateHeatmap(layer);
+            };
+            HeatmapSource.prototype.addLayer = function (layer, callback) {
+                var _this = this;
+                async.series([
+                    function (cb) {
+                        layer.layerRenderer = "heatmap";
+                        layer.isLoading = true;
+                        // Calculate heatmap
+                        _this.generateHeatmap(layer);
+                        layer.enabled = true;
+                        _this.enableProjectLayer(layer);
+                        layer.isLoading = false;
+                        cb(null, null);
+                    },
+                    // Callback
+                    function () {
+                        callback(layer);
+                    }
+                ]);
+            };
+            HeatmapSource.prototype.removeLayer = function (layer) {
+                delete (this.heatmapModel);
+                this.heatmapModel = new Heatmap.HeatmapModel("ProjectHeatmap");
+                layer.enabled = false;
+                layer.data = JSON;
+                this.enableProjectLayer(layer); // Set project layer to disabled
+                //this.updateLayer(layer);
+            };
+            /* Enables the project layer if the 'layer' parameter has the same id as a project layer */
+            HeatmapSource.prototype.enableProjectLayer = function (layer) {
+                if (layer.id) {
+                    this.service.project.groups.forEach(function (group) {
+                        group.layers.forEach(function (l) {
+                            if (l.id == layer.id) {
+                                l.enabled = layer.enabled;
+                                if (l.enabled == false) {
+                                    layer.data = JSON;
+                                }
+                            }
+                        });
+                    });
+                }
+            };
+            HeatmapSource.prototype.getRequiredLayers = function (layer) {
+                var _this = this;
+                var requiredLayers = [];
+                if (layer.heatmapSettings && layer.heatmapSettings.referenceList) {
+                    layer.heatmapSettings.referenceList.forEach(function (ref) {
+                        _this.service.project.groups.forEach(function (group) {
+                            group.layers.forEach(function (l) {
+                                if (l.reference == ref) {
+                                    requiredLayers.push(l);
+                                }
+                            });
+                        });
+                    });
+                }
+                return requiredLayers;
+            };
+            HeatmapSource.prototype.getFeatureTypes = function (layer) {
+                var featureTypes = [];
+                layer.heatmapItems.forEach(function (hi) {
+                    featureTypes.push(hi.featureType.name);
+                });
+                return featureTypes;
+            };
+            HeatmapSource.prototype.generateHeatmap = function (layer) {
+                var _this = this;
+                console.log('Generating heatmap');
+                var geoLayer = L.geoJson([]);
+                this.heatmapModel.deserialize(layer);
+                this.heatmapModel.id = layer.id;
+                var currentZoom = this.service.$mapService.getMap().getZoom();
+                if (currentZoom < this.heatmapModel.heatmapSettings.minZoom || currentZoom > this.heatmapModel.heatmapSettings.maxZoom) {
+                    return;
+                }
+                else {
+                    this.heatmapModel.updateWeights();
+                    this.heatmapModel.calculate(this.service, this.service.$mapService, geoLayer);
+                    var time = new Date().getTime();
+                    layer.data = geoLayer.toGeoJSON();
+                }
+                if ((layer.data) && (layer.data).features) {
+                    (layer.data).features.forEach(function (f) {
+                        _this.service.initFeature(f, layer);
+                    });
+                    // Set default style for the heatmap:
+                    if ((layer.data).features[0]) {
+                        var calloutProp = new FeatureProps.CallOutProperty("intensity", "0", "intensity", true, true, (layer.data).features[0], false, false);
+                        var propinfo = new Services.PropertyInfo();
+                        // Tweak the group style info to keep constant min/max color values on panning and zooming.
+                        propinfo.count = (layer.data).features.length;
+                        propinfo.max = 1;
+                        propinfo.min = -1;
+                        propinfo.sdMax = propinfo.max;
+                        propinfo.sdMin = propinfo.min;
+                        propinfo.mean = 0;
+                        propinfo.varience = 0.67;
+                        propinfo.sd = Math.sqrt(propinfo.varience);
+                        this.service.setStyle(calloutProp, false, propinfo); // Set the style
+                    }
+                }
+                var time2 = new Date().getTime();
+                console.log('Init and style features in ' + (time2 - time).toFixed(1) + ' ms');
+            };
+            return HeatmapSource;
+        })();
+        Services.HeatmapSource = HeatmapSource;
+    })(Services = csComp.Services || (csComp.Services = {}));
+})(csComp || (csComp = {}));
+var csComp;
+(function (csComp) {
+    var Services;
+    (function (Services) {
+        'use strict';
         var TileLayerSource = (function () {
             function TileLayerSource(service) {
                 this.service = service;
                 this.title = "tilelayer";
+                //service : LayerService;
+                this.requiresLayer = false;
             }
+            TileLayerSource.prototype.refreshLayer = function (layer) {
+            };
             TileLayerSource.prototype.addLayer = function (layer, callback) {
                 layer.layerRenderer = "tilelayer";
+                callback(layer);
                 //this.$rootScope.$apply();
             };
             TileLayerSource.prototype.removeLayer = function (layer) {
@@ -8889,10 +9442,14 @@ var csComp;
     (function (Services) {
         'use strict';
         var WmsSource = (function () {
+            //service : LayerService;
             function WmsSource(service) {
                 this.service = service;
                 this.title = "wms";
+                this.requiresLayer = false;
             }
+            WmsSource.prototype.refreshLayer = function (layer) {
+            };
             WmsSource.prototype.addLayer = function (layer, callback) {
                 var wms = L.tileLayer.wms(layer.url, {
                     layers: layer.wmsLayers,
@@ -9297,6 +9854,26 @@ var csComp;
                             this.service.map.map.removeLayer(layer.mapLayer);
                         }
                         break;
+                    case "heatmap":
+                        var g = layer.group;
+                        //m = layer.group.vectors;
+                        if (g.clustering) {
+                            var m = g.cluster;
+                            this.service.project.features.forEach(function (feature) {
+                                if (feature.layerId === layer.id) {
+                                    try {
+                                        m.removeLayer(layer.group.markers[feature.id]);
+                                        delete layer.group.markers[feature.id];
+                                    }
+                                    catch (error) {
+                                    }
+                                }
+                            });
+                        }
+                        else {
+                            this.service.map.map.removeLayer(layer.mapLayer);
+                        }
+                        break;
                     case "wms":
                         break;
                 }
@@ -9314,7 +9891,7 @@ var csComp;
             LeafletRenderer.prototype.addLayer = function (layer) {
                 var _this = this;
                 switch (layer.layerRenderer) {
-                    case "tile":
+                    case "tilelayer":
                         var tileLayer = L.tileLayer(layer.url, {
                             attribution: layer.description
                         });
@@ -9369,6 +9946,56 @@ var csComp;
                         layer.data.features.forEach(function (f) {
                             layer.group.markers[f.id] = _this.addFeature(f);
                         });
+                        break;
+                    case "heatmap":
+                        var time = new Date().getTime();
+                        // create leaflet layers
+                        if (layer.group.clustering) {
+                            var markers = L.geoJson(layer.data, {
+                                pointToLayer: function (feature, latlng) { return _this.createFeature(feature); },
+                                onEachFeature: function (feature, lay) {
+                                    //We do not need to init the feature here: already done in style.
+                                    //this.initFeature(feature, layer);
+                                    layer.group.markers[feature.id] = lay;
+                                    lay.on({
+                                        mouseover: function (a) { return _this.showFeatureTooltip(a, layer.group); },
+                                        mouseout: function (s) { return _this.hideFeatureTooltip(s); }
+                                    });
+                                }
+                            });
+                            layer.group.cluster.addLayer(markers);
+                        }
+                        else {
+                            layer.mapLayer = new L.LayerGroup();
+                            this.service.map.map.addLayer(layer.mapLayer);
+                            var v = L.geoJson(layer.data, {
+                                onEachFeature: function (feature, lay) {
+                                    //We do not need to init the feature here: already done in style.
+                                    //this.initFeature(feature, layer);
+                                    layer.group.markers[feature.id] = lay;
+                                    lay.on({
+                                        mouseover: function (a) { return _this.showFeatureTooltip(a, layer.group); },
+                                        mouseout: function (s) { return _this.hideFeatureTooltip(s); },
+                                        mousemove: function (d) { return _this.updateFeatureTooltip(d); },
+                                        click: function () { return _this.service.selectFeature(feature); }
+                                    });
+                                },
+                                style: function (f, m) {
+                                    layer.group.markers[f.id] = m;
+                                    return f.effectiveStyle;
+                                },
+                                pointToLayer: function (feature, latlng) { return _this.createFeature(feature); }
+                            });
+                            this.service.project.features.forEach(function (f) {
+                                if (f.layerId !== layer.id)
+                                    return;
+                                var ft = _this.service.getFeatureType(f);
+                                f.properties['Name'] = f.properties[ft.style.nameLabel];
+                            });
+                            layer.mapLayer.addLayer(v);
+                            var time2 = new Date().getTime();
+                            console.log('Applied style in ' + (time2 - time).toFixed(1) + ' ms');
+                        }
                         break;
                 }
             };
@@ -9481,7 +10108,7 @@ var csComp;
                     props['background'] = feature.effectiveStyle.fillColor;
                     props['width'] = feature.effectiveStyle.iconWidth + 'px';
                     props['height'] = feature.effectiveStyle.iconHeight + 'px';
-                    props['border-radius'] = '20%';
+                    props['border-radius'] = feature.effectiveStyle.cornerRadius + '%';
                     props['border-style'] = 'solid';
                     props['border-color'] = feature.effectiveStyle.strokeColor;
                     props['border-width'] = feature.effectiveStyle.strokeWidth;
@@ -9495,7 +10122,10 @@ var csComp;
                         html += key + ':' + props[key] + ';';
                     }
                     html += '\'>';
-                    if (iconUri != null) {
+                    if (feature.effectiveStyle.innerTextProperty != null && feature.properties.hasOwnProperty(feature.effectiveStyle.innerTextProperty)) {
+                        html += "<span style='font-size:12px;vertical-align:-webkit-baseline-middle'>" + feature.properties[feature.effectiveStyle.innerTextProperty] + "</span>";
+                    }
+                    else if (iconUri != null) {
                         // Must the iconUri be formatted?
                         if (iconUri != null && iconUri.indexOf('{') >= 0)
                             iconUri = csComp.Helpers.convertStringFormat(feature, iconUri);
@@ -9672,6 +10302,7 @@ var Translations;
             ORANGE_RED: 'orange - red',
             WHITE_RED: 'white - red',
             RED_WHITE: 'red - white',
+            RED_WHITE_BLUE: 'red - white - blue',
             GREEN_RED: 'green - red',
             RED_GREEN: 'red - green',
             BLUE_RED: 'blue - red',
@@ -9691,6 +10322,30 @@ var Translations;
             LAYER_SERVICE: {
                 RELOAD_PROJECT_TITLE: 'Data is reloaded',
                 RELOAD_PROJECT_MSG: 'After switching the language, we need to reload all the map data. Our appologies for the inconvenience.'
+            },
+            HEATMAP: {
+                DESCRIPTION: '<h4>Heatmap</h4><p  style="text-align: left; margin-left:5px;">Heatmap highlights areas on the map that fulfill multiple selected criteria.',
+                INFO: 'At the moment, no map layers are loaded that contain a heatmap. Open another map layer to use it.',
+                INFO_EXPERT: 'At the moment, no map layers are loaded that contain a heatmap. Open another map layer to use it, or create a new heatmap using the wizard.',
+                SHOW_FEATURE_MSG: 'Select a feature on the map to see the heatmap.',
+                TOTAL_RESULT: 'Combined result',
+                DELETE_MSG: 'Delete "{0}"',
+                DELETE_MSG2: 'Are you sure?',
+                EDITOR_TITLE: 'Heatmap Editor',
+                MAIN_FEATURE: 'Select the main feature',
+                PROPERTIES: 'Select the properties',
+                INTENSITY_SCALE: 'Intensity scale',
+                TITLE: 'Title... *',
+                SCALE_MIN_TITLE: '[Min. scale]',
+                SCALE_MAX_TITLE: '[Max. scale]',
+                AT_LOCATION_VALUE: '[Weight at location]',
+                DISTANCE_MAX_VALUE: '[Ideal distance]',
+                LOST_INTEREST_VALUE: '[Lost interest distance]',
+                LINEAR_ASC_DESC: 'Linearly increasing, then decreasing function.',
+                ADD_HEATMAP: 'Add a new heatmap.',
+                DELETE_HEATMAP: 'Delete the heatmap.',
+                EDIT_HEATMAP: 'Edit the heatmap.',
+                EXPORT_HEATMAP: 'Export the heatmap.'
             },
             MCA: {
                 DESCRIPTION: '<h4>Multi-Criteria Analysis</h4><p  style="text-align: left; margin-left:5px;">MCA, is a method that combines multiple properties of a feature on the map into a new property. It achieves this by:<ol><li>Scaling each property to a range between 0 (no value) and 1 (maximum value).</li><li>Weighing each property relative to the others, where a weight less than 0 indicates you wish to avoid it, 0 is ignored, and a value greater than 0 is prefered.</li></ol> In fact, it is a kind of linear regression.',
@@ -9766,6 +10421,7 @@ var Translations;
             PERCENTAGES_V1: 'percentages v1',
             ORANGE_RED: 'oranje - rood',
             WHITE_RED: 'wit - rood',
+            RED_WHITE_BLUE: 'rood - wit - blauw',
             RED_WHITE: 'rood - wit',
             GREEN_RED: 'groen - rood',
             RED_GREEN: 'rood - groen',
@@ -9786,6 +10442,31 @@ var Translations;
             LAYER_SERVICE: {
                 RELOAD_PROJECT_TITLE: 'Data wordt opnieuw geladen',
                 RELOAD_PROJECT_MSG: 'Na het wisselen van de taal moet de kaartdata opnieuw ingelezen worden. Excuses voor het ongemak.'
+            },
+            HEATMAP: {
+                DESCRIPTION: '<h4>Toelichting heatmap</h4><div style="text-align: left; margin-left:5px;"><p>Heatmap laat gebieden op de kaart oplichten die voldoen aan bepaalde criteria.',
+                INFO: 'Momenteel zijn er geen kaartlagen geopend die heatmaps bevatten.',
+                INFO_EXPERT: 'Momenteel zijn er geen kaartlagen geopend die heatmaps bevatten. Open een kaartlaag en maak een nieuwe heatmap aan met behulp van de wizard.',
+                SHOW_FEATURE_MSG: 'Selecteer een feature op de kaart om de heatmap resultaten in detail te bekijken.',
+                TOTAL_RESULT: 'Gecombineerd resultaat',
+                DELETE_MSG: 'Verwijder "{0}"',
+                DELETE_MSG2: 'Weet u het zeker?',
+                EDITOR_TITLE: 'Heatmap Editor',
+                MAIN_FEATURE: 'Selecteer het type feature',
+                PROPERTIES: 'Selecteer de eigenschappen',
+                INTENSITY_SCALE: 'Intensiteitsschaal',
+                TITLE: 'Titel... *',
+                TOGGLE_SPARKLINE: 'Toon of verberg de histogram en score functie.',
+                SCALE_MIN_TITLE: '[Schaal max]',
+                SCALE_MAX_TITLE: '[Schaal min]',
+                AT_LOCATION_VALUE: '[Waarde op locatie]',
+                DISTANCE_MAX_VALUE: '[Ideale afstand]',
+                LOST_INTEREST_VALUE: '[Negeer vanaf afstand]',
+                LINEAR_ASC_DESC: 'Linear toenemende, dan afnemende functie.',
+                ADD_HEATMAP: 'Maak een nieuwe heatmap.',
+                DELETE_HEATMAP: 'Verwijder de heatmap.',
+                EDIT_HEATMAP: 'Bewerk de heatmap.',
+                EXPORT_HEATMAP: 'Exporteer de heatmap.'
             },
             MCA: {
                 DESCRIPTION: '<h4>Toelichting MCA</h4><div style="text-align: left; margin-left:5px;"><p>Multi-Criteria Analysis (MCA) is een methode die verschillende eigenschappen van een locatie of gebied op de kaart combineerd tot een nieuwe eigenschap. Dit gaat als volgt: <ol><li>Schaal iedere eigenschap tussen 0 (geen waarde) en 1 (maximum waarde).</li><li>Weeg iedere eigenschap relatief t.o.v. de andere gekozen eigenschappen, waar een gewicht onder 0 betekent dat je de eigenschap wil vermijden, 0 wordt genegeerd, en een waarde groter dan 0 betekent dat je dit wil bereiken.</li></ol>Met andere woorden, het is een vorm van lineare regressie.</p></div>',

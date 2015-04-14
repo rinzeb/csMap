@@ -265,8 +265,4 @@ var App;
         };
     });
 })(App || (App = {}));
-<<<<<<< HEAD
 //# sourceMappingURL=app.js.map
-=======
-//# sourceMappingURL=app.js.map
->>>>>>> upstream/master
