@@ -19,6 +19,7 @@
     <!--TODO Add your title here-->
     <title>csMap</title>
 
+    <!-- build:css css/csMap.css -->
     <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap-theme.min.css" />
     <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.min.css" />
@@ -28,30 +29,29 @@
     <link rel="stylesheet" href="bower_components/leaflet.markercluster/dist/MarkerCluster.Default.css" />
     <link rel="stylesheet" href="bower_components/leaflet.locatecontrol/src/L.Control.Locate.css" />
     <link rel="stylesheet" href="bower_components/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" />
-
     <link rel="stylesheet" href="css/timeline.css" />
     <link rel="stylesheet" href="css/widgets.css" />
-
-    <style>
-        #cesiumContainer {
-            width: 100%;
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-        }
-    </style>
-
-
-
-    <!--<link rel="stylesheet" href="css/timeline.css" />-->
     <link rel="stylesheet" href="css/pnotify.custom.min.css" />
     <link rel="stylesheet" href="css/xbbcode.css">
     <link rel="stylesheet" href="css/csStyles.css" />
     <link rel="stylesheet" href="css/style.css">
     <link rel="shortcut icon" href="favicon.ico">
+    <!-- endbuild -->
+
+        <style>
+            #cesiumContainer {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+            }
+        </style>
+
+
 </head>
 <body data-ng-controller="appCtrl" data-ng-cloak data-ng-init="showMap=true">
+    <!-- build:js csMap.js -->
     <script src="bower_components/jquery/dist/jquery.min.js"></script>
     <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
     <script src="bower_components/angular/angular.min.js"></script>
@@ -94,6 +94,7 @@
 
     <script src="app/search/SearchCtrl.js"></script>
     <script src="app/app.js"></script>
+    <!-- endbuild -->
 
     <div role="navigation" class="navbar navbar-inverse navbar-fixed-top">
 
@@ -129,11 +130,6 @@
 
                 <li data-ng-class="{ active: vm.isActive('/map')}"><a href="#/map" data-ng-click="showMap=true" translate>MAP_LABEL</a></li>
                 <li data-ng-class="{ active: vm.isActive('/table')}"><a href="#/table" data-ng-click="vm.showTable()" translate>TABLE_LABEL</a></li>
-
-
-
-                <!--<li><language-switch></language-switch></li>-->
-
             </ul>
 
             <ul class="nav navbar-nav" style="float:right">
@@ -141,17 +137,28 @@
                 <li data-ng-if="vm.$layerService.activeMapRenderer.title!='cesium'"><a data-ng-click="vm.$layerService.selectRenderer('cesium')">3D</a></li>
             </ul>
 
-
-            <!-- Language switch -->
-            <!-- <language-switch class="navbar-form navbar-right" style="margin-top: 0; margin-bottom: 0"></language-switch>
-
-                        <expert-mode class="navbar-form navbar-right" style="outline:none; margin: 15px 5px 0 0; color: white"></expert-mode>-->
             <!-- Search form -->
             <offline-search class="navbar-form navbar-right" style="margin-right:0"></offline-search>
+            <!-- <form class="navbar-form navbar-right" style="margin-right:0" role="search" data-ng-controller="searchCtrl">
+                <div id="scrollable-dropdown-menu" class="form-group has-feedback navbar-right">
+                    <input data-ng-model="vm.searchText"
+                           typeahead="address as address.shortName(25) for address in vm.getLocation($viewValue)"
+                           typeahead-loading="loadingLocations"
+                           typeahead-min-length="2"
+                           typeahead-editable="false"
+                           typeahead-on-select="vm.onSelect($item, $model, $label)"
+                           id="searchbox"
+                           type="text"
+                           placeholder="Zoek in kaartlagen"
+                           class="typeahead form-control">
+                    <span id="searchicon" class="fa fa-search form-control-feedback"></span>
+                </div>
+            </form> -->
             <!-- Expert mode switch -->
-            <expert-mode class="navbar-form navbar-right" style="outline:none; margin: -9px -10px 0 0; color: white"></expert-mode>
+            <expert-mode class="navbar-form navbar-right" style="outline:none; margin: 5px -10px 0 0; color: white"></expert-mode>
             <!-- Language switch -->
             <language-switch class="navbar-form navbar-right" style="margin: 0 -5px 0 8px;"></language-switch>
+
         </div>
     </div>
 

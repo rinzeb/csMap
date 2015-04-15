@@ -173,12 +173,22 @@
             'csWeb.projectSettings',
             'csWeb.expertMode',
             'ngCookies',
-            //'csWeb.charts',
-            'csWeb.timeline'//,
-            //'csWeb.heatmap'
+            'csWeb.charts',
+            'csWeb.timeline',
+            'csWeb.offlineSearch',
+            'csWeb.heatmap'
         ])
         .config(localStorageServiceProvider => {
             localStorageServiceProvider.prefix = 'csMap';
+        })
+        .config(TimelineServiceProvider => {
+            TimelineServiceProvider.setTimelineOptions({
+                'width'          : '100%',
+                "eventMargin"    : 0,
+                "eventMarginAxis": 0,
+                'editable'       : false,
+                'layout'         : 'box'
+            });
         })
         .config($translateProvider => {
             // TODO ADD YOUR LOCAL TRANSLATIONS HERE, OR ALTERNATIVELY, CHECK OUT

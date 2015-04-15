@@ -134,17 +134,32 @@ var App;
         'csWeb.projectSettings',
         'csWeb.expertMode',
         'ngCookies',
-        'csWeb.timeline'
-    ]).config(function (localStorageServiceProvider) {
+        'csWeb.charts',
+        'csWeb.timeline',
+        'csWeb.offlineSearch',
+        'csWeb.heatmap'
+    ])
+        .config(function (localStorageServiceProvider) {
         localStorageServiceProvider.prefix = 'csMap';
-    }).config(function ($translateProvider) {
+    })
+        .config(function (TimelineServiceProvider) {
+        TimelineServiceProvider.setTimelineOptions({
+            'width': '100%',
+            "eventMargin": 0,
+            "eventMarginAxis": 0,
+            'editable': false,
+            'layout': 'box'
+        });
+    })
+        .config(function ($translateProvider) {
         // TODO ADD YOUR LOCAL TRANSLATIONS HERE, OR ALTERNATIVELY, CHECK OUT
         // http://angular-translate.github.io/docs/#/guide/12_asynchronous-loading
         // Translations.English.locale['MAP_LABEL'] = 'MY AWESOME MAP';
         $translateProvider.translations('en', Translations.English.locale);
         $translateProvider.translations('nl', Translations.Dutch.locale);
         $translateProvider.preferredLanguage('en');
-    }).config(function ($languagesProvider) {
+    })
+        .config(function ($languagesProvider) {
         // Defines the GUI languages that you wish to use in your project.
         // They will be available through a popup menu.
         var languages = [];
@@ -152,7 +167,8 @@ var App;
         languages.push({ key: 'nl', name: 'Nederlands', img: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAALCAIAAAD5gJpuAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAFXSURBVHjaYvzPgAD/UNlYEUAAkuTgCAAIBgJggq5VoAs1qM0vdzmMz362vezjokxPGimkEQ5WoAQEKuK71zwCCKyB4c//J8+BShn+/vv/+w/D399AEox+//8FJH/9/wUU+cUoKw20ASCAWBhEDf/LyDOw84BU//kDtgGI/oARmAHRDJQSFwVqAAggxo8fP/Ly8oKc9P8/AxjiAoyMjA8ePAAIIJZ///5BVIM0MOBWDpRlZPzz5w9AALH8gyvCbz7QBrCJAAHEyKDYX15r/+j1199//v35++/Xn7+///77DST/wMl/f4Dk378K4jx7O2cABBALw7NP77/+ev3xB0gOpOHfr99AdX9/gTVASKCGP//+8XCyMjC8AwggFoZfIHWSwpwQk4CW/AYjsKlA8u+ff////v33998/YPgBnQQQQIzAaGNg+AVGf5AYf5BE/oCjGEIyAQQYAGvKZ4C6+xXRAAAAAElFTkSuQmCC' });
         //languages.push({ key: 'de', name: 'Deutsch', img: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAALCAIAAAD5gJpuAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAGzSURBVHjaYvTxcWb4+53h3z8GZpZff/79+v3n/7/fDAz/GHAAgABi+f37e3FxOZD1Dwz+/v3z9y+E/AMFv3//+Qumfv9et241QACxMDExAVWfOHkJJAEW/gUEP0EQDn78+AHE/gFOQJUAAcQiy8Ag8O+fLFj1n1+/QDp+/gQioK7fP378+vkDqOH39x9A/RJ/gE5lAAhAYhzcAACCQBDkgRXRjP034R0IaDTZTFZn0DItot37S94KLOINerEcI7aKHAHE8v/3r/9//zIA1f36/R+o4tevf1ANYNVA9P07RD9IJQMDQACxADHD3z8Ig4GMHz+AqqHagKp//fwLVA0U//v7LwMDQACx/LZiYFD7/5/53/+///79BqK/EMZ/UPACSYa/v/8DyX9A0oTxx2EGgABi+a/H8F/m339BoCoQ+g8kgRaCQvgPJJiBYmAuw39hxn+uDAABxMLwi+E/0PusRkwMvxhBGoDkH4b/v/+D2EDyz///QB1/QLb8+sP0lQEggFh+vGXYM2/SP6A2Zoaf30Ex/J+PgekHwz9gQDAz/P0FYrAyMfz7wcDAzPDtFwNAgAEAd3SIyRitX1gAAAAASUVORK5CYII=' });
         $languagesProvider.setLanguages(languages);
-    }).filter('unique', function () {
+    })
+        .filter('unique', function () {
         // See https://github.com/angular-ui/angular-ui-OLDREPO/blob/master/modules/filters/unique/unique.js
         return function (items, filterOn) {
             if (filterOn === false) {
@@ -184,23 +200,31 @@ var App;
             }
             return items;
         };
-    }).config(function ($stateProvider, $urlRouterProvider) {
+    })
+        .config(function ($stateProvider, $urlRouterProvider) {
         // For any unmatched url, send to /
         $urlRouterProvider.otherwise("/map");
-        $stateProvider.state('map', {
+        $stateProvider
+            .state('map', {
             url: "/map?layers",
             templateUrl: "views/map/map.html",
             sticky: true,
             deepStateRedirect: true
-        }).state('table', {
+        })
+            .state('table', {
             url: "/table",
             template: "<datatable id='datatable'></datatable>",
             sticky: true
         });
-    }).service('messageBusService', csComp.Services.MessageBusService).service('mapService', csComp.Services.MapService).service('layerService', csComp.Services.LayerService).controller('appCtrl', AppCtrl).controller('searchCtrl', Search.SearchCtrl).controller('mcaEditorCtrl', Mca.McaEditorCtrl).filter('csmillions', [
-        '$filter',
-        '$locale',
-        function (filter, locale) {
+    })
+        .service('messageBusService', csComp.Services.MessageBusService)
+        .service('mapService', csComp.Services.MapService)
+        .service('layerService', csComp.Services.LayerService)
+        .controller('appCtrl', AppCtrl)
+        .controller('searchCtrl', Search.SearchCtrl)
+        .controller('mcaEditorCtrl', Mca.McaEditorCtrl)
+        .filter('csmillions', [
+        '$filter', '$locale', function (filter, locale) {
             return function (amount, currencySymbol) {
                 if (isNaN(amount))
                     return "";
@@ -208,15 +232,15 @@ var App;
                 return String.format("{0:N1}", millions);
             };
         }
-    ]).filter('format', [
-        '$filter',
-        '$locale',
-        function (filter, locale) {
+    ])
+        .filter('format', [
+        '$filter', '$locale', function (filter, locale) {
             return function (value, format) {
                 return String.format(format, value);
             };
         }
-    ]).directive('percentage', function () {
+    ])
+        .directive('percentage', function () {
         return {
             require: 'ngModel',
             link: function (scope, element, attrs, ngModelController) {
@@ -232,7 +256,8 @@ var App;
                 });
             }
         };
-    }).directive('ngModelOnblur', function () {
+    })
+        .directive('ngModelOnblur', function () {
         return {
             restrict: 'A',
             require: 'ngModel',
