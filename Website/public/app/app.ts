@@ -259,7 +259,7 @@
         .service('messageBusService', csComp.Services.MessageBusService)
         .service('mapService', csComp.Services.MapService)
         .service('layerService', csComp.Services.LayerService)
-        .controller('appCtrl', AppCtrl)        
+        .controller('appCtrl', AppCtrl)
         .controller('searchCtrl', Search.SearchCtrl)
         .controller('mcaEditorCtrl', Mca.McaEditorCtrl)
         .filter('csmillions', [
@@ -324,7 +324,7 @@
                 restrict: 'A',
                 require: 'ngModel',
                 priority: 1, // needed for angular 1.2.x
-                link: (scope, elm, attr, ngModelCtrl) => {
+                link: (scope, elm, attr: any, ngModelCtrl) => {
                     if (attr.type === 'radio' || attr.type === 'checkbox') return;
                     elm.unbind('input').unbind('keydown').unbind('change');
                     elm.bind('blur', () => {

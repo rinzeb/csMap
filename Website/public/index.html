@@ -1,27 +1,27 @@
 ﻿<!DOCTYPE html>
 <html ng-app="csWebApp">
-	<head>
-	    <!--[if lt IE 9]>
-	        <script>
-			    alert("This application does not work on IE8 or below! Please obtain a newer browser, or try a portable version of Firefox.");
-                window.location = "https://github.com/TNOCS/csMap";
-	        </script>
-		<![endif]-->
-		<meta charset="utf-8">
-		<meta http-equiv="X-UA-Compatible" content="IE=edge">
-		<meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
-		<meta name="mobile-web-app-capable" content="yes">
-		<meta name="apple-mobile-web-app-capable" content="yes">
-		<meta name="description" content="csMap, your mapping solution.">
-		<meta name="author" content="Arnoud de Jong, Erik Vullings">
-		<meta name="color:Accent" content="#a98e2e" />
+<head>
+    <!--[if lt IE 9]>
+        <script>
+            alert("This application does not work on IE8 or below! Please obtain a newer browser, or try a portable version of Firefox.");
+            window.location = "https://github.com/TNOCS/csMap";
+        </script>
+    <![endif]-->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="description" content="csMap, your mapping solution.">
+    <meta name="author" content="Arnoud de Jong, Erik Vullings">
+    <meta name="color:Accent" content="#a98e2e" />
 
-      <!--TODO Add your title here-->
+    <!--TODO Add your title here-->
     <title>csMap</title>
 
     <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap-theme.min.css" />
-    <link rel="stylesheet" href="bower_components/Font-Awesome/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.min.css" />
     <link rel="stylesheet" href="bower_components/leaflet/dist/leaflet.css" />
     <link rel="stylesheet" href="bower_components/dcjs/dc.css" />
     <link rel="stylesheet" href="bower_components/leaflet.markercluster/dist/MarkerCluster.css" />
@@ -29,20 +29,35 @@
     <link rel="stylesheet" href="bower_components/leaflet.locatecontrol/src/L.Control.Locate.css" />
     <link rel="stylesheet" href="bower_components/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" />
 
+    <link rel="stylesheet" href="css/timeline.css" />
+    <link rel="stylesheet" href="css/widgets.css" />
 
+    <style>
+        #cesiumContainer {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+    </style>
+
+
+
+    <!--<link rel="stylesheet" href="css/timeline.css" />-->
     <link rel="stylesheet" href="css/pnotify.custom.min.css" />
     <link rel="stylesheet" href="css/xbbcode.css">
     <link rel="stylesheet" href="css/csStyles.css" />
     <link rel="stylesheet" href="css/style.css">
-		<link rel="shortcut icon" href="favicon.ico">
-        <script src="/socket.io/socket.io.js"></script>
-	</head>
+    <link rel="shortcut icon" href="favicon.ico">
+</head>
 <body data-ng-controller="appCtrl" data-ng-cloak data-ng-init="showMap=true">
     <script src="bower_components/jquery/dist/jquery.min.js"></script>
     <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
     <script src="bower_components/angular/angular.min.js"></script>
     <script src="bower_components/angular-cookies/angular-cookies.min.js"></script>
     <script src="bower_components/angular-ui-router/release/angular-ui-router.min.js"></script>
+    <script src="bower_components/angular-translate/angular-translate.min.js"></script>
     <script src="bower_components/leaflet/dist/leaflet.js"></script>
     <script src="bower_components/leaflet.locatecontrol/src/L.Control.Locate.js"></script>
     <script src="bower_components/leaflet-ajax/dist/leaflet.ajax.min.js"></script>
@@ -52,7 +67,7 @@
     <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
     <script src="bower_components/angular-utils-pagination/dirPagination.js"></script>
     <script src="bower_components/angular-local-storage/dist/angular-local-storage.min.js"></script>
-    <script src="bower_components/angular-translate/angular-translate.min.js"></script>
+    <script src="bower_components/angular-sanitize/angular-sanitize.min.js"></script>
 
     <script src="bower_components/chroma-js/chroma.min.js"></script>
     <script src="bower_components/d3/d3.min.js"></script>
@@ -60,15 +75,9 @@
     <script src="bower_components/crossfilter/crossfilter.min.js"></script>
     <script src="bower_components/dcjs/dc.min.js"></script>
     <script src="bower_components/async/lib/async.js"></script>
-		<script src="bower_components/jquery-ui/jquery-ui.min.js"></script>
-		<script src="bower_components/underscore/underscore-min.js"></script>
-		<script src="bower_components/moment/min/moment.min.js"></script>
-
-    <script src="js/cs/csComp.js"></script>
-
-
-    <script src="app/search/SearchCtrl.js"></script>
-    <script src="app/app.js"></script>
+    <script src="bower_components/jquery-ui/jquery-ui.min.js"></script>
+    <script src="bower_components/underscore/underscore-min.js"></script>
+    <script src="bower_components/moment/min/moment.min.js"></script>
 
     <script src="js/cs/dashboard.min.js"></script>
     <script src="js/cs/stringformat-1.09.min.min.js"></script>
@@ -78,19 +87,13 @@
     <script src="js/cs/pnotify.custom.min.js"></script>
     <script src="js/cs/jqueryinjectCSS.min.js"></script>
     <script src="js/cs/timeline.min.js"></script>
-		<script src="http://cesiumjs.org/Cesium/Build/Cesium/Cesium.js"></script>
+    <script src="js/cs/cesium.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
 
-    <link rel="stylesheet" href="css/timeline.css" />
-		<link rel="stylesheet" href="http://cesiumjs.org/Cesium/Build/Cesium/Widgets/widgets.css" />
+    <script src="js/cs/csComp.js"></script>
 
-		<style>
-
-      #cesiumContainer {
-          width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden;
-      }
-  	</style>
-
-
+    <script src="app/search/SearchCtrl.js"></script>
+    <script src="app/app.js"></script>
 
     <div role="navigation" class="navbar navbar-inverse navbar-fixed-top">
 
@@ -133,133 +136,117 @@
 
             </ul>
 
-						<ul class="nav navbar-nav" style="float:right">
-							<li  data-ng-if="vm.$layerService.activeMapRenderer.title!='leaflet'"><a data-ng-click="vm.$layerService.selectRenderer('leaflet')">2D</a></li>
-							<li  data-ng-if="vm.$layerService.activeMapRenderer.title!='cesium'"><a data-ng-click="vm.$layerService.selectRenderer('cesium')">3D</a></li>
-						</ul>
+            <ul class="nav navbar-nav" style="float:right">
+                <li data-ng-if="vm.$layerService.activeMapRenderer.title!='leaflet'"><a data-ng-click="vm.$layerService.selectRenderer('leaflet')">2D</a></li>
+                <li data-ng-if="vm.$layerService.activeMapRenderer.title!='cesium'"><a data-ng-click="vm.$layerService.selectRenderer('cesium')">3D</a></li>
+            </ul>
 
 
             <!-- Language switch -->
-            <language-switch class="navbar-form navbar-right" style="margin-top: 0; margin-bottom: 0"></language-switch>
+            <!-- <language-switch class="navbar-form navbar-right" style="margin-top: 0; margin-bottom: 0"></language-switch>
 
-						<expert-mode class="navbar-form navbar-right" style="outline:none; margin: 15px 5px 0 0; color: white"></expert-mode>
-
+                        <expert-mode class="navbar-form navbar-right" style="outline:none; margin: 15px 5px 0 0; color: white"></expert-mode>-->
             <!-- Search form -->
-            <form class="navbar-form navbar-right" style="margin-right:0" role="search" data-ng-controller="searchCtrl">
-                <div id="scrollable-dropdown-menu" class="form-group has-feedback navbar-right">
-                    <!--                     <pre>Model: {{location | json}}</pre>-->
-
-                    <input data-ng-model="vm.searchText"
-                           typeahead="address as address.shortName(25) for address in vm.getLocation($viewValue)"
-                           typeahead-loading="loadingLocations"
-                           typeahead-min-length="2"
-                           typeahead-editable="false"
-                           typeahead-on-select="vm.onSelect($item, $model, $label)"
-                           id="searchbox"
-                           type="text"
-                           placeholder="Search"
-                           class="typeahead form-control">
-                    <!--                    <span ng-if="loadingLocations"  id="searchicon" class="fa fa-refresh fa-spin"></span>-->
-                    <span id="searchicon" class="fa fa-search form-control-feedback"></span>
-                </div>
-            </form>
-
-
+            <offline-search class="navbar-form navbar-right" style="margin-right:0"></offline-search>
+            <!-- Expert mode switch -->
+            <expert-mode class="navbar-form navbar-right" style="outline:none; margin: -9px -10px 0 0; color: white"></expert-mode>
+            <!-- Language switch -->
+            <language-switch class="navbar-form navbar-right" style="margin: 0 -5px 0 8px;"></language-switch>
         </div>
     </div>
 
-		<map mapid="main" style="width:50%"></map>
+    <map mapid="main" style="width:50%"></map>
 
-		<div style="position: absolute;width: 100%;height:100%;pointer-events: none">
+    <div style="position: absolute;width: 100%;height:100%;pointer-events: none">
 
-		    <div class="rightpanel" style="background-color: transparent; ">
-		        <div id="rightpanelTabContainer" class="tabbable tabs-left" style="position:relative;height:100%;padding:0px">
-		            <!-- Nav tabs -->
-		            <!--<div id="rightPanelToggle">
-		                    <i class="fa fa-2x fa-chevron-right" style="margin-left: 10px;margin-top: 108px;"></i>
-		                </div>-->
+        <div class="rightpanel" style="background-color: transparent; ">
+            <div id="rightpanelTabContainer" class="tabbable tabs-left" style="position:relative;height:100%;padding:0px">
+                <!-- Nav tabs -->
+                <!--<div id="rightPanelToggle">
+                        <i class="fa fa-2x fa-chevron-right" style="margin-left: 10px;margin-top: 108px;"></i>
+                    </div>-->
 
-		            <ul id="rightpanelTabs" class="nav nav-tabs" style="margin-right:0px; margin-top:100px; display:inline-block">
-		                <li class="rightPanelTab rightPanelTabAnimated active" ng-show="featureSelected"><a href="#info" style="" data-toggle="tab"><span class="fa fa-info fa-lg"></span></a></li>
-		            </ul>
-		            <div id="rightpanelTabPanes" class="tab-content" style="display: inline-block; height:100%; background-color: white;">
-		                <div class="tab-pane active" id="info">
-		                    <featureprops class="rightpanel-content"></featureprops>
-		                </div>
-		            </div>
-		        </div>
-		    </div>
+                <ul id="rightpanelTabs" class="nav nav-tabs" style="margin-right:0px; margin-top:100px; display:inline-block">
+                    <li class="rightPanelTab rightPanelTabAnimated active" ng-show="featureSelected"><a href="#info" style="" data-toggle="tab"><span class="fa fa-info fa-lg"></span></a></li>
+                </ul>
+                <div id="rightpanelTabPanes" class="tab-content" style="display: inline-block; height:100%; background-color: white;">
+                    <div class="tab-pane active" id="info">
+                        <featureprops class="rightpanel-content"></featureprops>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-		    <script>
-		        $('#rightpanelTabs a').click(function (e) {
-		            var tab = $(this);
-		            if (tab.parent('li').hasClass('tab-toggle')) {
-		                var foo = $("#rightpanelTabPanes").children(".tab-pane");
-		                if (foo.hasClass('active')) {
-		                    foo.removeClass('active');
-		                } else {
-		                    foo.addClass('active');
-		                }
+        <script>
+            $('#rightpanelTabs a').click(function (e) {
+                var tab = $(this);
+                if (tab.parent('li').hasClass('tab-toggle')) {
+                    var foo = $("#rightpanelTabPanes").children(".tab-pane");
+                    if (foo.hasClass('active')) {
+                        foo.removeClass('active');
+                    } else {
+                        foo.addClass('active');
+                    }
 
-		            }
-		            if (tab.parent('li').hasClass('active')) {
-		                window.setTimeout(function () {
-		                    var foo = $("#rightpanelTabPanes").children(".tab-pane");
-		                    foo.removeClass('active');
-		                    tab.parent('li').removeClass('active');
-		                    $('.leaflet-control-zoom').css('visibility', 'visible');
-		                    $('.leaflet-control-locate').css('visibility', 'visible');
-		                }, 1);
-		            } else {
-		                $('.leaflet-control-zoom').css('visibility', 'hidden');
-		                $('.leaflet-control-locate').css('visibility', 'hidden');
-		            }
-		        });
-		    </script>
+                }
+                if (tab.parent('li').hasClass('active')) {
+                    window.setTimeout(function () {
+                        var foo = $("#rightpanelTabPanes").children(".tab-pane");
+                        foo.removeClass('active');
+                        tab.parent('li').removeClass('active');
+                        $('.leaflet-control-zoom').css('visibility', 'visible');
+                        $('.leaflet-control-locate').css('visibility', 'visible');
+                    }, 1);
+                } else {
+                    $('.leaflet-control-zoom').css('visibility', 'hidden');
+                    $('.leaflet-control-locate').css('visibility', 'hidden');
+                }
+            });
+        </script>
 
-		    <div class="leftpanel" ng-cloak style="pointer-events: all">
-		        <div class="col-xs-3 leftpanel-tab">
-		            <!-- required for floating -->
-		            <!-- Nav tabs -->
-		            <ul class="nav nav-tabs tabs-left" id="leftPanelTab">
-		                <!-- 'tabs-right' for right tabs -->
-		                <li><a href="#basestyles" data-toggle="tab" data-ng-if="vm.$mapService.isIntermediate"><div class="mapIcon"></div></a></li>
-		                <li class="active"><a href="#layers" data-toggle="tab"><div class="layersIcon"></div></a></li>
-		                <li><a href="#filters" data-toggle="tab"><div class="filtersIcon"></div></a></li>
-		                <li><a href="#styles" data-toggle="tab"><div class="stylesIcon"></div></a></li>
-		                <li><a href="#mca" data-toggle="tab" data-ng-if="vm.$mapService.isExpert"><div class="mcaIcon"></div></a></li>
-		                <li><a href="#heatmap" data-toggle="tab"><div class="heatmapIcon"></div></a></li>
-		                <li><a href="#features" data-toggle="tab"><div class="featuresIcon"></div></a></li>
-		                <li><a href="#legend" data-toggle="tab"><div class="mainLegendIcon"></div></a></li>
-		                <li><a href="#settings" data-toggle="tab"><i class="fa fa-gear fa-2x" style="color: black"></i></a></li>
-		            </ul>
-		        </div>
+        <div class="leftpanel" ng-cloak style="pointer-events: all">
+            <div class="col-xs-3 leftpanel-tab">
+                <!-- required for floating -->
+                <!-- Nav tabs -->
+                <ul class="nav nav-tabs tabs-left" id="leftPanelTab">
+                    <!-- 'tabs-right' for right tabs -->
+                    <li><a href="#basestyles" data-toggle="tab" data-ng-if="vm.$mapService.isIntermediate"><div class="mapIcon"></div></a></li>
+                    <li class="active"><a href="#layers" data-toggle="tab"><div class="layersIcon"></div></a></li>
+                    <li><a href="#filters" data-toggle="tab"><div class="filtersIcon"></div></a></li>
+                    <li><a href="#styles" data-toggle="tab"><div class="stylesIcon"></div></a></li>
+                    <li><a href="#mca" data-toggle="tab" data-ng-if="vm.$mapService.isExpert"><div class="mcaIcon"></div></a></li>
+                    <li><a href="#heatmap" data-toggle="tab"><div class="heatmapIcon"></div></a></li>
+                    <li><a href="#features" data-toggle="tab"><div class="featuresIcon"></div></a></li>
+                    <li><a href="#legend" data-toggle="tab"><div class="mainLegendIcon"></div></a></li>
+                    <li><a href="#settings" data-toggle="tab"><i class="fa fa-gear fa-2x" style="color: black"></i></a></li>
+                </ul>
+            </div>
 
-		        <div class="col-xs-9 leftpanel-content">
-		            <!-- Tab panes -->
-		            <div class="tab-content">
-		                <base-map-list class="tab-pane" id="basestyles"></base-map-list>
+            <div class="col-xs-9 leftpanel-content">
+                <!-- Tab panes -->
+                <div class="tab-content">
+                    <base-map-list class="tab-pane" id="basestyles"></base-map-list>
 
-		                <layers-directive class="tab-pane active" id="layers"></layers-directive>
+                    <layers-directive class="tab-pane active" id="layers"></layers-directive>
 
-		                <filter-list class="tab-pane" id="filters"></filter-list>
+                    <filter-list class="tab-pane" id="filters"></filter-list>
 
-		                <style-list class="tab-pane" id="styles"></style-list>
+                    <style-list class="tab-pane" id="styles"></style-list>
 
-		                <mca class="tab-pane" id="mca"></mca>
+                    <mca class="tab-pane" id="mca"></mca>
 
-		                <heatmap class="tab-pane" id="heatmap"></heatmap>
+                    <heatmap class="tab-pane" id="heatmap"></heatmap>
 
-		                <feature-list class="tab-pane" id="features"></feature-list>
+                    <feature-list class="tab-pane" id="features"></feature-list>
 
-		                <legend-list class="tab-pane" id="legend"></legend-list>
+                    <legend-list class="tab-pane" id="legend"></legend-list>
 
-		                <project-settings class="tab-pane" id="settings"></project-settings>
-		            </div>
-		        </div>
-		    </div>
-		</div>
+                    <project-settings class="tab-pane" id="settings"></project-settings>
+                </div>
+            </div>
+        </div>
+    </div>
 
-	<timeline data-ng-show="vm.$mapService.timelineVisible" style="height: 100vh;"></timeline>
+    <timeline data-ng-show="vm.$mapService.timelineVisible" style="height: 100vh;"></timeline>
 </body>
 </html>

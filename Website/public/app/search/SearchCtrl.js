@@ -43,7 +43,8 @@ var Search;
                 params['south'] = this.$layerService.maxBounds.southWest[0].toString();
                 params['west'] = this.$layerService.maxBounds.southWest[1].toString();
             }
-            return this.$http.jsonp('http://api.geonames.org/searchJSON?callback=JSON_CALLBACK', { params: params }).then(function (result) {
+            return this.$http.jsonp('http://api.geonames.org/searchJSON?callback=JSON_CALLBACK', { params: params })
+                .then(function (result) {
                 var data = result.data;
                 var addresses = $.map(data.geonames, function (item) {
                     var address = new LookupAddress(item.name + ", " + item.adminName1, "GeoNames");
@@ -71,7 +72,7 @@ var Search;
         };
         SearchCtrl.prototype.onSelect = function ($item) {
             if ($item.feature) {
-                this.$layerService.selectFeature($item.feature);
+                //this.$layerService.selectFeature($item.feature);
                 this.$mapService.zoomTo($item.feature);
             }
             else {
@@ -93,4 +94,3 @@ var Search;
     })();
     Search.SearchCtrl = SearchCtrl;
 })(Search || (Search = {}));
-//# sourceMappingURL=SearchCtrl.js.map
