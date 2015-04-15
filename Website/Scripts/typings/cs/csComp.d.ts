@@ -1,5 +1,3 @@
-/// <reference path="../crossfilter/crossfilter.d.ts" />
-/// <reference path="../leaflet/leaflet.d.ts" />
 declare module csComp.GeoJson {
     class Feature implements IFeature {
         id: string;
@@ -894,6 +892,60 @@ declare module Translations {
     }
 }
 
+declare module Charts {
+    class ChartHelpers {
+        /**
+        * Returns the index and value of the maximum.
+        */
+        static max(arr: number[]): {
+            maxIndex: number;
+            max: number;
+        };
+        /**
+        * Returns the index and value of the minimum.
+        */
+        static min(arr: number[]): {
+            minIndex: number;
+            min: number;
+        };
+        /**
+        * Convert a timestamp to string.
+        */
+        static timestampToString(ts: number): any;
+        static windowResize(fun: any): void;
+        static initializeMargin(scope: any, attrs: any): void;
+        static getD3Selector(attrs: any, element: any): string;
+        static initializeLegendMargin(scope: any, attrs: any): void;
+        static defaultColor(): (d: any, i: any) => any;
+        static configureLegend(chart: any, scope: any, attrs: any): void;
+        static checkElementID(scope: any, attrs: any, element: any, chart: any, data: any): void;
+        static updateDimensions(scope: any, attrs: any, element: any, chart: any): void;
+    }
+}
+
+declare module Charts {
+    /**
+      * Module
+      */
+    var myModule: any;
+    interface ISparklineScope extends ng.IScope {
+        timestamps: number[];
+        sensor: number[];
+        width?: number;
+        height?: number;
+        margin?: {
+            top: number;
+            right: number;
+            bottom: number;
+            left: number;
+        };
+        showaxis?: boolean;
+    }
+    interface IBarchartScope extends ng.IScope {
+        data: number[];
+    }
+}
+
 declare module BaseMapList {
     /**
       * Module
@@ -961,6 +1013,49 @@ declare module Dashboard {
         checkViewbound(): void;
         checkTimeline(): void;
         updateDashboard(): void;
+    }
+}
+
+declare module DashboardSelection {
+    /**
+      * Module
+      */
+    var myModule: any;
+}
+
+declare module DashboardSelection {
+    var html: string;
+}
+
+declare module DashboardSelection {
+    interface IDashboardSelectionScope extends ng.IScope {
+        vm: any;
+        addWidget: Function;
+        title: string;
+    }
+    class DashboardSelectionCtrl {
+        private $scope;
+        private $layerService;
+        private $mapService;
+        private $messageBusService;
+        scope: any;
+        project: csComp.Services.SolutionProject;
+        static $inject: string[];
+        constructor($scope: any, $layerService: csComp.Services.LayerService, $mapService: csComp.Services.MapService, $messageBusService: csComp.Services.MessageBusService);
+        startDashboardEdit(dashboard: csComp.Services.Dashboard): void;
+        stopEdit(): void;
+        startEdit(): void;
+        /** Add new dashboard */
+        addDashboard(widget: csComp.Services.IWidget): void;
+        /** Remove existing dashboard */
+        removeDashboard(key: string): void;
+        toggleTimeline(): void;
+        toggleMap(): void;
+        checkTimeline(): void;
+        /** publish a message that a new dashboard was selected */
+        private publishDashboardUpdate();
+        /** Select an active dashboard */
+        selectDashboard(dashboard: csComp.Services.Dashboard): void;
     }
 }
 
@@ -1047,103 +1142,6 @@ declare module DataTable {
          * Convert to trusted html string.
          */
         toTrusted(html: string): any;
-    }
-}
-
-declare module Charts {
-    class ChartHelpers {
-        /**
-        * Returns the index and value of the maximum.
-        */
-        static max(arr: number[]): {
-            maxIndex: number;
-            max: number;
-        };
-        /**
-        * Returns the index and value of the minimum.
-        */
-        static min(arr: number[]): {
-            minIndex: number;
-            min: number;
-        };
-        /**
-        * Convert a timestamp to string.
-        */
-        static timestampToString(ts: number): any;
-        static windowResize(fun: any): void;
-        static initializeMargin(scope: any, attrs: any): void;
-        static getD3Selector(attrs: any, element: any): string;
-        static initializeLegendMargin(scope: any, attrs: any): void;
-        static defaultColor(): (d: any, i: any) => any;
-        static configureLegend(chart: any, scope: any, attrs: any): void;
-        static checkElementID(scope: any, attrs: any, element: any, chart: any, data: any): void;
-        static updateDimensions(scope: any, attrs: any, element: any, chart: any): void;
-    }
-}
-
-declare module Charts {
-    /**
-      * Module
-      */
-    var myModule: any;
-    interface ISparklineScope extends ng.IScope {
-        timestamps: number[];
-        sensor: number[];
-        width?: number;
-        height?: number;
-        margin?: {
-            top: number;
-            right: number;
-            bottom: number;
-            left: number;
-        };
-        showaxis?: boolean;
-    }
-    interface IBarchartScope extends ng.IScope {
-        data: number[];
-    }
-}
-
-declare module DashboardSelection {
-    /**
-      * Module
-      */
-    var myModule: any;
-}
-
-declare module DashboardSelection {
-    var html: string;
-}
-
-declare module DashboardSelection {
-    interface IDashboardSelectionScope extends ng.IScope {
-        vm: any;
-        addWidget: Function;
-        title: string;
-    }
-    class DashboardSelectionCtrl {
-        private $scope;
-        private $layerService;
-        private $mapService;
-        private $messageBusService;
-        scope: any;
-        project: csComp.Services.SolutionProject;
-        static $inject: string[];
-        constructor($scope: any, $layerService: csComp.Services.LayerService, $mapService: csComp.Services.MapService, $messageBusService: csComp.Services.MessageBusService);
-        startDashboardEdit(dashboard: csComp.Services.Dashboard): void;
-        stopEdit(): void;
-        startEdit(): void;
-        /** Add new dashboard */
-        addDashboard(widget: csComp.Services.IWidget): void;
-        /** Remove existing dashboard */
-        removeDashboard(key: string): void;
-        toggleTimeline(): void;
-        toggleMap(): void;
-        checkTimeline(): void;
-        /** publish a message that a new dashboard was selected */
-        private publishDashboardUpdate();
-        /** Select an active dashboard */
-        selectDashboard(dashboard: csComp.Services.Dashboard): void;
     }
 }
 
@@ -1458,64 +1456,6 @@ declare module Indicators {
     }
 }
 
-declare module LanguageSwitch {
-    /**
-      * Module
-      */
-    var myModule: any;
-}
-
-declare module LanguageSwitch {
-    var html: string;
-}
-
-declare module LanguageSwitch {
-    interface ILanguageSwitchScope extends ng.IScope {
-        vm: LanguageSwitchCtrl;
-    }
-    interface ILanguage {
-        key: string;
-        img: string;
-        name: string;
-    }
-    class LanguageSwitchCtrl {
-        private $scope;
-        private $translate;
-        private $languages;
-        private $messageBus;
-        private scope;
-        language: ILanguage;
-        static $inject: string[];
-        constructor($scope: ILanguageSwitchScope, $translate: any, $languages: ILanguage[], $messageBus: csComp.Services.MessageBusService);
-        switchLanguage(language: ILanguage): void;
-    }
-}
-
-declare module LayersDirective {
-    /**
-      * Module
-      */
-    var myModule: any;
-}
-
-declare module LayersDirective {
-    var html: string;
-}
-
-declare module LayersDirective {
-    interface ILayersDirectiveScope extends ng.IScope {
-        vm: LayersDirectiveCtrl;
-    }
-    class LayersDirectiveCtrl {
-        private $scope;
-        private $layerService;
-        private scope;
-        static $inject: string[];
-        constructor($scope: ILayersDirectiveScope, $layerService: csComp.Services.LayerService);
-        toggleLayer(layer: csComp.Services.ProjectLayer): void;
-    }
-}
-
 declare module Heatmap {
     /**
      * Module
@@ -1823,6 +1763,39 @@ declare module Heatmap {
     }
 }
 
+declare module LanguageSwitch {
+    /**
+      * Module
+      */
+    var myModule: any;
+}
+
+declare module LanguageSwitch {
+    var html: string;
+}
+
+declare module LanguageSwitch {
+    interface ILanguageSwitchScope extends ng.IScope {
+        vm: LanguageSwitchCtrl;
+    }
+    interface ILanguage {
+        key: string;
+        img: string;
+        name: string;
+    }
+    class LanguageSwitchCtrl {
+        private $scope;
+        private $translate;
+        private $languages;
+        private $messageBus;
+        private scope;
+        language: ILanguage;
+        static $inject: string[];
+        constructor($scope: ILanguageSwitchScope, $translate: any, $languages: ILanguage[], $messageBus: csComp.Services.MessageBusService);
+        switchLanguage(language: ILanguage): void;
+    }
+}
+
 declare module LegendList {
     /**
       * Module
@@ -1854,6 +1827,31 @@ declare module LegendList {
         private updateLegendItems();
         private getImageUri(ft);
         private getName(key, ft);
+    }
+}
+
+declare module LayersDirective {
+    /**
+      * Module
+      */
+    var myModule: any;
+}
+
+declare module LayersDirective {
+    var html: string;
+}
+
+declare module LayersDirective {
+    interface ILayersDirectiveScope extends ng.IScope {
+        vm: LayersDirectiveCtrl;
+    }
+    class LayersDirectiveCtrl {
+        private $scope;
+        private $layerService;
+        private scope;
+        static $inject: string[];
+        constructor($scope: ILayersDirectiveScope, $layerService: csComp.Services.LayerService);
+        toggleLayer(layer: csComp.Services.ProjectLayer): void;
     }
 }
 
@@ -2299,14 +2297,14 @@ declare module ProjectSettings {
     }
 }
 
-declare module Helpers.Resize {
+declare module ShowModal {
     /**
       * Module
       */
     var myModule: any;
 }
 
-declare module ShowModal {
+declare module Helpers.Resize {
     /**
       * Module
       */
@@ -2881,65 +2879,6 @@ declare module csComp.Services {
 }
 
 declare module csComp.Services {
-    class CesiumRenderer implements IMapRenderer {
-        title: string;
-        service: LayerService;
-        viewer: any;
-        camera: any;
-        init(service: LayerService): void;
-        enable(): void;
-        disable(): void;
-        addLayer(layer: ProjectLayer): void;
-        removeLayer(layer: ProjectLayer): void;
-        updateMapFilter(group: ProjectGroup): void;
-        addGroup(group: ProjectGroup): void;
-        removeGroup(group: ProjectGroup): void;
-        createFeature(feature: IFeature): void;
-        removeFeature(feature: IFeature): void;
-        updateFeature(feature: IFeature): void;
-        addFeature(feature: IFeature): void;
-    }
-}
-
-declare module csComp.Services {
-    class LeafletRenderer implements IMapRenderer {
-        title: string;
-        service: LayerService;
-        $messageBusService: MessageBusService;
-        private popup;
-        init(service: LayerService): void;
-        enable(): void;
-        disable(): void;
-        addGroup(group: ProjectGroup): void;
-        removeLayer(layer: ProjectLayer): void;
-        private getLeafletStyle(style);
-        addLayer(layer: ProjectLayer): void;
-        /***
-         * Update map markers in cluster after changing filter
-         */
-        updateMapFilter(group: ProjectGroup): void;
-        removeGroup(group: ProjectGroup): void;
-        removeFeature(feature: IFeature): void;
-        updateFeature(feature: IFeature): void;
-        addFeature(feature: IFeature): any;
-        /**
-         * add a feature
-         */
-        createFeature(feature: IFeature): any;
-        /**
-         * create icon based of feature style
-         */
-        getPointIcon(feature: IFeature): any;
-        /***
-         * Show tooltip with name, styles & filters.
-         */
-        showFeatureTooltip(e: any, group: ProjectGroup): void;
-        hideFeatureTooltip(e: any): void;
-        updateFeatureTooltip(e: any): void;
-    }
-}
-
-declare module csComp.Services {
     class GeoJsonSource implements ILayerSource {
         service: LayerService;
         title: string;
@@ -3003,5 +2942,64 @@ declare module csComp.Services {
         refreshLayer(layer: ProjectLayer): void;
         addLayer(layer: ProjectLayer, callback: Function): void;
         removeLayer(layer: ProjectLayer): void;
+    }
+}
+
+declare module csComp.Services {
+    class CesiumRenderer implements IMapRenderer {
+        title: string;
+        service: LayerService;
+        viewer: any;
+        camera: any;
+        init(service: LayerService): void;
+        enable(): void;
+        disable(): void;
+        addLayer(layer: ProjectLayer): void;
+        removeLayer(layer: ProjectLayer): void;
+        updateMapFilter(group: ProjectGroup): void;
+        addGroup(group: ProjectGroup): void;
+        removeGroup(group: ProjectGroup): void;
+        createFeature(feature: IFeature): void;
+        removeFeature(feature: IFeature): void;
+        updateFeature(feature: IFeature): void;
+        addFeature(feature: IFeature): void;
+    }
+}
+
+declare module csComp.Services {
+    class LeafletRenderer implements IMapRenderer {
+        title: string;
+        service: LayerService;
+        $messageBusService: MessageBusService;
+        private popup;
+        init(service: LayerService): void;
+        enable(): void;
+        disable(): void;
+        addGroup(group: ProjectGroup): void;
+        removeLayer(layer: ProjectLayer): void;
+        private getLeafletStyle(style);
+        addLayer(layer: ProjectLayer): void;
+        /***
+         * Update map markers in cluster after changing filter
+         */
+        updateMapFilter(group: ProjectGroup): void;
+        removeGroup(group: ProjectGroup): void;
+        removeFeature(feature: IFeature): void;
+        updateFeature(feature: IFeature): void;
+        addFeature(feature: IFeature): any;
+        /**
+         * add a feature
+         */
+        createFeature(feature: IFeature): any;
+        /**
+         * create icon based of feature style
+         */
+        getPointIcon(feature: IFeature): any;
+        /***
+         * Show tooltip with name, styles & filters.
+         */
+        showFeatureTooltip(e: any, group: ProjectGroup): void;
+        hideFeatureTooltip(e: any): void;
+        updateFeatureTooltip(e: any): void;
     }
 }
