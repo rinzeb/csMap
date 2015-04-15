@@ -150,6 +150,7 @@
 
     // Start the application
     angular.module('csWebApp', [
+            'ngSanitize',
             'ui.router',
             'ui.bootstrap',
             'LocalStorageModule',
