@@ -13,7 +13,8 @@
     },
     "expertMode": 3,
     "userPrivileges": {
-        "mca": { "expertMode": true }
+        "mca": { "expertMode": true },
+        "heatmap": { "expertMode": true }
     },
     "accentColor": "Green",
     "propertyTypeData": {
