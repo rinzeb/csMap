@@ -75,7 +75,7 @@ gulp.task('addref_csServerComp', function () {
 });
 
 gulp.task('include_js', function() {
-  gulp.src('../../../csWeb/csComp/includes/*.js')
+  gulp.src('../../../csWeb/csComp/includes/**/*.js')
     //.pipe(concat('includes.js'))
     .pipe(plumber())
     .pipe(uglify())
@@ -84,7 +84,7 @@ gulp.task('include_js', function() {
 });
 
 gulp.task('include_css', function () {
-    gulp.src('../../../csWeb/csComp/includes/*.css')
+    gulp.src('../../../csWeb/csComp/includes/**/*.css')
         .pipe(plumber())
         //.pipe(concat('includes.js'))
         .pipe(gulp.dest('./public/css'));

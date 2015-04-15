@@ -7,7 +7,7 @@
         public Name: string;
         public Layers: { [key: string]: LayerSubscription } = {};
 
-        constructor(public Client: any) { 
+        constructor(public Client: any) {
         }
 
         SubscribeLayer(sub: LayerSubscription) {
@@ -17,14 +17,13 @@
     }
 
     export class ConnectionManager {
-
         users: { [key: string]: WebClient } = {};
         io: SocketIO.Server;
 
         constructor(httpServer: any) {
-            io = require('socket.io')(httpServer);
+            this.io = require('socket.io')(httpServer);
 
-            io.on('connection',(socket: SocketIO.Socket) => {
+            this.io.on('connection',(socket: SocketIO.Socket) => {
 
                 // store user
                 console.log('user ' + socket.id + ' has connected');
@@ -47,7 +46,7 @@
                 //l.on('join',(j) => {
                 //    console.log("layers: "+ j);
                 //});
-                
+
             });
         }
 
@@ -55,10 +54,10 @@
 
         }
 
-        public updateFeature(layer: string, feature: csComp.Services.IFeature) {            
+        public updateFeature(layer: string, feature: csComp.Services.IFeature) {
             for (var uId in this.users) {
-                if (this.users[uId].Layers.hasOwnProperty(layer)) {                    
-                    this.users[uId].Client.emit("layer-" + layer, { action: "update", data: [feature] });                    
+                if (this.users[uId].Layers.hasOwnProperty(layer)) {
+                    this.users[uId].Client.emit("layer-" + layer, { action: "update", data: [feature] });
                 }
             }
         }
@@ -71,9 +70,9 @@
             }
         }
 
-        
 
-    }    
+
+    }
 }
 
 export = ClientConnection;
