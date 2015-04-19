@@ -46,11 +46,16 @@
                 padding: 0;
                 overflow: hidden;
             }
+
+            #contextMenu {
+  position: absolute;
+  display:none;
+}
         </style>
 
 
 </head>
-<body data-ng-controller="appCtrl" data-ng-cloak data-ng-init="showMap=true">
+<body data-ng-controller="appCtrl" data-ng-cloak data-ng-init="showMap=true" >
     <!-- build:js csMap.js -->
     <script src="bower_components/jquery/dist/jquery.min.js"></script>
     <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
