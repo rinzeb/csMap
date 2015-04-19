@@ -95,7 +95,7 @@ module FlightRadar {
                     var b = JSON.parse(r);
                     for (var screen in b) {
                         var s = b[screen];
-                        if (s[0] != "" && s[1] != null && s[2] != null && s[0] != null) {
+                        if (s[0] != "" && s[1] != null && s[2] != null && s[0] != null && s[8]!="GRND") {
                             var sit = {
                                 "type": "Feature",
                                 "geometry": { "type": "Point", "coordinates": [s[2], s[1]] },
@@ -111,6 +111,7 @@ module FlightRadar {
                                     "Time": new Date().getTime()
                                 }
                             };
+
                             this.CheckFeature(sit);
                             //result.features.push(sit);
                             //CheckFeature(sit, db);

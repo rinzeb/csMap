@@ -28,7 +28,8 @@
             '$location',
             'mapService',
             'layerService',
-            'messageBusService'
+            'messageBusService',
+            'dashboardService'
         ];
 
 
@@ -40,7 +41,8 @@
             private $location         : IAppLocationService,
             private $mapService       : csComp.Services.MapService,
             private $layerService     : csComp.Services.LayerService,
-            private $messageBusService: csComp.Services.MessageBusService
+            private $messageBusService: csComp.Services.MessageBusService,
+            private $dashboardService: csComp.Services.DashboardService
         // $inject annotation.
         ) {
             //console.log('$location: ' + JSON.stringify($location));
@@ -85,7 +87,7 @@
         private layerMessageReceived = (title:string, layer: csComp.Services.ProjectLayer): void => {
 
           var $contextMenu = $("#contextMenu");
-          
+
           $("body").on("contextmenu", "table tr", function(e) {
             $contextMenu.css({
               display: "block",
@@ -198,7 +200,10 @@
             'csWeb.charts',
             'csWeb.timeline',
             'csWeb.offlineSearch',
-            'csWeb.heatmap'
+            'csWeb.heatmap',
+            'csWeb.dashboardirective',
+        'csWeb.dashboardSelection',
+        'csWeb.indicators'
         ])
         .config(localStorageServiceProvider => {
             localStorageServiceProvider.prefix = 'csMap';
@@ -289,6 +294,7 @@
                 });
         })
         .service('messageBusService', csComp.Services.MessageBusService)
+        .service('dashboardService', csComp.Services.DashboardService)
         .service('mapService', csComp.Services.MapService)
         .service('layerService', csComp.Services.LayerService)
         .controller('appCtrl', AppCtrl)

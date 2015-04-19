@@ -11,6 +11,92 @@
         "zoomLevelName": "years",
         "isLive": false
     },
+    "datasources": [
+        {
+            "url": "data/projects/20141104_csMap/datasource.json"
+        }
+    ],
+    "dashboards": [
+        {
+            "id": "home",
+            "name": "Home",
+            "showTimeline": true,
+            "showLeftmenu": true,
+            "showMap": true,
+            "visiblelayers": [
+            ]
+        },
+        {
+            "id": "flight",
+            "name": "Flights",
+            "showTimeline": true,
+            "showLeftmenu": true,
+            "showMap": true,
+            "visiblelayers": [
+                "FlightRadar"
+            ],
+            "widgets": [
+
+                {
+                    "directive": "indicators",
+                    "title": "speed",
+                    "left": "10px",
+                    "top": "10px",
+                    "width": "225px",
+                    "height": "435px",
+                    "data": {
+                        "title": "Air Quality 2",
+                        "indicators": [
+                            {
+                                "title": "Air Quality Level",
+                                "visual": "circular",
+                                "sensor": "datasource/airquality"
+                            },
+                            {
+                                "title": "N02",
+                                "visual": "sparkline",
+                                "sensor": "datasource/nox",
+                                "layer": "NOX"
+
+                            },
+                            {
+                                "title": "PM10",
+                                "visual": "sparkline",
+                                "sensor": "datasource/pm10",
+                                "layer": "PM10"
+                            },
+                            {
+                                "title": "PM2,5",
+                                "visual": "sparkline",
+                                "sensor": "datasource/pm25",
+                                "layer": "PM25"
+                            }
+                        ]
+                    }
+                }
+            ],
+            "viewBounds": {
+                  "southWest": [ 50.7, 3.3 ],
+                  "northEast": [ 53.5, 7.3 ]
+            }
+        },
+        {
+            "id": "health",
+            "name": "Health",
+            "showTimeline": false,
+            "showLeftmenu": true,
+            "showMap": true,
+            "visiblelayers": [
+              "zorgkantoor",
+              "Hospitals"
+            ],
+            "viewBounds": {
+                  "southWest": [ 50.7, 3.3 ],
+                  "northEast": [ 53.5, 7.3 ]
+            },
+            "baselayer" : "World Terrain Base"
+        }
+      ],
     "expertMode": 3,
     "userPrivileges": {
         "mca": { "expertMode": true },
@@ -2447,9 +2533,42 @@
             "canEdit": true,
             "isSearchable": false,
             "minValue": 0
+        },
+        "Altitude": {
+            "label": "Altitude",
+            "type": "number",
+            "title": "Altitude"
+        },
+        "Speed": {
+            "label": "Speed",
+            "type": "number",
+            "title": "Speed"
+        },
+        "Track": {
+            "label": "Track",
+            "type": "number",
+            "title": "Track"
+        },
+        "PlaneType": {
+            "label": "PlaneType",
+            "type": "text",
+            "title": "PlaneType"
         }
     },
     "featureTypes": {
+      "plane": {
+            "name": "Vliegtuig",
+            "style": {
+                "strokeColor": "#000000",
+                "drawingMode": "Point",
+                "strokeWidth": 0,
+                "iconWidth": 32,
+                "iconHeight": 32,
+                "iconUri": "images/vliegtuig.png",
+                "rotateProperty": "Track"
+            },
+            "propertyTypeKeys": "PlaneType;Speed;Altitude;Track"
+        },
         "Hospital": {
             "name": "Ziekenhuis",
             "style": {
@@ -2708,6 +2827,7 @@
                     "type": "GeoJson",
                     "url": "data/projects/20141104_csMap/brandweerposten.json",
                     "enabled": false,
+                    "refreshTimer" : 10,
                     "opacity": 100
                 },
                 {
@@ -2753,7 +2873,7 @@
                     "wmsLayers": "pand,ligplaats,standplaats,verblijfsobject",
                     "url": "http://geodata.nationaalgeoregister.nl/bagviewer/wms?",
                     "enabled": false,
-                    "opacity": 50
+                    "opacity": 25
                 },
                 {
                     "id": "us",
@@ -2869,7 +2989,8 @@
                     "description": "US test",
                     "type": "tilelayer",
                     "title": "US",
-                    "url": "http://airapp.lohman-solutions.com/Tiles/{z}/{x}/{y}/hour_0.png"
+                    "url": "http://airapp.lohman-solutions.com/Tiles/{z}/{x}/{y}/hour_0.png",
+                    "opacity": 25
                 }
 
             ]
