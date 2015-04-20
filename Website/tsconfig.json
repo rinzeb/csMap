@@ -10,16 +10,18 @@
     "filesGlob": [
         "./**/*.ts",
         "!./node_modules/**/*.ts",
-        "!./public/bower_components/**/*.ts"
+        "!./public/bower_components/**/*.d.ts"
     ],
     "files": [
+        "./ClientConnection.ts",
         "./Scripts/typings/angular-translate/angular-translate.d.ts",
-        "./Scripts/typings/angular-ui/angular-ui-router.d.ts",
+        "./Scripts/typings/angular-ui-router/angular-ui-router.d.ts",
         "./Scripts/typings/angularLocalStorage/angularLocalStorage.d.ts",
         "./Scripts/typings/angularjs/angular-cookies.d.ts",
         "./Scripts/typings/angularjs/angular.d.ts",
         "./Scripts/typings/chroma-js/chroma-js.d.ts",
         "./Scripts/typings/crossfilter/crossfilter.d.ts",
+        "./Scripts/typings/cs-offline-search/cs-offline-search.d.ts",
         "./Scripts/typings/cs/csComp.d.ts",
         "./Scripts/typings/cs/csServerComp.d.ts",
         "./Scripts/typings/d3/d3.d.ts",
@@ -30,7 +32,9 @@
         "./Scripts/typings/leaflet/leaflet.d.ts",
         "./Scripts/typings/node/node.d.ts",
         "./Scripts/typings/q/Q.d.ts",
+        "./Scripts/typings/socketio/socket.io.d.ts",
         "./Scripts/typings/xbbcode/xbbcode.d.ts",
+        "./layers/flightradar.ts",
         "./public/app/app.ts",
         "./public/app/search/SearchCtrl.ts",
         "./server.ts"

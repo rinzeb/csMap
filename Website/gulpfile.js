@@ -25,20 +25,20 @@ var gulp      = require('gulp'),
 //       .pipe(gulp.dest('build'))
 // });
 
-gulp.task('convertTemplates2Ts', function() {
-  gulp.src('../../../csWeb/csComp/**/*.tpl.html')
-    .pipe(cache('templates'))
-    .pipe(insert.prepend(function(file) {
-      var filename = file.path.substring(file.path.lastIndexOf('\\')+1, file.path.lastIndexOf('.tpl.html'));
-        return 'module ' + filename + ' { export var html = \'';
-      }))
-    .pipe(insert.append('\'; }'))
-    .pipe(insert.transform(function(contents) {
-      return contents.replace(/(\r\n|\n|\r)/gm,"");
-    }))
-    .pipe(rename({extname: '.ts'}))
-    .pipe(gulp.dest('../../../csWeb/csComp'));
-});
+// gulp.task('convertTemplates2Ts', function() {
+//   gulp.src('../../../csWeb/csComp/**/*.tpl.html')
+//     .pipe(cache('templates'))
+//     .pipe(insert.prepend(function(file) {
+//       var filename = file.path.substring(file.path.lastIndexOf('\\')+1, file.path.lastIndexOf('.tpl.html'));
+//         return 'module ' + filename + ' { export var html = \'';
+//       }))
+//     .pipe(insert.append('\'; }'))
+//     .pipe(insert.transform(function(contents) {
+//       return contents.replace(/(\r\n|\n|\r)/gm,"");
+//     }))
+//     .pipe(rename({extname: '.ts'}))
+//     .pipe(gulp.dest('../../../csWeb/csComp'));
+// });
 
 gulp.task('minify_csComp', function () {
     gulp.src('../../../csWeb/csComp/dist/csComp.js')
@@ -75,7 +75,7 @@ gulp.task('addref_csServerComp', function () {
 });
 
 gulp.task('include_js', function() {
-  gulp.src('../../../csWeb/csComp/includes/*.js')
+  gulp.src('../../../csWeb/csComp/includes/**/*.js')
     //.pipe(concat('includes.js'))
     .pipe(plumber())
     .pipe(uglify())
@@ -84,7 +84,7 @@ gulp.task('include_js', function() {
 });
 
 gulp.task('include_css', function () {
-    gulp.src('../../../csWeb/csComp/includes/*.css')
+    gulp.src('../../../csWeb/csComp/includes/**/*.css')
         .pipe(plumber())
         //.pipe(concat('includes.js'))
         .pipe(gulp.dest('./public/css'));
@@ -97,11 +97,11 @@ gulp.task('include_images', function () {
 });
 
 gulp.task('watch', function () {
-    gulp.watch('../../../csWeb/csComp/**/*.tpl.html', ['convertTemplates2Ts']);
+    //gulp.watch('../../../csWeb/csComp/**/*.tpl.html', ['convertTemplates2Ts']);
     gulp.watch('../../../csWeb/csComp/dist/*', ['addref_csComp', 'minify_csComp']);
     gulp.watch('../../../csWeb/csServerComp/dist/*.d.ts', ['addref_csServerComp', 'minify_csServerComp']);
     gulp.watch('../../../csWeb/csComp/includes/*.*', ['include_js','include_css']);
     gulp.watch('../../../csWeb/csComp/includes/images/*.*', ['include_images']);
 });
 
-gulp.task('default', ['addref_csComp', 'addref_csServerComp', 'minify_csComp', 'minify_csServerComp', 'convertTemplates2Ts', 'include_js','include_css','include_images','watch']);
+gulp.task('default', ['addref_csComp', 'addref_csServerComp', 'minify_csComp', 'minify_csServerComp', 'include_js','include_css','include_images','watch']);

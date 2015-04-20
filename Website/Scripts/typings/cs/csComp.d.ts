@@ -1,5 +1,117 @@
-/// <reference path="../crossfilter/crossfilter.d.ts" />
-/// <reference path="../leaflet/leaflet.d.ts" />
+declare module csComp.GeoJson {
+    class Feature implements IFeature {
+        id: string;
+        layerId: string;
+        type: string;
+        geometry: IGeoJsonGeometry;
+        properties: Array<IStringToString>;
+        isSelected: boolean;
+        htmlStyle: string;
+        featureTypeName: string;
+        fType: IFeatureType;
+        isInitialized: boolean;
+    }
+    interface IStringToString {
+        [key: string]: string;
+    }
+    interface IGeoJsonGeometry {
+        type: string;
+        coordinates: any;
+    }
+    interface IFeature {
+        id: string;
+        layerId: string;
+        type: string;
+        geometry: IGeoJsonGeometry;
+        properties: Array<IStringToString>;
+        isSelected: boolean;
+        htmlStyle: string;
+        featureTypeName: string;
+        fType: IFeatureType;
+        isInitialized: boolean;
+    }
+    enum DrawingModeType {
+        None = 0,
+        Image = 1,
+        Point = 2,
+        Square = 3,
+        Rectangle = 4,
+        Line = 5,
+        Circle = 6,
+        Freehand = 7,
+        Polyline = 8,
+        Polygon = 9,
+        MultiPolygon = 10,
+    }
+    enum featureFilterType {
+        /** Turn filtering off */
+        none = 0,
+        /** Default for numbers: histogram */
+        bar = 1,
+        /** Default for text */
+        text = 2,
+    }
+    interface IMetaInfo {
+        label?: string;
+        title?: string;
+        description?: string;
+        type?: string;
+        section?: string;
+        stringFormat?: string;
+        visibleInCallOut?: boolean;
+        canEdit?: boolean;
+        filterType?: string;
+        isSearchable?: boolean;
+        minValue?: number;
+        maxValue?: number;
+        defaultValue?: number;
+    }
+    class MetaInfo {
+        label: string;
+        title: string;
+        description: string;
+        type: string;
+        section: string;
+        stringFormat: string;
+        visibleInCallOut: boolean;
+        canEdit: boolean;
+        filterType: string;
+        isSearchable: boolean;
+        minValue: number;
+        maxValue: number;
+        defaultValue: number;
+    }
+    interface IFeatureTypeStyle {
+        nameLabel?: string;
+        fillColor?: string;
+        strokeColor?: string;
+        drawingMode?: string;
+        strokeWidth?: number;
+        iconWidth?: number;
+        iconHeight?: number;
+        iconUri?: string;
+        maxTitleResolution?: string;
+        analysisMetaInfo?: any;
+    }
+    interface IFeatureType {
+        name?: string;
+        style?: IFeatureTypeStyle;
+        metaInfoData?: IMetaInfo[];
+        /**
+         * Optional list of MetaInfo keys, separated by semi-colons.
+         * The keys can be resolved in the project's metaInfoData dictionary, or in the local metaInfoData.
+         */
+        metaInfoKeys?: string;
+    }
+    interface IGeoJsonFile {
+        poiTypes?: {
+            [key: string]: IFeatureType;
+        };
+        type: string;
+        features: Array<Feature>;
+    }
+}
+
 declare module csComp.Services {
     class Widget {
         content: Function;
@@ -106,6 +218,27 @@ declare module csComp.Services {
         constructor(id?: string, title?: string);
     }
 }
+
+declare module csComp.Services {
+    class SensorSet {
+        id: string;
+        title: string;
+        type: string;
+        timestamps: number[];
+        values: any[];
+        activeValue: any;
+    }
+    class DataSource {
+        id: string;
+        url: string;
+        title: string;
+        sensors: {
+            (key: string): SensorSet;
+        };
+        static LoadData(ds: DataSource, callback: Function): void;
+    }
+}
+
 declare module csComp.Services {
     class SensorSet {
         id: string;
@@ -299,6 +432,7 @@ declare module csComp.Services {
         sdMin: number;
     }
 }
+
 declare module csComp.Services {
     enum LayerType {
         GeoJson = 0,
@@ -397,6 +531,7 @@ declare module csComp.Services {
         color: string;
     }
 }
+
 declare module csComp.Services {
     /**
     * Expert level for determining what options to show to the user.
@@ -580,28 +715,202 @@ declare module csComp.Services {
         test: string;
     }
 }
-declare module BaseMapList {
-    var html: string;
+
+declare module csComp.Helpers {
+    interface IDictionary<T> {
+        add(key: string, value: T): void;
+        remove(key: string): void;
+        containsKey(key: string): boolean;
+        keys(): string[];
+        clear(): void;
+        count(): number;
+        values(): Array<T>;
+    }
+    class Dictionary<T> implements IDictionary<T> {
+        private theKeys;
+        private theValues;
+        constructor();
+        initialize(init: {
+            key: string;
+            value: T;
+        }[]): void;
+        add(key: string, value: any): void;
+        remove(key: string): void;
+        clear(): void;
+        count(): number;
+        keys(): string[];
+        values(): Array<T>;
+        containsKey(key: string): boolean;
+        toLookup(): IDictionary<T>;
+    }
 }
-declare module BaseMapList {
+
+declare module csComp.Helpers {
     /**
-      * Module
-      */
-    var myModule: any;
-}
-declare module BaseMapList {
-    interface IBaseMapScope extends ng.IScope {
-        vm: BaseMapListCtrl;
+    * A set of static geo tools
+    * Source: http://www.csgnetwork.com/degreelenllavcalc.html
+    */
+    class GeoExtensions {
+        /**
+        * Convert topojson data to geojson data.
+        */
+        static convertTopoToGeoJson(data: any): any;
+        static deg2rad(degree: number): number;
+        static rad2deg(rad: number): number;
+        /**
+        * Calculate the log base 10 of val
+        */
+        static log10(val: any): number;
+        static convertDegreesToMeters(latitudeDegrees: number): {
+            latitudeLength: number;
+            longitudeLength: number;
+        };
     }
-    class BaseMapListCtrl {
-        private $scope;
-        private $mapService;
-        private scope;
-        static $inject: string[];
-        constructor($scope: IBaseMapScope, $mapService: csComp.Services.MapService);
-        selectBaseLayer(key: any): void;
+}
+
+declare module csComp.Helpers {
+    function supportsDataUri(): boolean;
+    function standardDeviation(values: number[]): {
+        avg: number;
+        stdDev: number;
+    };
+    function average(data: number[]): number;
+    /**
+     * Collect all the property types that are referenced by a feature type.
+     */
+    function getPropertyTypes(type: csComp.Services.IFeatureType, propertyTypeData: csComp.Services.IPropertyTypeData): Services.IPropertyType[];
+    /**
+     * Convert a property value to a display value using the property info.
+     */
+    function convertPropertyInfo(pt: csComp.Services.IPropertyType, text: any): string;
+    /**
+    * Set the name of a feature.
+    * @param {csComp.Services.IFeature} feature
+    */
+    function setFeatureName(feature: csComp.Services.IFeature): void;
+    /**
+    * Convert a feature's stringFormat to a string.
+    * @param {Services.IFeature} feature
+    * @param {string} stringFormat
+    */
+    function convertStringFormat(feature: Services.IFeature, stringFormat: string): string;
+    /**
+    * Get all indexes of the 'find' substring in the 'source' string.
+    * @param {string} source
+    * @param {string} find
+    */
+    function indexes(source: string, find: string): number[];
+    function getGuid(): string;
+    function S4(): string;
+    /**
+     * Load the features as visible on the map, effectively creating a virtual
+     * GeoJSON file that represents all visible items.
+     * Also loads the keys into the featuretype's propertyTypeData collection.
+     */
+    function loadMapLayers(layerService: Services.LayerService): Services.IGeoJsonFile;
+}
+
+declare module csComp.Helpers {
+    class PieData {
+        id: number;
+        label: string;
+        color: string;
+        weight: number;
+    }
+    class AsterPieData extends PieData {
+        score: number;
+    }
+    interface IHistogramOptions {
+        id?: string;
+        numberOfBins?: number;
+        width?: number;
+        height?: number;
+        xLabel?: string;
+        selectedValue?: number;
+    }
+    interface IMcaPlotOptions extends IHistogramOptions {
+        /** Scoring function x,y points */
+        xy?: {
+            x: number[];
+            y: number[];
+        };
+        /** Value of the feature, i.e. the point that we wish to highlight */
+        featureValue?: number;
+    }
+    class Plot {
+        /**
+         * Draw a histogram, and, if xy is specified, a line plot of x versus y (e.g. a scoring function).
+         */
+        static drawHistogram(values: number[], options?: IHistogramOptions): void;
+        static getScale(stepSize: number, max: number): number;
+        static drawMcaPlot(values: number[], options?: IMcaPlotOptions): void;
+        static pieColors: string[];
+        /**
+        * Draw a Pie chart.
+        */
+        static drawPie(pieRadius: number, data?: PieData[], parentId?: string, colorScale?: string, svgId?: string): void;
+        /**
+        * Draw an Aster Pie chart, i.e. a pie chart with varying radius depending on the score, where the maximum score of 100 equals the pie radius.
+        * See http://bl.ocks.org/bbest/2de0e25d4840c68f2db1
+        */
+        static drawAsterPlot(pieRadius: number, data?: AsterPieData[], parentId?: string, colorScale?: string, svgId?: string): void;
+        private static clearSvg(svgId);
     }
 }
+
+declare module csComp.StringExt {
+    function isNullOrEmpty(s: string): boolean;
+    /**
+     * String formatting
+     * 'Added {0} by {1} to your collection'.f(title, artist)
+     * 'Your balance is {0} USD'.f(77.7)
+     */
+    function format(s: string, ...args: string[]): string;
+    function isNumber(n: any): boolean;
+    function isBoolean(s: any): boolean;
+    function isBbcode(s: any): boolean;
+}
+
+interface String {
+    score(text: string, fuzziness: any): void;
+}
+
+declare module csComp.Helpers {
+    function getColorFromStringValue(v: string, gs: csComp.Services.GroupStyle): string;
+    function getColor(v: number, gs: csComp.Services.GroupStyle): string;
+    /**
+     * Extract a valid color string, without transparency.
+     */
+    function getColorString(color: string, defaultColor?: string): string;
+}
+
+declare module csComp {
+    enum FileType {
+        Js = 0,
+        Css = 1,
+    }
+    class Utils {
+        static loadedFiles: string[];
+        /**
+        * Load a JavaScript or CSS file dynamically by adding it to the end of the HEAD section in your document.
+        * See also: http://www.javascriptkit.com/javatutors/loadjavascriptcss.shtml
+        */
+        static loadJsCssfile(filename: string, filetype: FileType, callback?: Function): void;
+    }
+}
+
+declare module Translations {
+    class English {
+        static locale: ng.translate.ITranslationTable;
+    }
+}
+
+declare module Translations {
+    class Dutch {
+        static locale: ng.translate.ITranslationTable;
+    }
+}
+
 declare module Charts {
     class ChartHelpers {
         /**
@@ -632,6 +941,7 @@ declare module Charts {
         static updateDimensions(scope: any, attrs: any, element: any, chart: any): void;
     }
 }
+
 declare module Charts {
     /**
       * Module
@@ -654,15 +964,43 @@ declare module Charts {
         data: number[];
     }
 }
-declare module Dashboard {
+
+declare module BaseMapList {
+    /**
+      * Module
+      */
+    var myModule: any;
+}
+
+declare module BaseMapList {
     var html: string;
 }
+
+declare module BaseMapList {
+    interface IBaseMapScope extends ng.IScope {
+        vm: BaseMapListCtrl;
+    }
+    class BaseMapListCtrl {
+        private $scope;
+        private $mapService;
+        private scope;
+        static $inject: string[];
+        constructor($scope: IBaseMapScope, $mapService: csComp.Services.MapService);
+        selectBaseLayer(key: any): void;
+    }
+}
+
 declare module Dashboard {
     /**
       * Module
       */
     var myModule: any;
 }
+
+declare module Dashboard {
+    var html: string;
+}
+
 declare module Dashboard {
     interface IDashboardScope extends ng.IScope {
         vm: DashboardCtrl;
@@ -696,15 +1034,18 @@ declare module Dashboard {
         updateDashboard(): void;
     }
 }
-declare module DashboardSelection {
-    var html: string;
-}
+
 declare module DashboardSelection {
     /**
       * Module
       */
     var myModule: any;
 }
+
+declare module DashboardSelection {
+    var html: string;
+}
+
 declare module DashboardSelection {
     interface IDashboardSelectionScope extends ng.IScope {
         vm: any;
@@ -736,15 +1077,18 @@ declare module DashboardSelection {
         selectDashboard(dashboard: csComp.Services.Dashboard): void;
     }
 }
-declare module DataTable {
-    var html: string;
-}
+
 declare module DataTable {
     /**
       * Module
       */
     var myModule: any;
 }
+
+declare module DataTable {
+    var html: string;
+}
+
 declare module DataTable {
     import IGeoJsonFile = csComp.Services.IGeoJsonFile;
     import IPropertyType = csComp.Services.IPropertyType;
@@ -782,7 +1126,7 @@ declare module DataTable {
         rows: Array<Array<TableField>>;
         private mapFeatureTitle;
         static $inject: string[];
-        constructor($scope: IDataTableViewScope, $http: ng.IHttpService, $sce: ng.ISCEService, $translate: ng.translate.ITranslateService, $layerService: csComp.Services.LayerService, $localStorageService: ng.localStorage.ILocalStorageService, $messageBusService: csComp.Services.MessageBusService);
+        constructor($scope: IDataTableViewScope, $http: ng.IHttpService, $sce: ng.ISCEService, $translate: ng.translate.ITranslateService, $layerService: csComp.Services.LayerService, $localStorageService: angular.local.storage.ILocalStorageService<any>, $messageBusService: csComp.Services.MessageBusService);
         /**
          * Add a label to local storage and bind it to the scope.
          */
@@ -819,6 +1163,7 @@ declare module DataTable {
         toTrusted(html: string): any;
     }
 }
+
 declare module ExpertMode {
     var html: string;
 }
@@ -828,6 +1173,11 @@ declare module ExpertMode {
       */
     var myModule: any;
 }
+
+declare module ExpertMode {
+    var html: string;
+}
+
 declare module ExpertMode {
     import Expertise = csComp.Services.Expertise;
     interface IExpertModeScope extends ng.IScope {
@@ -841,7 +1191,11 @@ declare module ExpertMode {
         private $mapService;
         private $messageBus;
         static $inject: string[];
-        constructor($scope: IExpertModeScope, $localStorageService: ng.localStorage.ILocalStorageService, $layerService: csComp.Services.LayerService, $mapService: csComp.Services.MapService, $messageBus: csComp.Services.MessageBusService);
+        constructor($scope: IExpertModeScope, $localStorageService: angular.local.storage.ILocalStorageService<any>, $layerService: csComp.Services.LayerService, $mapService: csComp.Services.MapService, $messageBus: csComp.Services.MessageBusService);
+        /**
+        * Get the CSS class to render the mode.
+        */
+        getCssClass(): string;
         /**
         * Get the CSS class to render the mode.
         */
@@ -854,15 +1208,18 @@ declare module ExpertMode {
         private setExpertMode(expertMode);
     }
 }
-declare module FeatureList {
-    var html: string;
-}
+
 declare module FeatureList {
     /**
       * Module
       */
     var myModule: any;
 }
+
+declare module FeatureList {
+    var html: string;
+}
+
 declare module FeatureList {
     interface IFeatureListScope extends ng.IScope {
         vm: FeatureListCtrl;
@@ -877,15 +1234,18 @@ declare module FeatureList {
         constructor($scope: IFeatureListScope, $layerService: csComp.Services.LayerService, $mapService: csComp.Services.MapService);
     }
 }
-declare module FeatureProps {
-    var html: string;
-}
+
 declare module FeatureProps {
     /**
       * Module
       */
     var myModule: any;
 }
+
+declare module FeatureProps {
+    var html: string;
+}
+
 declare module FeatureProps {
     import IFeature = csComp.Services.IFeature;
     import IFeatureType = csComp.Services.IFeatureType;
@@ -1007,15 +1367,18 @@ declare module FeatureProps {
         }): void;
     }
 }
-declare module FeatureRelations {
-    var html: string;
-}
+
 declare module FeatureRelations {
     /**
       * Module
       */
     var myModule: any;
 }
+
+declare module FeatureRelations {
+    var html: string;
+}
+
 declare module FeatureRelations {
     import IFeature = csComp.Services.IFeature;
     interface IFeatureRelationsScope extends ng.IScope {
@@ -1052,15 +1415,18 @@ declare module FeatureRelations {
         private featureMessageReceived;
     }
 }
-declare module FilterList {
-    var html: string;
-}
+
 declare module FilterList {
     /**
       * Module
       */
     var myModule: any;
 }
+
+declare module FilterList {
+    var html: string;
+}
+
 declare module FilterList {
     interface IFilterListScope extends ng.IScope {
         vm: FilterListCtrl;
@@ -1073,15 +1439,60 @@ declare module FilterList {
         constructor($scope: IFilterListScope, $layerService: csComp.Services.LayerService);
     }
 }
-declare module Heatmap {
+
+declare module Indicators {
+    /**
+      * Module
+      */
+    var myModule: any;
+}
+
+declare module Indicators {
     var html: string;
 }
+
+declare module Indicators {
+    class indicatorData {
+        title: string;
+        indicators: indicator[];
+    }
+    class indicator {
+        title: string;
+        visual: string;
+        type: string;
+        sensor: string;
+        sensorSet: csComp.Services.SensorSet;
+        layer: string;
+        isActive: boolean;
+    }
+    interface ILayersDirectiveScope extends ng.IScope {
+        vm: LayersDirectiveCtrl;
+        data: indicatorData;
+    }
+    class LayersDirectiveCtrl {
+        private $scope;
+        private $layerService;
+        private $messageBus;
+        private scope;
+        private widget;
+        static $inject: string[];
+        constructor($scope: ILayersDirectiveScope, $layerService: csComp.Services.LayerService, $messageBus: csComp.Services.MessageBusService);
+        private checkLayers();
+        selectIndicator(i: indicator): void;
+    }
+}
+
 declare module Heatmap {
     /**
      * Module
      */
     var myModule: ng.IModule;
 }
+
+declare module Heatmap {
+    var html: string;
+}
+
 declare module Heatmap {
     import IFeature = csComp.Services.IFeature;
     interface IHeatmapScope extends ng.IScope {
@@ -1114,7 +1525,7 @@ declare module Heatmap {
         showChart: boolean;
         featureIcon: string;
         static $inject: string[];
-        constructor($scope: IHeatmapScope, $modal: any, $translate: ng.translate.ITranslateService, $timeout: ng.ITimeoutService, $localStorageService: ng.localStorage.ILocalStorageService, $layerService: csComp.Services.LayerService, $mapService: csComp.Services.MapService, messageBusService: csComp.Services.MessageBusService);
+        constructor($scope: IHeatmapScope, $modal: any, $translate: ng.translate.ITranslateService, $timeout: ng.ITimeoutService, $localStorageService: angular.local.storage.ILocalStorageService<any>, $layerService: csComp.Services.LayerService, $mapService: csComp.Services.MapService, messageBusService: csComp.Services.MessageBusService);
         updateAvailableHeatmaps(): void;
         createHeatmap(): void;
         editHeatmap(heatmap: HeatmapModel): void;
@@ -1136,6 +1547,7 @@ declare module Heatmap {
         private initializeHeatmap();
     }
 }
+
 declare module Heatmap {
     import IGeoJsonFile = csComp.Services.IGeoJsonFile;
     interface IHeatmapEditorScope extends ng.IScope {
@@ -1165,9 +1577,11 @@ declare module Heatmap {
         toggleItemDetails(index: number): void;
     }
 }
+
 declare module HeatmapEditorView {
     var html: string;
 }
+
 declare module Heatmap {
     /**
     * A simple interface to describe an item that can be used in a heatmap.
@@ -1252,6 +1666,7 @@ declare module Heatmap {
         toString(): string;
     }
 }
+
 declare module Heatmap {
     /**
     * A simple interface to describe a heat map.
@@ -1284,6 +1699,7 @@ declare module Heatmap {
         serialize(): string;
     }
 }
+
 declare module Heatmap {
     /**
     * A simple interface to describe heatmapsettings.
@@ -1301,6 +1717,7 @@ declare module Heatmap {
         intensityScale: number;
     }
 }
+
 declare module Heatmap {
     /**
      * A heat spot represents an lat-lon-point on the map with a certain intensity.
@@ -1324,6 +1741,7 @@ declare module Heatmap {
         AddLocation(i: any, j: any, contributor: any): Heatspot;
     }
 }
+
 declare module Heatmap {
     /**
      * The ideality measure specifies how much you like this item with respect to its
@@ -1370,54 +1788,18 @@ declare module Heatmap {
         computeIdealityAtDistance(distance: number): number;
     }
 }
-declare module Indicators {
-    var html: string;
-}
-declare module Indicators {
-    /**
-      * Module
-      */
-    var myModule: any;
-}
-declare module Indicators {
-    class indicatorData {
-        title: string;
-        indicators: indicator[];
-    }
-    class indicator {
-        title: string;
-        visual: string;
-        type: string;
-        sensor: string;
-        sensorSet: csComp.Services.SensorSet;
-        layer: string;
-        isActive: boolean;
-    }
-    interface ILayersDirectiveScope extends ng.IScope {
-        vm: LayersDirectiveCtrl;
-        data: indicatorData;
-    }
-    class LayersDirectiveCtrl {
-        private $scope;
-        private $layerService;
-        private $messageBus;
-        private scope;
-        private widget;
-        static $inject: string[];
-        constructor($scope: ILayersDirectiveScope, $layerService: csComp.Services.LayerService, $messageBus: csComp.Services.MessageBusService);
-        private checkLayers();
-        selectIndicator(i: indicator): void;
-    }
-}
-declare module LanguageSwitch {
-    var html: string;
-}
+
 declare module LanguageSwitch {
     /**
       * Module
       */
     var myModule: any;
 }
+
+declare module LanguageSwitch {
+    var html: string;
+}
+
 declare module LanguageSwitch {
     interface ILanguageSwitchScope extends ng.IScope {
         vm: LanguageSwitchCtrl;
@@ -1439,37 +1821,18 @@ declare module LanguageSwitch {
         switchLanguage(language: ILanguage): void;
     }
 }
-declare module LayersDirective {
-    var html: string;
-}
-declare module LayersDirective {
-    /**
-      * Module
-      */
-    var myModule: any;
-}
-declare module LayersDirective {
-    interface ILayersDirectiveScope extends ng.IScope {
-        vm: LayersDirectiveCtrl;
-    }
-    class LayersDirectiveCtrl {
-        private $scope;
-        private $layerService;
-        private scope;
-        static $inject: string[];
-        constructor($scope: ILayersDirectiveScope, $layerService: csComp.Services.LayerService);
-        toggleLayer(layer: csComp.Services.ProjectLayer): void;
-    }
-}
-declare module LegendList {
-    var html: string;
-}
+
 declare module LegendList {
     /**
       * Module
       */
     var myModule: any;
 }
+
+declare module LegendList {
+    var html: string;
+}
+
 declare module LegendList {
     interface ILegendItem {
         title: string;
@@ -1492,33 +1855,32 @@ declare module LegendList {
         private getName(key, ft);
     }
 }
-declare module MapElement {
-    var html: string;
-}
-declare module MapElement {
+
+declare module LayersDirective {
     /**
       * Module
       */
     var myModule: any;
 }
-declare module MapElement {
-    interface IMapElementScope extends ng.IScope {
-        vm: MapElementCtrl;
-        mapid: string;
-        initMap: Function;
+
+declare module LayersDirective {
+    var html: string;
+}
+
+declare module LayersDirective {
+    interface ILayersDirectiveScope extends ng.IScope {
+        vm: LayersDirectiveCtrl;
     }
-    class MapElementCtrl {
+    class LayersDirectiveCtrl {
         private $scope;
         private $layerService;
-        private mapService;
-        private $messageBusService;
         private scope;
-        private locale;
         static $inject: string[];
-        constructor($scope: IMapElementScope, $layerService: csComp.Services.LayerService, mapService: csComp.Services.MapService, $messageBusService: csComp.Services.MessageBusService);
-        initMap(): void;
+        constructor($scope: ILayersDirectiveScope, $layerService: csComp.Services.LayerService);
+        toggleLayer(layer: csComp.Services.ProjectLayer): void;
     }
 }
+
 declare module Mca.Models {
     import IFeature = csComp.Services.IFeature;
     enum ScoringFunctionType {
@@ -1531,102 +1893,67 @@ declare module Mca.Models {
         GaussianValley = 6,
     }
     /**
-    * Scoring function creates a PLA of the scoring algorithm.
-    */
-    class ScoringFunction {
+     * The name of the property you include in generating the offline search result.
+     */
+    interface IPropertyType {
+        /**
+         * Name of the property
+         * @type {string}
+         */
+        name: string;
+        /**
+         * The title of the property.
+         * @type {string}
+         */
         title: string;
-        type: ScoringFunctionType;
-        scores: string;
-        cssClass: string;
-        constructor(scoringFunctionType?: ScoringFunctionType);
         /**
-         * Create a score based on the type, in which x in [0,10] and y in [0.1].
-         * Before applying it, you need to scale the x-axis based on your actual range.
-         * Typically, you would map x=0 to the min(x)+0.1*range(x) and x(10)-0.1*range(x) to max(x),
-         * i.e. x' = ax+b, where a=100/(8r) and b=-100(min+0.1r)/(8r) and r=max-min
+         * Language information for localisation.
+         * @type {f.ILanguageData}
          */
-        static createScores(type: ScoringFunctionType): string;
+        languages?: csComp.Services.ILanguageData;
     }
-    class ScoringFunctions {
-        static scoringFunctions: ScoringFunctions[];
+    /**
+     * Specify the offline search options.
+     */
+    interface IOfflineSearchOptions {
+        /**
+         * Words you wish to exclude from the index.
+         * @type {string[]}
+         */
+        stopWords: string[];
+        /**
+         * The property types that you wish to use for generating the index.
+         * @type {osr.PropertyType}
+         */
+        propertyTypes: IPropertyType[];
     }
-    class Criterion {
+    class Layer {
+        groupTitle: string;
+        index: number;
+        id: string;
         title: string;
-        description: string;
+        path: string;
+        type: string;
         /**
-        * Top level label will be used to add a property to a feature, mca_LABELNAME, with the MCA value.
-        * Lower level children will be used to obtain the property value.
-        */
-        label: string;
-        /** Color of the pie chart */
-        color: string;
-        /** Specified weight by the user */
-        userWeight: number;
-        /** Derived weight based on the fact that the sum of weights in a group of criteria needs to be 1. */
-        weight: number;
-        /** Scoring function y = f(x), which translates a specified measurement x to a value y, where y in [0,1].
-         * Format [x1,y1 x2,y2], and may contain special characters, such as min or max to define the minimum or maximum.
+         * Names of all the features.
+         * @type {string[]}
          */
-        scores: string;
-        propValues: number[];
-        criteria: Criterion[];
-        /** Piece-wise linear approximation of the scoring function by a set of x and y points */
-        isPlaUpdated: boolean;
-        /** Piece-wise linear approximation must be scaled:x' = ax+b, where a=100/(8r) and b=-100(min+0.1r)/(8r) and r=max-min */
-        isPlaScaled: boolean;
-        minValue: number;
-        maxValue: number;
-        minCutoffValue: number;
-        maxCutoffValue: number;
-        x: number[];
-        y: number[];
-        deserialize(input: Criterion): Criterion;
-        private requiresMinimum();
-        private requiresMaximum();
-        getTitle(): string;
-        /**
-         * Update the piecewise linear approximation (PLA) of the scoring (a.k.a. user) function,
-         * which translates a property value to a MCA value in the range [0,1] using all features.
-         */
-        updatePla(features: IFeature[]): void;
-        getScore(feature: IFeature): number;
-    }
-    class Mca extends Criterion implements csComp.Services.ISerializable<Mca> {
-        /** Section of the callout */
-        section: string;
-        stringFormat: string;
-        /** Optionally, export the result also as a rank */
-        rankTitle: string;
-        rankDescription: string;
-        /** Optionally, stringFormat for the ranked result */
-        rankFormat: string;
-        /** Maximum number of star ratings to use to set the weight */
-        userWeightMax: number;
-        /** Applicable feature ids as a string[]. */
-        featureIds: string[];
-        scaleMaxValue: number;
-        scaleMinValue: number;
-        rankLabel: string;
-        constructor();
-        deserialize(input: Mca): Mca;
-        /**
-        * Update the MCA by calculating the weights and setting the colors.
-        */
-        update(): void;
-        private calculateWeights(criteria?);
-        /** Set the colors of all criteria and sub-criteria */
-        private setColors();
+        featureNames: string[];
+        constructor(groupTitle: string, index: number, id: string, title: string, path: string, type: string);
     }
 }
-declare module Mca {
-    var html: string;
-}
+
 declare module Mca {
     /**
      * Module
      */
     var myModule: ng.IModule;
 }
+
+declare module Mca {
+    var html: string;
+}
+
 declare module Mca {
     import IFeature = csComp.Services.IFeature;
     interface IMcaScope extends ng.IScope {
@@ -1660,7 +1987,7 @@ declare module Mca {
         showSparkline: boolean;
         private groupStyle;
         static $inject: string[];
-        constructor($scope: IMcaScope, $modal: any, $translate: ng.translate.ITranslateService, $timeout: ng.ITimeoutService, $localStorageService: ng.localStorage.ILocalStorageService, $layerService: csComp.Services.LayerService, messageBusService: csComp.Services.MessageBusService);
+        constructor($scope: IMcaScope, $modal: any, $translate: ng.translate.ITranslateService, $timeout: ng.ITimeoutService, $localStorageService: angular.local.storage.ILocalStorageService<any>, $layerService: csComp.Services.LayerService, messageBusService: csComp.Services.MessageBusService);
         private getVotingClass(criterion);
         private createDummyMca();
         toggleMcaChartType(): void;
@@ -1696,6 +2023,7 @@ declare module Mca {
         private static createRankPropertyType(mca);
     }
 }
+
 declare module Mca {
     import IFeatureType = csComp.Services.IFeatureType;
     import IGeoJsonFile = csComp.Services.IGeoJsonFile;
@@ -1746,18 +2074,89 @@ declare module Mca {
         toggleItemDetails(index: number): void;
     }
 }
+
 declare module McaEditorView {
     var html: string;
 }
-declare module OfflineSearch {
+
+declare module MapElement {
+    /**
+     * An index entry that contains a search result.
+     */
+    class Entry {
+        private v;
+        constructor(layerIndexOrArray: Array<number> | number, featureIndex?: number, propertyIndex?: number);
+        layerIndex: number;
+        featureIndex: number;
+        /**
+         * This function is called when serializing the Entry object to JSON, which is
+         * much less verbose than the default JSON. In the constructor, I've used a
+         * Union type to deserialize it again.
+         */
+        toJSON(): number[];
+    }
+    class KeywordIndex {
+        [key: string]: Entry[];
+    }
+    class OfflineSearchResult {
+        project: IProjectLocation;
+        options: IOfflineSearchOptions;
+        layers: Layer[];
+        keywordIndex: KeywordIndex;
+        constructor(project: IProjectLocation, options: IOfflineSearchOptions);
+    }
+}
+
+declare module MapElement {
     var html: string;
 }
+
+declare module MapElement {
+    interface IMapElementScope extends ng.IScope {
+        vm: MapElementCtrl;
+        mapid: string;
+        initMap: Function;
+    }
+    interface ILookupResult {
+        title?: string;
+        score: number;
+        key: string;
+        entries: Entry[];
+    }
+    class OfflineSearchResultViewModel {
+        title: string;
+        layerTitle: string;
+        groupTitle: string;
+        entry: Entry;
+        firstInGroup: boolean;
+        constructor(title: string, layerTitle: string, groupTitle: string, entry: Entry);
+        toString(): string;
+        fullTitle: string;
+    }
+    class OfflineSearchCtrl {
+        private $scope;
+        private $layerService;
+        private mapService;
+        private $messageBusService;
+        private scope;
+        private locale;
+        static $inject: string[];
+        constructor($scope: IMapElementScope, $layerService: csComp.Services.LayerService, mapService: csComp.Services.MapService, $messageBusService: csComp.Services.MessageBusService);
+        initMap(): void;
+    }
+}
+
 declare module OfflineSearch {
     /**
       * Module
       */
     var myModule: any;
 }
+
+declare module OfflineSearch {
+    var html: string;
+}
+
 declare module OfflineSearch {
     interface IProjectLocation {
         title: string;
@@ -1838,6 +2237,7 @@ declare module OfflineSearch {
         constructor(project: IProjectLocation, options: IOfflineSearchOptions);
     }
 }
+
 declare module OfflineSearch {
     interface IOfflineSearchScope extends ng.IScope {
         vm: OfflineSearchCtrl;
@@ -1896,15 +2296,18 @@ declare module OfflineSearch {
         private selectFeature(layerId, featureIndex);
     }
 }
-declare module ProjectSettings {
-    var html: string;
-}
+
 declare module ProjectSettings {
     /**
       * Module
       */
     var myModule: any;
 }
+
+declare module ProjectSettings {
+    var html: string;
+}
+
 declare module ProjectSettings {
     interface IProjectSettingsScope extends ng.IScope {
         vm: ProjectSettingsCtrl;
@@ -1918,27 +2321,32 @@ declare module ProjectSettings {
         constructor($scope: IProjectSettingsScope, $modal: any, $layerService: csComp.Services.LayerService);
     }
 }
-declare module Helpers.Resize {
-    /**
-      * Module
-      */
-    var myModule: any;
-}
+
 declare module ShowModal {
     /**
       * Module
       */
     var myModule: any;
 }
-declare module StyleList {
-    var html: string;
+
+declare module Helpers.Resize {
+    /**
+      * Module
+      */
+    var myModule: any;
 }
+
 declare module StyleList {
     /**
       * Module
       */
     var myModule: any;
 }
+
+declare module StyleList {
+    var html: string;
+}
+
 declare module StyleList {
     interface IStyleListScope extends ng.IScope {
         vm: StyleListCtrl;
@@ -1951,9 +2359,7 @@ declare module StyleList {
         constructor($scope: IStyleListScope, $layerService: csComp.Services.LayerService);
     }
 }
-declare module Timeline {
-    var html: string;
-}
+
 declare module Timeline {
     interface ITimelineService {
         getTimelineOptions(): csComp.Services.ITimelineOptions;
@@ -1964,6 +2370,11 @@ declare module Timeline {
       */
     var myModule: any;
 }
+
+declare module Timeline {
+    var html: string;
+}
+
 declare module Timeline {
     interface ITimelineScope extends ng.IScope {
         vm: TimelineCtrl;
@@ -2008,187 +2419,14 @@ declare module Timeline {
         loadLocales(): void;
     }
 }
+
 declare module Voting {
     /**
       * Module
       */
     var myModule: any;
 }
-declare module csComp.Helpers {
-    interface IDictionary<T> {
-        add(key: string, value: T): void;
-        remove(key: string): void;
-        containsKey(key: string): boolean;
-        keys(): string[];
-        clear(): void;
-        count(): number;
-        values(): Array<T>;
-    }
-    class Dictionary<T> implements IDictionary<T> {
-        private theKeys;
-        private theValues;
-        constructor();
-        initialize(init: {
-            key: string;
-            value: T;
-        }[]): void;
-        add(key: string, value: any): void;
-        remove(key: string): void;
-        clear(): void;
-        count(): number;
-        keys(): string[];
-        values(): Array<T>;
-        containsKey(key: string): boolean;
-        toLookup(): IDictionary<T>;
-    }
-}
-declare module csComp.Helpers {
-    /**
-    * A set of static geo tools
-    * Source: http://www.csgnetwork.com/degreelenllavcalc.html
-    */
-    class GeoExtensions {
-        /**
-        * Convert topojson data to geojson data.
-        */
-        static convertTopoToGeoJson(data: any): any;
-        static deg2rad(degree: number): number;
-        static rad2deg(rad: number): number;
-        /**
-        * Calculate the log base 10 of val
-        */
-        static log10(val: any): number;
-        static convertDegreesToMeters(latitudeDegrees: number): {
-            latitudeLength: number;
-            longitudeLength: number;
-        };
-    }
-}
-declare module csComp.Helpers {
-    function supportsDataUri(): boolean;
-    function standardDeviation(values: number[]): {
-        avg: number;
-        stdDev: number;
-    };
-    function average(data: number[]): number;
-    /**
-     * Collect all the property types that are referenced by a feature type.
-     */
-    function getPropertyTypes(type: csComp.Services.IFeatureType, propertyTypeData: csComp.Services.IPropertyTypeData): Services.IPropertyType[];
-    /**
-     * Convert a property value to a display value using the property info.
-     */
-    function convertPropertyInfo(pt: csComp.Services.IPropertyType, text: any): string;
-    /**
-    * Set the name of a feature.
-    * @param {csComp.Services.IFeature} feature
-    */
-    function setFeatureName(feature: csComp.Services.IFeature): void;
-    /**
-    * Convert a feature's stringFormat to a string.
-    * @param {Services.IFeature} feature
-    * @param {string} stringFormat
-    */
-    function convertStringFormat(feature: Services.IFeature, stringFormat: string): string;
-    /**
-    * Get all indexes of the 'find' substring in the 'source' string.
-    * @param {string} source
-    * @param {string} find
-    */
-    function indexes(source: string, find: string): number[];
-    function getGuid(): string;
-    function S4(): string;
-    /**
-     * Load the features as visible on the map, effectively creating a virtual
-     * GeoJSON file that represents all visible items.
-     * Also loads the keys into the featuretype's propertyTypeData collection.
-     */
-    function loadMapLayers(layerService: Services.LayerService): Services.IGeoJsonFile;
-}
-declare module csComp.Helpers {
-    class PieData {
-        id: number;
-        label: string;
-        color: string;
-        weight: number;
-    }
-    class AsterPieData extends PieData {
-        score: number;
-    }
-    interface IHistogramOptions {
-        id?: string;
-        numberOfBins?: number;
-        width?: number;
-        height?: number;
-        xLabel?: string;
-        selectedValue?: number;
-    }
-    interface IMcaPlotOptions extends IHistogramOptions {
-        /** Scoring function x,y points */
-        xy?: {
-            x: number[];
-            y: number[];
-        };
-        /** Value of the feature, i.e. the point that we wish to highlight */
-        featureValue?: number;
-    }
-    class Plot {
-        /**
-         * Draw a histogram, and, if xy is specified, a line plot of x versus y (e.g. a scoring function).
-         */
-        static drawHistogram(values: number[], options?: IHistogramOptions): void;
-        static getScale(stepSize: number, max: number): number;
-        static drawMcaPlot(values: number[], options?: IMcaPlotOptions): void;
-        static pieColors: string[];
-        /**
-        * Draw a Pie chart.
-        */
-        static drawPie(pieRadius: number, data?: PieData[], parentId?: string, colorScale?: string, svgId?: string): void;
-        /**
-        * Draw an Aster Pie chart, i.e. a pie chart with varying radius depending on the score, where the maximum score of 100 equals the pie radius.
-        * See http://bl.ocks.org/bbest/2de0e25d4840c68f2db1
-        */
-        static drawAsterPlot(pieRadius: number, data?: AsterPieData[], parentId?: string, colorScale?: string, svgId?: string): void;
-        private static clearSvg(svgId);
-    }
-}
-declare module csComp.StringExt {
-    function isNullOrEmpty(s: string): boolean;
-    /**
-     * String formatting
-     * 'Added {0} by {1} to your collection'.f(title, artist)
-     * 'Your balance is {0} USD'.f(77.7)
-     */
-    function format(s: string, ...args: string[]): string;
-    function isNumber(n: any): boolean;
-    function isBoolean(s: any): boolean;
-    function isBbcode(s: any): boolean;
-}
-interface String {
-    score(text: string, fuzziness: any): void;
-}
-declare module csComp.Helpers {
-    function getColorFromStringValue(v: string, gs: csComp.Services.GroupStyle): string;
-    function getColor(v: number, gs: csComp.Services.GroupStyle): string;
-    /**
-     * Extract a valid color string, without transparency.
-     */
-    function getColorString(color: string, defaultColor?: string): string;
-}
-declare module csComp {
-    enum FileType {
-        Js = 0,
-        Css = 1,
-    }
-    class Utils {
-        static loadedFiles: string[];
-        /**
-        * Load a JavaScript or CSS file dynamically by adding it to the end of the HEAD section in your document.
-        * See also: http://www.javascriptkit.com/javatutors/loadjavascriptcss.shtml
-        */
-        static loadJsCssfile(filename: string, filetype: FileType, callback?: Function): void;
-    }
-}
+
 declare module csComp.Services {
     interface IMessageBusCallback {
         (title: string, data?: any): any;
@@ -2303,6 +2541,7 @@ declare module csComp.Services {
         registerEvents(evtnames: Array<string>): void;
     }
 }
+
 declare module csComp.Services {
     class ConnectionService {
         private $messageBusService;
@@ -2311,6 +2550,7 @@ declare module csComp.Services {
         constructor($messageBusService: Services.MessageBusService, $layerService: Services.LayerService);
     }
 }
+
 declare module csComp.Services {
     class DashboardService {
         private $rootScope;
@@ -2341,6 +2581,7 @@ declare module csComp.Services {
         removeWidget(): void;
     }
 }
+
 declare module csComp.Services {
     interface ILayerSource {
         title: string;
@@ -2575,69 +2816,7 @@ declare module csComp.Services {
         private resetMapFilter(group);
     }
 }
-declare module csComp.Services {
-    class GeoJsonSource implements ILayerSource {
-        service: LayerService;
-        title: string;
-        layer: ProjectLayer;
-        requiresLayer: boolean;
-        constructor(service: LayerService);
-        refreshLayer(layer: ProjectLayer): void;
-        addLayer(layer: ProjectLayer, callback: Function): void;
-        protected baseAddLayer(layer: ProjectLayer, callback: Function): void;
-        removeLayer(layer: ProjectLayer): void;
-    }
-    class DynamicGeoJsonSource extends GeoJsonSource {
-        service: LayerService;
-        title: string;
-        connection: Connection;
-        constructor(service: LayerService);
-        private updateFeatureByProperty(key, id, value);
-        private deleteFeatureByProperty(key, id, value);
-        initSubscriptions(layer: ProjectLayer): void;
-        addLayer(layer: ProjectLayer, callback: Function): void;
-        connectionEvent(status: string): void;
-        removeLayer(layer: ProjectLayer): void;
-    }
-}
-declare module csComp.Services {
-    class HeatmapSource implements ILayerSource {
-        service: LayerService;
-        title: string;
-        requiresLayer: boolean;
-        heatmapModel: Heatmap.HeatmapModel;
-        constructor(service: LayerService);
-        refreshLayer(layer: ProjectLayer): void;
-        addLayer(layer: ProjectLayer, callback: Function): void;
-        removeLayer(layer: ProjectLayer): void;
-        enableProjectLayer(layer: ProjectLayer): void;
-        getRequiredLayers(layer: ProjectLayer): ProjectLayer[];
-        getFeatureTypes(layer: ProjectLayer): string[];
-        generateHeatmap(layer: ProjectLayer): void;
-    }
-}
-declare module csComp.Services {
-    class TileLayerSource implements ILayerSource {
-        service: LayerService;
-        title: string;
-        requiresLayer: boolean;
-        constructor(service: LayerService);
-        refreshLayer(layer: ProjectLayer): void;
-        addLayer(layer: ProjectLayer, callback: Function): void;
-        removeLayer(layer: ProjectLayer): void;
-    }
-}
-declare module csComp.Services {
-    class WmsSource implements ILayerSource {
-        service: LayerService;
-        title: string;
-        requiresLayer: boolean;
-        constructor(service: LayerService);
-        refreshLayer(layer: ProjectLayer): void;
-        addLayer(layer: ProjectLayer, callback: Function): void;
-        removeLayer(layer: ProjectLayer): void;
-    }
-}
+
 declare module csComp.Services {
     interface IMapLayersScope extends ng.IScope {
         map: L.Map;
@@ -2651,6 +2830,7 @@ declare module csComp.Services {
         constructor($scope: IMapLayersScope, $location: ng.ILocationService, $mapService: MapService);
     }
 }
+
 declare module csComp.Services {
     class MapService {
         private $localStorageService;
@@ -2665,7 +2845,7 @@ declare module csComp.Services {
         timelineVisible: boolean;
         rightMenuVisible: boolean;
         expertMode: Expertise;
-        constructor($localStorageService: ng.localStorage.ILocalStorageService, $timeout: ng.ITimeoutService, $messageBusService: csComp.Services.MessageBusService);
+        constructor($localStorageService: angular.local.storage.ILocalStorageService<any>, $timeout: ng.ITimeoutService, $messageBusService: csComp.Services.MessageBusService);
         /**
       * The expert mode can either be set manually, e.g. using this directive, or by setting the expertMode property in the
       * project.json file. In neither are set, we assume that we are dealing with an expert, so all features should be enabled.
@@ -2697,6 +2877,99 @@ declare module csComp.Services {
         getMap(): L.Map;
     }
 }
+
+declare module csComp.Search {
+    interface ISearchFormScope extends ng.IScope {
+        vm: SearchFormCtrl;
+        location: L.LatLng;
+    }
+    class SearchFormCtrl {
+        private $scope;
+        private $mapService;
+        static $inject: string[];
+        constructor($scope: ISearchFormScope, $mapService: csComp.Services.MapService);
+        doSearch(): void;
+    }
+}
+
+declare module csComp.Services {
+    class TimeService {
+        private $messageBusService;
+        static $inject: string[];
+        map: L.Map;
+        baseLayers: any;
+        private activeBaseLayer;
+        constructor($messageBusService: csComp.Services.MessageBusService);
+    }
+}
+
+declare module csComp.Services {
+    class GeoJsonSource implements ILayerSource {
+        service: LayerService;
+        title: string;
+        layer: ProjectLayer;
+        requiresLayer: boolean;
+        constructor(service: LayerService);
+        refreshLayer(layer: ProjectLayer): void;
+        addLayer(layer: ProjectLayer, callback: Function): void;
+        protected baseAddLayer(layer: ProjectLayer, callback: Function): void;
+        removeLayer(layer: ProjectLayer): void;
+    }
+    class DynamicGeoJsonSource extends GeoJsonSource {
+        service: LayerService;
+        title: string;
+        connection: Connection;
+        constructor(service: LayerService);
+        private updateFeatureByProperty(key, id, value);
+        private deleteFeatureByProperty(key, id, value);
+        initSubscriptions(layer: ProjectLayer): void;
+        addLayer(layer: ProjectLayer, callback: Function): void;
+        connectionEvent(status: string): void;
+        removeLayer(layer: ProjectLayer): void;
+    }
+}
+
+declare module csComp.Services {
+    class HeatmapSource implements ILayerSource {
+        service: LayerService;
+        title: string;
+        requiresLayer: boolean;
+        heatmapModel: Heatmap.HeatmapModel;
+        constructor(service: LayerService);
+        refreshLayer(layer: ProjectLayer): void;
+        addLayer(layer: ProjectLayer, callback: Function): void;
+        removeLayer(layer: ProjectLayer): void;
+        enableProjectLayer(layer: ProjectLayer): void;
+        getRequiredLayers(layer: ProjectLayer): ProjectLayer[];
+        getFeatureTypes(layer: ProjectLayer): string[];
+        generateHeatmap(layer: ProjectLayer): void;
+    }
+}
+
+declare module csComp.Services {
+    class TileLayerSource implements ILayerSource {
+        service: LayerService;
+        title: string;
+        requiresLayer: boolean;
+        constructor(service: LayerService);
+        refreshLayer(layer: ProjectLayer): void;
+        addLayer(layer: ProjectLayer, callback: Function): void;
+        removeLayer(layer: ProjectLayer): void;
+    }
+}
+
+declare module csComp.Services {
+    class WmsSource implements ILayerSource {
+        service: LayerService;
+        title: string;
+        requiresLayer: boolean;
+        constructor(service: LayerService);
+        refreshLayer(layer: ProjectLayer): void;
+        addLayer(layer: ProjectLayer, callback: Function): void;
+        removeLayer(layer: ProjectLayer): void;
+    }
+}
+
 declare module csComp.Services {
     class CesiumRenderer implements IMapRenderer {
         title: string;
@@ -2717,6 +2990,7 @@ declare module csComp.Services {
         addFeature(feature: IFeature): void;
     }
 }
+
 declare module csComp.Services {
     class LeafletRenderer implements IMapRenderer {
         title: string;
@@ -2752,38 +3026,5 @@ declare module csComp.Services {
         showFeatureTooltip(e: any, group: ProjectGroup): void;
         hideFeatureTooltip(e: any): void;
         updateFeatureTooltip(e: any): void;
-    }
-}
-declare module csComp.Search {
-    interface ISearchFormScope extends ng.IScope {
-        vm: SearchFormCtrl;
-        location: L.LatLng;
-    }
-    class SearchFormCtrl {
-        private $scope;
-        private $mapService;
-        static $inject: string[];
-        constructor($scope: ISearchFormScope, $mapService: csComp.Services.MapService);
-        doSearch(): void;
-    }
-}
-declare module csComp.Services {
-    class TimeService {
-        private $messageBusService;
-        static $inject: string[];
-        map: L.Map;
-        baseLayers: any;
-        private activeBaseLayer;
-        constructor($messageBusService: csComp.Services.MessageBusService);
-    }
-}
-declare module Translations {
-    class English {
-        static locale: ng.translate.ITranslationTable;
-    }
-}
-declare module Translations {
-    class Dutch {
-        static locale: ng.translate.ITranslationTable;
     }
 }

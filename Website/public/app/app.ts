@@ -28,8 +28,11 @@
             '$location',
             'mapService',
             'layerService',
-            'messageBusService'
+            'messageBusService',
+            'dashboardService'
         ];
+
+
 
         // dependencies are injected via AngularJS $injector
         // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
@@ -38,7 +41,8 @@
             private $location         : IAppLocationService,
             private $mapService       : csComp.Services.MapService,
             private $layerService     : csComp.Services.LayerService,
-            private $messageBusService: csComp.Services.MessageBusService
+            private $messageBusService: csComp.Services.MessageBusService,
+            private $dashboardService: csComp.Services.DashboardService
         // $inject annotation.
         ) {
             //console.log('$location: ' + JSON.stringify($location));
@@ -67,6 +71,10 @@
             $messageBusService.notify('Welcome to csMap', 'Your mapping solution.');
 
             this.$mapService.mapVisible = this.$location.path() === "/map";
+
+
+
+
         }
 
         /**
@@ -77,6 +85,21 @@
         }
 
         private layerMessageReceived = (title:string, layer: csComp.Services.ProjectLayer): void => {
+
+          var $contextMenu = $("#contextMenu");
+
+          $("body").on("contextmenu", "table tr", function(e) {
+            $contextMenu.css({
+              display: "block",
+              left: e.pageX,
+              top: e.pageY
+            });
+            return false;
+          });
+
+          $contextMenu.on("click", "a", function() {
+             $contextMenu.hide();
+          });
             switch(title) {
                 case "deactivate":
                     break;
@@ -180,20 +203,24 @@
             'csWeb.expertMode',
             'csWeb.offlineSearch',
             'ngCookies',
-            //'csWeb.charts',
-            'csWeb.timeline', 
-            'csWeb.heatmap'
+            'csWeb.charts',
+            'csWeb.timeline',
+            'csWeb.offlineSearch',
+            'csWeb.heatmap',
+            'csWeb.dashboardirective',
+        'csWeb.dashboardSelection',
+        'csWeb.indicators'
         ])
         .config(localStorageServiceProvider => {
             localStorageServiceProvider.prefix = 'csMap';
         })
         .config(TimelineServiceProvider => {
             TimelineServiceProvider.setTimelineOptions({
-                'width': '100%',
-                "eventMargin": 0,
+                'width'          : '100%',
+                "eventMargin"    : 0,
                 "eventMarginAxis": 0,
-                'editable': false,
-                'layout': 'box'
+                'editable'       : false,
+                'layout'         : 'box'
             });
         })
         .config($translateProvider => {
@@ -273,11 +300,12 @@
                 });
         })
         .service('messageBusService', csComp.Services.MessageBusService)
+        .service('dashboardService', csComp.Services.DashboardService)
         .service('mapService', csComp.Services.MapService)
         .service('layerService', csComp.Services.LayerService)
-        .controller('appCtrl', AppCtrl)        
-        //.controller('searchCtrl', Search.SearchCtrl)
-        //.controller('mcaEditorCtrl', Mca.McaEditorCtrl)
+        .controller('appCtrl', AppCtrl)
+        .controller('searchCtrl', Search.SearchCtrl)
+        .controller('mcaEditorCtrl', Mca.McaEditorCtrl)
         .filter('csmillions', [
             '$filter', '$locale', function(filter, locale) {
                 return function(amount, currencySymbol) {
@@ -311,6 +339,7 @@
                 }
             }
         })
+
         //.directive('googlePlaces', () => {
         //    return {
         //        restrict: 'E',
@@ -340,7 +369,7 @@
                 restrict: 'A',
                 require: 'ngModel',
                 priority: 1, // needed for angular 1.2.x
-                link: (scope, elm, attr, ngModelCtrl) => {
+                link: (scope, elm, attr: any, ngModelCtrl) => {
                     if (attr.type === 'radio' || attr.type === 'checkbox') return;
                     elm.unbind('input').unbind('keydown').unbind('change');
                     elm.bind('blur', () => {
@@ -350,5 +379,82 @@
                     });
                 }
             };
+        })
+
+        // Inline for demo purposes.
+    .directive('contextMenu', function ($parse) {
+    var renderContextMenu = function ($scope, event, options) {
+        if (!$) { var $ = angular.element; }
+        $(event.currentTarget).addClass('context');
+        var $contextMenu = $('<div>');
+        $contextMenu.addClass('dropdown clearfix');
+        var $ul = $('<ul>');
+        $ul.addClass('dropdown-menu');
+        $ul.attr({ 'role': 'menu' });
+        $ul.css({
+            display: 'block',
+            position: 'absolute',
+            left: event.pageX + 'px',
+            top: event.pageY + 'px'
         });
+        angular.forEach(options, function (item, i) {
+            var $li = $('<li>');
+            if (item === null) {
+                $li.addClass('divider');
+            } else {
+                var $a = $('<a>');
+                $a.attr({ tabindex: '-1', href: '#' });
+                $a.text(typeof item[0] == 'string' ? item[0] : item[0].call($scope, $scope));
+                $li.append($a);
+                $li.on('click', function ($event) {
+                    $event.preventDefault();
+                    $scope.$apply(function () {
+                        $(event.currentTarget).removeClass('context');
+                        $contextMenu.remove();
+                        item[1].call($scope, $scope);
+                    });
+                });
+            }
+            $ul.append($li);
+        });
+        $contextMenu.append($ul);
+        var height = Math.max(
+            document.body.scrollHeight, document.documentElement.scrollHeight,
+            document.body.offsetHeight, document.documentElement.offsetHeight,
+            document.body.clientHeight, document.documentElement.clientHeight
+        );
+        $contextMenu.css({
+            width: '100%',
+            height: height + 'px',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            zIndex: 9999
+        });
+        $(document).find('body').append($contextMenu);
+        $contextMenu.on("mousedown", function (e) {
+            if ($(e.target).hasClass('dropdown')) {
+                $(event.currentTarget).removeClass('context');
+                $contextMenu.remove();
+            }
+        }).on('contextmenu', function (event) {
+            $(event.currentTarget).removeClass('context');
+            event.preventDefault();
+            $contextMenu.remove();
+        });
+    };
+    return function ($scope, element, attrs) {
+        element.on('contextmenu', function (event) {
+            $scope.$apply(function () {
+                event.preventDefault();
+                var options = $scope.$eval(attrs.contextMenu);
+                if (options instanceof Array) {
+                    renderContextMenu($scope, event, options);
+                } else {
+                    throw '"' + attrs.contextMenu + '" not an array';
+                }
+            });
+        });
+    };
+});
 }

@@ -3,18 +3,18 @@ import http = require('http');
 import ClientConnection = require("./../ClientConnection");
 
 module FlightRadar {
-     
+
     export class IDynamicLayer {
         Connection: ClientConnection.ConnectionManager;
         GetLayer: Function;
         layerId: string;
-                 
+
     }
 
     export class FlightRadar implements IDynamicLayer {
 
         public static result;
-        
+
         constructor (public Connection: ClientConnection.ConnectionManager, public layerId : string)
         {
 
@@ -47,10 +47,10 @@ module FlightRadar {
         private CheckFeature(f) {
             this.updateNameById(FlightRadar.result.features, f["properties"]["id"], f);
             this.Connection.updateFeature(this.layerId, f);
-            
+
         }
 
-        public GetLayer(req: express.Request, res: express.Response) {            
+        public GetLayer(req: express.Request, res: express.Response) {
             if (FlightRadar.result != null) res.send(FlightRadar.result);
 
             //res.send("postgres layer");
@@ -70,6 +70,9 @@ module FlightRadar {
         }
 
         public GetFlightData(): any {
+
+          try
+          {
             var options = {
                 host: 'lhr.data.fr24.com',
                 path: '/zones/fcgi/feed.js?bounds=55.67283539294783,51.552131597019454,-1.5024902343745907,17.149658203125&faa=1&mlat=1&flarm=1&adsb=1&gnd=1&air=1&vehicles=1&estimated=1&maxage=900&gliders=1&stats=1&'
@@ -92,7 +95,7 @@ module FlightRadar {
                     var b = JSON.parse(r);
                     for (var screen in b) {
                         var s = b[screen];
-                        if (s[0] != "" && s[1] != null && s[2] != null && s[0] != null) {
+                        if (s[0] != "" && s[1] != null && s[2] != null && s[0] != null && s[8]!="GRND") {
                             var sit = {
                                 "type": "Feature",
                                 "geometry": { "type": "Point", "coordinates": [s[2], s[1]] },
@@ -108,10 +111,10 @@ module FlightRadar {
                                     "Time": new Date().getTime()
                                 }
                             };
+
                             this.CheckFeature(sit);
                             //result.features.push(sit);
                             //CheckFeature(sit, db);
-
                         }
                     }
                     var active = FlightRadar.result;
@@ -128,7 +131,7 @@ module FlightRadar {
 
                     FlightRadar.result = active;
 
-                    
+
 
                     console.log(FlightRadar.result.features.length);
                     // ID to avoid having duplicate _id keys (still need to know why this happens)
@@ -139,6 +142,12 @@ module FlightRadar {
 
                 });
             }).end();
+          }
+          catch (e)
+          {
+            return null;
+          }
+
         }
     }
 }

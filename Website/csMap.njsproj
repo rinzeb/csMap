@@ -23,7 +23,7 @@
     <OutputPath>.</OutputPath>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <ProjectTypeGuids>{3AF33F2E-1136-4D97-BBB7-1795711AC8B8};{349c5851-65df-11da-9384-00065b846f21};{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}</ProjectTypeGuids>
-    <ProjectView>ShowAllFiles</ProjectView>
+    <ProjectView>ProjectFiles</ProjectView>
     <NodejsPort>1331</NodejsPort>
     <TypeScriptSourceMap>True</TypeScriptSourceMap>
     <TypeScriptModuleKind>CommonJS</TypeScriptModuleKind>
@@ -37,11 +37,12 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="tsconfig.json" />
     <TypeScriptCompile Include="ClientConnection.ts" />
     <TypeScriptCompile Include="layers\flightradar.ts" />
     <TypeScriptCompile Include="public\app\search\SearchCtrl.ts" />
     <TypeScriptCompile Include="Scripts\typings\angular-translate\angular-translate.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\angular-ui\angular-ui-router.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\angular-ui-router\angular-ui-router.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular-cookies.d.ts" />
     <TypeScriptCompile Include="public\app\app.ts" />
     <TypeScriptCompile Include="Scripts\typings\angularjs\angular.d.ts" />
@@ -93,10 +94,11 @@
     <Folder Include="public\includes\" />
     <Folder Include="public\js\" />
     <Folder Include="public\js\cs\" />
+    <Folder Include="public\views\" />
     <Folder Include="Scripts\" />
     <Folder Include="Scripts\typings\" />
     <Folder Include="Scripts\typings\angular-translate\" />
-    <Folder Include="Scripts\typings\angular-ui\" />
+    <Folder Include="Scripts\typings\angular-ui-router\" />
     <Folder Include="Scripts\typings\angularjs\" />
     <Folder Include="Scripts\typings\angularLocalStorage\" />
     <Folder Include="Scripts\typings\chroma-js\" />
@@ -114,6 +116,7 @@
     <Folder Include="Scripts\typings\xbbcode\" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="gulpfile.js" />
     <Compile Include="public\js\cs\csComp.js" />
     <Compile Include="public\js\cs\jqueryinjectCSS.min.js" />
     <Compile Include="public\js\cs\pnotify.custom.min.js" />

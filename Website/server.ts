@@ -13,6 +13,14 @@ var offlineSearchManager = new offlineSearch('public/data/projects/projects.json
     stopWords: ['de', 'het', 'een', 'en', 'van', 'aan']
 });
 
+/**
+ * Create a search index file which can be loaded statically.
+ */
+var offlineSearchManager = new offlineSearch('public/data/projects/projects.json', {
+    propertyNames: ['Name', 'plaatnaam', 'postcode', 'Postcode', 'straat', 'loc_straat', 'KvK', 'gemeente', 'plaats', 'Naam_van_het_concern_DigiMV_2012'],
+    stopWords    : ['de', 'het', 'een', 'en', 'van', 'aan']
+});
+
 // setup socket.io object
 var server = express();
 var httpServer = require('http').Server(server);
@@ -24,8 +32,6 @@ io.on('connection', function (socket) {
     socket.on('disconnect', function () {
         console.log('user disconnected');
     });
-
-
 });
 
 // all environments

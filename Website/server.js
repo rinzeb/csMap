@@ -50,4 +50,3 @@ if ('development' == server.get('env')) {
 httpServer.listen(server.get('port'), function () {
     console.log('Express server listening on port ' + server.get('port'));
 });
-//# sourceMappingURL=server.js.map
