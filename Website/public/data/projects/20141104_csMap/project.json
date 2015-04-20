@@ -2727,6 +2727,24 @@
                     "url": "data/projects/20141104_csMap/aanrijtijden.json",
                     "enabled": false,
                     "opacity": 100
+                },
+				{
+                    "id": "Emmen",
+                    "reference": "Emmen",
+                    "languages": {
+                        "nl": {
+                            "title": "Emmen",
+                            "description": "Emmen."
+                        },
+                        "en": {
+                            "title": "Emmen",
+                            "description": "Emmen."
+                        }
+                    },
+                    "type": "GeoJson",
+                    "url": "data/projects/20141104_csMap/woningen_emmen.json",
+                    "enabled": false,
+                    "opacity": 100
                 }
             ]
         },
@@ -3002,17 +3020,15 @@
 					"reference" : "heatmaphospital",
 					"languages" : {
 						"nl" : {
-							"title" : "Heatmap ziekenhuis-brandweerkazerne",
-							"description" : "Prefereer ziekenhuizen, vermijd kazernes"
-
+							"title" : "Heatmap hospital-firestations",
+							"description" : "Prefer hospitals, avoid firestations"
 						},
 						"en" : {
 							"title" : "Heatmap hospital-firestations",
-							"description" : "Prefer hospitals, avoid firestations)"
+							"description" : "Prefereer ziekenhuizen, vermijd brandweerkazernes"
 						}
-
 					},
-					"description" : "Test of a heatmap(Source: thumb.)",
+					"description" : "Prefer hospitals, avoid firestations",
 					"type" : "Heatmap",
 					"heatmapSettings" : {
 						"referenceList" : [
@@ -3021,1199 +3037,139 @@
 						],
 						"minZoom" : 10,
 						"maxZoom" : 15,
-						"intensityScale": 3
+						"intensityScale" : 3,
+						"resolution" : 2
 					},
 					"heatmapItems" : [{
 							"title" : "Ziekenhuis",
 							"featureType" : {
-								"name" : "Ziekenhuis",
-								"style" : {
-									"fillColor" : "#ffffff",
-									"strokeColor" : "#808080",
-									"drawingMode" : "Point",
-									"strokeWidth" : 2,
-									"iconWidth" : 32,
-									"iconHeight" : 32,
-									"iconUri" : "images/ziekenhuis.png"
-								},
-								"propertyTypeData" : [{
-										"label" : "naam",
-										"type" : "text",
-										"languages" : {
-											"nl" : {
-												"title" : "Naam"
-											},
-											"en" : {
-												"title" : "Name"
-											}
-										},
-										"isSearchable" : true,
-										"canEdit" : false,
-										"visibleInCallOut" : true,
-										"title" : "Name"
-									}, {
-										"label" : "locatie",
-										"type" : "text",
-										"languages" : {
-											"nl" : {
-												"title" : "Locatie"
-											},
-											"en" : {
-												"title" : "Location"
-											}
-										},
-										"isSearchable" : true,
-										"canEdit" : false,
-										"visibleInCallOut" : true,
-										"title" : "Location"
-									}, {
-										"label" : "adres",
-										"type" : "text",
-										"languages" : {
-											"nl" : {
-												"title" : "Adres",
-												"section" : "Contact"
-											},
-											"en" : {
-												"title" : "Address",
-												"section" : "Contact"
-											}
-										},
-										"isSearchable" : true,
-										"canEdit" : false,
-										"visibleInCallOut" : true,
-										"title" : "Address",
-										"section" : "Contact"
-									}, {
-										"label" : "postcode",
-										"type" : "text",
-										"languages" : {
-											"nl" : {
-												"title" : "Postcode",
-												"section" : "Contact"
-											},
-											"en" : {
-												"title" : "Zip code",
-												"section" : "Contact"
-											}
-										},
-										"isSearchable" : true,
-										"canEdit" : false,
-										"visibleInCallOut" : true,
-										"title" : "Zip code",
-										"section" : "Contact"
-									}, {
-										"label" : "plaats",
-										"type" : "text",
-										"languages" : {
-											"nl" : {
-												"title" : "Plaats",
-												"section" : "Contact"
-											},
-											"en" : {
-												"title" : "Location",
-												"section" : "Contact"
-											}
-										},
-										"isSearchable" : true,
-										"canEdit" : false,
-										"visibleInCallOut" : true,
-										"title" : "Location",
-										"section" : "Contact"
-									}, {
-										"label" : "telefoonalgemeen",
-										"type" : "text",
-										"languages" : {
-											"nl" : {
-												"title" : "Telefoon algemeen",
-												"section" : "Contact"
-											},
-											"en" : {
-												"title" : "Telephone general",
-												"section" : "Contact"
-											}
-										},
-										"isSearchable" : false,
-										"canEdit" : false,
-										"visibleInCallOut" : true,
-										"title" : "Telephone general",
-										"section" : "Contact"
-									}, {
-										"label" : "telefoonSEH",
-										"type" : "text",
-										"languages" : {
-											"nl" : {
-												"title" : "Telefoon SEH",
-												"section" : "Contact"
-											},
-											"en" : {
-												"title" : "Telephone ER",
-												"section" : "Contact"
-											}
-										},
-										"isSearchable" : false,
-										"canEdit" : false,
-										"visibleInCallOut" : true,
-										"title" : "Telephone ER",
-										"section" : "Contact"
-									}, {
-										"label" : "bedden",
-										"type" : "number",
-										"languages" : {
-											"nl" : {
-												"title" : "Aantal bedden"
-											},
-											"en" : {
-												"title" : "Number of beds"
-											}
-										},
-										"isSearchable" : false,
-										"canEdit" : false,
-										"visibleInCallOut" : true,
-										"title" : "Number of beds"
-									}
-								]
+								"name" : "Ziekenhuis"
 							},
-							"userWeight" : 3,
 							"weight" : 0,
+							"userWeight" : 3,
+							"isSelected" : true,
 							"idealityMeasure" : {
 								"idealDistance" : 700,
 								"atLocation" : 0.1,
 								"lostInterestDistance" : 2000
 							},
-							"heatspots" : [],
-							"isSelected" : true,
-							"intensityScale" : 1,
-							"$$hashKey" : "object:290",
-							"scoringFunctionType" : {
-								"type" : 0,
-								"title" : "Linearly increasing, then decreasing function."
-							}
+							"heatspots" : []
 						}, {
 							"title" : "Brandweerkazerne",
 							"featureType" : {
-								"name" : "Brandweerkazerne",
-								"style" : {
-									"fillColor" : "#ffffff",
-									"strokeColor" : "#000000",
-									"drawingMode" : "Point",
-									"strokeWidth" : 1,
-									"iconWidth" : 30,
-									"iconHeight" : 30,
-									"iconUri" : "images/brandweerposten/Brandweerkazerne.png"
-								},
-								"propertyTypeKeys" : "Id;BAG_id;Organisatie;LOC_TYPE;LOC_NAAM;LOC_STRAAT;Huisnr;Postcode;Plaats;Gemeente;Regio;Telefoon;GeoAddress;Regio;Website"
+								"name" : "Brandweerkazerne"
 							},
-							"userWeight" : -2,
 							"weight" : 0,
+							"userWeight" : -2,
+							"isSelected" : true,
 							"idealityMeasure" : {
 								"idealDistance" : 300,
 								"atLocation" : 0.6,
 								"lostInterestDistance" : 2000
 							},
-							"heatspots" : [],
-							"isSelected" : true,
-							"intensityScale" : 1,
-							"$$hashKey" : "object:291",
-							"scoringFunctionType" : {
-								"type" : 0,
-								"title" : "Linearly increasing, then decreasing function."
-							}
+							"heatspots" : []
 						}
 					],
 					"enabled" : false,
 					"opacity" : 100
-				}, {
-					"id" : "emmenEnergy",
-					"reference" : "emmenEnergy",
-					"languages" : {
-						"nl" : {
-							"title" : "Emmen Energielabels",
-							"description" : "Prefereer A,B, vermijd F,G"
+					}, {
+						"id" : "emmen_energy",
+						"reference" : "emmen_energy",
+						"languages" : {
+							"nl" : {
+								"title" : "Emmen Energylabels",
+								"description" : "Emmen Energylabels"
+							},
+							"en" : {
+								"title" : "Emmen Energylabels",
+								"description" : "Emmen Energylabels"
+							}
 						},
-						"en" : {
-							"title" : "Emmen Energylabels",
-							"description" : "Prefer A,B, avoid F,G"
-						}
-					},
-					"description" : "Test of a heatmap(",
-					"type" : "Heatmap",
-					"heatmapSettings" : {
-						"referenceList" : ["Emmen"],
-						"minZoom" : 10,
-						"maxZoom" : 16,
-						"intensityScale": 1
-					},
-					"heatmapItems" : [{
-							"title" : "A",
-							"featureType" : {
-								"style" : {
-									"fillColor" : "#00ffffff",
-									"strokeColor" : "#ff808080",
-									"drawingMode" : "Image",
-									"strokeWidth" : 2,
-									"iconWidth" : 24,
-									"iconHeight" : 24,
-									"iconUri" : "images/LabelledHouse-{energielabel}.png",
-									"nameLabel" : "Name"
-								},
-								"propertyTypeData" : [{
-										"label" : "Name",
-										"type" : "stringFormat",
-										"title" : "Naam",
-										"section" : "Adres",
-										"stringFormat" : "{straat} {huisnummer}, {postcode}",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : true
-									}, {
-										"label" : "straat",
-										"type" : "text",
-										"title" : "Straat",
-										"section" : "Adres",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "huisnummer",
-										"type" : "number",
-										"title" : "Huisnummer",
-										"section" : "Adres",
-										"stringFormat" : "{0:0,0}",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "postcode",
-										"type" : "text",
-										"title" : "Postcode",
-										"section" : "Adres",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "wijk",
-										"type" : "options",
-										"options" : [
-											"Angelslo",
-											"Barger-Compascuum",
-											"Bargeres",
-											"Bargermeer-Meerveld",
-											"Barger-Oosterveld",
-											"BOG wijk",
-											"Emmen Centrum",
-											"Emmer-compascuum",
-											"Emmer-Compascuum",
-											"Emmerhout",
-											"Emmermeer",
-											"Emmerschans",
-											"Erica",
-											"Klazienaveen",
-											"Nieuw-Amsterdam",
-											"Nieuw-Dordrecht",
-											"Nieuw-Weerdinge",
-											"Rietlanden",
-											"Weerdinge",
-											"Zwartemeer"
-										],
-										"title" : "Wijk",
-										"description" : "Wijk (indeling Lefier, kan afwijken van CBS)",
-										"section" : "Adres",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "gem",
-										"type" : "options",
-										"options" : [
-											"Emmen"
-										],
-										"title" : "Gemeente",
-										"section" : "Adres",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "jaar",
-										"type" : "number",
-										"title" : "Bouwjaar",
-										"section" : "Woning",
-										"stringFormat" : "{0:0,0}",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "type1",
-										"type" : "options",
-										"options" : [
-											"Collectief woon/zorg vastgoed",
-											"Galerijflat",
-											"Maisonnette",
-											"Portiekflat",
-											"Rijtjeswoning",
-											"Twee-onder-Ã©Ã©n-kap woning",
-											"Vrijstaande woning"
-										],
-										"title" : "Type woning 1",
-										"section" : "Woning",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "type2",
-										"type" : "options",
-										"options" : [
-											"Eengezins",
-											"Meergezins met lift",
-											"Meergezins zonder lift"
-										],
-										"title" : "Type woning 2",
-										"section" : "Woning",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "staat",
-										"type" : "options",
-										"options" : [
-											"Brons",
-											"Goud",
-											"Zilver"
-										],
-										"title" : "Technische staat",
-										"description" : "Technische staat (goud-zilver-brons)",
-										"section" : "Woning",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "energielabel",
-										"type" : "options",
-										"options" : [
-											"-",
-											"A",
-											"B",
-											"C",
-											"D",
-											"E",
-											"F",
-											"G"
-										],
-										"title" : "Energielabel",
-										"description" : "Energielabel (A-H)",
-										"section" : "Woning",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "huur",
-										"type" : "number",
-										"title" : "Huur",
-										"description" : "Maandhuur (EUR)",
-										"section" : "Woning",
-										"stringFormat" : "â‚¬{0:0,0}",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "maxhuur",
-										"type" : "number",
-										"title" : "Max.huur",
-										"description" : "Maximale maandhuur (EUR)",
-										"section" : "Woning",
-										"stringFormat" : "â‚¬{0:0,0}",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "woz",
-										"type" : "number",
-										"title" : "WOZ",
-										"description" : "WOZ-waarde (EUR)",
-										"section" : "Woning",
-										"stringFormat" : "â‚¬{0:0,0}",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "toevoeging",
-										"type" : "number",
-										"title" : "Toevoeging",
-										"section" : "Adres",
-										"stringFormat" : "{0:0,0}",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "opp",
-										"type" : "number",
-										"title" : "Oppervlakte",
-										"description" : "Gebruiksoppervlakte uit BAG (m2]",
-										"section" : "Woning",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "taxatie",
-										"type" : "number",
-										"title" : "Taxatiewaarde",
-										"description" : "Taxatiewaarde onverhuurd (EUR)",
-										"section" : "Woning",
-										"stringFormat" : "â‚¬{0:0,0}",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}
-								],
-								"name" : "Emmen"
-							},
-							"weight" : 0.3333333333333333,
-							"userWeight" : 2,
-							"isSelected" : true,
-							"idealityMeasure" : {
-								"idealDistance" : 50,
-								"atLocation" : 0.8,
-								"lostInterestDistance" : 500
-							},
-							"propertyTitle" : "Energielabel",
-							"propertyLabel" : "energielabel",
-							"optionIndex" : 1,
-							"heatspots" : [],
+						"description" : "Emmen Energylabels",
+						"type" : "Heatmap",
+						"heatmapSettings" : {
+							"referenceList" : [
+								"Emmen"
+							],
+							"minZoom" : 10,
+							"maxZoom" : 16,
 							"intensityScale" : 1,
-							"$$hashKey" : "object:284",
-							"scoringFunctionType" : {
-								"type" : 0,
-								"title" : "Linearly increasing, then decreasing function."
-							}
-						}, {
-							"title" : "B",
-							"featureType" : {
-								"style" : {
-									"fillColor" : "#00ffffff",
-									"strokeColor" : "#ff808080",
-									"drawingMode" : "Image",
-									"strokeWidth" : 2,
-									"iconWidth" : 24,
-									"iconHeight" : 24,
-									"iconUri" : "images/LabelledHouse-{energielabel}.png",
-									"nameLabel" : "Name"
+							"resolution" : 1
+						},
+						"heatmapItems" : [{
+								"title" : "A",
+								"featureType" : {
+									"name" : "Emmen"
 								},
-								"propertyTypeData" : [{
-										"label" : "Name",
-										"type" : "stringFormat",
-										"title" : "Naam",
-										"section" : "Adres",
-										"stringFormat" : "{straat} {huisnummer}, {postcode}",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : true
-									}, {
-										"label" : "straat",
-										"type" : "text",
-										"title" : "Straat",
-										"section" : "Adres",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "huisnummer",
-										"type" : "number",
-										"title" : "Huisnummer",
-										"section" : "Adres",
-										"stringFormat" : "{0:0,0}",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "postcode",
-										"type" : "text",
-										"title" : "Postcode",
-										"section" : "Adres",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "wijk",
-										"type" : "options",
-										"options" : [
-											"Angelslo",
-											"Barger-Compascuum",
-											"Bargeres",
-											"Bargermeer-Meerveld",
-											"Barger-Oosterveld",
-											"BOG wijk",
-											"Emmen Centrum",
-											"Emmer-compascuum",
-											"Emmer-Compascuum",
-											"Emmerhout",
-											"Emmermeer",
-											"Emmerschans",
-											"Erica",
-											"Klazienaveen",
-											"Nieuw-Amsterdam",
-											"Nieuw-Dordrecht",
-											"Nieuw-Weerdinge",
-											"Rietlanden",
-											"Weerdinge",
-											"Zwartemeer"
-										],
-										"title" : "Wijk",
-										"description" : "Wijk (indeling Lefier, kan afwijken van CBS)",
-										"section" : "Adres",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "gem",
-										"type" : "options",
-										"options" : [
-											"Emmen"
-										],
-										"title" : "Gemeente",
-										"section" : "Adres",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "jaar",
-										"type" : "number",
-										"title" : "Bouwjaar",
-										"section" : "Woning",
-										"stringFormat" : "{0:0,0}",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "type1",
-										"type" : "options",
-										"options" : [
-											"Collectief woon/zorg vastgoed",
-											"Galerijflat",
-											"Maisonnette",
-											"Portiekflat",
-											"Rijtjeswoning",
-											"Twee-onder-Ã©Ã©n-kap woning",
-											"Vrijstaande woning"
-										],
-										"title" : "Type woning 1",
-										"section" : "Woning",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "type2",
-										"type" : "options",
-										"options" : [
-											"Eengezins",
-											"Meergezins met lift",
-											"Meergezins zonder lift"
-										],
-										"title" : "Type woning 2",
-										"section" : "Woning",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "staat",
-										"type" : "options",
-										"options" : [
-											"Brons",
-											"Goud",
-											"Zilver"
-										],
-										"title" : "Technische staat",
-										"description" : "Technische staat (goud-zilver-brons)",
-										"section" : "Woning",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "energielabel",
-										"type" : "options",
-										"options" : [
-											"-",
-											"A",
-											"B",
-											"C",
-											"D",
-											"E",
-											"F",
-											"G"
-										],
-										"title" : "Energielabel",
-										"description" : "Energielabel (A-H)",
-										"section" : "Woning",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "huur",
-										"type" : "number",
-										"title" : "Huur",
-										"description" : "Maandhuur (EUR)",
-										"section" : "Woning",
-										"stringFormat" : "â‚¬{0:0,0}",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "maxhuur",
-										"type" : "number",
-										"title" : "Max.huur",
-										"description" : "Maximale maandhuur (EUR)",
-										"section" : "Woning",
-										"stringFormat" : "â‚¬{0:0,0}",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "woz",
-										"type" : "number",
-										"title" : "WOZ",
-										"description" : "WOZ-waarde (EUR)",
-										"section" : "Woning",
-										"stringFormat" : "â‚¬{0:0,0}",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "toevoeging",
-										"type" : "number",
-										"title" : "Toevoeging",
-										"section" : "Adres",
-										"stringFormat" : "{0:0,0}",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "opp",
-										"type" : "number",
-										"title" : "Oppervlakte",
-										"description" : "Gebruiksoppervlakte uit BAG (m2]",
-										"section" : "Woning",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "taxatie",
-										"type" : "number",
-										"title" : "Taxatiewaarde",
-										"description" : "Taxatiewaarde onverhuurd (EUR)",
-										"section" : "Woning",
-										"stringFormat" : "â‚¬{0:0,0}",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}
-								],
-								"name" : "Emmen"
-							},
-							"weight" : 0.16666666666666666,
-							"userWeight" : 1,
-							"isSelected" : true,
-							"idealityMeasure" : {
-								"idealDistance" : 50,
-								"atLocation" : 0.5,
-								"lostInterestDistance" : 500
-							},
-							"propertyTitle" : "Energielabel",
-							"propertyLabel" : "energielabel",
-							"optionIndex" : 2,
-							"heatspots" : [],
-							"intensityScale" : 1,
-							"$$hashKey" : "object:285",
-							"scoringFunctionType" : {
-								"type" : 0,
-								"title" : "Linearly increasing, then decreasing function."
-							}
-						}, {
-							"title" : "F",
-							"featureType" : {
-								"style" : {
-									"fillColor" : "#00ffffff",
-									"strokeColor" : "#ff808080",
-									"drawingMode" : "Image",
-									"strokeWidth" : 2,
-									"iconWidth" : 24,
-									"iconHeight" : 24,
-									"iconUri" : "images/LabelledHouse-{energielabel}.png",
-									"nameLabel" : "Name"
+								"weight" : 0.3333333333333333,
+								"userWeight" : 2,
+								"isSelected" : true,
+								"idealityMeasure" : {
+									"idealDistance" : 50,
+									"atLocation" : 0.8,
+									"lostInterestDistance" : 500
 								},
-								"propertyTypeData" : [{
-										"label" : "Name",
-										"type" : "stringFormat",
-										"title" : "Naam",
-										"section" : "Adres",
-										"stringFormat" : "{straat} {huisnummer}, {postcode}",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : true
-									}, {
-										"label" : "straat",
-										"type" : "text",
-										"title" : "Straat",
-										"section" : "Adres",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "huisnummer",
-										"type" : "number",
-										"title" : "Huisnummer",
-										"section" : "Adres",
-										"stringFormat" : "{0:0,0}",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "postcode",
-										"type" : "text",
-										"title" : "Postcode",
-										"section" : "Adres",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "wijk",
-										"type" : "options",
-										"options" : [
-											"Angelslo",
-											"Barger-Compascuum",
-											"Bargeres",
-											"Bargermeer-Meerveld",
-											"Barger-Oosterveld",
-											"BOG wijk",
-											"Emmen Centrum",
-											"Emmer-compascuum",
-											"Emmer-Compascuum",
-											"Emmerhout",
-											"Emmermeer",
-											"Emmerschans",
-											"Erica",
-											"Klazienaveen",
-											"Nieuw-Amsterdam",
-											"Nieuw-Dordrecht",
-											"Nieuw-Weerdinge",
-											"Rietlanden",
-											"Weerdinge",
-											"Zwartemeer"
-										],
-										"title" : "Wijk",
-										"description" : "Wijk (indeling Lefier, kan afwijken van CBS)",
-										"section" : "Adres",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "gem",
-										"type" : "options",
-										"options" : [
-											"Emmen"
-										],
-										"title" : "Gemeente",
-										"section" : "Adres",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "jaar",
-										"type" : "number",
-										"title" : "Bouwjaar",
-										"section" : "Woning",
-										"stringFormat" : "{0:0,0}",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "type1",
-										"type" : "options",
-										"options" : [
-											"Collectief woon/zorg vastgoed",
-											"Galerijflat",
-											"Maisonnette",
-											"Portiekflat",
-											"Rijtjeswoning",
-											"Twee-onder-Ã©Ã©n-kap woning",
-											"Vrijstaande woning"
-										],
-										"title" : "Type woning 1",
-										"section" : "Woning",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "type2",
-										"type" : "options",
-										"options" : [
-											"Eengezins",
-											"Meergezins met lift",
-											"Meergezins zonder lift"
-										],
-										"title" : "Type woning 2",
-										"section" : "Woning",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "staat",
-										"type" : "options",
-										"options" : [
-											"Brons",
-											"Goud",
-											"Zilver"
-										],
-										"title" : "Technische staat",
-										"description" : "Technische staat (goud-zilver-brons)",
-										"section" : "Woning",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "energielabel",
-										"type" : "options",
-										"options" : [
-											"-",
-											"A",
-											"B",
-											"C",
-											"D",
-											"E",
-											"F",
-											"G"
-										],
-										"title" : "Energielabel",
-										"description" : "Energielabel (A-H)",
-										"section" : "Woning",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "huur",
-										"type" : "number",
-										"title" : "Huur",
-										"description" : "Maandhuur (EUR)",
-										"section" : "Woning",
-										"stringFormat" : "â‚¬{0:0,0}",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "maxhuur",
-										"type" : "number",
-										"title" : "Max.huur",
-										"description" : "Maximale maandhuur (EUR)",
-										"section" : "Woning",
-										"stringFormat" : "â‚¬{0:0,0}",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "woz",
-										"type" : "number",
-										"title" : "WOZ",
-										"description" : "WOZ-waarde (EUR)",
-										"section" : "Woning",
-										"stringFormat" : "â‚¬{0:0,0}",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "toevoeging",
-										"type" : "number",
-										"title" : "Toevoeging",
-										"section" : "Adres",
-										"stringFormat" : "{0:0,0}",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "opp",
-										"type" : "number",
-										"title" : "Oppervlakte",
-										"description" : "Gebruiksoppervlakte uit BAG (m2]",
-										"section" : "Woning",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "taxatie",
-										"type" : "number",
-										"title" : "Taxatiewaarde",
-										"description" : "Taxatiewaarde onverhuurd (EUR)",
-										"section" : "Woning",
-										"stringFormat" : "â‚¬{0:0,0}",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}
-								],
-								"name" : "Emmen"
-							},
-							"weight" : -0.16666666666666666,
-							"userWeight" : -1,
-							"isSelected" : true,
-							"idealityMeasure" : {
-								"idealDistance" : 50,
-								"atLocation" : 1,
-								"lostInterestDistance" : 500
-							},
-							"propertyTitle" : "Energielabel",
-							"propertyLabel" : "energielabel",
-							"optionIndex" : 6,
-							"heatspots" : [],
-							"intensityScale" : 1,
-							"$$hashKey" : "object:289",
-							"scoringFunctionType" : {
-								"type" : 0,
-								"title" : "Linearly increasing, then decreasing function."
-							}
-						}, {
-							"title" : "G",
-							"featureType" : {
-								"style" : {
-									"fillColor" : "#00ffffff",
-									"strokeColor" : "#ff808080",
-									"drawingMode" : "Image",
-									"strokeWidth" : 2,
-									"iconWidth" : 24,
-									"iconHeight" : 24,
-									"iconUri" : "images/LabelledHouse-{energielabel}.png",
-									"nameLabel" : "Name"
+								"propertyTitle" : "Energielabel",
+								"propertyLabel" : "energielabel",
+								"optionIndex" : 1,
+								"heatspots" : []
+							}, {
+								"title" : "B",
+								"featureType" : {
+									"name" : "Emmen"
 								},
-								"propertyTypeData" : [{
-										"label" : "Name",
-										"type" : "stringFormat",
-										"title" : "Naam",
-										"section" : "Adres",
-										"stringFormat" : "{straat} {huisnummer}, {postcode}",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : true
-									}, {
-										"label" : "straat",
-										"type" : "text",
-										"title" : "Straat",
-										"section" : "Adres",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "huisnummer",
-										"type" : "number",
-										"title" : "Huisnummer",
-										"section" : "Adres",
-										"stringFormat" : "{0:0,0}",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "postcode",
-										"type" : "text",
-										"title" : "Postcode",
-										"section" : "Adres",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "wijk",
-										"type" : "options",
-										"options" : [
-											"Angelslo",
-											"Barger-Compascuum",
-											"Bargeres",
-											"Bargermeer-Meerveld",
-											"Barger-Oosterveld",
-											"BOG wijk",
-											"Emmen Centrum",
-											"Emmer-compascuum",
-											"Emmer-Compascuum",
-											"Emmerhout",
-											"Emmermeer",
-											"Emmerschans",
-											"Erica",
-											"Klazienaveen",
-											"Nieuw-Amsterdam",
-											"Nieuw-Dordrecht",
-											"Nieuw-Weerdinge",
-											"Rietlanden",
-											"Weerdinge",
-											"Zwartemeer"
-										],
-										"title" : "Wijk",
-										"description" : "Wijk (indeling Lefier, kan afwijken van CBS)",
-										"section" : "Adres",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "gem",
-										"type" : "options",
-										"options" : [
-											"Emmen"
-										],
-										"title" : "Gemeente",
-										"section" : "Adres",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "jaar",
-										"type" : "number",
-										"title" : "Bouwjaar",
-										"section" : "Woning",
-										"stringFormat" : "{0:0,0}",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "type1",
-										"type" : "options",
-										"options" : [
-											"Collectief woon/zorg vastgoed",
-											"Galerijflat",
-											"Maisonnette",
-											"Portiekflat",
-											"Rijtjeswoning",
-											"Twee-onder-Ã©Ã©n-kap woning",
-											"Vrijstaande woning"
-										],
-										"title" : "Type woning 1",
-										"section" : "Woning",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "type2",
-										"type" : "options",
-										"options" : [
-											"Eengezins",
-											"Meergezins met lift",
-											"Meergezins zonder lift"
-										],
-										"title" : "Type woning 2",
-										"section" : "Woning",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "staat",
-										"type" : "options",
-										"options" : [
-											"Brons",
-											"Goud",
-											"Zilver"
-										],
-										"title" : "Technische staat",
-										"description" : "Technische staat (goud-zilver-brons)",
-										"section" : "Woning",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "energielabel",
-										"type" : "options",
-										"options" : [
-											"-",
-											"A",
-											"B",
-											"C",
-											"D",
-											"E",
-											"F",
-											"G"
-										],
-										"title" : "Energielabel",
-										"description" : "Energielabel (A-H)",
-										"section" : "Woning",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "huur",
-										"type" : "number",
-										"title" : "Huur",
-										"description" : "Maandhuur (EUR)",
-										"section" : "Woning",
-										"stringFormat" : "â‚¬{0:0,0}",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "maxhuur",
-										"type" : "number",
-										"title" : "Max.huur",
-										"description" : "Maximale maandhuur (EUR)",
-										"section" : "Woning",
-										"stringFormat" : "â‚¬{0:0,0}",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "woz",
-										"type" : "number",
-										"title" : "WOZ",
-										"description" : "WOZ-waarde (EUR)",
-										"section" : "Woning",
-										"stringFormat" : "â‚¬{0:0,0}",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "toevoeging",
-										"type" : "number",
-										"title" : "Toevoeging",
-										"section" : "Adres",
-										"stringFormat" : "{0:0,0}",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "opp",
-										"type" : "number",
-										"title" : "Oppervlakte",
-										"description" : "Gebruiksoppervlakte uit BAG (m2]",
-										"section" : "Woning",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}, {
-										"label" : "taxatie",
-										"type" : "number",
-										"title" : "Taxatiewaarde",
-										"description" : "Taxatiewaarde onverhuurd (EUR)",
-										"section" : "Woning",
-										"stringFormat" : "â‚¬{0:0,0}",
-										"visibleInCallOut" : true,
-										"canEdit" : false,
-										"isSearchable" : false
-									}
-								],
-								"name" : "Emmen"
-							},
-							"weight" : -0.3333333333333333,
-							"userWeight" : -2,
-							"isSelected" : true,
-							"idealityMeasure" : {
-								"idealDistance" : 100,
-								"atLocation" : 1,
-								"lostInterestDistance" : 800
-							},
-							"propertyTitle" : "Energielabel",
-							"propertyLabel" : "energielabel",
-							"optionIndex" : 7,
-							"heatspots" : [],
-							"intensityScale" : 1,
-							"$$hashKey" : "object:290",
-							"scoringFunctionType" : {
-								"type" : 0,
-								"title" : "Linearly increasing, then decreasing function."
+								"weight" : 0.16666666666666666,
+								"userWeight" : 1,
+								"isSelected" : true,
+								"idealityMeasure" : {
+									"idealDistance" : 50,
+									"atLocation" : 0.5,
+									"lostInterestDistance" : 500
+								},
+								"propertyTitle" : "Energielabel",
+								"propertyLabel" : "energielabel",
+								"optionIndex" : 2,
+								"heatspots" : []
+							}, {
+								"title" : "F",
+								"featureType" : {
+									"name" : "Emmen"
+								},
+								"weight" : -0.16666666666666666,
+								"userWeight" : -1,
+								"isSelected" : true,
+								"idealityMeasure" : {
+									"idealDistance" : 50,
+									"atLocation" : 1,
+									"lostInterestDistance" : 500
+								},
+								"propertyTitle" : "Energielabel",
+								"propertyLabel" : "energielabel",
+								"optionIndex" : 6,
+								"heatspots" : []
+							}, {
+								"title" : "G",
+								"featureType" : {
+									"name" : "Emmen"
+								},
+								"weight" : -0.3333333333333333,
+								"userWeight" : -2,
+								"isSelected" : true,
+								"idealityMeasure" : {
+									"idealDistance" : 100,
+									"atLocation" : 1,
+									"lostInterestDistance" : 800
+								},
+								"propertyTitle" : "Energielabel",
+								"propertyLabel" : "energielabel",
+								"optionIndex" : 7,
+								"heatspots" : []
 							}
-						}
-					],
-					"enabled" : false,
-					"opacity" : 100
-				}
-			]
+						],
+						"enabled" : false,
+						"opacity" : 100
+					}
+					]
 		}
 	]
 }
