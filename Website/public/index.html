@@ -1,4 +1,4 @@
-
+﻿
 <!DOCTYPE html>
 <html ng-app="csWebApp">
 
@@ -177,10 +177,18 @@
                             <span class="fa fa-info fa-lg"></span>
                         </a>
                     </li>
+                    <li class="rightPanelTab rightPanelTabAnimated" ng-show="featureSelected">
+                        <a href="#linkedData" style="" data-toggle="tab">
+                            <span class="fa fa-link fa-lg"></span>
+                        </a>
+                    </li>
                 </ul>
                 <div id="rightpanelTabPanes" class="tab-content" style="display: inline-block; height:100%; background-color: white;">
                     <div class="tab-pane active" id="info">
                         <featureprops class="rightpanel-content"></featureprops>
+                    </div>
+                    <div class="tab-pane" id="linkedData">
+                        <featurerelations class="rightpanel-content"></featurerelations>
                     </div>
                 </div>
             </div>

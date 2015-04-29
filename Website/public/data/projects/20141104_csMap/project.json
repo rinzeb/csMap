@@ -2569,6 +2569,69 @@
             },
             "propertyTypeKeys": "PlaneType;Speed;Altitude;Track"
         },
+		"Huisarts": {
+            "name": "Huisarts",
+            "style": {
+                "fillColor": "#ffffff",
+                "strokeColor": "#808080",
+                "drawingMode": "Point",
+                "strokeWidth": 2,
+                "iconWidth": 32,
+                "iconHeight": 32,
+                "iconUri": "images/huisarts.png",
+				"nameLabel": "naam"
+            },
+            "propertyTypeData": [
+                {
+                    "label": "naam",
+                    "type": "text",
+                    "title": "Name",
+                    "isSearchable": true
+                },
+				{
+                    "label": "SameTown",
+                    "type": "relation",
+					"subject": "town",
+					"target": "town",
+                    "title": "In deze gemeente",
+                    "isSearchable": false,
+					"visibleInCallOut": false
+                },
+				{
+                    "label": "province",
+                    "type": "relation",
+					"subject": "province",
+					"target": "province",
+                    "title": "In deze provincie",
+                    "isSearchable": false,
+					"visibleInCallOut": false
+                },
+				{
+                    "label": "inw_per_arts",
+                    "type": "hierarchy",
+					"section": "hierarchy",
+					"targetlayer": "gemeentes",
+					"targetproperty": "aant_inw",
+					"calculation": "ratio",
+                    "title": "Inwoners per arts",
+                    "isSearchable": false,
+					"visibleInCallOut": false
+                },
+                {
+                    "label": "kvk_nr",
+                    "type": "number",
+                    "languages": {
+                        "nl": {
+                            "title": "kvk nummer"
+                        },
+                        "en": {
+                            "title": "kvk number"
+                        }
+                    },
+                    "isSearchable": false
+                }
+            ]
+        },
         "Hospital": {
             "name": "Ziekenhuis",
             "style": {
@@ -3122,7 +3185,49 @@
                     "opacity": 100
                 }
             ]
-        }, {
+        },
+		{
+            "languages": {
+                "nl": {
+                    "title": "Hierarchische data",
+                    "description": "Hierarchische data."
+                },
+                "en": {
+                    "title": "Hierarchical data",
+                    "description": "Hierarchical data."
+                }
+            },
+			"oneLayerActive": true,
+			"clustering": true,
+			"clusterLevel": 15,
+            "layers": [
+                {
+                	"description" : "Huisartsen in Nederland",
+                	"type" : "hierarchy",
+                	"hierarchySettings" : {
+                		"referenceList" : [
+                			"gemeentes"
+                		]
+                	},
+                	"title" : "Huisartsen",
+                	"url" : "data/projects/20141104_csMap/huisartsen.json",
+                	"opacity" : 50
+                },
+				{
+                	"description" : "Verzorgingshuizen in Nederland",
+                	"type" : "hierarchy",
+                	"hierarchySettings" : {
+                		"referenceList" : [
+                			"gemeentes"
+                		]
+                	},
+                	"title" : "Verzorgingshuizen",
+                	"url" : "data/projects/20141104_csMap/verzorgingshuizen.json",
+                	"opacity" : 50
+                }
+            ]
+        },
+		{
 			"languages" : {
 				"nl" : {
 					"title" : "Heatmaps",
