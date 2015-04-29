@@ -42,12 +42,12 @@ var gulp      = require('gulp'),
 
 gulp.task('minify_csComp', function () {
     gulp.src('../../../csWeb/csComp/dist/csComp.js')
+       .pipe(plumber())
+       .pipe(gulp.dest('public/js/cs'));
+    gulp.src('../../../csWeb/csComp/dist/csComp.js')
       .pipe(plumber())
       .pipe(uglify())
       .pipe(rename({suffix: '.min'}))
-      .pipe(gulp.dest('public/js/cs'));
-   gulp.src('../../../csWeb/csComp/dist/csComp.js')
-      .pipe(plumber())
       .pipe(gulp.dest('public/js/cs'));
 });
 
@@ -98,9 +98,10 @@ gulp.task('include_images', function () {
 
 gulp.task('watch', function () {
     //gulp.watch('../../../csWeb/csComp/**/*.tpl.html', ['convertTemplates2Ts']);
-    gulp.watch('../../../csWeb/csComp/dist/*', ['addref_csComp', 'minify_csComp']);
-    gulp.watch('../../../csWeb/csServerComp/dist/*.d.ts', ['addref_csServerComp', 'minify_csServerComp']);
-    gulp.watch('../../../csWeb/csComp/includes/*.*', ['include_js','include_css']);
+    gulp.watch('../../../csWeb/csComp/dist/*.js', ['minify_csComp','addref_csComp']);
+    //gulp.watch('../../../csWeb/csServerComp/dist/*.d.ts', ['addref_csServerComp', 'minify_csServerComp']);
+    gulp.watch('../../../csWeb/csComp/includes/**/*.css', ['include_css']);
+    gulp.watch('../../../csWeb/csComp/includes/**/*.js', ['include_js']);
     gulp.watch('../../../csWeb/csComp/includes/images/*.*', ['include_images']);
 });
 

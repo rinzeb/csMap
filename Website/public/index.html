@@ -1,5 +1,7 @@
-﻿<!DOCTYPE html>
+
+<!DOCTYPE html>
 <html ng-app="csWebApp">
+
 <head>
     <!--[if lt IE 9]>
         <script>
@@ -35,27 +37,11 @@
     <link rel="stylesheet" href="css/xbbcode.css">
     <link rel="stylesheet" href="css/csStyles.css" />
     <link rel="stylesheet" href="css/style.css">
-    <link rel="shortcut icon" href="favicon.ico">
     <!-- endbuild -->
-
-        <style>
-            #cesiumContainer {
-                width: 100%;
-                height: 100%;
-                margin: 0;
-                padding: 0;
-                overflow: hidden;
-            }
-
-            #contextMenu {
-  position: absolute;
-  display:none;
-}
-        </style>
-
-
+    <link rel="shortcut icon" href="favicon.ico">
 </head>
-<body data-ng-controller="appCtrl" data-ng-cloak data-ng-init="showMap=true" >
+
+<body data-ng-controller="appCtrl" data-ng-cloak data-ng-init="showMap=true">
     <!-- build:js csMap.js -->
     <script src="bower_components/jquery/dist/jquery.min.js"></script>
     <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
@@ -116,12 +102,10 @@
             <ul class="nav navbar-nav">
                 <!--Start project dropdown-->
                 <li class="dropdown">
-                    <a data-ng-href="{{vm.$layerService.project.url}}" class="pull-left" style="padding: 10px; padding-bottom: 0">
+                    <a target="_blank" data-ng-href="{{vm.$layerService.project.url}}" class="pull-left" style="padding: 10px; padding-bottom: 0; cursor: pointer">
                         <img data-ng-src="{{vm.$layerService.project.logo}}" alt="{{vm.$layerService.project.title}}" width="32" height="32" />
                     </a>
-                    <a href=""
-                       class="navbar-brand dropdown-toggle pull-left"
-                       style="color:white; margin-left:-10px;">
+                    <a href="" class="navbar-brand dropdown-toggle" data-toggle="dropdown" style="color:white; margin: 5px 0 -5px -5px; padding: 10px; padding-bottom: 0; cursor: pointer" aria-haspopup="true" aria-expanded="false">
                         {{vm.$layerService.project.title}}
                         <span class="caret" data-ng-if="vm.$layerService.solution.projects.length > 1"></span>
                     </a>
@@ -138,15 +122,14 @@
             </ul>
 
             <ul class="nav navbar-nav">
-                    <style>
-                        a:focus{
-                            color:#FFF;
-                        }
-                    </style>
-                    <!--<li data-ng-class="{ active: vm.isActive('/map')}"><a href="#/map" data-ng-click="showMap=true">Map</a></li>
-        <li data-ng-class="{ active: vm.isActive('/table')}"><a href="#/table" data-ng-click="vm.showTable()">Table</a></li>-->
-                    <li ng-repeat="v in vm.$layerService.project.dashboards" ng-class="{dashboardactive: v == vm.$dashboardService.mainDashboard}"><a ng-class="{dashboardactivelink: v == vm.$dashboardService.mainDashboard}" data-ng-click="vm.$dashboardService.selectDashboard(v)"><span style="color:white;font-size:20px;cursor:pointer">{{v.name}}</span></a></li>
-                </ul>
+                <!--<li data-ng-class="{ active: vm.isActive('/map')}"><a href="#/map" data-ng-click="showMap=true">Map</a></li>
+                <li data-ng-class="{ active: vm.isActive('/table')}"><a href="#/table" data-ng-click="vm.showTable()">Table</a></li>-->
+                <li ng-repeat="v in vm.$layerService.project.dashboards" ng-class="{dashboardactive: v == vm.$dashboardService.mainDashboard}">
+                    <a ng-class="{dashboardactivelink: v == vm.$dashboardService.mainDashboard}" data-ng-click="vm.$dashboardService.selectDashboard(v)">
+                        <span style="color:white;font-size:20px;cursor:pointer">{{v.name}}</span>
+                    </a>
+                </li>
+            </ul>
 
             <ul class="nav navbar-nav" style="float:right">
                 <li data-ng-if="vm.$layerService.activeMapRenderer.title!='leaflet'"><a data-ng-click="vm.$layerService.selectRenderer('leaflet')">2D</a></li>
@@ -181,20 +164,19 @@
     <map mapid="main" style="width:50%"></map>
 
     <div style="position: absolute;width: 100%;height:100%;pointer-events: none">
-
-      <dashboardirective class="dashboard-directive" dashboard="vm.$dashboardService.mainDashboard"></dashboardirective>
-
-    <div style="position: absolute;width: 100%;height:100%;pointer-events: none">
-
+        <dashboardirective class="dashboard-directive" dashboard="vm.$dashboardService.mainDashboard"></dashboardirective>
         <div class="rightpanel" style="background-color: transparent; ">
             <div id="rightpanelTabContainer" class="tabbable tabs-left" style="position:relative;height:100%;padding:0px">
                 <!-- Nav tabs -->
                 <!--<div id="rightPanelToggle">
                         <i class="fa fa-2x fa-chevron-right" style="margin-left: 10px;margin-top: 108px;"></i>
                     </div>-->
-
                 <ul id="rightpanelTabs" class="nav nav-tabs" style="margin-right:0px; margin-top:100px; display:inline-block">
-                    <li class="rightPanelTab rightPanelTabAnimated active" ng-show="featureSelected"><a href="#info" style="" data-toggle="tab"><span class="fa fa-info fa-lg"></span></a></li>
+                    <li class="rightPanelTab rightPanelTabAnimated active" ng-show="featureSelected">
+                        <a href="#info" style="" data-toggle="tab">
+                            <span class="fa fa-info fa-lg"></span>
+                        </a>
+                    </li>
                 </ul>
                 <div id="rightpanelTabPanes" class="tab-content" style="display: inline-block; height:100%; background-color: white;">
                     <div class="tab-pane active" id="info">
@@ -205,7 +187,7 @@
         </div>
 
         <script>
-            $('#rightpanelTabs a').click(function (e) {
+            $('#rightpanelTabs a').click(function(e) {
                 var tab = $(this);
                 if (tab.parent('li').hasClass('tab-toggle')) {
                     var foo = $("#rightpanelTabPanes").children(".tab-pane");
@@ -217,7 +199,7 @@
 
                 }
                 if (tab.parent('li').hasClass('active')) {
-                    window.setTimeout(function () {
+                    window.setTimeout(function() {
                         var foo = $("#rightpanelTabPanes").children(".tab-pane");
                         foo.removeClass('active');
                         tab.parent('li').removeClass('active');
@@ -237,14 +219,46 @@
                 <!-- Nav tabs -->
                 <ul class="nav nav-tabs tabs-left" id="leftPanelTab">
                     <!-- 'tabs-right' for right tabs -->
-                    <li><a href="#basestyles" data-toggle="tab" data-ng-if="vm.$mapService.isIntermediate"><div class="mapIcon"></div></a></li>
-                    <li class="active"><a href="#layers" data-toggle="tab"><div class="layersIcon"></div></a></li>
-                    <li><a href="#filters" data-toggle="tab"><div class="filtersIcon"></div></a></li>
-                    <li><a href="#styles" data-toggle="tab"><div class="stylesIcon"></div></a></li>
-                    <li><a href="#mca" data-toggle="tab" data-ng-if="vm.$mapService.isExpert"><div class="mcaIcon"></div></a></li>
-                    <li><a href="#heatmap" data-toggle="tab" data-ng-if="vm.$mapService.isExpert"><div class="heatmapIcon"></div></a></li>
-                    <li><a href="#features" data-toggle="tab"><div class="featuresIcon"></div></a></li>
-                    <li><a href="#legend" data-toggle="tab"><div class="mainLegendIcon"></div></a></li>
+                    <li>
+                        <a href="#basestyles" data-toggle="tab" data-ng-if="vm.$mapService.isIntermediate">
+                            <div class="mapIcon"></div>
+                        </a>
+                    </li>
+                    <li class="active">
+                        <a href="#layers" data-toggle="tab">
+                            <div class="layersIcon"></div>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#filters" data-toggle="tab">
+                            <div class="filtersIcon"></div>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#styles" data-toggle="tab">
+                            <div class="stylesIcon"></div>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#mca" data-toggle="tab" data-ng-if="vm.$mapService.isExpert">
+                            <div class="mcaIcon"></div>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#heatmap" data-toggle="tab">
+                            <div class="heatmapIcon"></div>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#features" data-toggle="tab">
+                            <div class="featuresIcon"></div>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#legend" data-toggle="tab">
+                            <div class="mainLegendIcon"></div>
+                        </a>
+                    </li>
                     <li><a href="#settings" data-toggle="tab"><i class="fa fa-gear fa-2x" style="color: black"></i></a></li>
                 </ul>
             </div>
@@ -276,4 +290,5 @@
 
     <timeline data-ng-show="vm.$mapService.timelineVisible" style="height: 100vh;"></timeline>
 </body>
+
 </html>

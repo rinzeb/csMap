@@ -71,10 +71,6 @@
             $messageBusService.notify('Welcome to csMap', 'Your mapping solution.');
 
             this.$mapService.mapVisible = this.$location.path() === "/map";
-
-
-
-
         }
 
         /**
