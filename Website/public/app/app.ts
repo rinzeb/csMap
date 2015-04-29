@@ -12,6 +12,7 @@
         title        : string;
         showMenuRight: boolean;
         featureSelected: boolean;
+        layersLoading: boolean;
     }
 
     // TODO For setting the current culture for string formatting (note you need to include public/js/cs/stringformat.YOUR-CULTURE.js. See sffjs.1.09.zip for your culture.)
@@ -55,6 +56,7 @@
             $scope.vm = this;
             $scope.showMenuRight = false;
             $scope.featureSelected = false;
+            $scope.layersLoading = false;
 
             $messageBusService.subscribe("project", () => {
                 // NOTE EV: You may run into problems here when calling this inside an angular apply cycle.
@@ -82,6 +84,19 @@
 
         private layerMessageReceived = (title:string, layer: csComp.Services.ProjectLayer): void => {
 
+            switch (title) {
+                case "loading":
+                    this.$scope.layersLoading = true;
+                    console.log("Loading");
+                    break;
+                case "activated":
+                    this.$scope.layersLoading = false;
+                    console.log("Activated");
+                    break;
+                case "deactivate":
+                    break;
+            }
+
           var $contextMenu = $("#contextMenu");
 
           $("body").on("contextmenu", "table tr", function(e) {
@@ -96,10 +111,6 @@
           $contextMenu.on("click", "a", function() {
              $contextMenu.hide();
           });
-            switch(title) {
-                case "deactivate":
-                    break;
-            }
 
             // NOTE EV: You need to call apply only when an event is received outside the angular scope.
             // However, make sure you are not calling this inside an angular apply cycle, as it will generate an error.
