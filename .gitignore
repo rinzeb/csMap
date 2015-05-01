@@ -6,3 +6,4 @@ Website/public/bower_components/
 *.map
 Website/ClientConnection.js
 Website/layers/flightradar.js
+Website/public/js/cs/
