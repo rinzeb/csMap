@@ -1,29 +1,68 @@
-﻿module ClientConnection {
-    export class LayerSubscription {
-        public id: string;
+module ClientConnection {
+
+    declare var io;
+
+    export class IDynamicLayer {
+        Connection: ClientConnection.ConnectionManager;
+        GetLayer: Function;
+        GetDataSource : Function;
+        layerId: string;
+
     }
+
+    export class ClientSubscription {
+        public id: string;
+        public type: string;
+        public target : string;
+    }
+
+    export class ClientMessage{
+      constructor (public action : string, public data : any){}
+    }
+
 
     export class WebClient {
         public Name: string;
-        public Layers: { [key: string]: LayerSubscription } = {};
+        public Subscriptions: { [key: string]: ClientSubscription } = {};
 
         constructor(public Client: any) {
         }
 
-        SubscribeLayer(sub: LayerSubscription) {
-            this.Layers[sub.id] = sub;
+        public FindSubscription(target : string, type : string) : ClientSubscription
+        {
+          for (var k in this.Subscriptions)
+          {
+            if (this.Subscriptions[k].target == target && this.Subscriptions[k].type == type) return this.Subscriptions[k];
+          }
+          return null;
+        }
+
+        public Subscribe(sub: ClientSubscription) {
+            this.Subscriptions[sub.id] = sub;
+            this.Client.on(sub.id,(data)=>
+            {
+              switch (data.action)
+              {
+                case "unsubscribe":
+                  console.log('unsubscribed');
+                  break;
+              }
+            });
+            this.Client.emit(sub.id,new ClientMessage("subscribed",""));
             console.log('subscribed to layer : ' + sub);
         }
+
     }
 
     export class ConnectionManager {
+
         users: { [key: string]: WebClient } = {};
         io: SocketIO.Server;
 
         constructor(httpServer: any) {
-            this.io = require('socket.io')(httpServer);
+            io = require('socket.io')(httpServer);
 
-            this.io.on('connection',(socket: SocketIO.Socket) => {
+            io.on('connection',(socket: SocketIO.Socket) => {
 
                 // store user
                 console.log('user ' + socket.id + ' has connected');
@@ -35,11 +74,13 @@
                     console.log('user ' + socket.id + ' disconnected');
                 });
 
-                socket.on('joinlayer',(msg: LayerSubscription) => {
-                    wc.SubscribeLayer(msg);
-                    wc.Client.emit('laag', 'test');
+                socket.on('subscribe',(msg: ClientSubscription) => {
+                    console.log('subscribe ' + JSON.stringify(msg));
+                    wc.Subscribe(msg);
+                   // wc.Client.emit('laag', 'test');
                     //socket.emit('laag', 'test');
                 });
+
 
                 // create layers room
                 //var l = socket.join('layers');
@@ -54,19 +95,47 @@
 
         }
 
-        public updateFeature(layer: string, feature: csComp.Services.IFeature) {
-            for (var uId in this.users) {
-                if (this.users[uId].Layers.hasOwnProperty(layer)) {
-                    this.users[uId].Client.emit("layer-" + layer, { action: "update", data: [feature] });
+        public updateSensorValue(sensor : string, date : number, value : number)
+        {
+          console.log('updateSensorValue:' + sensor);
+          for (var uId in this.users) {
+            //var sub = this.users[uId].FindSubscription(sensor,"sensor");
+            for (var s in this.users[uId].Subscriptions)
+            {
+                var sub = this.users[uId].Subscriptions[s];
+                if (sub.type == "sensor" && sub.target == sensor) {
+                    console.log('sending update:' + sub.id);
+                    var cm = new ClientMessage("sensor-update", [{ sensor: sensor, date: date, value: value }]);
+                    console.log(JSON.stringify(cm));
+                    this.users[uId].Client.emit(sub.id, cm);
                 }
             }
+
+          }
+        }
+
+        public updateFeature(layer: string, feature: csComp.Services.IFeature) {
+          //console.log('update feature ' + layer);
+          for (var uId in this.users) {
+
+            var sub = this.users[uId].FindSubscription(layer,"layer");
+            if (sub!=null)
+            {
+              //console.log('sending update:' + sub.id);
+              this.users[uId].Client.emit(sub.id,new ClientMessage("feature-update",[feature]));
+            }
+
+          }
         }
 
         public deleteFeature(layer: string, feature: csComp.Services.IFeature) {
             for (var uId in this.users) {
-                if (this.users[uId].Layers.hasOwnProperty(layer)) {
-                    this.users[uId].Client.emit("layer-" + layer, { action: "delete", data: [feature.id] });
-                }
+              var sub = this.users[uId].FindSubscription(layer,"layer");
+              if (sub!=null)
+              {
+                this.users[uId].Client.emit(sub.id,new ClientMessage("feature-delete",[feature.id]));
+              }
+
             }
         }
 

@@ -13,7 +13,8 @@
     },
     "datasources": [
         {
-            "url": "data/projects/20141104_csMap/datasource.json"
+            "url": "/datasource",
+            "type" : "dynamic"
         }
     ],
     "dashboards": [
@@ -50,26 +51,12 @@
                             {
                                 "title": "Air Quality Level",
                                 "visual": "circular",
-                                "sensor": "datasource/airquality"
+                                "sensor": "datasource/test"
                             },
                             {
                                 "title": "N02",
                                 "visual": "sparkline",
-                                "sensor": "datasource/nox",
-                                "layer": "NOX"
-
-                            },
-                            {
-                                "title": "PM10",
-                                "visual": "sparkline",
-                                "sensor": "datasource/pm10",
-                                "layer": "PM10"
-                            },
-                            {
-                                "title": "PM2,5",
-                                "visual": "sparkline",
-                                "sensor": "datasource/pm25",
-                                "layer": "PM25"
+                                "sensor": "datasource/test"                                
                             }
                         ]
                     }
@@ -95,6 +82,13 @@
                   "northEast": [ 53.5, 7.3 ]
             },
             "baselayer" : "World Terrain Base"
+        },
+        {
+            "id": "nomap",
+            "name": "No Map",
+            "showTimeline": false,
+            "showLeftmenu": false,
+            "showMap": false
         }
       ],
     "expertMode": 3,

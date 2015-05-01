@@ -95,7 +95,7 @@ module FlightRadar {
                     var b = JSON.parse(r);
                     for (var screen in b) {
                         var s = b[screen];
-                        if (s[0] != "" && s[1] != null && s[2] != null && s[0] != null && s[8]!="GRND") {
+                        if (s[0] != "" && s[1] != null && s[2] != null && s[0] != null) {
                             var sit = {
                                 "type": "Feature",
                                 "geometry": { "type": "Point", "coordinates": [s[2], s[1]] },
@@ -111,10 +111,10 @@ module FlightRadar {
                                     "Time": new Date().getTime()
                                 }
                             };
-
                             this.CheckFeature(sit);
                             //result.features.push(sit);
                             //CheckFeature(sit, db);
+
                         }
                     }
                     var active = FlightRadar.result;
@@ -130,8 +130,6 @@ module FlightRadar {
                     // send all deletes
 
                     FlightRadar.result = active;
-
-
 
                     console.log(FlightRadar.result.features.length);
                     // ID to avoid having duplicate _id keys (still need to know why this happens)
