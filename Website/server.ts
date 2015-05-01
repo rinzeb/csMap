@@ -5,6 +5,9 @@ import offlineSearch = require('cs-offline-search');
 
 var cc = require("./ClientConnection");
 var fr = require("./layers/FlightRadar");
+var ds = require("./sensors/DataSource");
+
+
 
 /**
  * Create a search index file which can be loaded statically.
@@ -12,7 +15,7 @@ var fr = require("./layers/FlightRadar");
 var offlineSearchManager = new offlineSearch('public/data/projects/projects.json', {
     propertyNames: ['Name', 'plaatnaam', 'postcode', 'Postcode', 'straat', 'loc_straat', 'KvK', 'gemeente', 'plaats', 'Naam_van_het_concern_DigiMV_2012'],
     stopWords    : ['de', 'het', 'een', 'en', 'van', 'aan']
-});
+}); 
 
 // setup socket.io object
 var server = express();
@@ -44,7 +47,11 @@ var cm = new cc.ConnectionManager(httpServer);
 var planes = new fr.FlightRadar(cm, "FlightRadar");
 planes.Start();
 
+var ds = new ds.DataSourceService(cm,"DataSource");
+ds.Start();
+
 server.get("/fr", planes.GetLayer);
+server.get("/datasource", ds.GetDataSource);
 
 server.use(express.static(path.join(__dirname, 'public')));
 console.log("started");

@@ -13,7 +13,8 @@
     },
     "datasources": [
         {
-            "url": "data/projects/20141104_csMap/datasource.json"
+            "url": "/datasource",
+            "type" : "static"
         }
     ],
     "dashboards": [
@@ -45,31 +46,12 @@
                     "width": "225px",
                     "height": "435px",
                     "data": {
-                        "title": "Air Quality 2",
+                        "title": "Air Quality",
                         "indicators": [
-                            {
-                                "title": "Air Quality Level",
-                                "visual": "circular",
-                                "sensor": "datasource/airquality"
-                            },
                             {
                                 "title": "N02",
                                 "visual": "sparkline",
-                                "sensor": "datasource/nox",
-                                "layer": "NOX"
-
-                            },
-                            {
-                                "title": "PM10",
-                                "visual": "sparkline",
-                                "sensor": "datasource/pm10",
-                                "layer": "PM10"
-                            },
-                            {
-                                "title": "PM2,5",
-                                "visual": "sparkline",
-                                "sensor": "datasource/pm25",
-                                "layer": "PM25"
+                                "sensor": "datasource/test"
                             }
                         ]
                     }
@@ -95,6 +77,13 @@
                   "northEast": [ 53.5, 7.3 ]
             },
             "baselayer" : "World Terrain Base"
+        },
+        {
+            "id": "nomap",
+            "name": "No Map",
+            "showTimeline": false,
+            "showLeftmenu": false,
+            "showMap": false
         }
       ],
     "expertMode": 3,
@@ -2980,19 +2969,6 @@
                     "enabled": false,
                     "opacity": 50
                 }
-            ]
-        },
-        {
-            "title": "us test",
-            "layers": [
-                {
-                    "description": "US test",
-                    "type": "tilelayer",
-                    "title": "US",
-                    "url": "http://airapp.lohman-solutions.com/Tiles/{z}/{x}/{y}/hour_0.png",
-                    "opacity": 25
-                }
-
             ]
         },
         {

@@ -1,4 +1,4 @@
-﻿module App {
+module App {
     'use strict';
 
     import IFeature = csComp.Services.IFeature;
@@ -212,7 +212,7 @@
     //    <button class="btn ng-scope" ng-click="changeLanguage('en')" translate="BUTTON_LANG_EN"></button>
     //    <button class="btn ng-scope" ng-click="changeLanguage('de')" translate="BUTTON_LANG_DE"></button>
     // </div>
-        .config(($stateProvider, $urlRouterProvider) => {
+    .config(($stateProvider, $urlRouterProvider) => {
         // For any unmatched url, send to /
         $urlRouterProvider.otherwise("/map");
         $stateProvider
@@ -222,7 +222,7 @@
             sticky: true,
             deepStateRedirect: true
         })
-            .state('table', {
+        .state('table', {
             url: "/table",
             template: "<datatable id='datatable'></datatable>",
             sticky: true
