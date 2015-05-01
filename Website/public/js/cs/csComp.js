@@ -2171,214 +2171,214 @@ var Charts;
                 //    }
                 //],
                 link: function (scope, element, attrs) {
-                    if (scope.timestamps == null || scope.sensor == null)
-                        return;
                     var doDraw = (function () {
-                        var margin = scope.margin || { top: 15, right: 5, bottom: 0, left: 10 };
-                        var width = scope.width || 100;
-                        var height = scope.height || 70;
-                        var showAxis = typeof scope.showaxis !== 'undefined' && scope.showaxis;
-                        var closed = typeof scope.closed !== 'undefined' && scope.closed;
-                        var cursorTextHeight = 12; // + (showAxis ? 5 : 0); // leave room for the cursor text (timestamp | measurement)
-                        $(element[0]).empty();
-                        var chart = d3.select(element[0])
-                            .append('svg:svg')
-                            .attr('width', width)
-                            .attr('height', height);
-                        var marginAxis = showAxis
-                            ? { top: 0, right: 0, bottom: 20, left: 10 }
-                            : { top: 0, right: 0, bottom: 0, left: 0 };
-                        var x = d3.scale.linear().range([margin.left + marginAxis.left, width - margin.left - margin.right - marginAxis.left - marginAxis.right]);
-                        var y = d3.scale.linear().range([height - margin.bottom - marginAxis.bottom, margin.top + marginAxis.top + cursorTextHeight]);
-                        var bisect = d3.bisector(function (d) { return d.time; }).left;
-                        var line = d3.svg.line()
-                            .interpolate((closed) ? "linear-closed" : "cardinal")
-                            .x(function (d) { return x(d.time); })
-                            .y(function (d) { return y(d.measurement); });
-                        var data = [];
-                        //data.push({time:scope.timestamps[0],measurement:0});
-                        for (var i = 0; i < scope.timestamps.length; i++) {
-                            data.push({ time: scope.timestamps[i], measurement: scope.sensor[i] });
-                        }
-                        //data.push({time:scope.timestamps[scope.timestamps.length-1],measurement:0});
-                        x.domain(d3.extent(data, function (d) { return d.time; }));
-                        y.domain(d3.extent(data, function (d) { return d.measurement; }));
-                        var s = [];
-                        if (closed)
-                            s.push({ time: data[0].time, measurement: 0 });
-                        data.forEach(function (d) { return s.push(d); });
-                        if (closed)
-                            s.push({ time: data[data.length - 1].time, measurement: 0 });
-                        var path = chart.append("svg:path")
-                            .attr("d", line(s))
-                            .attr('class', 'sparkline-path')
-                            .style('fill', (closed) ? 'steelblue' : 'none');
-                        // draw a circle around the max and min value
-                        var measurements = data.map(function (d) { return d.measurement; });
-                        var min = Charts.ChartHelpers.min(measurements);
-                        var max = Charts.ChartHelpers.max(measurements);
-                        chart.append('circle')
-                            .attr('class', 'sparkcircle-max')
-                            .attr('cx', x(data[max.maxIndex].time))
-                            .attr('cy', y(max.max))
-                            .attr('r', 4);
-                        chart.append('circle')
-                            .attr('class', 'sparkcircle-min')
-                            .attr('cx', x(data[min.minIndex].time))
-                            .attr('cy', y(min.min))
-                            .attr('r', 4);
-                        if (showAxis) {
-                            //var xAxis = d3.svg.axis()
-                            //    .scale(x)
-                            //    .orient("bottom")
-                            //    .ticks(d3.time.months, 2);  //Set rough # of ticks
-                            //chart.append("g")
-                            //    .attr("class", "sparkline-axis")
-                            //    .attr("transform", "translate(0," + (height - margin.bottom - marginAxis.bottom) + ")")
-                            //    .call(xAxis);
-                            var strokeLength = 6;
-                            // Draw min/max at x and y axis
-                            var xbor = d3.min(x.range()), xmin = xbor - strokeLength, xmax = d3.max(x.range()), ybor = d3.max(y.range()), ymin = d3.min(y.range()), ymax = ybor + strokeLength;
-                            // y-axis, max
-                            chart.append('line')
-                                .attr("x1", xmin)
-                                .attr("y1", ymin)
-                                .attr("x2", xbor)
-                                .attr("y2", ymin)
-                                .attr("stroke", "black");
-                            chart.append("text")
-                                .attr("x", xmin - 2)
-                                .attr("y", ymin)
-                                .attr("dy", ".35em")
-                                .style("text-anchor", "end")
-                                .text(d3.max(y.domain()));
-                            // y-axis, min
-                            chart.append('line')
-                                .attr("x1", xmin)
-                                .attr("y1", ybor)
-                                .attr("x2", xbor)
-                                .attr("y2", ybor)
-                                .attr("stroke", "black");
-                            chart.append("text")
-                                .attr("x", xmin - 2)
-                                .attr("y", ybor)
-                                .attr("dy", ".35em")
-                                .style("text-anchor", "end")
-                                .text(d3.min(y.domain()));
-                            // x-axis, min
-                            chart.append('line')
-                                .attr("x1", xbor)
-                                .attr("y1", ymax)
-                                .attr("x2", xbor)
-                                .attr("y2", ybor)
-                                .attr("stroke", "black");
-                            chart.append("text")
-                                .attr("x", xbor)
-                                .attr("y", ymax + 9)
-                                .attr("dy", ".35em")
-                                .style("text-anchor", "start")
-                                .text(Charts.ChartHelpers.timestampToString(d3.min(x.domain())));
-                            // x-axis, max
-                            chart.append('line')
-                                .attr("x1", xmax)
-                                .attr("y1", ymax)
-                                .attr("x2", xmax)
-                                .attr("y2", ybor)
-                                .attr("stroke", "black");
-                            chart.append("text")
-                                .attr("x", xmax)
-                                .attr("y", ymax + 9)
-                                .attr("dy", ".35em")
-                                .style("text-anchor", "end")
-                                .text(Charts.ChartHelpers.timestampToString(d3.max(x.domain())));
-                        }
-                        // draw a line at the current cursor position
-                        var cursor = chart.append("line")
-                            .attr("x1", 0)
-                            .attr("y1", 0)
-                            .attr("x2", 0)
-                            .attr("y2", 0)
-                            .attr("opacity", 0)
-                            .attr("stroke", "black");
-                        var timestampText = chart.append("text")
-                            .attr("x", 0)
-                            .attr("y", 0)
-                            .attr("dy", ".35em")
-                            .attr("opacity", 0)
-                            .style("text-anchor", "end")
-                            .text("");
-                        var measurementText = chart.append("text")
-                            .attr("x", 0)
-                            .attr("y", 0)
-                            .attr("dy", ".35em")
-                            .attr("opacity", 0)
-                            .text("");
-                        var pathEl = path.node();
-                        var pathLength = pathEl.getTotalLength();
-                        chart
-                            .on("mouseout", function () {
-                            cursor.attr("opacity", 0);
-                            timestampText.attr("opacity", 0);
-                            measurementText.attr("opacity", 0);
-                        })
-                            .on("mousemove", function () {
-                            var offsetLeft = element[0].getBoundingClientRect().left;
-                            var xpos = d3.event.clientX - offsetLeft;
-                            var beginning = xpos, end = pathLength, target;
-                            while (true) {
-                                target = Math.floor((beginning + end) / 2);
-                                var pos = pathEl.getPointAtLength(target);
-                                if ((target === end || target === beginning) && pos.x !== xpos) {
-                                    break;
-                                }
-                                if (pos.x > xpos)
-                                    end = target;
-                                else if (pos.x < xpos)
-                                    beginning = target;
-                                else
-                                    break; //position found
+                        if (scope.timestamps != null && scope.sensor != null && scope.timestamps.length > 0) {
+                            var margin = scope.margin || { top: 15, right: 5, bottom: 0, left: 10 };
+                            var width = scope.width || 100;
+                            var height = scope.height || 70;
+                            var showAxis = typeof scope.showaxis !== 'undefined' && scope.showaxis;
+                            var closed = typeof scope.closed !== 'undefined' && scope.closed;
+                            var cursorTextHeight = 12; // + (showAxis ? 5 : 0); // leave room for the cursor text (timestamp | measurement)
+                            $(element[0]).empty();
+                            var chart = d3.select(element[0])
+                                .append('svg:svg')
+                                .attr('width', width)
+                                .attr('height', height);
+                            var marginAxis = showAxis
+                                ? { top: 0, right: 0, bottom: 20, left: 10 }
+                                : { top: 0, right: 0, bottom: 0, left: 0 };
+                            var x = d3.scale.linear().range([margin.left + marginAxis.left, width - margin.left - margin.right - marginAxis.left - marginAxis.right]);
+                            var y = d3.scale.linear().range([height - margin.bottom - marginAxis.bottom, margin.top + marginAxis.top + cursorTextHeight]);
+                            var bisect = d3.bisector(function (d) { return d.time; }).left;
+                            var line = d3.svg.line()
+                                .interpolate((closed) ? "linear-closed" : "cardinal")
+                                .x(function (d) { return x(d.time); })
+                                .y(function (d) { return y(d.measurement); });
+                            var data = [];
+                            //data.push({time:scope.timestamps[0],measurement:0});
+                            for (var i = 0; i < scope.timestamps.length; i++) {
+                                data.push({ time: scope.timestamps[i], measurement: scope.sensor[i] });
                             }
-                            // using the x scale, in this case a d3 time scale
-                            // use the .invert() function to interpolate a date along the scale
-                            // given the x-coordinates of the mouse
-                            var t0 = x.invert(d3.mouse(this)[0]);
-                            // using the interpolated date, find an index in the sorted data
-                            // this would be the index suitable for insertion
-                            var i = bisect(data, t0, 1);
-                            if (0 < i && i < data.length) {
-                                // now that we know where in the data the interpolated date would "fit"
-                                // between two values, pull them both back as temporaries
-                                var d0 = data[i - 1];
-                                var d1 = data[i];
-                                // now, examine which of the two dates we are "closer" to
-                                // to do this, compare the delta values
-                                var d = t0 - d0.time > d1.time - t0 ? d1 : d0;
+                            //data.push({time:scope.timestamps[scope.timestamps.length-1],measurement:0});
+                            x.domain(d3.extent(data, function (d) { return d.time; }));
+                            y.domain(d3.extent(data, function (d) { return d.measurement; }));
+                            var s = [];
+                            if (closed && data.length > 0)
+                                s.push({ time: data[0].time, measurement: 0 });
+                            data.forEach(function (d) { return s.push(d); });
+                            if (closed && data.length > 0)
+                                s.push({ time: data[data.length - 1].time, measurement: 0 });
+                            var path = chart.append("svg:path")
+                                .attr("d", line(s))
+                                .attr('class', 'sparkline-path')
+                                .style('fill', (closed) ? 'steelblue' : 'none');
+                            // draw a circle around the max and min value
+                            var measurements = data.map(function (d) { return d.measurement; });
+                            var min = Charts.ChartHelpers.min(measurements);
+                            var max = Charts.ChartHelpers.max(measurements);
+                            chart.append('circle')
+                                .attr('class', 'sparkcircle-max')
+                                .attr('cx', x(data[max.maxIndex].time))
+                                .attr('cy', y(max.max))
+                                .attr('r', 4);
+                            chart.append('circle')
+                                .attr('class', 'sparkcircle-min')
+                                .attr('cx', x(data[min.minIndex].time))
+                                .attr('cy', y(min.min))
+                                .attr('r', 4);
+                            if (showAxis) {
+                                //var xAxis = d3.svg.axis()
+                                //    .scale(x)
+                                //    .orient("bottom")
+                                //    .ticks(d3.time.months, 2);  //Set rough # of ticks
+                                //chart.append("g")
+                                //    .attr("class", "sparkline-axis")
+                                //    .attr("transform", "translate(0," + (height - margin.bottom - marginAxis.bottom) + ")")
+                                //    .call(xAxis);
+                                var strokeLength = 6;
+                                // Draw min/max at x and y axis
+                                var xbor = d3.min(x.range()), xmin = xbor - strokeLength, xmax = d3.max(x.range()), ybor = d3.max(y.range()), ymin = d3.min(y.range()), ymax = ybor + strokeLength;
+                                // y-axis, max
+                                chart.append('line')
+                                    .attr("x1", xmin)
+                                    .attr("y1", ymin)
+                                    .attr("x2", xbor)
+                                    .attr("y2", ymin)
+                                    .attr("stroke", "black");
+                                chart.append("text")
+                                    .attr("x", xmin - 2)
+                                    .attr("y", ymin)
+                                    .attr("dy", ".35em")
+                                    .style("text-anchor", "end")
+                                    .text(d3.max(y.domain()));
+                                // y-axis, min
+                                chart.append('line')
+                                    .attr("x1", xmin)
+                                    .attr("y1", ybor)
+                                    .attr("x2", xbor)
+                                    .attr("y2", ybor)
+                                    .attr("stroke", "black");
+                                chart.append("text")
+                                    .attr("x", xmin - 2)
+                                    .attr("y", ybor)
+                                    .attr("dy", ".35em")
+                                    .style("text-anchor", "end")
+                                    .text(d3.min(y.domain()));
+                                // x-axis, min
+                                chart.append('line')
+                                    .attr("x1", xbor)
+                                    .attr("y1", ymax)
+                                    .attr("x2", xbor)
+                                    .attr("y2", ybor)
+                                    .attr("stroke", "black");
+                                chart.append("text")
+                                    .attr("x", xbor)
+                                    .attr("y", ymax + 9)
+                                    .attr("dy", ".35em")
+                                    .style("text-anchor", "start")
+                                    .text(Charts.ChartHelpers.timestampToString(d3.min(x.domain())));
+                                // x-axis, max
+                                chart.append('line')
+                                    .attr("x1", xmax)
+                                    .attr("y1", ymax)
+                                    .attr("x2", xmax)
+                                    .attr("y2", ybor)
+                                    .attr("stroke", "black");
+                                chart.append("text")
+                                    .attr("x", xmax)
+                                    .attr("y", ymax + 9)
+                                    .attr("dy", ".35em")
+                                    .style("text-anchor", "end")
+                                    .text(Charts.ChartHelpers.timestampToString(d3.max(x.domain())));
                             }
-                            else if (i <= 0)
-                                d = data[0];
-                            else
-                                d = data[data.length - 1];
-                            xpos = x(d.time);
-                            // draw
-                            cursor
-                                .attr("x1", xpos)
+                            // draw a line at the current cursor position
+                            var cursor = chart.append("line")
+                                .attr("x1", 0)
                                 .attr("y1", 0)
-                                .attr("x2", xpos)
-                                .attr("y2", d3.max(y.range()) + (strokeLength || 0))
-                                .attr("opacity", 1);
-                            timestampText
-                                .attr("x", xpos - 6)
-                                .attr("y", 4)
+                                .attr("x2", 0)
+                                .attr("y2", 0)
+                                .attr("opacity", 0)
+                                .attr("stroke", "black");
+                            var timestampText = chart.append("text")
+                                .attr("x", 0)
+                                .attr("y", 0)
                                 .attr("dy", ".35em")
-                                .attr("opacity", 1)
-                                .text(Charts.ChartHelpers.timestampToString(d.time));
-                            measurementText
-                                .attr("x", xpos + 6)
-                                .attr("y", 4)
+                                .attr("opacity", 0)
+                                .style("text-anchor", "end")
+                                .text("");
+                            var measurementText = chart.append("text")
+                                .attr("x", 0)
+                                .attr("y", 0)
                                 .attr("dy", ".35em")
-                                .attr("opacity", 1)
-                                .text(d.measurement);
-                        });
+                                .attr("opacity", 0)
+                                .text("");
+                            var pathEl = path.node();
+                            var pathLength = pathEl.getTotalLength();
+                            chart
+                                .on("mouseout", function () {
+                                cursor.attr("opacity", 0);
+                                timestampText.attr("opacity", 0);
+                                measurementText.attr("opacity", 0);
+                            })
+                                .on("mousemove", function () {
+                                var offsetLeft = element[0].getBoundingClientRect().left;
+                                var xpos = d3.event.clientX - offsetLeft;
+                                var beginning = xpos, end = pathLength, target;
+                                while (true) {
+                                    target = Math.floor((beginning + end) / 2);
+                                    var pos = pathEl.getPointAtLength(target);
+                                    if ((target === end || target === beginning) && pos.x !== xpos) {
+                                        break;
+                                    }
+                                    if (pos.x > xpos)
+                                        end = target;
+                                    else if (pos.x < xpos)
+                                        beginning = target;
+                                    else
+                                        break; //position found
+                                }
+                                // using the x scale, in this case a d3 time scale
+                                // use the .invert() function to interpolate a date along the scale
+                                // given the x-coordinates of the mouse
+                                var t0 = x.invert(d3.mouse(this)[0]);
+                                // using the interpolated date, find an index in the sorted data
+                                // this would be the index suitable for insertion
+                                var i = bisect(data, t0, 1);
+                                if (0 < i && i < data.length) {
+                                    // now that we know where in the data the interpolated date would "fit"
+                                    // between two values, pull them both back as temporaries
+                                    var d0 = data[i - 1];
+                                    var d1 = data[i];
+                                    // now, examine which of the two dates we are "closer" to
+                                    // to do this, compare the delta values
+                                    var d = t0 - d0.time > d1.time - t0 ? d1 : d0;
+                                }
+                                else if (i <= 0)
+                                    d = data[0];
+                                else
+                                    d = data[data.length - 1];
+                                xpos = x(d.time);
+                                // draw
+                                cursor
+                                    .attr("x1", xpos)
+                                    .attr("y1", 0)
+                                    .attr("x2", xpos)
+                                    .attr("y2", d3.max(y.range()) + (strokeLength || 0))
+                                    .attr("opacity", 1);
+                                timestampText
+                                    .attr("x", xpos - 6)
+                                    .attr("y", 4)
+                                    .attr("dy", ".35em")
+                                    .attr("opacity", 1)
+                                    .text(Charts.ChartHelpers.timestampToString(d.time));
+                                measurementText
+                                    .attr("x", xpos + 6)
+                                    .attr("y", 4)
+                                    .attr("dy", ".35em")
+                                    .attr("opacity", 1)
+                                    .text(d.measurement);
+                            });
+                        }
                     });
                     doDraw();
                     scope.$watchCollection("sensor", function () { console.log('redraw chart'); doDraw(); });
@@ -2399,15 +2399,45 @@ var Charts;
                     //selection[0][0] is the DOM node
                     //but we won't need that this time
                     var chart = d3.select(element[0]);
-                    //to our original directive markup bars-chart
-                    //we add a div with out chart stling and bind each
-                    //data entry to the chart
                     chart.append("div").attr("class", "chart")
                         .selectAll('div')
                         .data(scope.data).enter().append("div")
                         .transition().ease("elastic")
                         .style("width", function (d) { return d + "%"; })
                         .text(function (d) { return d + "%"; });
+                    //to our original directive markup bars-chart
+                    //we add a div with out chart stling and bind each
+                    //data entry to the chart
+                }
+            };
+        }
+    ])
+        .directive('radialChart', ['$filter',
+        function ($filter) {
+            return {
+                terminal: true,
+                restrict: 'EA',
+                scope: {
+                    value: '=',
+                    maintitle: '=',
+                    min: '@',
+                    max: '@'
+                },
+                link: function (scope, element, attrs) {
+                    console.log('chart');
+                    //in D3, any selection[0] contains the group
+                    //selection[0][0] is the DOM node
+                    //but we won't need that this time
+                    var chart = d3.select(element[0]);
+                    //to our original directive markup bars-chart
+                    //we add a div with out chart stling and bind each
+                    //data entry to the chart
+                    var measurementText = chart.append("text")
+                        .attr("x", 0)
+                        .attr("y", 0)
+                        .attr("dy", ".35em")
+                        .attr("opacity", 0)
+                        .text(scope.maintitle);
                     //a little of magic: setting it's width based
                     //on the data value (d)
                     //and text all with a smooth transition
@@ -2417,110 +2447,199 @@ var Charts;
     ]);
 })(Charts || (Charts = {}));
 
-var Helpers;
-(function (Helpers) {
-    var ContextMenu;
-    (function (ContextMenu) {
-        /**
-         * Config
-         */
-        var moduleName = 'csComp';
-        /**
-          * Module
-          */
-        ContextMenu.myModule;
-        try {
-            ContextMenu.myModule = angular.module(moduleName);
-        }
-        catch (err) {
-            // named module does not exist, so create one
-            ContextMenu.myModule = angular.module(moduleName, []);
-        }
-        /**
-          * Directive to resize an element by settings its width or height,
-          * for example to make sure that the scrollbar appears.
-          * Typical usage:
-          * <div style="overflow-y: auto; overflow-x: hidden" resize resize-x="20" resize-y="250">...</div>
-          * Load the directive in your module, e.g.
-          * angular.module('myWebApp', ['csWeb.resize'])
-          */
-        ContextMenu.myModule.directive('contextMenu', function ($parse) {
-            var renderContextMenu = function ($scope, event, options) {
-                if (!$) {
-                    var $ = angular.element;
+/**
+ Copyright (c) 2014 BrightPoint Consulting, Inc.
+
+ Permission is hereby granted, free of charge, to any person
+ obtaining a copy of this software and associated documentation
+ files (the "Software"), to deal in the Software without
+ restriction, including without limitation the rights to use,
+ copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the
+ Software is furnished to do so, subject to the following
+ conditions:
+
+ The above copyright notice and this permission notice shall be
+ included in all copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ OTHER DEALINGS IN THE SOFTWARE.
+ */
+function radialProgress(parent) {
+    var _data = null, _duration = 1000, _selection, _margin = { top: 0, right: 0, bottom: 30, left: 0 }, _width = 300, _height = 300, _diameter = 150, _label = "", _fontSize = 10;
+    var _mouseClick;
+    var _value = 0, _minValue = 0, _maxValue = 100;
+    var _currentArc = 0, _currentArc2 = 0, _currentValue = 0;
+    var _arc = d3.svg.arc()
+        .startAngle(0 * (Math.PI / 180)); //just radians
+    var _arc2 = d3.svg.arc()
+        .startAngle(0 * (Math.PI / 180))
+        .endAngle(0); //just radians
+    _selection = d3.select(parent);
+    function component() {
+        _selection.each(function (data) {
+            // Select the svg element, if it exists.
+            var svg = d3.select(this).selectAll("svg").data([data]);
+            var enter = svg.enter().append("svg").attr("class", "radial-svg").append("g");
+            measure();
+            svg.attr("width", _width)
+                .attr("height", _height);
+            var background = enter.append("g").attr("class", "component")
+                .attr("cursor", "pointer")
+                .on("click", onMouseClick);
+            _arc.endAngle(360 * (Math.PI / 180));
+            background.append("rect")
+                .attr("class", "background")
+                .attr("width", _width)
+                .attr("height", _height);
+            background.append("path")
+                .attr("transform", "translate(" + _width / 2 + "," + _width / 2 + ")")
+                .attr("d", _arc);
+            background.append("text")
+                .attr("class", "label")
+                .attr("transform", "translate(" + _width / 2 + "," + (_width + _fontSize) + ")")
+                .text(_label);
+            var g = svg.select("g")
+                .attr("transform", "translate(" + _margin.left + "," + _margin.top + ")");
+            _arc.endAngle(_currentArc);
+            enter.append("g").attr("class", "arcs");
+            var path = svg.select(".arcs").selectAll(".arc").data(data);
+            path.enter().append("path")
+                .attr("class", "arc")
+                .attr("transform", "translate(" + _width / 2 + "," + _width / 2 + ")")
+                .attr("d", _arc);
+            //Another path in case we exceed 100%
+            var path2 = svg.select(".arcs").selectAll(".arc2").data(data);
+            path2.enter().append("path")
+                .attr("class", "arc2")
+                .attr("transform", "translate(" + _width / 2 + "," + _width / 2 + ")")
+                .attr("d", _arc2);
+            enter.append("g").attr("class", "labels");
+            var label = svg.select(".labels").selectAll(".label").data(data);
+            label.enter().append("text")
+                .attr("class", "label")
+                .attr("y", _width / 2 + _fontSize / 3)
+                .attr("x", _width / 2)
+                .attr("cursor", "pointer")
+                .attr("width", _width)
+                .text(function (d) { return Math.round((_value - _minValue) / (_maxValue - _minValue) * 100) + "%"; })
+                .style("font-size", _fontSize + "px")
+                .on("click", onMouseClick);
+            path.exit().transition().duration(500).attr("x", 1000).remove();
+            layout(svg);
+            function layout(svg) {
+                var ratio = (_value - _minValue) / (_maxValue - _minValue);
+                var endAngle = Math.min(360 * ratio, 360);
+                endAngle = endAngle * Math.PI / 180;
+                path.datum(endAngle);
+                path.transition().duration(_duration)
+                    .attrTween("d", arcTween);
+                if (ratio > 1) {
+                    path2.datum(Math.min(360 * (ratio - 1), 360) * Math.PI / 180);
+                    path2.transition().delay(_duration).duration(_duration)
+                        .attrTween("d", arcTween2);
                 }
-                $(event.currentTarget).addClass('context');
-                var $contextMenu = $('<div>');
-                $contextMenu.addClass('dropdown clearfix');
-                var $ul = $('<ul>');
-                $ul.addClass('dropdown-menu');
-                $ul.attr({ 'role': 'menu' });
-                $ul.css({
-                    display: 'block',
-                    position: 'absolute',
-                    left: event.pageX + 'px',
-                    top: event.pageY + 'px'
-                });
-                angular.forEach(options, function (item, i) {
-                    var $li = $('<li>');
-                    if (item === null) {
-                        $li.addClass('divider');
-                    }
-                    else {
-                        var $a = $('<a>');
-                        $a.attr({ tabindex: '-1', href: '#' });
-                        $a.text(typeof item[0] == 'string' ? item[0] : item[0].call($scope, $scope));
-                        $li.append($a);
-                        $li.on('click', function ($event) {
-                            $event.preventDefault();
-                            $scope.$apply(function () {
-                                $(event.currentTarget).removeClass('context');
-                                $contextMenu.remove();
-                                item[1].call($scope, $scope);
-                            });
-                        });
-                    }
-                    $ul.append($li);
-                });
-                $contextMenu.append($ul);
-                var height = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight, document.body.offsetHeight, document.documentElement.offsetHeight, document.body.clientHeight, document.documentElement.clientHeight);
-                $contextMenu.css({
-                    width: '100%',
-                    height: height + 'px',
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    zIndex: 9999
-                });
-                $(document).find('body').append($contextMenu);
-                $contextMenu.on("mousedown", function (e) {
-                    if ($(e.target).hasClass('dropdown')) {
-                        $(event.currentTarget).removeClass('context');
-                        $contextMenu.remove();
-                    }
-                }).on('contextmenu', function (event) {
-                    $(event.currentTarget).removeClass('context');
-                    event.preventDefault();
-                    $contextMenu.remove();
-                });
-            };
-            return function ($scope, element, attrs) {
-                element.on('contextmenu', function (event) {
-                    $scope.$apply(function () {
-                        event.preventDefault();
-                        var options = $scope.$eval(attrs.contextMenu);
-                        if (options instanceof Array) {
-                            renderContextMenu($scope, event, options);
-                        }
-                        else {
-                            throw '"' + attrs.contextMenu + '" not an array';
-                        }
-                    });
-                });
-            };
+                label.datum(Math.round(ratio * 100));
+                label.transition().duration(_duration)
+                    .tween("text", labelTween);
+            }
         });
-    })(ContextMenu = Helpers.ContextMenu || (Helpers.ContextMenu = {}));
-})(Helpers || (Helpers = {}));
+        function onMouseClick(d) {
+            if (typeof _mouseClick == "function") {
+                _mouseClick.call();
+            }
+        }
+    }
+    function labelTween(a) {
+        var i = d3.interpolate(_currentValue, a);
+        _currentValue = i(0);
+        return function (t) {
+            _currentValue = i(t);
+            this.textContent = Math.round(i(t)) + "%";
+        };
+    }
+    function arcTween(a) {
+        var i = d3.interpolate(_currentArc, a);
+        return function (t) {
+            _currentArc = i(t);
+            return _arc.endAngle(i(t))();
+        };
+    }
+    function arcTween2(a) {
+        var i = d3.interpolate(_currentArc2, a);
+        return function (t) {
+            return _arc2.endAngle(i(t))();
+        };
+    }
+    function measure() {
+        _width = _diameter - _margin.right - _margin.left - _margin.top - _margin.bottom;
+        _height = _width;
+        _fontSize = _width * .2;
+        _arc.outerRadius(_width / 2);
+        _arc.innerRadius(_width / 2 * .85);
+        _arc2.outerRadius(_width / 2 * .85);
+        _arc2.innerRadius(_width / 2 * .85 - (_width / 2 * .15));
+    }
+    component.render = function () {
+        measure();
+        component();
+        return component;
+    }(component).value = function (_) {
+        if (!arguments.length)
+            return _value;
+        _value = [_];
+        _selection.datum([_value]);
+        return component;
+    }(component).margin = function (_) {
+        if (!arguments.length)
+            return _margin;
+        _margin = _;
+        return component;
+    };
+    component.diameter = function (_) {
+        if (!arguments.length)
+            return _diameter;
+        _diameter = _;
+        return component;
+    };
+    component.minValue = function (_) {
+        if (!arguments.length)
+            return _minValue;
+        _minValue = _;
+        return component;
+    };
+    component.maxValue = function (_) {
+        if (!arguments.length)
+            return _maxValue;
+        _maxValue = _;
+        return component;
+    };
+    component.label = function (_) {
+        if (!arguments.length)
+            return _label;
+        _label = _;
+        return component;
+    };
+    component._duration = function (_) {
+        if (!arguments.length)
+            return _duration;
+        _duration = _;
+        return component;
+    };
+    component.onClick = function (_) {
+        if (!arguments.length)
+            return _mouseClick;
+        _mouseClick = _;
+        return component;
+    };
+    return component;
+}
 
 var Dashboard;
 (function (Dashboard) {
@@ -2755,6 +2874,111 @@ var Dashboard;
     Dashboard_1.DashboardCtrl = DashboardCtrl;
 })(Dashboard || (Dashboard = {}));
 
+var Helpers;
+(function (Helpers) {
+    var ContextMenu;
+    (function (ContextMenu) {
+        /**
+         * Config
+         */
+        var moduleName = 'csComp';
+        /**
+          * Module
+          */
+        ContextMenu.myModule;
+        try {
+            ContextMenu.myModule = angular.module(moduleName);
+        }
+        catch (err) {
+            // named module does not exist, so create one
+            ContextMenu.myModule = angular.module(moduleName, []);
+        }
+        /**
+          * Directive to resize an element by settings its width or height,
+          * for example to make sure that the scrollbar appears.
+          * Typical usage:
+          * <div style="overflow-y: auto; overflow-x: hidden" resize resize-x="20" resize-y="250">...</div>
+          * Load the directive in your module, e.g.
+          * angular.module('myWebApp', ['csWeb.resize'])
+          */
+        ContextMenu.myModule.directive('contextMenu', function ($parse) {
+            var renderContextMenu = function ($scope, event, options) {
+                if (!$) {
+                    var $ = angular.element;
+                }
+                $(event.currentTarget).addClass('context');
+                var $contextMenu = $('<div>');
+                $contextMenu.addClass('dropdown clearfix');
+                var $ul = $('<ul>');
+                $ul.addClass('dropdown-menu');
+                $ul.attr({ 'role': 'menu' });
+                $ul.css({
+                    display: 'block',
+                    position: 'absolute',
+                    left: event.pageX + 'px',
+                    top: event.pageY + 'px'
+                });
+                angular.forEach(options, function (item, i) {
+                    var $li = $('<li>');
+                    if (item === null) {
+                        $li.addClass('divider');
+                    }
+                    else {
+                        var $a = $('<a>');
+                        $a.attr({ tabindex: '-1', href: '#' });
+                        $a.text(typeof item[0] == 'string' ? item[0] : item[0].call($scope, $scope));
+                        $li.append($a);
+                        $li.on('click', function ($event) {
+                            $event.preventDefault();
+                            $scope.$apply(function () {
+                                $(event.currentTarget).removeClass('context');
+                                $contextMenu.remove();
+                                item[1].call($scope, $scope);
+                            });
+                        });
+                    }
+                    $ul.append($li);
+                });
+                $contextMenu.append($ul);
+                var height = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight, document.body.offsetHeight, document.documentElement.offsetHeight, document.body.clientHeight, document.documentElement.clientHeight);
+                $contextMenu.css({
+                    width: '100%',
+                    height: height + 'px',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    zIndex: 9999
+                });
+                $(document).find('body').append($contextMenu);
+                $contextMenu.on("mousedown", function (e) {
+                    if ($(e.target).hasClass('dropdown')) {
+                        $(event.currentTarget).removeClass('context');
+                        $contextMenu.remove();
+                    }
+                }).on('contextmenu', function (event) {
+                    $(event.currentTarget).removeClass('context');
+                    event.preventDefault();
+                    $contextMenu.remove();
+                });
+            };
+            return function ($scope, element, attrs) {
+                element.on('contextmenu', function (event) {
+                    $scope.$apply(function () {
+                        event.preventDefault();
+                        var options = $scope.$eval(attrs.contextMenu);
+                        if (options instanceof Array) {
+                            renderContextMenu($scope, event, options);
+                        }
+                        else {
+                            throw '"' + attrs.contextMenu + '" not an array';
+                        }
+                    });
+                });
+            };
+        });
+    })(ContextMenu = Helpers.ContextMenu || (Helpers.ContextMenu = {}));
+})(Helpers || (Helpers = {}));
+
 var DashboardSelection;
 (function (DashboardSelection) {
     /**
@@ -2821,7 +3045,7 @@ var DashboardSelection;
 
 var DashboardSelection;
 (function (DashboardSelection) {
-    DashboardSelection.html = '<div>    <h3 class="leftpanel-header" style="width: 100%">        Dashboards        <div class="leftpanel-header-button-container">            <button ng-show="vm.$dashboardService.editMode" ng-click="vm.$dashboardService.editMode = false; vm.stopEdit()" class="button fa fa-check leftpanel-header-button" />            <button ng-show="vm.$dashboardService.editMode" class="button fa fa-plus leftpanel-header-button" ng-click="vm.addDashboard()" />            <button ng-hide="vm.$dashboardService.editMode" ng-click="vm.$dashboardService.editMode = true; vm.startEdit()" class="button fa fa-pencil leftpanel-header-button" />                     </div>    </h3>    <style>    </style>    <ul style="padding: 0;list-style-type: none" data-ng-repeat="value in vm.$layerService.project.dashboards">        <li>            <div ng-class="{\'dashboard-selected\' : value.id === vm.$dashboardService.mainDashboard.id}" class="dashboard-item">                <span ng-click="vm.$dashboardService.selectDashboard(value)" class="dashboard-name">{{value.name}}</span>                <div ng-show="vm.$dashboardService.editMode" class="leftpanel-header-button-container">                    <button ng-click="vm.removeDashboard(value.id)" class="button fa fa-trash leftpanel-header-button" />                    <div ng-show="value == vm.$dashboardService.mainDashboard" style="float:right">                        <button ng-hide="value.editMode" ng-click="value.editMode = true; vm.startDashboardEdit(value)" class="button fa fa-pencil leftpanel-header-button" />                        <button ng-show="value.editMode" ng-click="value.editMode = false" class="button fa fa-check leftpanel-header-button" />                    </div>                </div>            </div>            <div style="margin-top:0" ng-show="value.editMode">                <label class="control-label" for="dashboardTitle">Title</label>                <div class="controls">                    <input id="dashboardTitle" name="textinput" type="text" ng-model="value.name" placeholder="placeholder" class="input-xlarge">                </div>                <div class="checkbox" style="margin-left: 20px">                     <input type="checkbox" id="showmap-{{value.id}}" ng-model="value.showMap" ng-click="vm.toggleMap()">                    <label for="showmap-{{value.id}}">Show Map</label>                </div>                <div class="checkbox" style="margin-left: 20px">                    <input type="checkbox" id="timeline-{{value.id}}" ng-model="value.showTimeline" ng-click="vm.toggleTimeline()">                    <label for="timeline-{{value.id}}">Show Timeline</label>                </div>            </div>        </li>    </ul></div>';
+    DashboardSelection.html = '<div>    <h3 class="leftpanel-header" style="width: 100%">        Dashboards        <div class="leftpanel-header-button-container">            <button ng-show="vm.$dashboardService.editMode" ng-click="vm.$dashboardService.editMode = false; vm.stopEdit()" class="button fa fa-check leftpanel-header-button" />            <button ng-show="vm.$dashboardService.editMode" class="button fa fa-plus leftpanel-header-button" ng-click="vm.addDashboard()" />            <button ng-hide="vm.$dashboardService.editMode" ng-click="vm.$dashboardService.editMode = true; vm.startEdit()" class="button fa fa-pencil leftpanel-header-button" />        </div>    </h3>    <style>    </style>    <ul style="padding: 0;list-style-type: none" data-ng-repeat="value in vm.$layerService.project.dashboards">        <li>            <div ng-class="{\'dashboard-selected\' : value.id === vm.$dashboardService.mainDashboard.id}" class="dashboard-item">                <span ng-click="vm.$dashboardService.selectDashboard(value)" class="dashboard-name">{{value.name}}</span>                <div ng-show="vm.$dashboardService.editMode" class="leftpanel-header-button-container">                    <button ng-click="vm.removeDashboard(value.id)" class="button fa fa-trash leftpanel-header-button" />                    <div ng-show="value == vm.$dashboardService.mainDashboard" style="float:right">                        <button ng-hide="value.editMode" ng-click="value.editMode = true; vm.startDashboardEdit(value)" class="button fa fa-pencil leftpanel-header-button" />                        <button ng-show="value.editMode" ng-click="value.editMode = false" class="button fa fa-check leftpanel-header-button" />                    </div>                </div>            </div>            <div style="margin-top:0" ng-show="value.editMode">                <label class="control-label" for="dashboardTitle">Title</label>                <div class="controls">                    <input id="dashboardTitle" name="textinput" type="text" ng-model="value.name" placeholder="placeholder" class="input-xlarge">                </div>                <div class="checkbox" style="margin-left: 20px">                    <input type="checkbox" id="showmap-{{value.id}}" ng-model="value.showMap" ng-click="vm.toggleMap()">                    <label for="showmap-{{value.id}}">Show Map</label>                </div>                <div class="checkbox" style="margin-left: 20px">                    <input type="checkbox" id="timeline-{{value.id}}" ng-model="value.showTimeline" ng-click="vm.toggleTimeline()">                    <label for="timeline-{{value.id}}">Show Timeline</label>                </div>            </div>        </li>    </ul></div>';
 })(DashboardSelection || (DashboardSelection = {}));
 
 var DashboardSelection;
@@ -3342,135 +3566,6 @@ var DataTable;
     })();
     DataTable.DataTableCtrl = DataTableCtrl;
 })(DataTable || (DataTable = {}));
-
-var ExpertMode;
-(function (ExpertMode) {
-    /**
-  * Config
-  */
-    var moduleName = 'csComp';
-    /**
-      * Module
-      */
-    ExpertMode.myModule;
-    try {
-        ExpertMode.myModule = angular.module(moduleName);
-    }
-    catch (err) {
-        // named module does not exist, so create one
-        ExpertMode.myModule = angular.module(moduleName, []);
-    }
-    /**
-      * Directive to set the expert mode, so we can determine what the user should see (degree of difficulty).
-      * The expert mode can either be set manually, e.g. using this directive, or by setting the expertMode property in the
-      * project.json file. In neither are set, we assume that we are dealing with an expert, so all features should be enabled.
-      *
-      * Precedence:
-      * - when a declaration is absent, assume Expert.
-      * - when the mode is set in local storage, take that value.
-      * - when the mode is set in the project.json file, take that value.
-      *
-      * As we want the expertMode to be always available, we have added it to the MapService service.
-      */
-    ExpertMode.myModule
-        .directive('expertMode', [
-        '$compile',
-        function ($compile) {
-            return {
-                terminal: true,
-                restrict: 'E',
-                scope: {},
-                templateUrl: 'directives/ExpertMode/ExpertMode.tpl.html',
-                compile: function (el) {
-                    var fn = $compile(el);
-                    return function (scope) {
-                        fn(scope);
-                    };
-                },
-                //link: function (scope, element, attrs) {
-                //     // Since we are wrapping the rating directive in this directive, I couldn't use transclude,
-                //     // so I copy the existing attributes manually.
-                //     var attributeString = '';
-                //     for (var key in attrs) {
-                //         if (key.substr(0, 1) !== '$' && attrs.hasOwnProperty(key)) attributeString += key + '="' + attrs[key] + '" ';
-                //     }
-                //     var html = '<rating ng-model="expertMode" '
-                //         + attributeString
-                //         + 'tooltip-html-unsafe="{{\'EXPERTMODE.EXPLANATION\' | translate}}" tooltip-placement="bottom" tooltip-trigger="mouseenter" tooltip-append-to-body="false"'
-                //         + 'max="3"></rating>';
-                //     var e = $compile(html)(scope);
-                //     element.replaceWith(e);
-                // },
-                replace: true,
-                transclude: true,
-                controller: ExpertMode.ExpertModeCtrl
-            };
-        }
-    ]);
-})(ExpertMode || (ExpertMode = {}));
-
-var ExpertMode;
-(function (ExpertMode) {
-    ExpertMode.html = '<div class="navbar-collapse collapse"     tooltip-html-unsafe="{{\'EXPERTMODE.EXPLANATION\' | translate}}"     tooltip-placement="left"     tooltip-trigger="mouseenter"     tooltip-append-to-body="false">    <ul class="nav navbar-nav">        <li class="dropdown" style="margin-top:-15px">            <a href=""               class="navbar-brand dropdown-toggle pull-left"               data-toggle="dropdown"               style="color:white; margin-left:-10px;">                <div class="circle"><span data-ng-class="vm.getCssClass()" style="width: 32px; height: 32px"></span></div>            </a>            <ul class="dropdown-menu" role="menu">                <li>                    <a data-ng-click="vm.setExpertMode(1)">                        <span class="beginnerUserIcon" style="margin-left: -10px; width: 40px; height: 32px"></span>                        <div translate>EXPERTMODE.BEGINNER</div>                    </a>                </li>                <li>                    <a data-ng-click="vm.setExpertMode(2)">                        <span class="intermediateUserIcon" style="margin-left: -10px; width: 40px; height: 32px"></span>                        <div translate>EXPERTMODE.INTERMEDIATE</div>                    </a>                </li>                <li>                    <a data-ng-click="vm.setExpertMode(3)">                        <span class="expertUserIcon" style="margin-left: -10px; width: 40px; height: 32px"></span>                        <div translate>EXPERTMODE.EXPERT</div>                    </a>                </li>            </ul>        </li>    </ul></div>';
-})(ExpertMode || (ExpertMode = {}));
-
-var ExpertMode;
-(function (ExpertMode) {
-    var Expertise = csComp.Services.Expertise;
-    var ExpertModeCtrl = (function () {
-        function ExpertModeCtrl($scope, $localStorageService, $layerService, $mapService, $messageBus) {
-            var _this = this;
-            this.$scope = $scope;
-            this.$localStorageService = $localStorageService;
-            this.$layerService = $layerService;
-            this.$mapService = $mapService;
-            this.$messageBus = $messageBus;
-            $scope.vm = this;
-            $scope.expertMode = $mapService.expertMode;
-            $messageBus.subscribe('expertMode', function (title, mode) {
-                if (title !== 'newExpertise')
-                    return;
-                $scope.expertMode = mode;
-            });
-            $scope.$watch('expertMode', function () {
-                _this.setExpertMode($scope.expertMode);
-            });
-        }
-        /**
-        * Get the CSS class to render the mode.
-        */
-        ExpertModeCtrl.prototype.getCssClass = function () {
-            switch (this.$mapService.expertMode) {
-                case Expertise.Beginner:
-                    return 'beginnerUserIcon';
-                    break;
-                case Expertise.Intermediate:
-                    return 'intermediateUserIcon';
-                    break;
-                case Expertise.Expert:
-                    return 'expertUserIcon';
-                    break;
-            }
-        };
-        /**
-        * Set the expert mode: although we assume that each directive is responsible for managing it by listening
-        * to the expertMode.newExpertise message, we already set some common options here.
-        * This is to reduce the dependency on this directive.
-        */
-        ExpertModeCtrl.prototype.setExpertMode = function (expertMode) {
-            this.$messageBus.publish('expertMode', 'newExpertise', expertMode);
-        };
-        ExpertModeCtrl.$inject = [
-            '$scope',
-            'localStorageService',
-            'layerService',
-            'mapService',
-            'messageBusService'
-        ];
-        return ExpertModeCtrl;
-    })();
-    ExpertMode.ExpertModeCtrl = ExpertModeCtrl;
-})(ExpertMode || (ExpertMode = {}));
 
 var FeatureList;
 (function (FeatureList) {
@@ -4283,7 +4378,7 @@ var Indicators;
 
 var Indicators;
 (function (Indicators) {
-    Indicators.html = '<div>    <style>        .indicator-list        {            list-style:none;            padding-left:0;        }        .indicator-group{            position: relative;            cursor:pointer;        }        /*sparkline*/        .indicator-sparkline-group {                height: 75px;        }        .indicator-sparkline-title{            font-size:20px;            font-weight:bold;        }        .indicator-sparkline-value{            font-size: 20px;            font-weight: bold;            right: 5px;            position: absolute;            bottom:5px;        }        /*circular*/        .indicator-circular-group {                height: 165px;        }        .indicator-circular-title{            font-size:20px;            font-weight:bold;        }        .indicator-circular-value{            font-size: 20px;            font-weight: bold;            right: 5px;            position: absolute;            bottom:5px;        }        .isActive{            background-color:#B5A3C1;        }        .indicatorwidget-title{              text-align: center;  font-size: 25px;  font-weight: bold;        }    </style>    <div class="indicatorwidget-title">{{data.title}}</div>    <ul class="indicator-list" data-ng-repeat="i in data.indicators" ng-switch on="i.visual">        <li ng-class="{isActive : i.isActive}" class="indicator-group indicator-sparkline-group" ng-click="vm.selectIndicator(i)" ng-switch-when="sparkline">            <div class="indicator-sparkline-title">{{i.title}}</div>            <sparkline-chart timestamps="i.sensorSet.timestamps" sensor="i.sensorSet.values" width="200" height="40" showaxis="false" closed="true" ></sparkline-chart>            <div class="indicator-sparkline-value">{{i.sensorSet.activeValue}}</div>        </li>        <li ng-class="{isActive : i.isActive}" class="indicator-group indicator-circular-group" ng-switch-when="circular">            <div id="{{i.id}}" data-dimension="150" data-info="{{i.title}}" bordersize="5" data-text="{{i.sensorSet.activeValue}}" data-width="10" data-fontsize="20" data-percent="{{i.sensorSet.activeValue}}" data-fgcolor="#61a9dc" data-bgcolor="#eee" data-fill="#ddd" class="circliful" style="width:100px;left:30px"></div>        </li>        <li ng-class="{isActive : i.isActive}" class="indicator-group" ng-switch-default>            <div>{{i.title}}</div>            <div>{{i.sensorSet.activeValue}}</div>        </li>    </ul></div>';
+    Indicators.html = '<div>    <style>        .indicator-list        {            list-style:none;            padding-left:0;        }        .indicator-group{            position: relative;            cursor:pointer;        }        /*sparkline*/        .indicator-sparkline-group {                height: 75px;        }        .indicator-sparkline-title{            font-size:20px;            font-weight:bold;        }        .indicator-sparkline-value{            font-size: 20px;            font-weight: bold;            right: 5px;            position: absolute;            bottom:5px;        }        /*circular*/        .indicator-circular-group {                height: 165px;        }        .indicator-circular-title{            font-size:20px;            font-weight:bold;        }        .indicator-circular-value{            font-size: 20px;            font-weight: bold;            right: 5px;            position: absolute;            bottom:5px;        }        .isActive{            background-color:#B5A3C1;        }        .indicatorwidget-title{              text-align: center;  font-size: 25px;  font-weight: bold;        }    </style>    <div class="indicatorwidget-title">{{data.title}}</div>    <ul class="indicator-list" data-ng-repeat="i in data.indicators" ng-switch on="i.visual">        <li ng-class="{isActive : i.isActive}" class="indicator-group indicator-sparkline-group" ng-click="vm.selectIndicator(i)" ng-switch-when="sparkline">            <div class="indicator-sparkline-title">{{i.title}}</div>            <sparkline-chart timestamps="i.sensorSet.timestamps" sensor="i.sensorSet.values" width="200" height="40" showaxis="false" closed="true" ></sparkline-chart>            <div class="indicator-sparkline-value">{{i.sensorSet.activeValue}}</div>        </li>        <li ng-class="{isActive : i.isActive}" class="indicator-group indicator-circular-group" ng-switch-when="circular">          <radialChart title="{{i.title}}" value="{{i.sensorSet.activeValue}}" width="150" height="150"/>                    </li>        <li ng-class="{isActive : i.isActive}" class="indicator-group" ng-switch-default>            <div>{{i.title}}</div>            <div>{{i.sensorSet.activeValue}}</div>        </li>    </ul></div>';
 })(Indicators || (Indicators = {}));
 
 var Indicators;
@@ -4341,7 +4436,7 @@ var Indicators;
                 if (!_this.$scope.$$phase)
                     _this.$scope.$apply();
                 setTimeout(function () {
-                    $("#" + i.id).circliful();
+                    // (<any>$("#" + i.id)).circliful();
                 }, 1000);
             });
         };
@@ -4403,98 +4498,134 @@ var Indicators;
     Indicators.IndicatorsCtrl = IndicatorsCtrl;
 })(Indicators || (Indicators = {}));
 
-var LanguageSwitch;
-(function (LanguageSwitch) {
+var ExpertMode;
+(function (ExpertMode) {
     /**
-      * Config
-      */
+  * Config
+  */
     var moduleName = 'csComp';
     /**
       * Module
       */
-    LanguageSwitch.myModule;
+    ExpertMode.myModule;
     try {
-        LanguageSwitch.myModule = angular.module(moduleName);
+        ExpertMode.myModule = angular.module(moduleName);
     }
     catch (err) {
         // named module does not exist, so create one
-        LanguageSwitch.myModule = angular.module(moduleName, []);
+        ExpertMode.myModule = angular.module(moduleName, []);
     }
     /**
-      * Directive to display the available map layers.
+      * Directive to set the expert mode, so we can determine what the user should see (degree of difficulty).
+      * The expert mode can either be set manually, e.g. using this directive, or by setting the expertMode property in the
+      * project.json file. In neither are set, we assume that we are dealing with an expert, so all features should be enabled.
+      *
+      * Precedence:
+      * - when a declaration is absent, assume Expert.
+      * - when the mode is set in local storage, take that value.
+      * - when the mode is set in the project.json file, take that value.
+      *
+      * As we want the expertMode to be always available, we have added it to the MapService service.
       */
-    LanguageSwitch.myModule
-        .directive('languageSwitch', [
+    ExpertMode.myModule
+        .directive('expertMode', [
         '$compile',
         function ($compile) {
             return {
                 terminal: true,
                 restrict: 'E',
                 scope: {},
-                templateUrl: 'directives/LanguageSwitch/LanguageSwitch.tpl.html',
+                templateUrl: 'directives/ExpertMode/ExpertMode.tpl.html',
                 compile: function (el) {
                     var fn = $compile(el);
                     return function (scope) {
                         fn(scope);
                     };
                 },
+                //link: function (scope, element, attrs) {
+                //     // Since we are wrapping the rating directive in this directive, I couldn't use transclude,
+                //     // so I copy the existing attributes manually.
+                //     var attributeString = '';
+                //     for (var key in attrs) {
+                //         if (key.substr(0, 1) !== '$' && attrs.hasOwnProperty(key)) attributeString += key + '="' + attrs[key] + '" ';
+                //     }
+                //     var html = '<rating ng-model="expertMode" '
+                //         + attributeString
+                //         + 'tooltip-html-unsafe="{{\'EXPERTMODE.EXPLANATION\' | translate}}" tooltip-placement="bottom" tooltip-trigger="mouseenter" tooltip-append-to-body="false"'
+                //         + 'max="3"></rating>';
+                //     var e = $compile(html)(scope);
+                //     element.replaceWith(e);
+                // },
                 replace: true,
                 transclude: true,
-                controller: LanguageSwitch.LanguageSwitchCtrl
+                controller: ExpertMode.ExpertModeCtrl
             };
         }
-    ])
-        .provider('$languages', function () {
-        this.languages = [];
-        this.$get = function () {
-            return this.languages;
-        };
-        this.setLanguages = function (languages) {
-            this.languages = languages;
-        };
-    });
-})(LanguageSwitch || (LanguageSwitch = {}));
+    ]);
+})(ExpertMode || (ExpertMode = {}));
 
-var LanguageSwitch;
-(function (LanguageSwitch) {
-    LanguageSwitch.html = '<div class="navbar-collapse collapse">    <ul class="nav navbar-nav">        <li class="dropdown">            <a href=""               class="navbar-brand dropdown-toggle pull-left"               data-toggle="dropdown"               style="color:white; margin-left:-10px;">                <img data-ng-src="{{vm.language.img}}" />                <span class="caret" data-ng-if="vm.$languages.length > 1"></span>            </a>            <ul data-ng-if="vm.$languages.length > 1" class="dropdown-menu" role="menu">                <li ng-repeat="language in vm.$languages">                    <a ng-click="vm.switchLanguage(language)">                        <span>                            <img data-ng-src="{{language.img}}" />                            &nbsp;{{language.name}}                        </span>                    </a>                </li>            </ul>        </li>    </ul></div>';
-})(LanguageSwitch || (LanguageSwitch = {}));
+var ExpertMode;
+(function (ExpertMode) {
+    ExpertMode.html = '<div class="navbar-collapse collapse"     tooltip-html-unsafe="{{\'EXPERTMODE.EXPLANATION\' | translate}}"     tooltip-placement="left"     tooltip-trigger="mouseenter"     tooltip-append-to-body="false">    <ul class="nav navbar-nav">        <li class="dropdown" style="margin-top:-15px">            <a href=""               class="navbar-brand dropdown-toggle pull-left"               data-toggle="dropdown"               style="color:white; margin-left:-10px;">                <div class="circle"><span data-ng-class="vm.getCssClass()" style="width: 32px; height: 32px"></span></div>            </a>            <ul class="dropdown-menu" role="menu">                <li>                    <a data-ng-click="vm.setExpertMode(1)">                        <span class="beginnerUserIcon" style="margin-left: -10px; width: 40px; height: 32px"></span>                        <div translate>EXPERTMODE.BEGINNER</div>                    </a>                </li>                <li>                    <a data-ng-click="vm.setExpertMode(2)">                        <span class="intermediateUserIcon" style="margin-left: -10px; width: 40px; height: 32px"></span>                        <div translate>EXPERTMODE.INTERMEDIATE</div>                    </a>                </li>                <li>                    <a data-ng-click="vm.setExpertMode(3)">                        <span class="expertUserIcon" style="margin-left: -10px; width: 40px; height: 32px"></span>                        <div translate>EXPERTMODE.EXPERT</div>                    </a>                </li>            </ul>        </li>    </ul></div>';
+})(ExpertMode || (ExpertMode = {}));
 
-var LanguageSwitch;
-(function (LanguageSwitch) {
-    var LanguageSwitchCtrl = (function () {
-        // dependencies are injected via AngularJS $injector
-        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
-        function LanguageSwitchCtrl($scope, $translate, $languages, $messageBus) {
+var ExpertMode;
+(function (ExpertMode) {
+    var Expertise = csComp.Services.Expertise;
+    var ExpertModeCtrl = (function () {
+        function ExpertModeCtrl($scope, $localStorageService, $layerService, $mapService, $messageBus) {
+            var _this = this;
             this.$scope = $scope;
-            this.$translate = $translate;
-            this.$languages = $languages;
+            this.$localStorageService = $localStorageService;
+            this.$layerService = $layerService;
+            this.$mapService = $mapService;
             this.$messageBus = $messageBus;
             $scope.vm = this;
-            //this.guiLanguages = $languages;
-            //this.languages.push({ key: 'en', name: 'English', img: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAALCAIAAAD5gJpuAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAflJREFUeNpinDRzn5qN3uFDt16+YWBg+Pv339+KGN0rbVP+//2rW5tf0Hfy/2+mr99+yKpyOl3Ydt8njEWIn8f9zj639NC7j78eP//8739GVUUhNUNuhl8//ysKeZrJ/v7z10Zb2PTQTIY1XZO2Xmfad+f7XgkXxuUrVB6cjPVXef78JyMjA8PFuwyX7gAZj97+T2e9o3d4BWNp84K1NzubTjAB3fH0+fv6N3qP/ir9bW6ozNQCijB8/8zw/TuQ7r4/ndvN5mZgkpPXiis3Pv34+ZPh5t23//79Rwehof/9/NDEgMrOXHvJcrllgpoRN8PFOwy/fzP8+gUlgZI/f/5xcPj/69e/37//AUX+/mXRkN555gsOG2xt/5hZQMwF4r9///75++f3nz8nr75gSms82jfvQnT6zqvXPjC8e/srJQHo9P9fvwNtAHmG4f8zZ6dDc3bIyM2LTNlsbtfM9OPHH3FhtqUz3eXX9H+cOy9ZMB2o6t/Pn0DHMPz/b+2wXGTvPlPGFxdcD+mZyjP8+8MUE6sa7a/xo6Pykn1s4zdzIZ6///8zMGpKM2pKAB0jqy4UE7/msKat6Jw5mafrsxNtWZ6/fjvNLW29qv25pQd///n+5+/fxDDVbcc//P/zx/36m5Ub9zL8+7t66yEROcHK7q5bldMBAgwADcRBCuVLfoEAAAAASUVORK5CYII=' });
-            //this.languages.push({ key: 'nl', name: 'Nederlands', img: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAALCAIAAAD5gJpuAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAFXSURBVHjaYvzPgAD/UNlYEUAAkuTgCAAIBgJggq5VoAs1qM0vdzmMz362vezjokxPGimkEQ5WoAQEKuK71zwCCKyB4c//J8+BShn+/vv/+w/D399AEox+//8FJH/9/wUU+cUoKw20ASCAWBhEDf/LyDOw84BU//kDtgGI/oARmAHRDJQSFwVqAAggxo8fP/Ly8oKc9P8/AxjiAoyMjA8ePAAIIJZ///5BVIM0MOBWDpRlZPzz5w9AALH8gyvCbz7QBrCJAAHEyKDYX15r/+j1199//v35++/Xn7+///77DST/wMl/f4Dk378K4jx7O2cABBALw7NP77/+ev3xB0gOpOHfr99AdX9/gTVASKCGP//+8XCyMjC8AwggFoZfIHWSwpwQk4CW/AYjsKlA8u+ff////v33998/YPgBnQQQQIzAaGNg+AVGf5AYf5BE/oCjGEIyAQQYAGvKZ4C6+xXRAAAAAElFTkSuQmCC' });
-            this.language = $languages[0];
+            $scope.expertMode = $mapService.expertMode;
+            $messageBus.subscribe('expertMode', function (title, mode) {
+                if (title !== 'newExpertise')
+                    return;
+                $scope.expertMode = mode;
+            });
+            $scope.$watch('expertMode', function () {
+                _this.setExpertMode($scope.expertMode);
+            });
         }
-        LanguageSwitchCtrl.prototype.switchLanguage = function (language) {
-            this.language = language;
-            this.$translate.use(language.key);
-            this.$messageBus.publish('language', 'newLanguage', language.key);
+        /**
+        * Get the CSS class to render the mode.
+        */
+        ExpertModeCtrl.prototype.getCssClass = function () {
+            switch (this.$mapService.expertMode) {
+                case Expertise.Beginner:
+                    return 'beginnerUserIcon';
+                    break;
+                case Expertise.Intermediate:
+                    return 'intermediateUserIcon';
+                    break;
+                case Expertise.Expert:
+                    return 'expertUserIcon';
+                    break;
+            }
         };
-        // $inject annotation.
-        // It provides $injector with information about dependencies to be injected into constructor
-        // it is better to have it close to the constructor, because the parameters must match in count and type.
-        // See http  ://docs.angularjs.org/guide/di
-        LanguageSwitchCtrl.$inject = [
+        /**
+        * Set the expert mode: although we assume that each directive is responsible for managing it by listening
+        * to the expertMode.newExpertise message, we already set some common options here.
+        * This is to reduce the dependency on this directive.
+        */
+        ExpertModeCtrl.prototype.setExpertMode = function (expertMode) {
+            this.$messageBus.publish('expertMode', 'newExpertise', expertMode);
+        };
+        ExpertModeCtrl.$inject = [
             '$scope',
-            '$translate',
-            '$languages',
+            'localStorageService',
+            'layerService',
+            'mapService',
             'messageBusService'
         ];
-        return LanguageSwitchCtrl;
+        return ExpertModeCtrl;
     })();
-    LanguageSwitch.LanguageSwitchCtrl = LanguageSwitchCtrl;
-})(LanguageSwitch || (LanguageSwitch = {}));
+    ExpertMode.ExpertModeCtrl = ExpertModeCtrl;
+})(ExpertMode || (ExpertMode = {}));
 
 var LayersDirective;
 (function (LayersDirective) {
@@ -4540,9 +4671,7 @@ var LayersDirective;
 
 var LayersDirective;
 (function (LayersDirective) {
-    LayersDirective.html = '<div>    <h4 class="leftpanel-header" translate="LAYERS"></h4>    <div style="overflow-y: auto; overflow-x: hidden; margin-top: -10px" resize resize-y="95">        <div data-ng-repeat="group in vm.$layerService.project.groups" style="margin-left: 5px">            <div style="float: left; margin-left: -5px; margin-top: 5px" data-toggle="collapse" data-target="#layergroup_{{group.id}}"><i class="fa fa-chevron-down togglebutton toggle-arrow-down"></i><i class="fa fa-chevron-up togglebutton toggle-arrow-up"></i></div>            <div popover="{{(group.description) ? group.description : ';
-    '}}"                 popover-placement="right"                 popover-width="400"                 popover-trigger="mouseenter"                 class="group-title">{{group.title}}</div>            <div id="layergroup_{{group.id}}" class="collapse in">                <div popover="{{(layer.description) ? layer.description : ';
-    '}}"                     popover-placement="right"                     popover-trigger="mouseenter"                     data-ng-repeat="layer in group.layers">                    <!--bs-popover>-->                    <div context-menu="options(layer)" style="list-style-type: none; padding: 0;" data-ng-class="{indent: layer.isSublayer}">                        <style>                            .left-menu{                                background: url("includes/images/menu-left.png");	                            background-position: right bottom;	                            background-repeat: no-repeat;                                position:absolute;                                right:3px;                                top:0;                                width:16px;                                height:16px;                                cursor:pointer;                            }                            .menu {    position:relative;}.menu > .dropdown-menu {    position:static;    display:block;}                        </style>                        <!--<button type="button" class="btn btn-default" data-container="body" data-toggle="popover" data-placement="right" data-content="Vivamus sagittis lacus vel augue laoreet rutrum faucibus." data-original-title="" title="">Right</button>-->                        <div  ng-hide="group.oneLayerActive" class="checkbox checkbox-primary" style="margin-left: 20px">                            <input type="checkbox" id="cblayer{{layer.id}}" ng-model="layer.enabled" data-ng-click="vm.toggleLayer(layer);">                            <label for="cblayer{{layer.id}}">                                {{layer.title}}                            </label>                            <div ng-show="layer.enabled" class="left-menu dropdown-toggle pull-left"  ng-click="vm.openLayerMenu($event)" >                            </div>                            <div ng-show="layer.isLoading" class="spinner">                            <div class="bounce1"></div>                            <div class="bounce2"></div>                            <div class="bounce3"></div>                        </div>                        </div>                        <div ng-show="group.oneLayerActive" class="radio radio-primary" style="margin-left: 20px">                            <input type="radio" ng-value="true" id="rblayer{{layer.id}}" ng-model="layer.enabled" data-ng-click="vm.toggleLayer(layer);">                            <label for="rblayer{{layer.id}}">                                {{layer.title}}                            </label>                            <div ng-show="layer.enabled" class="left-menu dropdown-toggle pull-left"  ng-click="vm.openLayerMenu($event)" >                            </div>                            <div ng-show="layer.isLoading" class="spinner">                            <div class="bounce1"></div>                            <div class="bounce2"></div>                            <div class="bounce3"></div>                        </div>                    </div>                </div>            </div>        </div>    </div></div>';
+    LayersDirective.html = '<div>    <h4 class="leftpanel-header" translate="LAYERS"></h4>    <div style="overflow-y: auto; overflow-x: hidden; margin-top: -10px" resize resize-y="95">        <div data-ng-repeat="group in vm.$layerService.project.groups" style="margin-left: 5px">            <div style="float: left; margin-left: -5px; margin-top: 5px" data-toggle="collapse" data-target="#layergroup_{{group.id}}"><i class="fa fa-chevron-down togglebutton toggle-arrow-down"></i><i class="fa fa-chevron-up togglebutton toggle-arrow-up"></i></div>            <div popover="{{(group.description) ? group.description : \'\'}}"                 popover-placement="right"                 popover-width="400"                 popover-trigger="mouseenter"                 class="group-title">{{group.title}}</div>            <div id="layergroup_{{group.id}}" class="collapse in">                <div popover="{{(layer.description) ? layer.description : \'\'}}"                     popover-placement="right"                     popover-trigger="mouseenter"                     data-ng-repeat="layer in group.layers">                    <!--bs-popover>-->                    <div context-menu="options(layer)" style="list-style-type: none; padding: 0;" data-ng-class="{indent: layer.isSublayer}">                        <style>                            .left-menu{                                background: url("includes/images/menu-left.png");	                            background-position: right bottom;	                            background-repeat: no-repeat;                                position:absolute;                                right:3px;                                top:0;                                width:16px;                                height:16px;                                cursor:pointer;                            }                            .menu {    position:relative;}.menu > .dropdown-menu {    position:static;    display:block;}                        </style>                        <!--<button type="button" class="btn btn-default" data-container="body" data-toggle="popover" data-placement="right" data-content="Vivamus sagittis lacus vel augue laoreet rutrum faucibus." data-original-title="" title="">Right</button>-->                        <div  ng-hide="group.oneLayerActive" class="checkbox checkbox-primary" style="margin-left: 20px">                            <input type="checkbox" id="cblayer{{layer.id}}" ng-model="layer.enabled" data-ng-click="vm.toggleLayer(layer);">                            <label for="cblayer{{layer.id}}">                                {{layer.title}}                            </label>                            <div ng-show="layer.enabled" class="left-menu dropdown-toggle pull-left"  ng-click="vm.openLayerMenu($event)" >                            </div>                            <div ng-show="layer.isLoading" class="spinner">                            <div class="bounce1"></div>                            <div class="bounce2"></div>                            <div class="bounce3"></div>                        </div>                        </div>                        <div ng-show="group.oneLayerActive" class="radio radio-primary" style="margin-left: 20px">                            <input type="radio" ng-value="true" id="rblayer{{layer.id}}" ng-model="layer.enabled" data-ng-click="vm.toggleLayer(layer);">                            <label for="rblayer{{layer.id}}">                                {{layer.title}}                            </label>                            <div ng-show="layer.enabled" class="left-menu dropdown-toggle pull-left"  ng-click="vm.openLayerMenu($event)" >                            </div>                            <div ng-show="layer.isLoading" class="spinner">                            <div class="bounce1"></div>                            <div class="bounce2"></div>                            <div class="bounce3"></div>                        </div>                    </div>                </div>            </div>        </div>    </div></div>';
 })(LayersDirective || (LayersDirective = {}));
 
 var LayersDirective;
@@ -4601,6 +4730,155 @@ var LayersDirective;
     })();
     LayersDirective.LayersDirectiveCtrl = LayersDirectiveCtrl;
 })(LayersDirective || (LayersDirective = {}));
+
+var LegendList;
+(function (LegendList) {
+    /**
+      * Config
+      */
+    var moduleName = 'csComp';
+    /**
+      * Module
+      */
+    LegendList.myModule;
+    try {
+        LegendList.myModule = angular.module(moduleName);
+    }
+    catch (err) {
+        // named module does not exist, so create one
+        LegendList.myModule = angular.module(moduleName, []);
+    }
+    /**
+      * Directive to display the available map layers.
+      */
+    LegendList.myModule.directive('legendList', [
+        '$window', '$compile',
+        function ($window, $compile) {
+            return {
+                terminal: false,
+                restrict: 'E',
+                scope: {},
+                templateUrl: 'directives/LegendList/LegendList.tpl.html',
+                // Directives that want to modify the DOM typically use the link option.link takes a function with the following signature, function link(scope, element, attrs) { ... } where:
+                // scope is an Angular scope object.
+                // element is the jqLite - wrapped element that this directive matches.
+                // attrs is a hash object with key - value pairs of normalized attribute names and their corresponding attribute values.
+                link: function (scope, element, attrs) {
+                    // Deal with resizing the element list
+                    scope.onResizeFunction = function () {
+                        var filterHeight = 50;
+                        var paginationCtrlHeight = 100;
+                        var itemHeight = 60;
+                        //scope.windowHeight          = $window.innerHeight;
+                        //scope.windowWidth           = $window.innerWidth;
+                        scope.numberOfItems = Math.floor(($window.innerHeight - filterHeight - paginationCtrlHeight) / itemHeight);
+                    };
+                    // Call to the function when the page is first loaded
+                    scope.onResizeFunction();
+                    angular.element($window).bind('resize', function () {
+                        scope.onResizeFunction();
+                        scope.$apply();
+                    });
+                },
+                replace: true,
+                transclude: true,
+                controller: LegendList.LegendListCtrl
+            };
+        }
+    ]).directive('bsPopover', function () {
+        return function (scope, element, attrs) {
+            element.find("a[rel=popover]").popover({ placement: 'right', html: 'true' });
+        };
+    });
+})(LegendList || (LegendList = {}));
+
+var LegendList;
+(function (LegendList) {
+    LegendList.html = '<div style="position: relative;">    <h4 class="leftpanel-header" translate="LEGEND"></h4>    <div>        <div ng-repeat="legendItem in legendItems" class="legendItem">            <div class="legendIcon">                <img ng-src="{{legendItem.uri}}" class="legendImage" />            </div>            <span class="legendText">{{legendItem.title}}</span>        </div>    </div></div>';
+})(LegendList || (LegendList = {}));
+
+var LegendList;
+(function (LegendList) {
+    var LegendListCtrl = (function () {
+        // dependencies are injected via AngularJS $injector
+        // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
+        function LegendListCtrl($scope, $layerService, $mapService, $messageBusService) {
+            var _this = this;
+            this.$scope = $scope;
+            this.$layerService = $layerService;
+            this.$mapService = $mapService;
+            this.$messageBusService = $messageBusService;
+            $scope.vm = this;
+            $messageBusService.subscribe('project', function () {
+                // Update the legend when a project is loaded.
+                _this.updateLegendItems();
+            });
+            $messageBusService.subscribe('layer', function () {
+                // Update the legend when a layer is added or removed.
+                _this.updateLegendItems();
+            });
+            this.updateLegendItems();
+            $scope.legendItems = [];
+            $scope.numberOfItems = 10; // This is being reset in the directive upon receiving a resize.
+        }
+        LegendListCtrl.prototype.updateLegendItems = function () {
+            var legendItems = [];
+            var existingItems = [];
+            for (var key in this.$layerService.featureTypes) {
+                var ft = this.$layerService.featureTypes[key];
+                var uri = this.getImageUri(ft);
+                var title = this.getName(key, ft);
+                var existingItem = name + uri;
+                if (existingItems.indexOf(existingItem) < 0) {
+                    existingItems.push(existingItem);
+                    legendItems.push({ "title": title, "uri": uri });
+                }
+            }
+            legendItems.sort(function (a, b) {
+                if (a.title > b.title)
+                    return 1;
+                if (a.title < b.title)
+                    return -1;
+                return 0;
+            });
+            this.$scope.legendItems = legendItems;
+        };
+        LegendListCtrl.prototype.getImageUri = function (ft) {
+            var iconUri = ft.style.iconUri;
+            if (iconUri == null)
+                iconUri = "includes/images/marker.png";
+            if (iconUri.indexOf('{') >= 0)
+                iconUri = iconUri.replace('{', '').replace('}', '');
+            if (ft.style != null && ft.style.drawingMode != null && ft.style.drawingMode.toLowerCase() != "point") {
+                if (iconUri.indexOf('_Media') < 0)
+                    return iconUri;
+                else
+                    return "includes/images/polygon.png";
+            }
+            else if (ft.style != null && iconUri != null) {
+                return iconUri;
+            }
+            else {
+                return "includes/images/marker.png";
+            }
+        };
+        LegendListCtrl.prototype.getName = function (key, ft) {
+            return ft.name || key.replace('_Default', '');
+        };
+        // $inject annotation.
+        // It provides $injector with information about dependencies to be injected into constructor
+        // it is better to have it close to the constructor, because the parameters must match in count and type.
+        // See http://docs.angularjs.org/guide/di
+        LegendListCtrl.$inject = [
+            '$scope',
+            'layerService',
+            'mapService',
+            'messageBusService'
+        ];
+        return LegendListCtrl;
+    })();
+    LegendList.LegendListCtrl = LegendListCtrl;
+})(LegendList || (LegendList = {}));
 
 var Heatmap;
 (function (Heatmap) {
@@ -5530,8 +5808,8 @@ var Heatmap;
     Heatmap.IdealityMeasure = IdealityMeasure;
 })(Heatmap || (Heatmap = {}));
 
-var LegendList;
-(function (LegendList) {
+var LanguageSwitch;
+(function (LanguageSwitch) {
     /**
       * Config
       */
@@ -5539,145 +5817,89 @@ var LegendList;
     /**
       * Module
       */
-    LegendList.myModule;
+    LanguageSwitch.myModule;
     try {
-        LegendList.myModule = angular.module(moduleName);
+        LanguageSwitch.myModule = angular.module(moduleName);
     }
     catch (err) {
         // named module does not exist, so create one
-        LegendList.myModule = angular.module(moduleName, []);
+        LanguageSwitch.myModule = angular.module(moduleName, []);
     }
     /**
       * Directive to display the available map layers.
       */
-    LegendList.myModule.directive('legendList', [
-        '$window', '$compile',
-        function ($window, $compile) {
+    LanguageSwitch.myModule
+        .directive('languageSwitch', [
+        '$compile',
+        function ($compile) {
             return {
-                terminal: false,
+                terminal: true,
                 restrict: 'E',
                 scope: {},
-                templateUrl: 'directives/LegendList/LegendList.tpl.html',
-                // Directives that want to modify the DOM typically use the link option.link takes a function with the following signature, function link(scope, element, attrs) { ... } where:
-                // scope is an Angular scope object.
-                // element is the jqLite - wrapped element that this directive matches.
-                // attrs is a hash object with key - value pairs of normalized attribute names and their corresponding attribute values.
-                link: function (scope, element, attrs) {
-                    // Deal with resizing the element list
-                    scope.onResizeFunction = function () {
-                        var filterHeight = 50;
-                        var paginationCtrlHeight = 100;
-                        var itemHeight = 60;
-                        //scope.windowHeight          = $window.innerHeight;
-                        //scope.windowWidth           = $window.innerWidth;
-                        scope.numberOfItems = Math.floor(($window.innerHeight - filterHeight - paginationCtrlHeight) / itemHeight);
+                templateUrl: 'directives/LanguageSwitch/LanguageSwitch.tpl.html',
+                compile: function (el) {
+                    var fn = $compile(el);
+                    return function (scope) {
+                        fn(scope);
                     };
-                    // Call to the function when the page is first loaded
-                    scope.onResizeFunction();
-                    angular.element($window).bind('resize', function () {
-                        scope.onResizeFunction();
-                        scope.$apply();
-                    });
                 },
                 replace: true,
                 transclude: true,
-                controller: LegendList.LegendListCtrl
+                controller: LanguageSwitch.LanguageSwitchCtrl
             };
         }
-    ]).directive('bsPopover', function () {
-        return function (scope, element, attrs) {
-            element.find("a[rel=popover]").popover({ placement: 'right', html: 'true' });
+    ])
+        .provider('$languages', function () {
+        this.languages = [];
+        this.$get = function () {
+            return this.languages;
+        };
+        this.setLanguages = function (languages) {
+            this.languages = languages;
         };
     });
-})(LegendList || (LegendList = {}));
+})(LanguageSwitch || (LanguageSwitch = {}));
 
-var LegendList;
-(function (LegendList) {
-    LegendList.html = '<div style="position: relative;">    <h4 class="leftpanel-header" translate="LEGEND"></h4>    <div>        <div ng-repeat="legendItem in legendItems" class="legendItem">            <div class="legendIcon">                <img ng-src="{{legendItem.uri}}" class="legendImage" />            </div>            <span class="legendText">{{legendItem.title}}</span>        </div>    </div></div>';
-})(LegendList || (LegendList = {}));
+var LanguageSwitch;
+(function (LanguageSwitch) {
+    LanguageSwitch.html = '<div class="navbar-collapse collapse">    <ul class="nav navbar-nav">        <li class="dropdown">            <a href=""               class="navbar-brand dropdown-toggle pull-left"               data-toggle="dropdown"               style="color:white; margin-left:-10px;">                <img data-ng-src="{{vm.language.img}}" />                <span class="caret" data-ng-if="vm.$languages.length > 1"></span>            </a>            <ul data-ng-if="vm.$languages.length > 1" class="dropdown-menu" role="menu">                <li ng-repeat="language in vm.$languages">                    <a ng-click="vm.switchLanguage(language)">                        <span>                            <img data-ng-src="{{language.img}}" />                            &nbsp;{{language.name}}                        </span>                    </a>                </li>            </ul>        </li>    </ul></div>';
+})(LanguageSwitch || (LanguageSwitch = {}));
 
-var LegendList;
-(function (LegendList) {
-    var LegendListCtrl = (function () {
+var LanguageSwitch;
+(function (LanguageSwitch) {
+    var LanguageSwitchCtrl = (function () {
         // dependencies are injected via AngularJS $injector
         // controller's name is registered in Application.ts and specified from ng-controller attribute in index.html
-        function LegendListCtrl($scope, $layerService, $mapService, $messageBusService) {
-            var _this = this;
+        function LanguageSwitchCtrl($scope, $translate, $languages, $messageBus) {
             this.$scope = $scope;
-            this.$layerService = $layerService;
-            this.$mapService = $mapService;
-            this.$messageBusService = $messageBusService;
+            this.$translate = $translate;
+            this.$languages = $languages;
+            this.$messageBus = $messageBus;
             $scope.vm = this;
-            $messageBusService.subscribe('project', function () {
-                // Update the legend when a project is loaded.
-                _this.updateLegendItems();
-            });
-            $messageBusService.subscribe('layer', function () {
-                // Update the legend when a layer is added or removed.
-                _this.updateLegendItems();
-            });
-            this.updateLegendItems();
-            $scope.legendItems = [];
-            $scope.numberOfItems = 10; // This is being reset in the directive upon receiving a resize.
+            //this.guiLanguages = $languages;
+            //this.languages.push({ key: 'en', name: 'English', img: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAALCAIAAAD5gJpuAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAflJREFUeNpinDRzn5qN3uFDt16+YWBg+Pv339+KGN0rbVP+//2rW5tf0Hfy/2+mr99+yKpyOl3Ydt8njEWIn8f9zj639NC7j78eP//8739GVUUhNUNuhl8//ysKeZrJ/v7z10Zb2PTQTIY1XZO2Xmfad+f7XgkXxuUrVB6cjPVXef78JyMjA8PFuwyX7gAZj97+T2e9o3d4BWNp84K1NzubTjAB3fH0+fv6N3qP/ir9bW6ozNQCijB8/8zw/TuQ7r4/ndvN5mZgkpPXiis3Pv34+ZPh5t23//79Rwehof/9/NDEgMrOXHvJcrllgpoRN8PFOwy/fzP8+gUlgZI/f/5xcPj/69e/37//AUX+/mXRkN555gsOG2xt/5hZQMwF4r9///75++f3nz8nr75gSms82jfvQnT6zqvXPjC8e/srJQHo9P9fvwNtAHmG4f8zZ6dDc3bIyM2LTNlsbtfM9OPHH3FhtqUz3eXX9H+cOy9ZMB2o6t/Pn0DHMPz/b+2wXGTvPlPGFxdcD+mZyjP8+8MUE6sa7a/xo6Pykn1s4zdzIZ6///8zMGpKM2pKAB0jqy4UE7/msKat6Jw5mafrsxNtWZ6/fjvNLW29qv25pQd///n+5+/fxDDVbcc//P/zx/36m5Ub9zL8+7t66yEROcHK7q5bldMBAgwADcRBCuVLfoEAAAAASUVORK5CYII=' });
+            //this.languages.push({ key: 'nl', name: 'Nederlands', img: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAALCAIAAAD5gJpuAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAFXSURBVHjaYvzPgAD/UNlYEUAAkuTgCAAIBgJggq5VoAs1qM0vdzmMz362vezjokxPGimkEQ5WoAQEKuK71zwCCKyB4c//J8+BShn+/vv/+w/D399AEox+//8FJH/9/wUU+cUoKw20ASCAWBhEDf/LyDOw84BU//kDtgGI/oARmAHRDJQSFwVqAAggxo8fP/Ly8oKc9P8/AxjiAoyMjA8ePAAIIJZ///5BVIM0MOBWDpRlZPzz5w9AALH8gyvCbz7QBrCJAAHEyKDYX15r/+j1199//v35++/Xn7+///77DST/wMl/f4Dk378K4jx7O2cABBALw7NP77/+ev3xB0gOpOHfr99AdX9/gTVASKCGP//+8XCyMjC8AwggFoZfIHWSwpwQk4CW/AYjsKlA8u+ff////v33998/YPgBnQQQQIzAaGNg+AVGf5AYf5BE/oCjGEIyAQQYAGvKZ4C6+xXRAAAAAElFTkSuQmCC' });
+            this.language = $languages[0];
         }
-        LegendListCtrl.prototype.updateLegendItems = function () {
-            var legendItems = [];
-            var existingItems = [];
-            for (var key in this.$layerService.featureTypes) {
-                var ft = this.$layerService.featureTypes[key];
-                var uri = this.getImageUri(ft);
-                var title = this.getName(key, ft);
-                var existingItem = name + uri;
-                if (existingItems.indexOf(existingItem) < 0) {
-                    existingItems.push(existingItem);
-                    legendItems.push({ "title": title, "uri": uri });
-                }
-            }
-            legendItems.sort(function (a, b) {
-                if (a.title > b.title)
-                    return 1;
-                if (a.title < b.title)
-                    return -1;
-                return 0;
-            });
-            this.$scope.legendItems = legendItems;
-        };
-        LegendListCtrl.prototype.getImageUri = function (ft) {
-            var iconUri = ft.style.iconUri;
-            if (iconUri == null)
-                iconUri = "includes/images/marker.png";
-            if (iconUri.indexOf('{') >= 0)
-                iconUri = iconUri.replace('{', '').replace('}', '');
-            if (ft.style != null && ft.style.drawingMode != null && ft.style.drawingMode.toLowerCase() != "point") {
-                if (iconUri.indexOf('_Media') < 0)
-                    return iconUri;
-                else
-                    return "includes/images/polygon.png";
-            }
-            else if (ft.style != null && iconUri != null) {
-                return iconUri;
-            }
-            else {
-                return "includes/images/marker.png";
-            }
-        };
-        LegendListCtrl.prototype.getName = function (key, ft) {
-            return ft.name || key.replace('_Default', '');
+        LanguageSwitchCtrl.prototype.switchLanguage = function (language) {
+            this.language = language;
+            this.$translate.use(language.key);
+            this.$messageBus.publish('language', 'newLanguage', language.key);
         };
         // $inject annotation.
         // It provides $injector with information about dependencies to be injected into constructor
         // it is better to have it close to the constructor, because the parameters must match in count and type.
-        // See http://docs.angularjs.org/guide/di
-        LegendListCtrl.$inject = [
+        // See http  ://docs.angularjs.org/guide/di
+        LanguageSwitchCtrl.$inject = [
             '$scope',
-            'layerService',
-            'mapService',
+            '$translate',
+            '$languages',
             'messageBusService'
         ];
-        return LegendListCtrl;
+        return LanguageSwitchCtrl;
     })();
-    LegendList.LegendListCtrl = LegendListCtrl;
-})(LegendList || (LegendList = {}));
+    LanguageSwitch.LanguageSwitchCtrl = LanguageSwitchCtrl;
+})(LanguageSwitch || (LanguageSwitch = {}));
 
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -7659,6 +7881,60 @@ var StyleList;
     StyleList.StyleListCtrl = StyleListCtrl;
 })(StyleList || (StyleList = {}));
 
+var Voting;
+(function (Voting) {
+    /**
+      * Config
+      */
+    var moduleName = 'csComp';
+    /**
+      * Module
+      */
+    Voting.myModule;
+    try {
+        Voting.myModule = angular.module(moduleName);
+    }
+    catch (err) {
+        // named module does not exist, so create one
+        Voting.myModule = angular.module(moduleName, []);
+    }
+    /**
+      * Directive to display an MCA control.
+      */
+    Voting.myModule.directive('voting', ['$timeout', function ($timeout) {
+            return {
+                restrict: 'EA',
+                require: '^ngModel',
+                scope: {
+                    min: '=',
+                    max: '=',
+                    ngModel: '=',
+                    ngChange: '&'
+                },
+                template: '<div style="line-height: 12px; vertical-align: top; margin: 0; background: rgba(0, 0, 0, 0.1); border-radius: 6px; padding: 4px 6px;">' +
+                    '<a href="" data-ng-click="decrement()" data-ng-disabled="ngModel <= min" style="float: left;"><i class="fa" data-ng-class="{true: \'fa-minus-square\', false: \'fa-minus-square-o\'}[ngModel > min]"></i></a>' +
+                    '<span style="float: left; width:28px; text-align: center;">{{ngModel}}</span>' +
+                    '<a href="" data-ng-click="increment()" data-ng-disabled="ngModel >= max"><i class="fa" data-ng-class="{true: \'fa-plus-square\' , false: \'fa-plus-square-o\' }[ngModel < max]"></i></a>' +
+                    '</div>',
+                link: function ($scope) {
+                    $scope.increment = function () {
+                        if ($scope.ngModel >= $scope.max)
+                            return;
+                        $scope.ngModel++;
+                        $timeout($scope.ngChange, 0);
+                    };
+                    $scope.decrement = function () {
+                        if ($scope.ngModel <= $scope.min)
+                            return;
+                        $scope.ngModel--;
+                        $timeout($scope.ngChange, 0);
+                    };
+                }
+            };
+        }
+    ]);
+})(Voting || (Voting = {}));
+
 var Timeline;
 (function (Timeline) {
     // The following class represents the provider
@@ -8005,60 +8281,6 @@ var Timeline;
     })();
     Timeline.TimelineCtrl = TimelineCtrl;
 })(Timeline || (Timeline = {}));
-
-var Voting;
-(function (Voting) {
-    /**
-      * Config
-      */
-    var moduleName = 'csComp';
-    /**
-      * Module
-      */
-    Voting.myModule;
-    try {
-        Voting.myModule = angular.module(moduleName);
-    }
-    catch (err) {
-        // named module does not exist, so create one
-        Voting.myModule = angular.module(moduleName, []);
-    }
-    /**
-      * Directive to display an MCA control.
-      */
-    Voting.myModule.directive('voting', ['$timeout', function ($timeout) {
-            return {
-                restrict: 'EA',
-                require: '^ngModel',
-                scope: {
-                    min: '=',
-                    max: '=',
-                    ngModel: '=',
-                    ngChange: '&'
-                },
-                template: '<div style="line-height: 12px; vertical-align: top; margin: 0; background: rgba(0, 0, 0, 0.1); border-radius: 6px; padding: 4px 6px;">' +
-                    '<a href="" data-ng-click="decrement()" data-ng-disabled="ngModel <= min" style="float: left;"><i class="fa" data-ng-class="{true: \'fa-minus-square\', false: \'fa-minus-square-o\'}[ngModel > min]"></i></a>' +
-                    '<span style="float: left; width:28px; text-align: center;">{{ngModel}}</span>' +
-                    '<a href="" data-ng-click="increment()" data-ng-disabled="ngModel >= max"><i class="fa" data-ng-class="{true: \'fa-plus-square\' , false: \'fa-plus-square-o\' }[ngModel < max]"></i></a>' +
-                    '</div>',
-                link: function ($scope) {
-                    $scope.increment = function () {
-                        if ($scope.ngModel >= $scope.max)
-                            return;
-                        $scope.ngModel++;
-                        $timeout($scope.ngChange, 0);
-                    };
-                    $scope.decrement = function () {
-                        if ($scope.ngModel <= $scope.min)
-                            return;
-                        $scope.ngModel--;
-                        $timeout($scope.ngChange, 0);
-                    };
-                }
-            };
-        }
-    ]);
-})(Voting || (Voting = {}));
 
 var csComp;
 (function (csComp) {
@@ -9680,7 +9902,6 @@ var csComp;
                                     for (var s in ds.sensors) {
                                         var ss = ds.sensors[s];
                                         ss.activeValue = ss.values[ss.values.length - 1];
-                                        console.log(ss.activeValue);
                                     }
                                 });
                             }
@@ -10691,7 +10912,6 @@ var csComp;
                         });
                     },
                     // Callback
-                    // Callback
                     function () {
                         callback(layer);
                     }
@@ -10876,7 +11096,6 @@ var csComp;
                         layer.isLoading = false;
                         cb(null, null);
                     },
-                    // Callback
                     // Callback
                     function () {
                         callback(layer);

@@ -14,7 +14,7 @@
     "datasources": [
         {
             "url": "/datasource",
-            "type" : "dynamic"
+            "type" : "static"
         }
     ],
     "dashboards": [
@@ -46,17 +46,12 @@
                     "width": "225px",
                     "height": "435px",
                     "data": {
-                        "title": "Air Quality 2",
+                        "title": "Air Quality",
                         "indicators": [
-                            {
-                                "title": "Air Quality Level",
-                                "visual": "circular",
-                                "sensor": "datasource/test"
-                            },
                             {
                                 "title": "N02",
                                 "visual": "sparkline",
-                                "sensor": "datasource/test"                                
+                                "sensor": "datasource/test"
                             }
                         ]
                     }
@@ -2974,19 +2969,6 @@
                     "enabled": false,
                     "opacity": 50
                 }
-            ]
-        },
-        {
-            "title": "us test",
-            "layers": [
-                {
-                    "description": "US test",
-                    "type": "tilelayer",
-                    "title": "US",
-                    "url": "http://airapp.lohman-solutions.com/Tiles/{z}/{x}/{y}/hour_0.png",
-                    "opacity": 25
-                }
-
             ]
         },
         {

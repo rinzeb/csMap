@@ -95,12 +95,11 @@ gulp.task('minify_csComp', function() {
 });
 
 gulp.task('include_js', function() {
-    gulp.src('../../../csWeb/csComp/includes/**/*.js')
-        .pipe(plumber())
-        .pipe(uglify())
-        .pipe(rename({
-            suffix: '.min'
+    gulp.src('../../../csWeb/csComp/includes/js/**/*.*')
+        .pipe(debug({
+            title: 'include_js:'
         }))
+        .pipe(plumber())
         .pipe(gulp.dest('./public/js/cs'));
 });
 
