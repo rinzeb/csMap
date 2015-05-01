@@ -230,10 +230,13 @@ declare module csComp.Services {
         timestamps: number[];
         values: any[];
         activeValue: any;
+        addValue(date: number, value: number): void;
     }
     class DataSource {
         id: string;
         url: string;
+        /** static, dynamic */
+        type: string;
         title: string;
         sensors: {
             (key: string): SensorSet;
@@ -502,6 +505,7 @@ declare module csComp.Services {
         id: string;
         description: string;
         legendKind: string;
+        visualAspect: string;
         legendEntries: LegendEntry[];
     }
     class LegendEntry {
@@ -685,6 +689,8 @@ declare module csComp.Services {
         disableCache: boolean;
         /** key attached for identifying to */
         cacheKey: string;
+        /** handle for receiving server events */
+        serverHandle: MessageBusHandle;
     }
     /**
      * Baselayers are background maps (e.g. openstreetmap, nokia here, etc).
@@ -974,6 +980,7 @@ declare module Charts {
         sensor: number[];
         width?: number;
         height?: number;
+        closed?: boolean;
         margin?: {
             top: number;
             right: number;
@@ -1358,30 +1365,6 @@ declare module FeatureProps {
     }
 }
 
-declare module FilterList {
-    /**
-      * Module
-      */
-    var myModule: any;
-}
-
-declare module FilterList {
-    var html: string;
-}
-
-declare module FilterList {
-    interface IFilterListScope extends ng.IScope {
-        vm: FilterListCtrl;
-    }
-    class FilterListCtrl {
-        private $scope;
-        private $layerService;
-        private scope;
-        static $inject: string[];
-        constructor($scope: IFilterListScope, $layerService: csComp.Services.LayerService);
-    }
-}
-
 declare module FeatureRelations {
     /**
       * Module
@@ -1430,6 +1413,76 @@ declare module FeatureRelations {
     }
 }
 
+declare module FilterList {
+    /**
+      * Module
+      */
+    var myModule: any;
+}
+
+declare module FilterList {
+    var html: string;
+}
+
+declare module FilterList {
+    interface IFilterListScope extends ng.IScope {
+        vm: FilterListCtrl;
+    }
+    class FilterListCtrl {
+        private $scope;
+        private $layerService;
+        private scope;
+        static $inject: string[];
+        constructor($scope: IFilterListScope, $layerService: csComp.Services.LayerService);
+    }
+}
+
+declare module Indicators {
+    /**
+      * Module
+      */
+    var myModule: any;
+}
+
+declare module Indicators {
+    var html: string;
+}
+
+declare module Indicators {
+    class indicatorData {
+        title: string;
+        indicators: indicator[];
+    }
+    class indicator {
+        title: string;
+        visual: string;
+        type: string;
+        sensor: string;
+        sensorSet: csComp.Services.SensorSet;
+        layer: string;
+        isActive: boolean;
+        id: string;
+        indexValue: number;
+    }
+    interface ILayersDirectiveScope extends ng.IScope {
+        vm: LayersDirectiveCtrl;
+        data: indicatorData;
+    }
+    class LayersDirectiveCtrl {
+        private $scope;
+        private $layerService;
+        private $messageBus;
+        private $mapService;
+        private scope;
+        private widget;
+        static $inject: string[];
+        constructor($scope: ILayersDirectiveScope, $layerService: csComp.Services.LayerService, $messageBus: csComp.Services.MessageBusService, $mapService: csComp.Services.MapService);
+        updateIndicator(i: indicator): void;
+        private checkLayers();
+        selectIndicator(i: indicator): void;
+    }
+}
+
 declare module LanguageSwitch {
     /**
       * Module
@@ -1463,49 +1516,6 @@ declare module LanguageSwitch {
     }
 }
 
-declare module Indicators {
-    /**
-      * Module
-      */
-    var myModule: any;
-}
-
-declare module Indicators {
-    var html: string;
-}
-
-declare module Indicators {
-    class indicatorData {
-        title: string;
-        indicators: indicator[];
-    }
-    class indicator {
-        title: string;
-        visual: string;
-        type: string;
-        sensor: string;
-        sensorSet: csComp.Services.SensorSet;
-        layer: string;
-        isActive: boolean;
-        id: string;
-    }
-    interface ILayersDirectiveScope extends ng.IScope {
-        vm: LayersDirectiveCtrl;
-        data: indicatorData;
-    }
-    class LayersDirectiveCtrl {
-        private $scope;
-        private $layerService;
-        private $messageBus;
-        private scope;
-        private widget;
-        static $inject: string[];
-        constructor($scope: ILayersDirectiveScope, $layerService: csComp.Services.LayerService, $messageBus: csComp.Services.MessageBusService);
-        private checkLayers();
-        selectIndicator(i: indicator): void;
-    }
-}
-
 declare module LayersDirective {
     /**
       * Module
@@ -1530,40 +1540,6 @@ declare module LayersDirective {
         constructor($scope: ILayersDirectiveScope, $layerService: csComp.Services.LayerService);
         openLayerMenu(e: any): void;
         toggleLayer(layer: csComp.Services.ProjectLayer): void;
-    }
-}
-
-declare module LegendList {
-    /**
-      * Module
-      */
-    var myModule: any;
-}
-
-declare module LegendList {
-    var html: string;
-}
-
-declare module LegendList {
-    interface ILegendItem {
-        title: string;
-        uri: string;
-    }
-    interface ILegendListScope extends ng.IScope {
-        vm: LegendListCtrl;
-        numberOfItems: number;
-        legendItems: ILegendItem[];
-    }
-    class LegendListCtrl {
-        private $scope;
-        private $layerService;
-        private $mapService;
-        private $messageBusService;
-        static $inject: string[];
-        constructor($scope: ILegendListScope, $layerService: csComp.Services.LayerService, $mapService: csComp.Services.MapService, $messageBusService: csComp.Services.MessageBusService);
-        private updateLegendItems();
-        private getImageUri(ft);
-        private getName(key, ft);
     }
 }
 
@@ -1879,33 +1855,37 @@ declare module Heatmap {
     }
 }
 
-declare module MapElement {
+declare module LegendList {
     /**
       * Module
       */
     var myModule: any;
 }
 
-declare module MapElement {
+declare module LegendList {
     var html: string;
 }
 
-declare module MapElement {
-    interface IMapElementScope extends ng.IScope {
-        vm: MapElementCtrl;
-        mapid: string;
-        initMap: Function;
+declare module LegendList {
+    interface ILegendItem {
+        title: string;
+        uri: string;
     }
-    class MapElementCtrl {
+    interface ILegendListScope extends ng.IScope {
+        vm: LegendListCtrl;
+        numberOfItems: number;
+        legendItems: ILegendItem[];
+    }
+    class LegendListCtrl {
         private $scope;
         private $layerService;
-        private mapService;
+        private $mapService;
         private $messageBusService;
-        private scope;
-        private locale;
         static $inject: string[];
-        constructor($scope: IMapElementScope, $layerService: csComp.Services.LayerService, mapService: csComp.Services.MapService, $messageBusService: csComp.Services.MessageBusService);
-        initMap(): void;
+        constructor($scope: ILegendListScope, $layerService: csComp.Services.LayerService, $mapService: csComp.Services.MapService, $messageBusService: csComp.Services.MessageBusService);
+        private updateLegendItems();
+        private getImageUri(ft);
+        private getName(key, ft);
     }
 }
 
@@ -2145,6 +2125,36 @@ declare module McaEditorView {
     var html: string;
 }
 
+declare module MapElement {
+    /**
+      * Module
+      */
+    var myModule: any;
+}
+
+declare module MapElement {
+    var html: string;
+}
+
+declare module MapElement {
+    interface IMapElementScope extends ng.IScope {
+        vm: MapElementCtrl;
+        mapid: string;
+        initMap: Function;
+    }
+    class MapElementCtrl {
+        private $scope;
+        private $layerService;
+        private mapService;
+        private $messageBusService;
+        private scope;
+        private locale;
+        static $inject: string[];
+        constructor($scope: IMapElementScope, $layerService: csComp.Services.LayerService, mapService: csComp.Services.MapService, $messageBusService: csComp.Services.MessageBusService);
+        initMap(): void;
+    }
+}
+
 declare module OfflineSearch {
     /**
       * Module
@@ -2335,6 +2345,30 @@ declare module ShowModal {
     var myModule: any;
 }
 
+declare module StyleList {
+    /**
+      * Module
+      */
+    var myModule: any;
+}
+
+declare module StyleList {
+    var html: string;
+}
+
+declare module StyleList {
+    interface IStyleListScope extends ng.IScope {
+        vm: StyleListCtrl;
+    }
+    class StyleListCtrl {
+        private $scope;
+        private $layerService;
+        private scope;
+        static $inject: string[];
+        constructor($scope: IStyleListScope, $layerService: csComp.Services.LayerService);
+    }
+}
+
 declare module Timeline {
     interface ITimelineService {
         getTimelineOptions(): csComp.Services.ITimelineOptions;
@@ -2395,30 +2429,6 @@ declare module Timeline {
     }
 }
 
-declare module StyleList {
-    /**
-      * Module
-      */
-    var myModule: any;
-}
-
-declare module StyleList {
-    var html: string;
-}
-
-declare module StyleList {
-    interface IStyleListScope extends ng.IScope {
-        vm: StyleListCtrl;
-    }
-    class StyleListCtrl {
-        private $scope;
-        private $layerService;
-        private scope;
-        static $inject: string[];
-        constructor($scope: IStyleListScope, $layerService: csComp.Services.LayerService);
-    }
-}
-
 declare module Voting {
     /**
       * Module
@@ -2459,9 +2469,15 @@ declare module csComp.Services {
         cache: {
             [topic: string]: Array<IMessageBusCallback>;
         };
+        subscriptions: {
+            [id: string]: ServerSubscription;
+        };
         socket: any;
         events: IMessageEvent;
         constructor(id: string, url: string);
+        unsubscribe(id: string, callback: IMessageBusCallback): void;
+        reSubscribeAll(): void;
+        subscribe(target: string, type: string, callback: IMessageBusCallback): ServerSubscription;
         connect(callback: Function): void;
         disconnect(): void;
     }
@@ -2470,6 +2486,14 @@ declare module csComp.Services {
         BottomLeft = 1,
         TopRight = 2,
         TopLeft = 3,
+    }
+    class ServerSubscription {
+        target: string;
+        type: string;
+        callbacks: Array<IMessageBusCallback>;
+        id: string;
+        serverCallback: any;
+        constructor(target: string, type: string);
     }
     /**
      * Simple message bus service, used for subscribing and unsubsubscribing to topics.
@@ -2484,7 +2508,8 @@ declare module csComp.Services {
         getConnection(id: string): Connection;
         initConnection(id: string, url: string, callback: Function): void;
         serverPublish(topic: string, message: any, serverId?: string): any;
-        serverSubscribe(topic: string, callback: IMessageBusCallback, serverId?: string): MessageBusHandle;
+        serverSubscribe(target: string, type: string, callback: IMessageBusCallback, serverId?: string): MessageBusHandle;
+        serverUnsubscribe(handle: MessageBusHandle, serverId?: string): any;
         /**
          * Publish a notification that needs to be translated
          * @title:       the translation key of the notification's title
@@ -2547,6 +2572,37 @@ declare module csComp.Services {
         private $layerService;
         static $inject: string[];
         constructor($messageBusService: Services.MessageBusService, $layerService: Services.LayerService);
+    }
+}
+
+declare module csComp.Services {
+    class DashboardService {
+        private $rootScope;
+        private $compile;
+        private $location;
+        private $translate;
+        private $messageBusService;
+        private $layerService;
+        private $mapService;
+        maxBounds: IBoundingBox;
+        featureDashboard: csComp.Services.Dashboard;
+        mainDashboard: csComp.Services.Dashboard;
+        editMode: boolean;
+        activeWidget: IWidget;
+        dashboards: any;
+        widgetTypes: {
+            [key: string]: IWidget;
+        };
+        socket: any;
+        init(): void;
+        static $inject: string[];
+        constructor($rootScope: any, $compile: any, $location: ng.ILocationService, $translate: ng.translate.ITranslateService, $messageBusService: Services.MessageBusService, $layerService: Services.LayerService, $mapService: Services.MapService);
+        selectDashboard(dashboard: csComp.Services.Dashboard, container: string): void;
+        addNewWidget(widget: IWidget, dashboard: Dashboard): IWidget;
+        updateWidget(widget: csComp.Services.IWidget): void;
+        addWidget(widget: IWidget): IWidget;
+        editWidget(widget: csComp.Services.IWidget): void;
+        removeWidget(): void;
     }
 }
 
@@ -2646,7 +2702,7 @@ declare module csComp.Services {
         private initLayerSources();
         loadRequiredLayers(layer: ProjectLayer): void;
         addLayer(layer: ProjectLayer): void;
-        checkLayerLegend(layer: ProjectLayer): void;
+        checkLayerLegend(layer: ProjectLayer, property: string): void;
         checkLayerTimer(layer: ProjectLayer): void;
         removeStyle(style: GroupStyle): void;
         updatePropertyStyle(k: string, v: any, parent: any): void;
@@ -2761,6 +2817,8 @@ declare module csComp.Services {
          * @params layers: Optionally provide a semi-colon separated list of layer IDs that should be opened.
          */
         openProject(url: string, layers?: string): void;
+        checkDataSourceSubscriptions(ds: DataSource): void;
+        checkSubscriptions(): void;
         closeProject(): void;
         findSensorSet(key: string, callback: Function): any;
         /**
@@ -2785,37 +2843,6 @@ declare module csComp.Services {
          */
         private updateMapFilter(group);
         private resetMapFilter(group);
-    }
-}
-
-declare module csComp.Services {
-    class DashboardService {
-        private $rootScope;
-        private $compile;
-        private $location;
-        private $translate;
-        private $messageBusService;
-        private $layerService;
-        private $mapService;
-        maxBounds: IBoundingBox;
-        featureDashboard: csComp.Services.Dashboard;
-        mainDashboard: csComp.Services.Dashboard;
-        editMode: boolean;
-        activeWidget: IWidget;
-        dashboards: any;
-        widgetTypes: {
-            [key: string]: IWidget;
-        };
-        socket: any;
-        init(): void;
-        static $inject: string[];
-        constructor($rootScope: any, $compile: any, $location: ng.ILocationService, $translate: ng.translate.ITranslateService, $messageBusService: Services.MessageBusService, $layerService: Services.LayerService, $mapService: Services.MapService);
-        selectDashboard(dashboard: csComp.Services.Dashboard, container: string): void;
-        addNewWidget(widget: IWidget, dashboard: Dashboard): IWidget;
-        updateWidget(widget: csComp.Services.IWidget): void;
-        addWidget(widget: IWidget): IWidget;
-        editWidget(widget: csComp.Services.IWidget): void;
-        removeWidget(): void;
     }
 }
 
