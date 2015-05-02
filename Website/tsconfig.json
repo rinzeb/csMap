@@ -37,6 +37,7 @@
         "./layers/flightradar.ts",
         "./public/app/app.ts",
         "./public/app/search/SearchCtrl.ts",
+        "./sensors/datasource.ts",
         "./server.ts"
     ]
 }
