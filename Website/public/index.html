@@ -32,11 +32,15 @@
     <link rel="stylesheet" href="bower_components/leaflet.locatecontrol/src/L.Control.Locate.css" />
     <link rel="stylesheet" href="bower_components/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" />
     <!-- <link rel="stylesheet" href="bower_components/circliful/css/jquery.circliful.css" type="text/css" /> -->
-    <link rel="stylesheet" href="css/timeline.css" />
-    <link rel="stylesheet" href="css/widgets.css" />
-    <link rel="stylesheet" href="css/pnotify.custom.min.css" />
-    <link rel="stylesheet" href="css/xbbcode.css">
-    <link rel="stylesheet" href="css/csStyles.css" />
+
+    <!-- common sense style sheets -->
+    <link rel="stylesheet" href="cs/css/timeline.css" />
+    <link rel="stylesheet" href="cs/css/widgets.css" />
+    <link rel="stylesheet" href="cs/css/pnotify.custom.min.css" />
+    <link rel="stylesheet" href="cs/css/xbbcode.css">
+    <link rel="stylesheet" href="cs/css/csStyles.css" />
+
+    <!-- this app style sheets -->
     <link rel="stylesheet" href="css/style.css">
     <!-- endbuild -->
     <link rel="shortcut icon" href="favicon.ico">
@@ -72,28 +76,31 @@
     <script src="bower_components/underscore/underscore-min.js"></script>
     <script src="bower_components/moment/min/moment.min.js"></script>
 
-    <script src="js/cs/dashboard.min.js"></script>
-    <script src="js/cs/stringformat-1.09.min.min.js"></script>
-    <script src="js/cs/stringformat.nl-NL.min.js"></script>
-    <script src="js/cs/xbbcode.min.js"></script>
-    <script src="js/cs/jquery.cookies.min.js"></script>
-    <script src="js/cs/pnotify.custom.min.js"></script>
-    <script src="js/cs/jqueryinjectCSS.min.js"></script>
-    <script src="js/cs/timeline.min.js"></script>
+
+
+    <script src="cs/js/dashboard.min.js"></script>
+    <script src="cs/js/stringformat-1.09.min.min.js"></script>
+    <script src="cs/js/stringformat.nl-NL.min.js"></script>
+    <script src="cs/js/xbbcode.min.js"></script>
+    <script src="cs/js/jquery.cookies.min.js"></script>
+    <script src="cs/js/pnotify.custom.min.js"></script>
+    <script src="cs/js/jqueryinjectCSS.min.js"></script>
+    <script src="cs/js/timeline.min.js"></script>
+
+
+    <script src="cs/js/csComp.js"></script>
+    <script src="app/search/SearchCtrl.js"></script>
+    <script src="app/app.js"></script>
+    <script src="cs/js/csTemplates.js"></script>
+    <script src="cs/js/Cesium.js"></script>
 
     <script src="/socket.io/socket.io.js"></script>
 
-    <script src="js/cs/csComp.js"></script>
 
-    <script src="app/search/SearchCtrl.js"></script>
-    <script src="app/app.js"></script>
-    <script src="js/cs/csTemplates.js"></script>
 
-    <script src="js/cs/Cesium.js"></script>
+
+
     <!-- endbuild -->
-
-
-
 
 
     <div role="navigation" class="navbar navbar-inverse navbar-fixed-top">
@@ -115,7 +122,7 @@
                         <img data-ng-src="{{vm.$layerService.project.logo}}" alt="{{vm.$layerService.project.title}}" width="32" height="32" />
                     </a>
                     <a href="" class="navbar-brand dropdown-toggle" data-toggle="dropdown" style="color:white; margin: 5px 0 -5px -5px; padding: 10px; padding-bottom: 0; cursor: pointer" aria-haspopup="true" aria-expanded="false">
-                        {{vm.$layerService.project.title}} 
+                        {{vm.$layerService.project.title}}
                         <span class="caret" data-ng-if="vm.$layerService.solution.projects.length > 1"></span>
                     </a>
                     <ul data-ng-if="vm.$layerService.solution.projects.length > 1" class="dropdown-menu" role="menu">
