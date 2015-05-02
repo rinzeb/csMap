@@ -104,7 +104,7 @@ gulp.task('include_js', function() {
 });
 
 gulp.task('include_css', function() {
-    gulp.src('../../../csWeb/csComp/includes/**/*.css')
+    gulp.src('../../../csWeb/csComp/includes/css/*.*')
         .pipe(plumber())
         .pipe(gulp.dest('./public/cs/css'));
 });
@@ -114,6 +114,7 @@ gulp.task('include_images', function() {
         .pipe(plumber())
         .pipe(gulp.dest('./public/cs/images/'));
 });
+
 
 gulp.task('watch', function() {
     gulp.watch('../../../csWeb/csComp/js/**/*.js', ['built_csComp']);
