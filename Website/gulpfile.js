@@ -27,7 +27,7 @@ gulp.task('built_csComp', function() {
         // ]))
         // .pipe(debug({title: 'after ordering:'}))
         .pipe(concat('csComp.js'))
-        .pipe(gulp.dest('./public/js/cs'));
+        .pipe(gulp.dest('./public/cs/js'));
 });
 
 gulp.task('built_csComp.d.ts', function() {
@@ -56,7 +56,7 @@ gulp.task('create_templateCache', function() {
             title: 'create_templateCache:'
         }))
         .pipe(templateCache(options))
-        .pipe(gulp.dest('public/js/cs'))
+        .pipe(gulp.dest('public/cs/js'))
 })
 
 gulp.task('create_dist', function() {
@@ -91,7 +91,7 @@ gulp.task('minify_csComp', function() {
         .pipe(rename({
             suffix: '.min'
         }))
-        .pipe(gulp.dest('public/js/cs'));
+        .pipe(gulp.dest('public/cs/js'));
 });
 
 gulp.task('include_js', function() {
@@ -100,19 +100,19 @@ gulp.task('include_js', function() {
             title: 'include_js:'
         }))
         .pipe(plumber())
-        .pipe(gulp.dest('./public/js/cs'));
+        .pipe(gulp.dest('./public/cs/js'));
 });
 
 gulp.task('include_css', function() {
     gulp.src('../../../csWeb/csComp/includes/**/*.css')
         .pipe(plumber())
-        .pipe(gulp.dest('./public/css'));
+        .pipe(gulp.dest('./public/cs/css'));
 });
 
 gulp.task('include_images', function() {
     gulp.src('../../../csWeb/csComp/includes/images/*.*')
         .pipe(plumber())
-        .pipe(gulp.dest('./public/includes/images/'));
+        .pipe(gulp.dest('./public/cs/images/'));
 });
 
 gulp.task('watch', function() {
