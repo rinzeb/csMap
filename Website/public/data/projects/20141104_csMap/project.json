@@ -35,7 +35,7 @@
             "id": "flight",
             "name": "Flights",
             "showTimeline": true,
-            "showLeftmenu": true,
+            "showLeftmenu": false,
             "showMap": true,
             "visiblelayers": [
                 "FlightRadar"
