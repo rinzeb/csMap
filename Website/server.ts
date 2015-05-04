@@ -7,15 +7,13 @@ var cc = require("./ClientConnection");
 var fr = require("./layers/FlightRadar");
 var ds = require("./sensors/DataSource");
 
-
-
 /**
  * Create a search index file which can be loaded statically.
  */
 var offlineSearchManager = new offlineSearch('public/data/projects/projects.json', {
     propertyNames: ['Name', 'plaatnaam', 'postcode', 'Postcode', 'straat', 'loc_straat', 'KvK', 'gemeente', 'plaats', 'Naam_van_het_concern_DigiMV_2012'],
     stopWords    : ['de', 'het', 'een', 'en', 'van', 'aan']
-}); 
+});
 
 // setup socket.io object
 var server = express();

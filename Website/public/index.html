@@ -31,6 +31,7 @@
     <link rel="stylesheet" href="bower_components/leaflet.markercluster/dist/MarkerCluster.Default.css" />
     <link rel="stylesheet" href="bower_components/leaflet.locatecontrol/src/L.Control.Locate.css" />
     <link rel="stylesheet" href="bower_components/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" />
+    <link rel="stylesheet" href="http://daneden.github.io/animate.css/animate.min.css" />
     <!-- <link rel="stylesheet" href="bower_components/circliful/css/jquery.circliful.css" type="text/css" /> -->
 
     <!-- common sense style sheets -->
@@ -78,7 +79,7 @@
 
 
 
-    <script src="cs/js/dashboard.min.js"></script>
+    <!-- <script src="cs/js/dashboard.min.js"></script> -->
     <script src="cs/js/stringformat-1.09.min.min.js"></script>
     <script src="cs/js/stringformat.nl-NL.min.js"></script>
     <script src="cs/js/xbbcode.min.js"></script>
@@ -98,11 +99,58 @@
 
     <!-- endbuild -->
 
+    <script>
+//     jQuery(document).ready(function() {
+//     function e() {
+//         jQuery("#leftpanel .nav-parent").each(function() {
+//             var e = jQuery(this);
+//             e.hasClass("nav-active") && e.find("> ul").slideUp(200, function() {
+//                 e.removeClass("nav-active")
+//             })
+//         })
+//     }
+//
+//     function a() {
+//         var e = jQuery(document).height();
+//         e > jQuery(".mainpanel").height() && jQuery(".mainpanel").height(e)
+//     }
+//     var l = jQuery("body");
+//     jQuery("#tabs-left > li > a").click(function() {
+//         l.hasClass("leftpanel-collapsed") && l.removeClass("leftpanel-collapsed")
+//     }), jQuery(".menutoggle").click(function() {
+//         var e = l.css("position");
+//         "relative" != e ? l.hasClass("leftpanel-collapsed") ? (l.removeClass("leftpanel-collapsed chat-view"), jQuery(".nav-bracket li.active ul").css({
+//             display: "block"
+//         }), jQuery(this).removeClass("menu-collapsed")) : (l.addClass("leftpanel-collapsed"), jQuery(".nav-bracket ul").attr("style", ""), jQuery(this).addClass("menu-collapsed")) : l.hasClass("leftpanel-show") ? l.removeClass("leftpanel-show") : l.addClass("leftpanel-show")
+//     }), jQuery("#leftpanel .nav-parent > a").on("click", function() {
+//         var l = jQuery(this).parent(),
+//             s = l.find("> ul");
+//         return jQuery("body").hasClass("leftpanel-collapsed") || (s.is(":visible") ? s.slideUp(200, function() {
+//             l.removeClass("nav-active"), jQuery(".mainpanel").css({
+//                 height: ""
+//             }), a()
+//         }) : (e(), l.addClass("nav-active"), s.slideDown(200, function() {
+//             a()
+//         }))), !1
+//     }), a(), jQuery(".panel .panel-close").click(function() {
+//         return jQuery(this).closest(".panel").fadeOut(200), !1
+//     }), jQuery.cookie("sticky-header") && jQuery("body").addClass("stickyheader"), jQuery.cookie("sticky-leftpanel") && (jQuery("body").addClass("stickyheader"), jQuery(".leftpanel").addClass("sticky-leftpanel")), jQuery.cookie("leftpanel-collapsed") && (jQuery("body").addClass("leftpanel-collapsed"), jQuery(".menutoggle").addClass("menu-collapsed"));
+//     var s = jQuery.cookie("change-skin");
+//     s && jQuery("head").append('<link id="skinswitch" rel="stylesheet" href="css/style.' + s + '.css" />');
+//     var n = jQuery.cookie("change-font");
+//     n && jQuery("head").append('<link id="fontswitch" rel="stylesheet" href="css/font.' + n + '.css" />'), jQuery("body").hasClass("leftpanel-collapsed") && jQuery(".nav-bracket .children").css({
+//         display: ""
+//     }), jQuery(".dropdown-menu").find("form").click(function(e) {
+//         e.stopPropagation()
+//     })
+// });
+    </script>
+
 
     <div role="navigation" class="navbar navbar-inverse navbar-fixed-top">
 
         <div class="navbar-header" data-ng-cloak>
-            <a class="menutoggle"><i class="fa fa-bars"></i></a>
+            <a class="menutoggle" ng-click="vm.$layerService.visual.leftPanelVisible = !vm.$layerService.visual.leftPanelVisible"><i class="fa fa-bars"></i></a>
             <!--<a class="navbar-brand" style="margin-top: -5px;" href="{{vm.$layerService.project.url}}" target="_blank">
                 <img data-ng-src="{{vm.$layerService.project.logo}}" alt="{{vm.$layerService.project.title}}" width="32" height="32" />
                 {{vm.$layerService.project.title}}
@@ -134,7 +182,7 @@
             </ul>
 
             <!-- Dashboard selection -->
-          <dashboard-header-selection/>
+            <dashboard-header-selection></dashboard-header-selection>
 
             <!-- Select renderer -->
             <ul class="nav navbar-nav" style="float:right">
@@ -151,24 +199,113 @@
         </div>
     </div>
 
-    <map mapid="main" ng-show="vm.$layerService.visual.mapVisible"></map>
+    <style>
+    .map-main
+    {
+      position:absolute;
+      width:100%;
+      height:100%;
+    }
 
-    <div style="position: absolute;width: 100%;height:100%;pointer-events: none">
-        <dashboardirective class="dashboard-directive" dashboard="vm.$dashboardService.mainDashboard"></dashboardirective>
-        <div class="rightpanel" style="background-color: transparent; ">
-            <div id="rightpanelTabContainer" class="tabbable tabs-left" style="position:relative;height:100%;padding:0px">
+    .leftpanel-entrance {
+      -webkit-animation:fadeInLeft 0.5s
+    }
+    </style>
+
+    <map mapid="main" class="map-main" ng-show="vm.$layerService.visual.mapVisible"></map>
+
+    <div style="position: absolute;width: 100%;height:100%;pointer-events: none;display:table">
+
+      <div ng-show="vm.$layerService.visual.leftPanelVisible" class="leftpanel leftpanel-entrance"  ng-cloak style="pointer-events: all">
+        <div style="width:350px;height:100%;background:white">
+          <div class="col-xs-3 leftpanel-tab">
+              <!-- required for floating -->
+              <!-- Nav tabs -->
+              <ul class="nav nav-tabs tabs-left" id="leftPanelTab">
+                  <!-- 'tabs-right' for right tabs -->
+                  <li>
+                      <a href="#basestyles" data-toggle="tab" data-ng-if="vm.$mapService.isIntermediate">
+                          <div class="mapIcon"></div>
+                      </a>
+                  </li>
+                  <li class="active">
+                      <a href="#layers" data-toggle="tab">
+                          <div class="layersIcon"></div>
+                      </a>
+                  </li>
+                  <li>
+                      <a href="#filters" data-toggle="tab">
+                          <div class="filtersIcon"></div>
+                      </a>
+                  </li>
+                  <li>
+                      <a href="#styles" data-toggle="tab">
+                          <div class="stylesIcon"></div>
+                      </a>
+                  </li>
+                  <li>
+                      <a href="#mca" data-toggle="tab" data-ng-if="vm.$mapService.isExpert">
+                          <div class="mcaIcon"></div>
+                      </a>
+                  </li>
+                  <li>
+                      <a href="#heatmap" data-toggle="tab">
+                          <div class="heatmapIcon"></div>
+                      </a>
+                  </li>
+                  <li>
+                      <a href="#features" data-toggle="tab">
+                          <div class="featuresIcon"></div>
+                      </a>
+                  </li>
+                  <li>
+                      <a href="#legend" data-toggle="tab">
+                          <div class="mainLegendIcon"></div>
+                      </a>
+                  </li>
+                  <li><a href="#settings" data-toggle="tab"><i class="fa fa-gear fa-2x" style="color: black"></i></a></li>
+              </ul>
+          </div>
+
+          <div class="col-xs-9 leftpanel-content">
+              <!-- Tab panes -->
+              <div class="tab-content ">
+                  <base-map-list class="tab-pane"  id="basestyles"></base-map-list>
+
+                  <layers-directive class="tab-pane active" id="layers"></layers-directive>
+
+                  <filter-list class="tab-pane" id="filters"></filter-list>
+
+                  <style-list class="tab-pane" id="styles"></style-list>
+
+                  <mca class="tab-pane" id="mca"></mca>
+
+                  <heatmap class="tab-pane" id="heatmap"></heatmap>
+
+                  <feature-list class="tab-pane" id="features"></feature-list>
+
+                  <legend-list class="tab-pane" id="legend"></legend-list>
+
+                  <project-settings class="tab-pane" id="settings"></project-settings>
+              </div>
+          </div>
+          </div>
+      </div>
+      <dashboardirective container="main" style="display:table-cell;width:100%;vertical-align: top;" dashboard="vm.$dashboardService.mainDashboard"></dashboardirective> <!-- class="dashboard-directive" -->
+      <div class="rightpanel" style="background-color: transparent;">
+            <div id="rightpanelTabContainer" class="tabbable tabs-left" style="display:table;height:100%;padding:0px;">
                 <!-- Nav tabs -->
                 <!--<div id="rightPanelToggle">
                         <i class="fa fa-2x fa-chevron-right" style="margin-left: 10px;margin-top: 108px;"></i>
                     </div>-->
-                <ul id="rightpanelTabs" class="nav nav-tabs" style="margin-right:0px; margin-top:100px; display:inline-block">
-                    <li class="rightPanelTab rightPanelTabAnimated active" ng-show="featureSelected">
+                <ul id="rightpanelTabs" class="nav nav-tabs" style="margin-right:0px;width:50px; height:100%; display:table-cell">
+                    <li class="rightPanelTab rightPanelTabAnimated active" style="margin-top:50px" ng-show="featureSelected">
                         <a href="#info" style="" data-toggle="tab">
                             <span class="fa fa-info fa-lg"></span>
                         </a>
                     </li>
                 </ul>
-                <div id="rightpanelTabPanes" class="tab-content" style="display: inline-block; height:100%; background-color: white;">
+                <div id="rightpanelTabPanes" class="tab-content" style="display: table-cell; vertical-align:top; width:100%; height:100%; background-color: white;">
                     <div class="tab-pane active" id="info">
                         <featureprops class="rightpanel-content"></featureprops>
                     </div>
@@ -203,81 +340,8 @@
                 }
             });
         </script>
+</div>
 
-        <div class="leftpanel" ng-cloak style="pointer-events: all">
-            <div class="col-xs-3 leftpanel-tab">
-                <!-- required for floating -->
-                <!-- Nav tabs -->
-                <ul class="nav nav-tabs tabs-left" id="leftPanelTab">
-                    <!-- 'tabs-right' for right tabs -->
-                    <li>
-                        <a href="#basestyles" data-toggle="tab" data-ng-if="vm.$mapService.isIntermediate">
-                            <div class="mapIcon"></div>
-                        </a>
-                    </li>
-                    <li class="active">
-                        <a href="#layers" data-toggle="tab">
-                            <div class="layersIcon"></div>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#filters" data-toggle="tab">
-                            <div class="filtersIcon"></div>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#styles" data-toggle="tab">
-                            <div class="stylesIcon"></div>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#mca" data-toggle="tab" data-ng-if="vm.$mapService.isExpert">
-                            <div class="mcaIcon"></div>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#heatmap" data-toggle="tab">
-                            <div class="heatmapIcon"></div>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#features" data-toggle="tab">
-                            <div class="featuresIcon"></div>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#legend" data-toggle="tab">
-                            <div class="mainLegendIcon"></div>
-                        </a>
-                    </li>
-                    <li><a href="#settings" data-toggle="tab"><i class="fa fa-gear fa-2x" style="color: black"></i></a></li>
-                </ul>
-            </div>
-
-            <div class="col-xs-9 leftpanel-content">
-                <!-- Tab panes -->
-                <div class="tab-content">
-                    <base-map-list class="tab-pane" id="basestyles"></base-map-list>
-
-                    <layers-directive class="tab-pane active" id="layers"></layers-directive>
-
-                    <filter-list class="tab-pane" id="filters"></filter-list>
-
-                    <style-list class="tab-pane" id="styles"></style-list>
-
-                    <mca class="tab-pane" id="mca"></mca>
-
-                    <heatmap class="tab-pane" id="heatmap"></heatmap>
-
-                    <feature-list class="tab-pane" id="features"></feature-list>
-
-                    <legend-list class="tab-pane" id="legend"></legend-list>
-
-                    <project-settings class="tab-pane" id="settings"></project-settings>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <timeline data-ng-show="vm.$mapService.timelineVisible" style="height: 100vh;"></timeline>
 </body>

@@ -55,6 +55,24 @@
                             }
                         ]
                     }
+                },
+                {
+                    "directive": "indicators",
+                    "title": "speed",
+                    "right": "10px",
+                    "top": "10px",
+                    "width": "225px",
+                    "height": "435px",
+                    "data": {
+                        "title": "Air Quality",
+                        "indicators": [
+                            {
+                                "title": "N02",
+                                "visual": "sparkline",
+                                "sensor": "datasource/test"
+                            }
+                        ]
+                    }
                 }
             ],
             "viewBounds": {
