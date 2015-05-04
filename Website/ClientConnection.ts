@@ -100,7 +100,7 @@ module ClientConnection {
             {
                 var sub = this.users[uId].Subscriptions[s];
                 if (sub.type == "sensor" && sub.target == sensor) {
-                     console.log('sending update:' + sub.id);
+                    //console.log('sending update:' + sub.id);
                     var cm = new ClientMessage("sensor-update", [{ sensor: sensor, date: date, value: value }]);
                     //console.log(JSON.stringify(cm));
                     this.users[uId].Client.emit(sub.id, cm);

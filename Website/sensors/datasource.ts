@@ -51,6 +51,7 @@ module DataSource {
           DataSourceService.result.id = "datasource";
 
           DataSourceService.result.sensors["test"] = new SensorSet("test");
+          DataSourceService.result.sensors["test2"] = new SensorSet("test2");
         }
 
 
@@ -76,8 +77,9 @@ module DataSource {
         public Start() {
           setInterval(()=>
           {
-            var ds = DataSourceService.result.sensors["test"];
-
+            for (var s in DataSourceService.result.sensors)
+            {
+            var ds = DataSourceService.result.sensors[s];
             this.updateSensorValue(ds,new Date().getTime(),Math.floor(Math.random()*100));
 
 
@@ -86,6 +88,7 @@ module DataSource {
               ds.values.shift();
             }
             console.log('sensor data added');
+          }
           },5000);
         }
 }
