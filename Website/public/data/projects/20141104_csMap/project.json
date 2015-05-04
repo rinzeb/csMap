@@ -16,7 +16,8 @@
             "url": "/datasource",
             "type" : "dynamic",
             "sensors" : {
-                "test" : { "propertyTypeKey" : "sensor_test"}
+                "test" : { "propertyTypeKey" : "sensor_test"},
+                "test2" : { "propertyTypeKey" : "sensor_test2"}
             }
         }
     ],
@@ -50,7 +51,7 @@
                         "title": "Sensor Data 1",
                         "indicators": [
                             {
-                                "visual": "sparkline",
+                                "visual": "circular",
                                 "sensor": "datasource/test"
                             },
                             {
@@ -100,6 +101,11 @@
         "sensor_test":{
           "type": "number",
           "title": "Test value",
+          "stringFormat": "{0:0,0}"
+        },
+        "sensor_test2":{
+          "type": "number",
+          "title": "Test value 2",
           "stringFormat": "{0:0,0}"
         },
         "aant_gem": {

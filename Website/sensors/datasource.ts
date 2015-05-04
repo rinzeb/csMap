@@ -80,7 +80,7 @@ module DataSource {
             for (var s in DataSourceService.result.sensors)
             {
             var ds = DataSourceService.result.sensors[s];
-            this.updateSensorValue(ds,new Date().getTime(),Math.floor(Math.random()*100));
+            this.updateSensorValue(ds,new Date().getTime(),Math.random()*100);
 
 
             if (ds.values.length > 20) {
