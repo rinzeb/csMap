@@ -14,7 +14,7 @@
     "datasources": [
         {
             "url": "/datasource",
-            "type" : "static"
+            "type" : "dynamic"
         }
     ],
     "dashboards": [

@@ -7,13 +7,12 @@ module ClientConnection {
         GetLayer: Function;
         GetDataSource : Function;
         layerId: string;
-
     }
 
     export class ClientSubscription {
         public id: string;
         public type: string;
-        public target : string;
+        public target: string;
     }
 
     export class ClientMessage{
@@ -48,10 +47,9 @@ module ClientConnection {
                   break;
               }
             });
-            this.Client.emit(sub.id,new ClientMessage("subscribed",""));
-            console.log('subscribed to layer : ' + sub);
+            this.Client.emit(sub.id, new ClientMessage("subscribed",""));
+            console.log('subscribed to : ' + sub.target + " (" + sub.type + ")");
         }
-
     }
 
     export class ConnectionManager {
@@ -75,19 +73,17 @@ module ClientConnection {
                 });
 
                 socket.on('subscribe',(msg: ClientSubscription) => {
-                    console.log('subscribe ' + JSON.stringify(msg));
+                    console.log('subscribe ' + JSON.stringify(msg.target));
                     wc.Subscribe(msg);
-                   // wc.Client.emit('laag', 'test');
+                    // wc.Client.emit('laag', 'test');
                     //socket.emit('laag', 'test');
                 });
-
 
                 // create layers room
                 //var l = socket.join('layers');
                 //l.on('join',(j) => {
                 //    console.log("layers: "+ j);
                 //});
-
             });
         }
 
@@ -97,20 +93,19 @@ module ClientConnection {
 
         public updateSensorValue(sensor : string, date : number, value : number)
         {
-          console.log('updateSensorValue:' + sensor);
+          //console.log('updateSensorValue:' + sensor);
           for (var uId in this.users) {
             //var sub = this.users[uId].FindSubscription(sensor,"sensor");
             for (var s in this.users[uId].Subscriptions)
             {
                 var sub = this.users[uId].Subscriptions[s];
                 if (sub.type == "sensor" && sub.target == sensor) {
-                    console.log('sending update:' + sub.id);
+                     console.log('sending update:' + sub.id);
                     var cm = new ClientMessage("sensor-update", [{ sensor: sensor, date: date, value: value }]);
-                    console.log(JSON.stringify(cm));
+                    //console.log(JSON.stringify(cm));
                     this.users[uId].Client.emit(sub.id, cm);
                 }
             }
-
           }
         }
 
@@ -124,7 +119,6 @@ module ClientConnection {
               //console.log('sending update:' + sub.id);
               this.users[uId].Client.emit(sub.id,new ClientMessage("feature-update",[feature]));
             }
-
           }
         }
 
@@ -135,12 +129,8 @@ module ClientConnection {
               {
                 this.users[uId].Client.emit(sub.id,new ClientMessage("feature-delete",[feature.id]));
               }
-
             }
         }
-
-
-
     }
 }
 

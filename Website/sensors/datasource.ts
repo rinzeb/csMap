@@ -5,12 +5,16 @@ import ClientConnection = require("./../ClientConnection");
 module DataSource {
 
   export class SensorSet {
-          id: string;
           title: string;
           type: string;
           timestamps: number[] = [];
           values: any[] = [];
           activeValue: any;
+
+          constructor (public id : string)
+          {
+
+          }
       }
 
       export class DataSource {
@@ -46,7 +50,7 @@ module DataSource {
           DataSourceService.result = new DataSource();
           DataSourceService.result.id = "datasource";
 
-          DataSourceService.result.sensors["test"] = new SensorSet();
+          DataSourceService.result.sensors["test"] = new SensorSet("test");
         }
 
 
@@ -73,6 +77,7 @@ module DataSource {
           setInterval(()=>
           {
             var ds = DataSourceService.result.sensors["test"];
+
             this.updateSensorValue(ds,new Date().getTime(),Math.floor(Math.random()*100));
 
 
