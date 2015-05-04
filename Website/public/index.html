@@ -141,19 +141,6 @@
         </div>
     </div>
 
-    <style>
-    .map-main
-    {
-      position:absolute;
-      width:100%;
-      height:100%;
-    }
-
-    .leftpanel-entrance {
-      -webkit-animation:fadeInLeft 0.5s
-    }
-    </style>
-
     <map mapid="main" class="map-main" ng-show="vm.$layerService.visual.mapVisible"></map>
 
     <div style="position: absolute;width: 100%;height:100%;pointer-events: none;display:table">
@@ -205,6 +192,7 @@
                           <div class="mainLegendIcon"></div>
                       </a>
                   </li>
+                  <li><a href="#dashboardselection" data-ng-if="vm.$mapService.isExpert" data-toggle="tab"><i class="fa fa-tachometer fa-2x" style="color: black"></i></a></li>
                   <li><a href="#settings" data-toggle="tab"><i class="fa fa-gear fa-2x" style="color: black"></i></a></li>
               </ul>
           </div>
@@ -227,6 +215,8 @@
                   <feature-list class="tab-pane" id="features"></feature-list>
 
                   <legend-list class="tab-pane" id="legend"></legend-list>
+
+                  <dashboard-selection class="tab-pane" id="dashboardselection"></dashboard-selection>
 
                   <project-settings class="tab-pane" id="settings"></project-settings>
               </div>

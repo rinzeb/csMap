@@ -35,8 +35,9 @@
             "id": "flight",
             "name": "Flights",
             "showTimeline": true,
-            "showLeftmenu": false,
+            "showLeftmenu": true,
             "showMap": true,
+            "baselayer" : "Positron",
             "visiblelayers": [
                 "FlightRadar"
             ],
@@ -81,13 +82,13 @@
                   "southWest": [ 50.7, 3.3 ],
                   "northEast": [ 53.5, 7.3 ]
             },
-            "baselayer" : "World Terrain Base"
+            "baselayer" : "Satellite Day"
         },
         {
             "id": "nomap",
             "name": "No Map",
             "showTimeline": false,
-            "showLeftmenu": false,
+            "showLeftmenu": true,
             "showMap": false
         }
       ],
