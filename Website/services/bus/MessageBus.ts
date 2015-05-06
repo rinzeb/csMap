@@ -14,7 +14,6 @@ class MessageBusHandle {
         this.topic = topic;
         this.callback = callback;
     }
-
     public topic: string;
     public callback: IMessageBusCallback;
 }

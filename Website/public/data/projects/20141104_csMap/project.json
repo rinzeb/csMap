@@ -55,6 +55,10 @@
             "directive": "indicators",
             "left": "10px",
             "top": "10px",
+                    "borderwidth" : "3px",
+                    "background" : "red",
+                    "bordercolor" : "red",
+                    "borderradius" : "5px",
             "width": "255px",
             "height": "435px",
             "data": {
@@ -68,6 +72,22 @@
                 }]
             }
         }],
+                },
+                {
+                    "directive": "indicators",
+                    "left": "275px",
+                    "top": "10px",
+                    "width": "255px",
+                    "height": "435px",
+                    "data": {
+                        "title": "Sensor Data 2",
+                        "indicators": [
+                            {
+                                "visual": "sparkline",
+                                "sensor": "datasource/test2"
+                            }
+                        ]
+                    }
         "viewBounds": {
             "southWest": [50.7, 3.3],
             "northEast": [53.5, 7.3]
@@ -81,6 +101,69 @@
         "visiblelayers": [
             "zorgkantoor",
             "Hospitals"
+            ],
+            "widgets":[
+              {
+                  "directive": "indicators",
+                  "title": "Mobility",
+                  "left": "10px",
+                  "top": "10px",
+                  "borderwidth" : 5,
+                  "bordercolor" : "red",
+                  "width": "225px",
+                  "height": "365px",
+                  "data": {
+                      "title": "Mobility",
+                      "indicators": [
+                          {
+                              "title": "Traffic performance",
+                              "visual": "circular",
+                              "sensor": "datasource/tp",
+                              "indexValue": 500000
+                          },
+                          {
+                              "title": "Relative speed (% of max)",
+                              "visual": "sparkline",
+                              "sensor": "datasource/speed",
+                              "layer": "live_traffic/speed"
+                          },
+                          {
+                              "title": "Density (veh/km)",
+                              "visual": "sparkline",
+                              "sensor": "datasource/density",
+                              "layer": "live_traffic/density"
+                          }
+                      ]
+                  }
+              },
+              {
+                  "directive": "indicators",
+                  "title": "Mobility",
+                  "left": "10px",
+                  "top": "385px",
+                  "width": "225px",
+                  "height": "295px",
+                  "data": {
+                      "title": "Verkeer",
+                      "indicators": [
+                          {
+                              "title": "Licht verkeer",
+                              "visual": "sparkline",
+                              "sensor": "datasource/lv"
+                          },
+                          {
+                              "title": "Middel-zwaar verkeer",
+                              "visual": "sparkline",
+                              "sensor": "datasource/mv"
+                          },
+                          {
+                              "title": "Zwaar verkeer",
+                              "visual": "sparkline",
+                              "sensor": "datasource/z"
+                          }
+                      ]
+                  }
+              }
         ],
         "viewBounds": {
             "southWest": [50.7, 3.3],

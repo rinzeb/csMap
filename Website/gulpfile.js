@@ -31,6 +31,20 @@ gulp.task('built_csComp', function() {
         .pipe(gulp.dest('./public/cs/js'));
 });
 
+gulp.task('built_csComp_classes', function() {
+    return gulp.src('../../../csWeb/csComp/classes/**/*.ts')
+        .pipe(debug({
+            title: 'built_csComp_classes:'
+        }))
+        // .pipe(debug({title: 'before ordering:'}))
+        // .pipe(order([
+        //     "translations/locale-nl.js"
+        // ]))
+        // .pipe(debug({title: 'after ordering:'}))
+        .pipe(concat('csCompClasses.ts'))
+        .pipe(gulp.dest('./classes'));
+});
+
 gulp.task('built_csComp.d.ts', function() {
     gulp.src('../../../csWeb/csComp/js/**/*.d.ts')
         // .pipe(debug({title: 'before ordering:'}))
@@ -43,7 +57,10 @@ gulp.task('built_csComp.d.ts', function() {
         .pipe(insert.prepend('/// <reference path="../leaflet/leaflet.d.ts" />\r\n'))
         .pipe(insert.prepend('/// <reference path="../crossfilter/crossfilter.d.ts" />\r\n'))
         .pipe(gulp.dest('Scripts/typings/cs'));
+        //.pipe(gulp.dest('./public/cs/js'));
 });
+
+
 
 gulp.task('create_templateCache', function() {
     console.log('Creating templateCache.')
@@ -119,6 +136,7 @@ gulp.task('include_images', function() {
 
 gulp.task('watch', function() {
     gulp.watch('../../../csWeb/csComp/js/**/*.js', ['built_csComp']);
+    gulp.watch('../../../csWeb/csComp/js/classes/*.js', ['built_csComp_classes']);
     gulp.watch('../../../csWeb/csComp/js/**/*.d.ts', ['built_csComp.d.ts']);
     gulp.watch('../../../csWeb/csComp/**/*.tpl.html', ['create_templateCache']);
     gulp.watch('../../../csWeb/csComp/includes/**/*.css', ['include_css']);
@@ -126,4 +144,4 @@ gulp.task('watch', function() {
     gulp.watch('../../../csWeb/csComp/includes/images/*.*', ['include_images']);
 });
 
-gulp.task('default', ['create_templateCache', 'built_csComp', 'built_csComp.d.ts', 'include_css', 'include_js', 'include_images', 'watch']);
+gulp.task('default', ['create_templateCache', 'built_csComp', 'built_csComp_classes','built_csComp.d.ts', 'include_css', 'include_js', 'include_images', 'watch']);

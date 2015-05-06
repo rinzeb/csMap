@@ -1,6 +1,7 @@
 ﻿import express = require('express');
 import http = require('http');
 import ClientConnection = require("./../ClientConnection");
+import DynamicProject = require("../DynamicProject");
 
 module DataSource {
     export class SensorSet {
@@ -38,7 +39,7 @@ module DataSource {
         }
     }
 
-    export class DataSourceService implements ClientConnection.IDynamicLayer {
+    export class DataSourceService implements DynamicProject.IDynamicLayer {
         public static result: DataSource;
 
         constructor(public Connection: ClientConnection.ConnectionManager, public layerId: string) {
@@ -73,7 +74,6 @@ module DataSource {
                         ds.timestamps.shift();
                         ds.values.shift();
                     }
-                    console.log('sensor data added');
                 }
             }, 5000);
         }
