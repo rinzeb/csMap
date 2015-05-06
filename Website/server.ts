@@ -3,6 +3,7 @@ import http          = require('http');
 import path          = require('path');
 import offlineSearch = require('cs-offline-search');
 
+<<<<<<< HEAD
 var cc = require("./ClientConnection");
 var fr = require("./layers/FlightRadar");
 /**
@@ -13,6 +14,8 @@ var offlineSearchManager = new offlineSearch('public/data/projects/projects.json
     stopWords: ['de', 'het', 'een', 'en', 'van', 'aan']
 });
 
+=======
+>>>>>>> upstream/layer-sources-renders
 /**
  * Create a search index file which can be loaded statically.
  */
@@ -24,7 +27,7 @@ var offlineSearchManager = new offlineSearch('public/data/projects/projects.json
 // setup socket.io object
 var server = express();
 var httpServer = require('http').Server(server);
-var io = require('socket.io')(httpServer);
+var io: SocketIO.Server = require('socket.io')(httpServer);
 
 io.on('connection', function (socket) {
     console.log('a user has connected');
@@ -32,6 +35,10 @@ io.on('connection', function (socket) {
     socket.on('disconnect', function () {
         console.log('user disconnected');
     });
+    socket.on('onerror', function(err) {
+        console.log('SocketIO connection error: ');
+        console.log(err);
+    })
 });
 
 // all environments
@@ -47,11 +54,19 @@ server.use(express.urlencoded());
 server.use(express.methodOverride());
 server.use(server.router);
 
+var cc = require("./ClientConnection");
+var fr = require("./layers/FlightRadar");
+var ds = require("./sensors/DataSource");
+
 var cm = new cc.ConnectionManager(httpServer);
 var planes = new fr.FlightRadar(cm, "FlightRadar");
 planes.Start();
 
+var ds = new ds.DataSourceService(cm,"DataSource");
+ds.Start();
+
 server.get("/fr", planes.GetLayer);
+server.get("/datasource", ds.GetDataSource);
 
 server.use(express.static(path.join(__dirname, 'public')));
 console.log("started");

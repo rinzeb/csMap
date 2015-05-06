@@ -13,7 +13,12 @@
     },
     "datasources": [
         {
-            "url": "data/projects/20141104_csMap/datasource.json"
+            "url": "/datasource",
+            "type" : "dynamic",
+            "sensors" : {
+                "test" : { "propertyTypeKey" : "sensor_test"},
+                "test2" : { "propertyTypeKey" : "sensor_test2"}
+            }
         }
     ],
     "dashboards": [
@@ -32,44 +37,27 @@
             "showTimeline": true,
             "showLeftmenu": true,
             "showMap": true,
+            "baselayer" : "Positron",
             "visiblelayers": [
                 "FlightRadar"
             ],
             "widgets": [
-
                 {
                     "directive": "indicators",
-                    "title": "speed",
                     "left": "10px",
                     "top": "10px",
-                    "width": "225px",
+                    "width": "255px",
                     "height": "435px",
                     "data": {
-                        "title": "Air Quality 2",
+                        "title": "Sensor Data 1",
                         "indicators": [
                             {
-                                "title": "Air Quality Level",
                                 "visual": "circular",
-                                "sensor": "datasource/airquality"
+                                "sensor": "datasource/test"
                             },
                             {
-                                "title": "N02",
                                 "visual": "sparkline",
-                                "sensor": "datasource/nox",
-                                "layer": "NOX"
-
-                            },
-                            {
-                                "title": "PM10",
-                                "visual": "sparkline",
-                                "sensor": "datasource/pm10",
-                                "layer": "PM10"
-                            },
-                            {
-                                "title": "PM2,5",
-                                "visual": "sparkline",
-                                "sensor": "datasource/pm25",
-                                "layer": "PM25"
+                                "sensor": "datasource/test2"
                             }
                         ]
                     }
@@ -94,7 +82,14 @@
                   "southWest": [ 50.7, 3.3 ],
                   "northEast": [ 53.5, 7.3 ]
             },
-            "baselayer" : "World Terrain Base"
+            "baselayer" : "Satellite Day"
+        },
+        {
+            "id": "nomap",
+            "name": "No Map",
+            "showTimeline": false,
+            "showLeftmenu": true,
+            "showMap": false
         }
       ],
     "expertMode": 3,
@@ -104,6 +99,16 @@
     },
     "accentColor": "Green",
     "propertyTypeData": {
+        "sensor_test":{
+          "type": "number",
+          "title": "Test value",
+          "stringFormat": "{0:0,0}"
+        },
+        "sensor_test2":{
+          "type": "number",
+          "title": "Test value 2",
+          "stringFormat": "{0:0,0}"
+        },
         "aant_gem": {
             "label": "aant_gem",
             "type": "number",
@@ -3060,19 +3065,6 @@
                     "enabled": false,
                     "opacity": 50
                 }
-            ]
-        },
-        {
-            "title": "us test",
-            "layers": [
-                {
-                    "description": "US test",
-                    "type": "tilelayer",
-                    "title": "US",
-                    "url": "http://airapp.lohman-solutions.com/Tiles/{z}/{x}/{y}/hour_0.png",
-                    "opacity": 25
-                }
-
             ]
         },
         {

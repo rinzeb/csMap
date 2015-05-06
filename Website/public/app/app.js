@@ -128,39 +128,14 @@ var App;
     App.AppCtrl = AppCtrl;
     // Start the application
     angular.module('csWebApp', [
+        'csComp',
         'ngSanitize',
         'ui.router',
         'ui.bootstrap',
         'LocalStorageModule',
         'angularUtils.directives.dirPagination',
         'pascalprecht.translate',
-        'csWeb.mapElement',
-        'csWeb.featureprops',
-        'csWeb.featurerelations',
-        'csWeb.layersDirective',
-        'csWeb.featureList',
-        'csWeb.filterList',
-        'csWeb.baseMapList',
-        'csWeb.styleList',
-        'csWeb.legendList',
-        'csWeb.resize',
-        'csWeb.showModal',
-        'csWeb.voting',
-        'csWeb.mca',
-        'csWeb.datatable',
-        'csWeb.languageSwitch',
-        'csWeb.projectSettings',
-        'csWeb.charts',
-        'csWeb.expertMode',
-        'csWeb.offlineSearch',
-        'ngCookies',
-        'csWeb.charts',
-        'csWeb.timeline',
-        'csWeb.offlineSearch',
-        'csWeb.heatmap',
-        'csWeb.dashboardirective',
-        'csWeb.dashboardSelection',
-        'csWeb.indicators'
+        'ngCookies'
     ])
         .config(function (localStorageServiceProvider) {
         localStorageServiceProvider.prefix = 'csMap';
@@ -191,39 +166,6 @@ var App;
         //languages.push({ key: 'de', name: 'Deutsch', img: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAALCAIAAAD5gJpuAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAGzSURBVHjaYvTxcWb4+53h3z8GZpZff/79+v3n/7/fDAz/GHAAgABi+f37e3FxOZD1Dwz+/v3z9y+E/AMFv3//+Qumfv9et241QACxMDExAVWfOHkJJAEW/gUEP0EQDn78+AHE/gFOQJUAAcQiy8Ag8O+fLFj1n1+/QDp+/gQioK7fP378+vkDqOH39x9A/RJ/gE5lAAhAYhzcAACCQBDkgRXRjP034R0IaDTZTFZn0DItot37S94KLOINerEcI7aKHAHE8v/3r/9//zIA1f36/R+o4tevf1ANYNVA9P07RD9IJQMDQACxADHD3z8Ig4GMHz+AqqHagKp//fwLVA0U//v7LwMDQACx/LZiYFD7/5/53/+///79BqK/EMZ/UPACSYa/v/8DyX9A0oTxx2EGgABi+a/H8F/m339BoCoQ+g8kgRaCQvgPJJiBYmAuw39hxn+uDAABxMLwi+E/0PusRkwMvxhBGoDkH4b/v/+D2EDyz///QB1/QLb8+sP0lQEggFh+vGXYM2/SP6A2Zoaf30Ex/J+PgekHwz9gQDAz/P0FYrAyMfz7wcDAzPDtFwNAgAEAd3SIyRitX1gAAAAASUVORK5CYII=' });
         $languagesProvider.setLanguages(languages);
     })
-        .filter('unique', function () {
-        // See https://github.com/angular-ui/angular-ui-OLDREPO/blob/master/modules/filters/unique/unique.js
-        return function (items, filterOn) {
-            if (filterOn === false) {
-                return items;
-            }
-            if ((filterOn || angular.isUndefined(filterOn)) && angular.isArray(items)) {
-                var hashCheck = {}, newItems = [];
-                var extractValueToCompare = function (item) {
-                    if (angular.isObject(item) && angular.isString(filterOn)) {
-                        return item[filterOn];
-                    }
-                    else {
-                        return item;
-                    }
-                };
-                angular.forEach(items, function (item) {
-                    var valueToCheck, isDuplicate = false;
-                    for (var i = 0; i < newItems.length; i++) {
-                        if (angular.equals(extractValueToCompare(newItems[i]), extractValueToCompare(item))) {
-                            isDuplicate = true;
-                            break;
-                        }
-                    }
-                    if (!isDuplicate) {
-                        newItems.push(item);
-                    }
-                });
-                items = newItems;
-            }
-            return items;
-        };
-    })
         .config(function ($stateProvider, $urlRouterProvider) {
         // For any unmatched url, send to /
         $urlRouterProvider.otherwise("/map");
@@ -240,138 +182,6 @@ var App;
             sticky: true
         });
     })
-        .service('messageBusService', csComp.Services.MessageBusService)
-        .service('dashboardService', csComp.Services.DashboardService)
-        .service('mapService', csComp.Services.MapService)
-        .service('layerService', csComp.Services.LayerService)
-        .controller('appCtrl', AppCtrl)
-        .controller('searchCtrl', Search.SearchCtrl)
-        .controller('mcaEditorCtrl', Mca.McaEditorCtrl)
-        .filter('csmillions', [
-        '$filter', '$locale', function (filter, locale) {
-            return function (amount, currencySymbol) {
-                if (isNaN(amount))
-                    return "";
-                var millions = amount / 1000000;
-                return String.format("{0:N1}", millions);
-            };
-        }
-    ])
-        .filter('format', [
-        '$filter', '$locale', function (filter, locale) {
-            return function (value, format) {
-                return String.format(format, value);
-            };
-        }
-    ])
-        .directive('percentage', function () {
-        return {
-            require: 'ngModel',
-            link: function (scope, element, attrs, ngModelController) {
-                ngModelController.$parsers.push(function (data) {
-                    if (data == null)
-                        return 0;
-                    return parseInt(data.replace('%', '')) / 100; //converted
-                });
-                ngModelController.$formatters.push(function (data) {
-                    if (data == null)
-                        return '';
-                    return Math.round((data * 100)) + '%'; //converted
-                });
-            }
-        };
-    })
-        .directive('ngModelOnblur', function () {
-        return {
-            restrict: 'A',
-            require: 'ngModel',
-            priority: 1,
-            link: function (scope, elm, attr, ngModelCtrl) {
-                if (attr.type === 'radio' || attr.type === 'checkbox')
-                    return;
-                elm.unbind('input').unbind('keydown').unbind('change');
-                elm.bind('blur', function () {
-                    scope.$apply(function () {
-                        ngModelCtrl.$setViewValue(elm.val());
-                    });
-                });
-            }
-        };
-    })
-        .directive('contextMenu', function ($parse) {
-        var renderContextMenu = function ($scope, event, options) {
-            if (!$) {
-                var $ = angular.element;
-            }
-            $(event.currentTarget).addClass('context');
-            var $contextMenu = $('<div>');
-            $contextMenu.addClass('dropdown clearfix');
-            var $ul = $('<ul>');
-            $ul.addClass('dropdown-menu');
-            $ul.attr({ 'role': 'menu' });
-            $ul.css({
-                display: 'block',
-                position: 'absolute',
-                left: event.pageX + 'px',
-                top: event.pageY + 'px'
-            });
-            angular.forEach(options, function (item, i) {
-                var $li = $('<li>');
-                if (item === null) {
-                    $li.addClass('divider');
-                }
-                else {
-                    var $a = $('<a>');
-                    $a.attr({ tabindex: '-1', href: '#' });
-                    $a.text(typeof item[0] == 'string' ? item[0] : item[0].call($scope, $scope));
-                    $li.append($a);
-                    $li.on('click', function ($event) {
-                        $event.preventDefault();
-                        $scope.$apply(function () {
-                            $(event.currentTarget).removeClass('context');
-                            $contextMenu.remove();
-                            item[1].call($scope, $scope);
-                        });
-                    });
-                }
-                $ul.append($li);
-            });
-            $contextMenu.append($ul);
-            var height = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight, document.body.offsetHeight, document.documentElement.offsetHeight, document.body.clientHeight, document.documentElement.clientHeight);
-            $contextMenu.css({
-                width: '100%',
-                height: height + 'px',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                zIndex: 9999
-            });
-            $(document).find('body').append($contextMenu);
-            $contextMenu.on("mousedown", function (e) {
-                if ($(e.target).hasClass('dropdown')) {
-                    $(event.currentTarget).removeClass('context');
-                    $contextMenu.remove();
-                }
-            }).on('contextmenu', function (event) {
-                $(event.currentTarget).removeClass('context');
-                event.preventDefault();
-                $contextMenu.remove();
-            });
-        };
-        return function ($scope, element, attrs) {
-            element.on('contextmenu', function (event) {
-                $scope.$apply(function () {
-                    event.preventDefault();
-                    var options = $scope.$eval(attrs.contextMenu);
-                    if (options instanceof Array) {
-                        renderContextMenu($scope, event, options);
-                    }
-                    else {
-                        throw '"' + attrs.contextMenu + '" not an array';
-                    }
-                });
-            });
-        };
-    });
+        .controller('appCtrl', AppCtrl);
 })(App || (App = {}));
 //# sourceMappingURL=app.js.map
