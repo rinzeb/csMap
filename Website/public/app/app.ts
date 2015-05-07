@@ -12,7 +12,7 @@ module App {
         title: string;
         showMenuRight: boolean;
         featureSelected: boolean;
-        layersLoading: boolean;
+        layersLoading: number;
     }
 
     // TODO For setting the current culture for string formatting (note you need to include public/js/cs/stringformat.YOUR-CULTURE.js. See sffjs.1.09.zip for your culture.)
@@ -56,7 +56,7 @@ module App {
             $scope.vm = this;
             $scope.showMenuRight = false;
             $scope.featureSelected = false;
-            $scope.layersLoading = false;
+            $scope.layersLoading = 0;
 
             $messageBusService.subscribe("project", () => {
                 // NOTE EV: You may run into problems here when calling this inside an angular apply cycle.
@@ -86,11 +86,11 @@ module App {
 
             switch (title) {
                 case "loading":
-                    this.$scope.layersLoading = true;
+                    this.$scope.layersLoading += 1;
                     console.log("Loading");
                     break;
                 case "activated":
-                    this.$scope.layersLoading = false;
+                    this.$scope.layersLoading -= 1;
                     console.log("Activated");
                     break;
                 case "deactivate":
