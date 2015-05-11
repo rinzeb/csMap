@@ -14,7 +14,6 @@
     ],
     "files": [
         "./ClientConnection.ts",
-        "./DynamicProject.ts",
         "./Scripts/typings/angular-translate/angular-translate.d.ts",
         "./Scripts/typings/angular-ui-router/angular-ui-router.d.ts",
         "./Scripts/typings/angularLocalStorage/angularLocalStorage.d.ts",
@@ -40,21 +39,8 @@
         "./public/app/app.ts",
         "./public/data/projects/smartcycling/overview/split.ts",
         "./sensors/datasource.ts",
-        "./server.ts",
-        "./server/Layers/flightradar.ts",
-        "./server/bus/MessageBus.ts",
-        "./server/configuration/ConfigurationService.ts",
-        "./server/configuration/IConfiguration.ts",
-        "./server/dynamic/ClientConnection.ts",
-        "./server/dynamic/Datasource.ts",
-        "./server/dynamic/DynamicProject.ts",
-        "./services/MapLayerCreator/IGeoJsonFeature.ts",
-        "./services/MapLayerCreator/MapLayerFactory.ts",
-        "./services/bus/MessageBus.ts",
-        "./services/configuration/ConfigurationService.ts",
+        "./server.ts"
         "./services/configuration/IConfiguration.ts",
-        "./services/database/BagDatabase.ts",
-        "./services/database/IBagAddress.ts",
-        "./services/database/Location.ts"
+        "./services/database/BagDatabase.ts"
     ]
 }

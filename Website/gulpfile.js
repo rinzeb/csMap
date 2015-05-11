@@ -136,7 +136,7 @@ gulp.task('include_images', function() {
 
 gulp.task('watch', function() {
     gulp.watch('../../../csWeb/csComp/js/**/*.js', ['built_csComp']);
-    gulp.watch('../../../csWeb/csComp/js/classes/*.js', ['built_csComp_classes']);
+    //gulp.watch('../../../csWeb/csComp/js/classes/*.js', ['built_csComp_classes']);
     gulp.watch('../../../csWeb/csComp/js/**/*.d.ts', ['built_csComp.d.ts']);
     gulp.watch('../../../csWeb/csComp/**/*.tpl.html', ['create_templateCache']);
     gulp.watch('../../../csWeb/csComp/includes/**/*.css', ['include_css']);
@@ -144,4 +144,4 @@ gulp.task('watch', function() {
     gulp.watch('../../../csWeb/csComp/includes/images/*.*', ['include_images']);
 });
 
-gulp.task('default', ['create_templateCache', 'built_csComp', 'built_csComp_classes','built_csComp.d.ts', 'include_css', 'include_js', 'include_images', 'watch']);
+gulp.task('default', ['create_templateCache', 'built_csComp','built_csComp.d.ts', 'include_css', 'include_js', 'include_images', 'watch']);

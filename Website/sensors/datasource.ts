@@ -1,7 +1,19 @@
 ﻿import express = require('express');
 import http = require('http');
 import ClientConnection = require("./../ClientConnection");
-import DynamicProject = require("../DynamicProject");
+
+
+//import DynamicProject = require("../DynamicProject");
+
+module DynamicProject
+{
+  export class IDynamicLayer {
+      Connection: ClientConnection.ConnectionManager;
+      GetLayer: Function;
+      GetDataSource : Function;
+      layerId: string;
+  }
+}
 
 module DataSource {
     export class SensorSet {

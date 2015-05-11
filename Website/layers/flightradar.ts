@@ -1,11 +1,13 @@
 ﻿import express = require('express');
 import http = require('http');
-import DynamicProject = require("./../DynamicProject");
+import DynamicProject = require("./../sensors/datasource");
 import ClientConnection = require("./../ClientConnection");
 
 module FlightRadar {
 
-    export class FlightRadar implements DynamicProject.IDynamicLayer {
+
+
+    export class FlightRadar  {
 
         public static result;
 
