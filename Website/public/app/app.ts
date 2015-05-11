@@ -93,6 +93,10 @@ module App {
                     this.$scope.layersLoading -= 1;
                     console.log("Activated");
                     break;
+                case "error":
+                    this.$scope.layersLoading -= 1;
+                    console.log("Error loading");
+                    break;
                 case "deactivate":
                     break;
             }

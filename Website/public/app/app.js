@@ -25,6 +25,10 @@ var App;
                         _this.$scope.layersLoading -= 1;
                         console.log("Activated");
                         break;
+                    case "error":
+                        _this.$scope.layersLoading -= 1;
+                        console.log("Error loading");
+                        break;
                     case "deactivate":
                         break;
                 }
