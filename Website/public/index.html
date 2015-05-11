@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html ng-app="csWebApp">
 
 <head>
@@ -177,7 +177,7 @@
                       </a>
                   </li>
                   <li>
-                      <a href="#heatmap" data-toggle="tab">
+                      <a href="#heatmap" data-toggle="tab" data-ng-if="vm.$mapService.isExpert">
                           <div class="heatmapIcon"></div>
                       </a>
                   </li>
@@ -240,6 +240,11 @@
                             <span class="fa fa-tachometer fa-lg"></span>
                         </a>
                     </li>
+                    <li class="rightPanelTab rightPanelTabAnimated" ng-show="featureSelected">
+                        <a href="#linkedData" style="" data-toggle="tab">
+                            <span class="fa fa-link fa-lg"></span>
+                        </a>
+                    </li>
                 </ul>
                 <div id="rightpanelTabPanes" class="tab-content" style="display: table-cell; vertical-align:top; width:100%; height:100%; background-color: white;">
                     <div class="tab-pane active" id="info">
@@ -247,6 +252,9 @@
                     </div>
                     <div class="tab-pane" ng-show="vm.$dashboardService.editWidgetMode" style="width:355px" id="widgetEdit">
                       <widgetedit ng-show="vm.$dashboardService.editWidgetMode"></widgetedit>
+                    </div>
+                    <div class="tab-pane" id="linkedData">
+                        <featurerelations class="rightpanel-content"></featurerelations>
                     </div>
                 </div>
             </div>
@@ -281,6 +289,15 @@
         </script>
 </div>
 
+
+    <!--Loading spinner-->
+    <div data-ng-show="layersLoading" id="loadingspinner" style="margin:0px auto; width:200px; height:100px;">
+        <div class="spinner" style="position: initial; margin-top:60px;">
+            <div class="bounce1" style="width:16px; height:16px;"></div>
+            <div class="bounce2" style="width:16px; height:16px;"></div>
+            <div class="bounce3" style="width:16px; height:16px;"></div>
+        </div>
+    </div>
 
     <timeline data-ng-show="vm.$mapService.timelineVisible" style="height: 100vh;"></timeline>
 </body>

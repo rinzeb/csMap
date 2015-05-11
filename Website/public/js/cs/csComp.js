@@ -216,6 +216,37 @@ var csComp;
 (function (csComp) {
     var Services;
     (function (Services) {
+        var SensorSet = (function () {
+            function SensorSet() {
+            }
+            return SensorSet;
+        })();
+        Services.SensorSet = SensorSet;
+        var DataSource = (function () {
+            function DataSource() {
+            }
+            DataSource.LoadData = function (ds, callback) {
+                if (ds.url != null) {
+                    $.getJSON(ds.url, function (temp) {
+                        if (temp != null) {
+                            ds.id = temp.id;
+                            ds.sensors = temp.sensors;
+                            ds.title = temp.title;
+                            callback();
+                        }
+                        //var projects = data;
+                    });
+                }
+            };
+            return DataSource;
+        })();
+        Services.DataSource = DataSource;
+    })(Services = csComp.Services || (csComp.Services = {}));
+})(csComp || (csComp = {}));
+var csComp;
+(function (csComp) {
+    var Services;
+    (function (Services) {
         var Event = (function () {
             function Event() {
                 var _this = this;
@@ -3985,6 +4016,8 @@ var FeatureProps;
                 console.log(e + ': ' + html);
                 return '';
             }
+            var time3 = new Date().getTime();
+            console.log('Calculated ' + (i * j) + ' cells in ' + (time3 - time).toFixed(1) + ' ms');
         };
         FeaturePropsCtrl.prototype.createScatter = function (property) {
             var sc = new csComp.Services.GroupFilter();
@@ -11541,6 +11574,15 @@ var csComp;
                     case "heatmap":
                         var time = new Date().getTime();
                         // create leaflet layers
+                        layer.mapLayer = new L.LayerGroup();
+                        this.service.map.map.addLayer(layer.mapLayer);
+                        layer.data.features.forEach(function (f) {
+                            layer.group.markers[f.id] = _this.addFeature(f);
+                        });
+                        break;
+                    case "heatmap":
+                        var time = new Date().getTime();
+                        // create leaflet layers
                         if (layer.group.clustering) {
                             var markers = L.geoJson(layer.data, {
                                 pointToLayer: function (feature, latlng) { return _this.createFeature(feature); },
@@ -11633,6 +11675,10 @@ var csComp;
                 else {
                     marker.setStyle(this.getLeafletStyle(feature.effectiveStyle));
                 }
+                else {
+                    l.mapLayer.addLayer(m);
+                }
+                return m;
             };
             LeafletRenderer.prototype.addFeature = function (feature) {
                 var _this = this;
