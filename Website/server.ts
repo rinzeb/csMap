@@ -43,7 +43,7 @@ var ds = new DataSource.DataSourceService(cm,"DataSource");
 ds.Start();
 server.get("/datasource", ds.GetDataSource);
 
-var mapLayerFactory = new MapLayerFactory(messageBus);
+var mapLayerFactory = new MapLayerFactory(configService, messageBus);
 server.post('/projecttemplate', (req, res) => mapLayerFactory.process(req, res));
 
 server.use(express.static(path.join(__dirname, 'public')));
