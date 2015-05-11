@@ -66,11 +66,9 @@ module FlightRadar {
             setInterval(()=> {
                 this.GetFlightData();
             }, 20000);
-
         }
 
         public GetFlightData(): any {
-
           try
           {
             var options = {
@@ -79,8 +77,6 @@ module FlightRadar {
             };
 
             var r = "";
-
-
             http.request(options, (res)=> {
                 res.setEncoding('utf8');
                 res.on('data', (d)=> {

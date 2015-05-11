@@ -1,7 +1,12 @@
-﻿import express       = require('express');
-import http          = require('http');
-import path          = require('path');
-import offlineSearch = require('cs-offline-search');
+﻿import express         = require('express');
+import http            = require('http');
+import path            = require('path');
+import offlineSearch   = require('cs-offline-search');
+import cc              = require("./ClientConnection");
+import MapLayerFactory = require('./services/MapLayerCreator/MapLayerFactory');
+import fr              = require("./layers/FlightRadar");
+import DataSource      = require("./sensors/DataSource");
+import MessageBus      = require('./services/bus/MessageBus');
 
 /**
  * Create a search index file which can be loaded statically.
@@ -14,26 +19,13 @@ var offlineSearchManager = new offlineSearch('public/data/projects/projects.json
 // setup socket.io object
 var server = express();
 var httpServer = require('http').Server(server);
-var io: SocketIO.Server = require('socket.io')(httpServer);
-
-io.on('connection', function (socket) {
-    console.log('a user has connected');
-
-    socket.on('disconnect', function () {
-        console.log('user disconnected');
-    });
-    socket.on('onerror', function(err) {
-        console.log('SocketIO connection error: ');
-        console.log(err);
-    })
-});
+var cm         = new cc.ConnectionManager(httpServer);
+var messageBus = new MessageBus();
 
 // all environments
 server.set('port', '3002');
 server.set('views', path.join(__dirname, 'views'));
 server.set('view engine', 'jade');
-//server.set('view engine', 'html');
-//server.engine('html', require('jade').renderFile);
 server.use(express.favicon());
 server.use(express.logger('dev'));
 server.use(express.json());
@@ -41,19 +33,16 @@ server.use(express.urlencoded());
 server.use(express.methodOverride());
 server.use(server.router);
 
-var cc = require("./ClientConnection");
-var fr = require("./layers/FlightRadar");
-var ds = require("./sensors/DataSource");
+// var planes = new fr.FlightRadar(cm, "FlightRadar");
+// planes.Start();
+// server.get("/fr", planes.GetLayer);
 
-var cm = new cc.ConnectionManager(httpServer);
-var planes = new fr.FlightRadar(cm, "FlightRadar");
-planes.Start();
-
-var ds = new ds.DataSourceService(cm,"DataSource");
+var ds = new DataSource.DataSourceService(cm,"DataSource");
 ds.Start();
-
-server.get("/fr", planes.GetLayer);
 server.get("/datasource", ds.GetDataSource);
+
+var mapLayerFactory = new MapLayerFactory(messageBus);
+server.post('/projecttemplate', (req, res) => mapLayerFactory.process(req, res));
 
 server.use(express.static(path.join(__dirname, 'public')));
 console.log("started");
