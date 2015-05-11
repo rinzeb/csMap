@@ -7,6 +7,7 @@ import MapLayerFactory = require('./services/MapLayerCreator/MapLayerFactory');
 import fr              = require("./layers/FlightRadar");
 import DataSource      = require("./sensors/DataSource");
 import MessageBus      = require('./services/bus/MessageBus');
+import ConfigurationService = require('./services/configuration/ConfigurationService');
 
 /**
  * Create a search index file which can be loaded statically.
@@ -17,10 +18,11 @@ var offlineSearchManager = new offlineSearch('public/data/projects/projects.json
 });
 
 // setup socket.io object
-var server = express();
-var httpServer = require('http').Server(server);
-var cm         = new cc.ConnectionManager(httpServer);
-var messageBus = new MessageBus();
+var server        = express();
+var httpServer    = require('http').Server(server);
+var cm            = new cc.ConnectionManager(httpServer);
+var messageBus    = new MessageBus();
+var configService = new ConfigurationService('./configuration.json');
 
 // all environments
 server.set('port', '3002');

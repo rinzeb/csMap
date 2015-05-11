@@ -1,5 +1,6 @@
 import express    = require('express');
 import MessageBus = require('../bus/MessageBus');
+import ConfigurationService = require('../configuration/ConfigurationService');
 
 interface ILayerDefinition {
     reference:     string,
@@ -28,11 +29,7 @@ interface ILayerTemplate {
 
 /** A factory class to create new map layers based on input, e.g. from Excel */
 class MapLayerFactory {
-    private messageBus: MessageBus;
-
-    constructor(messageBus: MessageBus) {
-        this.messageBus = messageBus;
-    }
+    constructor(private configService: ConfigurationService, private messageBus: MessageBus) {}
 
     public process(req: express.Request, res: express.Response) {
         console.log('POST /');
@@ -56,6 +53,7 @@ class MapLayerFactory {
         //
         // };
         var ld = template.layerDefinition;
+        var features: csComp.Services.IFeature[] = [];
         var geojson: csComp.Services.IGeoJsonFile = {
             type: "FeatureCollection",
             featureTypes: {
@@ -71,7 +69,7 @@ class MapLayerFactory {
                     propertyTypeData: template.properties
                 }
             },
-            features: []
+            features: features
         };
 
         // Add geometry

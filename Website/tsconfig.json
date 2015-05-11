@@ -39,6 +39,8 @@
         "./sensors/datasource.ts",
         "./server.ts",
         "./services/MapLayerCreator/MapLayerFactory.ts",
-        "./services/bus/MessageBus.ts"
+        "./services/bus/MessageBus.ts",
+        "./services/configuration/ConfigurationService.ts",
+        "./services/configuration/IConfiguration.ts"
     ]
 }
