@@ -35,9 +35,9 @@ server.use(express.urlencoded());
 server.use(express.methodOverride());
 server.use(server.router);
 
-// var planes = new fr.FlightRadar(cm, "FlightRadar");
-// planes.Start();
-// server.get("/fr", planes.GetLayer);
+var planes = new fr.FlightRadar(cm, "FlightRadar");
+planes.Start();
+server.get("/fr", planes.GetLayer);
 
 var ds = new DataSource.DataSourceService(cm,"DataSource");
 ds.Start();
