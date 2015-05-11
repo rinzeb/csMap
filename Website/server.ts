@@ -3,19 +3,6 @@ import http          = require('http');
 import path          = require('path');
 import offlineSearch = require('cs-offline-search');
 
-<<<<<<< HEAD
-var cc = require("./ClientConnection");
-var fr = require("./layers/FlightRadar");
-/**
- * Create a search index file which can be loaded statically.
- */
-var offlineSearchManager = new offlineSearch('public/data/projects/projects.json', {
-    propertyNames: ['Name', 'plaatnaam', 'postcode', 'Postcode', 'straat', 'loc_straat', 'KvK', 'gemeente', 'plaats', 'Naam_van_het_concern_DigiMV_2012'],
-    stopWords: ['de', 'het', 'een', 'en', 'van', 'aan']
-});
-
-=======
->>>>>>> upstream/layer-sources-renders
 /**
  * Create a search index file which can be loaded statically.
  */
