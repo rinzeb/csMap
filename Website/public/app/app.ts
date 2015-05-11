@@ -12,6 +12,7 @@ module App {
         title: string;
         showMenuRight: boolean;
         featureSelected: boolean;
+        layersLoading: number;
     }
 
     // TODO For setting the current culture for string formatting (note you need to include public/js/cs/stringformat.YOUR-CULTURE.js. See sffjs.1.09.zip for your culture.)
@@ -55,6 +56,7 @@ module App {
             $scope.vm = this;
             $scope.showMenuRight = false;
             $scope.featureSelected = false;
+            $scope.layersLoading = 0;
 
             $messageBusService.subscribe("project", () => {
                 // NOTE EV: You may run into problems here when calling this inside an angular apply cycle.
@@ -82,7 +84,24 @@ module App {
 
         private layerMessageReceived = (title: string, layer: csComp.Services.ProjectLayer): void => {
 
-            var $contextMenu = $("#contextMenu");
+            switch (title) {
+                case "loading":
+                    this.$scope.layersLoading += 1;
+                    console.log("Loading");
+                    break;
+                case "activated":
+                    this.$scope.layersLoading -= 1;
+                    console.log("Activated");
+                    break;
+                case "error":
+                    this.$scope.layersLoading -= 1;
+                    console.log("Error loading");
+                    break;
+                case "deactivate":
+                    break;
+            }
+
+          var $contextMenu = $("#contextMenu");
 
             $("body").on("contextmenu", "table tr", function(e) {
                 $contextMenu.css({
@@ -93,13 +112,9 @@ module App {
                 return false;
             });
 
-            $contextMenu.on("click", "a", function() {
-                $contextMenu.hide();
-            });
-            switch (title) {
-                case "deactivate":
-                    break;
-            }
+          $contextMenu.on("click", "a", function() {
+             $contextMenu.hide();
+          });
 
             // NOTE EV: You need to call apply only when an event is received outside the angular scope.
             // However, make sure you are not calling this inside an angular apply cycle, as it will generate an error.
@@ -154,6 +169,10 @@ module App {
             this.$messageBusService.publish("sidebar", "toggle");
             window.console.log("Publish toggle sidebar");
         }
+
+        //public showTable(tableVisible: boolean) {
+        //    this.$mapService.mapVisible = !tableVisible;
+        //}
 
         showTable() {
             this.$mapService.mapVisible = false;

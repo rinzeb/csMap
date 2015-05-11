@@ -435,7 +435,7 @@
         "p_eenp_hh": {
             "label": "p_eenp_hh",
             "type": "number",
-            "title": "Eénpersoonshuishoudens",
+            "title": "EÃ©npersoonshuishoudens",
             "section": "CBS",
             "stringFormat": "{0}%",
             "visibleInCallOut": true,
@@ -1021,7 +1021,7 @@
             "label": "tweedebrandweeraanrijdelta",
             "type": "number",
             "title": "2de brandweeraanrijtijd (delta s)",
-            "description": "De extra tijd die de op één na dichtsbijzijnde brandweerpost nodig heeft, in seconden.",
+            "description": "De extra tijd die de op Ã©Ã©n na dichtsbijzijnde brandweerpost nodig heeft, in seconden.",
             "visibleInCallOut": false,
             "canEdit": true,
             "isSearchable": false
@@ -1039,7 +1039,7 @@
             "label": "Tweede_brandweeraanrijtijd_min",
             "type": "number",
             "title": "2de brandweeraanrijtijd (min)",
-            "description": "Gemiddelde aanrijtijd vanuit op één na dichtsbijzijnde brandweerpost, in minuten, volgens Google's route planner.",
+            "description": "Gemiddelde aanrijtijd vanuit op Ã©Ã©n na dichtsbijzijnde brandweerpost, in minuten, volgens Google's route planner.",
             "visibleInCallOut": true,
             "canEdit": true,
             "isSearchable": false
@@ -1172,7 +1172,7 @@
             "label": "Intramuraal",
             "type": "number",
             "title": "Intramuraal",
-            "description": "Optelling aantal cliënten intramuraal",
+            "description": "Optelling aantal cliÃ«nten intramuraal",
             "stringFormat": "{0:0,0}",
             "visibleInCallOut": true,
             "canEdit": true,
@@ -1256,7 +1256,7 @@
             "label": "Boekwaarde",
             "type": "number",
             "title": "Boekwaarde",
-            "description": "Boekwaarde per 31 december (= totaal materiële vaste activa) - verslagjaar",
+            "description": "Boekwaarde per 31 december (= totaal materiÃ«le vaste activa) - verslagjaar",
             "section": "Financieel",
             "stringFormat": "{0:0,0}",
             "visibleInCallOut": true,
@@ -1347,7 +1347,7 @@
             "label": "Ebitda",
             "type": "text",
             "title": "Ebitda",
-            "description": "(Resultaat uit gewone bedrijfsvoering -Afschrijvingen op immateriële en materiële vaste activa) / Som der bedrijfsopbrengsten",
+            "description": "(Resultaat uit gewone bedrijfsvoering -Afschrijvingen op immateriÃ«le en materiÃ«le vaste activa) / Som der bedrijfsopbrengsten",
             "section": "Financieel",
             "visibleInCallOut": true,
             "canEdit": true,
@@ -1357,7 +1357,7 @@
             "label": "DSCR",
             "type": "text",
             "title": "DSCR",
-            "description": "Debt Service Coverage Ratio:betalingscapaciteit (Debt Service) / financiële verplichtingen ",
+            "description": "Debt Service Coverage Ratio:betalingscapaciteit (Debt Service) / financiÃ«le verplichtingen ",
             "section": "Financieel",
             "visibleInCallOut": true,
             "canEdit": true,
@@ -2574,6 +2574,69 @@
             },
             "propertyTypeKeys": "PlaneType;Speed;Altitude;Track"
         },
+		"Huisarts": {
+            "name": "Huisarts",
+            "style": {
+                "fillColor": "#ffffff",
+                "strokeColor": "#808080",
+                "drawingMode": "Point",
+                "strokeWidth": 2,
+                "iconWidth": 32,
+                "iconHeight": 32,
+                "iconUri": "images/huisarts.png",
+				"nameLabel": "naam"
+            },
+            "propertyTypeData": [
+                {
+                    "label": "naam",
+                    "type": "text",
+                    "title": "Name",
+                    "isSearchable": true
+                },
+				{
+                    "label": "SameTown",
+                    "type": "relation",
+					"subject": "town",
+					"target": "town",
+                    "title": "In deze gemeente",
+                    "isSearchable": false,
+					"visibleInCallOut": false
+                },
+				{
+                    "label": "province",
+                    "type": "relation",
+					"subject": "province",
+					"target": "province",
+                    "title": "In deze provincie",
+                    "isSearchable": false,
+					"visibleInCallOut": false
+                },
+				{
+                    "label": "inw_per_arts",
+                    "type": "hierarchy",
+					"section": "hierarchy",
+					"targetlayer": "gemeentes",
+					"targetproperty": "aant_inw",
+					"calculation": "ratio",
+                    "title": "Inwoners per arts",
+                    "isSearchable": false,
+					"visibleInCallOut": false
+                },
+                {
+                    "label": "kvk_nr",
+                    "type": "number",
+                    "languages": {
+                        "nl": {
+                            "title": "kvk nummer"
+                        },
+                        "en": {
+                            "title": "kvk number"
+                        }
+                    },
+                    "isSearchable": false
+                }
+            ]
+        },
         "Hospital": {
             "name": "Ziekenhuis",
             "style": {
@@ -2832,7 +2895,6 @@
                     "type": "GeoJson",
                     "url": "data/projects/20141104_csMap/brandweerposten.json",
                     "enabled": false,
-                    "refreshTimer" : 10,
                     "opacity": 100
                 },
                 {
@@ -2850,6 +2912,24 @@
                     },
                     "type": "GeoJson",
                     "url": "data/projects/20141104_csMap/aanrijtijden.json",
+                    "enabled": false,
+                    "opacity": 100
+                },
+				{
+                    "id": "Emmen",
+                    "reference": "Emmen",
+                    "languages": {
+                        "nl": {
+                            "title": "Emmen",
+                            "description": "Emmen."
+                        },
+                        "en": {
+                            "title": "Emmen",
+                            "description": "Emmen."
+                        }
+                    },
+                    "type": "GeoJson",
+                    "url": "data/projects/20141104_csMap/woningen_emmen.json",
                     "enabled": false,
                     "opacity": 100
                 }
@@ -3097,6 +3177,216 @@
                     "opacity": 100
                 }
             ]
-        }
-    ]
+        },
+		{
+            "languages": {
+                "nl": {
+                    "title": "Hierarchische data",
+                    "description": "Hierarchische data."
+                },
+                "en": {
+                    "title": "Hierarchical data",
+                    "description": "Hierarchical data."
+                }
+            },
+			"oneLayerActive": true,
+			"clustering": true,
+			"clusterLevel": 15,
+            "layers": [
+                {
+                	"description" : "Huisartsen in Nederland",
+                	"type" : "hierarchy",
+                	"hierarchySettings" : {
+                		"referenceList" : [
+                			"gemeentes"
+                		]
+                	},
+                	"title" : "Huisartsen",
+                	"url" : "data/projects/20141104_csMap/huisartsen.json",
+                	"opacity" : 50
+                },
+				{
+                	"description" : "Verzorgingshuizen in Nederland",
+                	"type" : "hierarchy",
+                	"hierarchySettings" : {
+                		"referenceList" : [
+                			"gemeentes"
+                		]
+                	},
+                	"title" : "Verzorgingshuizen",
+                	"url" : "data/projects/20141104_csMap/verzorgingshuizen.json",
+                	"opacity" : 50
+                }
+            ]
+        },
+		{
+			"languages" : {
+				"nl" : {
+					"title" : "Heatmaps",
+					"description" : "Demonstreert heatmap lagen gebaseerd op features."
+				},
+				"en" : {
+					"title" : "Heatmaps",
+					"description" : "Demonstrates heatmap layers based on features."
+				}
+			},
+			"clustering" : false,
+			"oneLayerActive" : true,
+			"layers" : [{
+					"id" : "heatmaphospital",
+					"reference" : "heatmaphospital",
+					"languages" : {
+						"nl" : {
+							"title" : "Heatmap hospital-firestations",
+							"description" : "Prefer hospitals, avoid firestations"
+						},
+						"en" : {
+							"title" : "Heatmap hospital-firestations",
+							"description" : "Prefereer ziekenhuizen, vermijd brandweerkazernes"
+						}
+					},
+					"description" : "Prefer hospitals, avoid firestations",
+					"type" : "Heatmap",
+					"heatmapSettings" : {
+						"referenceList" : [
+							"Hospitals",
+							"firestation"
+						],
+						"minZoom" : 10,
+						"maxZoom" : 15,
+						"intensityScale" : 3,
+						"resolution" : 2
+					},
+					"heatmapItems" : [{
+							"title" : "Ziekenhuis",
+							"featureType" : {
+								"name" : "Ziekenhuis"
+							},
+							"weight" : 0,
+							"userWeight" : 3,
+							"isSelected" : true,
+							"idealityMeasure" : {
+								"idealDistance" : 700,
+								"atLocation" : 0.1,
+								"lostInterestDistance" : 2000
+							},
+							"heatspots" : []
+						}, {
+							"title" : "Brandweerkazerne",
+							"featureType" : {
+								"name" : "Brandweerkazerne"
+							},
+							"weight" : 0,
+							"userWeight" : -2,
+							"isSelected" : true,
+							"idealityMeasure" : {
+								"idealDistance" : 300,
+								"atLocation" : 0.6,
+								"lostInterestDistance" : 2000
+							},
+							"heatspots" : []
+						}
+					],
+					"enabled" : false,
+					"opacity" : 100
+					}, {
+						"id" : "emmen_energy",
+						"reference" : "emmen_energy",
+						"languages" : {
+							"nl" : {
+								"title" : "Emmen Energylabels",
+								"description" : "Emmen Energylabels"
+							},
+							"en" : {
+								"title" : "Emmen Energylabels",
+								"description" : "Emmen Energylabels"
+							}
+						},
+						"description" : "Emmen Energylabels",
+						"type" : "Heatmap",
+						"heatmapSettings" : {
+							"referenceList" : [
+								"Emmen"
+							],
+							"minZoom" : 10,
+							"maxZoom" : 16,
+							"intensityScale" : 1,
+							"resolution" : 1
+						},
+						"heatmapItems" : [{
+								"title" : "A",
+								"featureType" : {
+									"name" : "Emmen"
+								},
+								"weight" : 0.3333333333333333,
+								"userWeight" : 2,
+								"isSelected" : true,
+								"idealityMeasure" : {
+									"idealDistance" : 50,
+									"atLocation" : 0.8,
+									"lostInterestDistance" : 500
+								},
+								"propertyTitle" : "Energielabel",
+								"propertyLabel" : "energielabel",
+								"optionIndex" : 1,
+								"heatspots" : []
+							}, {
+								"title" : "B",
+								"featureType" : {
+									"name" : "Emmen"
+								},
+								"weight" : 0.16666666666666666,
+								"userWeight" : 1,
+								"isSelected" : true,
+								"idealityMeasure" : {
+									"idealDistance" : 50,
+									"atLocation" : 0.5,
+									"lostInterestDistance" : 500
+								},
+								"propertyTitle" : "Energielabel",
+								"propertyLabel" : "energielabel",
+								"optionIndex" : 2,
+								"heatspots" : []
+							}, {
+								"title" : "F",
+								"featureType" : {
+									"name" : "Emmen"
+								},
+								"weight" : -0.16666666666666666,
+								"userWeight" : -1,
+								"isSelected" : true,
+								"idealityMeasure" : {
+									"idealDistance" : 50,
+									"atLocation" : 1,
+									"lostInterestDistance" : 500
+								},
+								"propertyTitle" : "Energielabel",
+								"propertyLabel" : "energielabel",
+								"optionIndex" : 6,
+								"heatspots" : []
+							}, {
+								"title" : "G",
+								"featureType" : {
+									"name" : "Emmen"
+								},
+								"weight" : -0.3333333333333333,
+								"userWeight" : -2,
+								"isSelected" : true,
+								"idealityMeasure" : {
+									"idealDistance" : 100,
+									"atLocation" : 1,
+									"lostInterestDistance" : 800
+								},
+								"propertyTitle" : "Energielabel",
+								"propertyLabel" : "energielabel",
+								"optionIndex" : 7,
+								"heatspots" : []
+							}
+						],
+						"enabled" : false,
+						"opacity" : 100
+					}
+					]
+		}
+	]
 }
