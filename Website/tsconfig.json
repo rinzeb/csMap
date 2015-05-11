@@ -36,8 +36,9 @@
         "./Scripts/typings/xbbcode/xbbcode.d.ts",
         "./layers/flightradar.ts",
         "./public/app/app.ts",
-        "./public/app/search/SearchCtrl.ts",
         "./sensors/datasource.ts",
-        "./server.ts"
+        "./server.ts",
+        "./services/MapLayerCreator/MapLayerFactory.ts",
+        "./services/bus/MessageBus.ts"
     ]
 }
