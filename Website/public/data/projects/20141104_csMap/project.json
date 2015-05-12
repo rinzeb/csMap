@@ -3,7 +3,7 @@
     "description": "csMap is developed by the Dutch Research Organisation TNO, in first instance for the Dutch Ministry of Health (VWS).",
     "url": "https://github.com/TNOCS/csMap",
     "logo": "images/CommonSenseRound.png",
-        "connected": true,
+    "connected": true,
     "timeLine": {
         "start": 1375315200000,
         "end": 1425168000000,
@@ -11,103 +11,109 @@
         "zoomLevelName": "years",
         "isLive": false
     },
-    "datasources": [
-        {
-            "url": "/datasource",
-            "type" : "dynamic",
-            "sensors" : {
-                "test" : { "propertyTypeKey" : "sensor_test"},
-                "test2" : { "propertyTypeKey" : "sensor_test2"}
-            }
-        }
-    ],
-    "dashboards": [
-        {
-            "id": "home",
-            "name": "Home",
-            "showTimeline": true,
-            "showLeftmenu": true,
-            "showMap": true,
-            "visiblelayers": [
-            ]
-        },
-        {
-            "id": "flight",
-            "name": "Flights",
-            "showTimeline": true,
-            "showLeftmenu": true,
-            "showMap": true,
-            "baselayer" : "Positron",
-            "visiblelayers": [
-                "FlightRadar"
-            ],
-            "widgets": [
-                {
-                    "directive": "indicators",
-                    "left": "10px",
-                    "top": "10px",
-                    "width": "255px",
-                    "height": "435px",
-                    "data": {
-                        "title": "Sensor Data 1",
-                        "indicators": [
-                            {
-                                "visual": "circular",
-                                "sensor": "datasource/test"
-                            },
-                            {
-                                "visual": "sparkline",
-                                "sensor": "datasource/test2"
-                            }
-                        ]
-                    }
-                }
-            ],
-            "viewBounds": {
-                  "southWest": [ 50.7, 3.3 ],
-                  "northEast": [ 53.5, 7.3 ]
-            }
-        },
-        {
-            "id": "health",
-            "name": "Health",
-            "showTimeline": false,
-            "showLeftmenu": true,
-            "showMap": true,
-            "visiblelayers": [
-              "zorgkantoor",
-              "Hospitals"
-            ],
-            "viewBounds": {
-                  "southWest": [ 50.7, 3.3 ],
-                  "northEast": [ 53.5, 7.3 ]
+    "datasources": [{
+        "url": "/datasource",
+        "type": "dynamic",
+        "sensors": {
+            "test": {
+                "propertyTypeKey": "sensor_test"
             },
-            "baselayer" : "Satellite Day"
-        },
-        {
-            "id": "nomap",
-            "name": "No Map",
-            "showTimeline": false,
-            "showLeftmenu": true,
-            "showMap": false
+            "test2": {
+                "propertyTypeKey": "sensor_test2"
+            }
         }
-      ],
+    }],
+    "dashboards": [{
+        "id": "home",
+        "name": "Home",
+        "showTimeline": true,
+        "showLeftmenu": true,
+        "showMap": true
+    }, {
+        "id": "datatable",
+        "name": "Table",
+        "showTimeline": false,
+        "showLeftmenu": false,
+        "showMap": false,
+        "widgets": [{
+            "directive": "datatable",
+            "borderwidth": "0px",
+            "width": "100%",
+            "height": "100%"
+        }]
+    }, {
+        "id": "flight",
+        "name": "Flights",
+        "showTimeline": true,
+        "showLeftmenu": true,
+        "showMap": true,
+        "baselayer": "Positron",
+        "visiblelayers": [
+            "FlightRadar"
+        ],
+        "widgets": [{
+            "directive": "indicators",
+            "left": "10px",
+            "top": "10px",
+            "width": "255px",
+            "height": "435px",
+            "data": {
+                "title": "Sensor Data 1",
+                "indicators": [{
+                    "visual": "circular",
+                    "sensor": "datasource/test"
+                }, {
+                    "visual": "sparkline",
+                    "sensor": "datasource/test2"
+                }]
+            }
+        }],
+        "viewBounds": {
+            "southWest": [50.7, 3.3],
+            "northEast": [53.5, 7.3]
+        }
+    }, {
+        "id": "health",
+        "name": "Health",
+        "showTimeline": false,
+        "showLeftmenu": true,
+        "showMap": true,
+        "visiblelayers": [
+            "zorgkantoor",
+            "Hospitals"
+        ],
+        "viewBounds": {
+            "southWest": [50.7, 3.3],
+            "northEast": [53.5, 7.3]
+        },
+        "baselayer": "Satellite Day"
+    }, {
+        "id": "nomap",
+        "name": "No Map",
+        "showTimeline": false,
+        "showLeftmenu": true,
+        "showMap": false
+    }],
     "expertMode": 3,
     "userPrivileges": {
-        "mca": { "expertMode": true },
-        "heatmap": { "expertMode": true }
+        "mca": {
+            "expertMode": true
+        },
+        "heatmap": {
+            "expertMode": true
+        }
     },
     "accentColor": "Green",
     "propertyTypeData": {
-        "sensor_test":{
-          "type": "number",
-          "title": "Test value",
-          "stringFormat": "{0:0,0}"
+        "sensor_test": {
+            "type": "number",
+            "title": "Test value",
+            "stringFormat": "{0:0,0}"
         },
-        "sensor_test2":{
-          "type": "number",
-          "title": "Test value 2",
-          "stringFormat": "{0:0,0}"
+        "sensor_test2": {
+            "type": "number",
+            "title": "Test value 2",
+            "stringFormat": "{0:0,0}"
         },
         "aant_gem": {
             "label": "aant_gem",
@@ -2561,7 +2567,7 @@
         }
     },
     "featureTypes": {
-      "plane": {
+        "plane": {
             "name": "Vliegtuig",
             "style": {
                 "strokeColor": "#000000",
@@ -2574,7 +2580,7 @@
             },
             "propertyTypeKeys": "PlaneType;Speed;Altitude;Track"
         },
-		"Huisarts": {
+        "Huisarts": {
             "name": "Huisarts",
             "style": {
                 "fillColor": "#ffffff",
@@ -2584,58 +2590,52 @@
                 "iconWidth": 32,
                 "iconHeight": 32,
                 "iconUri": "images/huisarts.png",
-				"nameLabel": "naam"
+                "nameLabel": "naam"
             },
-            "propertyTypeData": [
-                {
-                    "label": "naam",
-                    "type": "text",
-                    "title": "Name",
-                    "isSearchable": true
-                },
-				{
-                    "label": "SameTown",
-                    "type": "relation",
-					"subject": "town",
-					"target": "town",
-                    "title": "In deze gemeente",
-                    "isSearchable": false,
-					"visibleInCallOut": false
-                },
-				{
-                    "label": "province",
-                    "type": "relation",
-					"subject": "province",
-					"target": "province",
-                    "title": "In deze provincie",
-                    "isSearchable": false,
-					"visibleInCallOut": false
-                },
-				{
-                    "label": "inw_per_arts",
-                    "type": "hierarchy",
-					"section": "hierarchy",
-					"targetlayer": "gemeentes",
-					"targetproperty": "aant_inw",
-					"calculation": "ratio",
-                    "title": "Inwoners per arts",
-                    "isSearchable": false,
-					"visibleInCallOut": false
-                },
-                {
-                    "label": "kvk_nr",
-                    "type": "number",
-                    "languages": {
-                        "nl": {
-                            "title": "kvk nummer"
-                        },
-                        "en": {
-                            "title": "kvk number"
-                        }
+            "propertyTypeData": [{
+                "label": "naam",
+                "type": "text",
+                "title": "Name",
+                "isSearchable": true
+            }, {
+                "label": "SameTown",
+                "type": "relation",
+                "subject": "town",
+                "target": "town",
+                "title": "In deze gemeente",
+                "isSearchable": false,
+                "visibleInCallOut": false
+            }, {
+                "label": "province",
+                "type": "relation",
+                "subject": "province",
+                "target": "province",
+                "title": "In deze provincie",
+                "isSearchable": false,
+                "visibleInCallOut": false
+            }, {
+                "label": "inw_per_arts",
+                "type": "hierarchy",
+                "section": "hierarchy",
+                "targetlayer": "gemeentes",
+                "targetproperty": "aant_inw",
+                "calculation": "ratio",
+                "title": "Inwoners per arts",
+                "isSearchable": false,
+                "visibleInCallOut": false
+            }, {
+                "label": "kvk_nr",
+                "type": "number",
+                "languages": {
+                    "nl": {
+                        "title": "kvk nummer"
                     },
-                    "isSearchable": false
-                }
-            ]
+                    "en": {
+                        "title": "kvk number"
+                    }
+                },
+                "isSearchable": false
+            }]
         },
         "Hospital": {
             "name": "Ziekenhuis",
@@ -2648,122 +2648,113 @@
                 "iconHeight": 32,
                 "iconUri": "images/ziekenhuis.png"
             },
-            "propertyTypeData": [
-                {
-                    "label": "naam",
-                    "type": "text",
-                    "languages": {
-                        "nl": {
-                            "title": "Naam"
-                        },
-                        "en": {
-                            "title": "Name"
-                        }
+            "propertyTypeData": [{
+                "label": "naam",
+                "type": "text",
+                "languages": {
+                    "nl": {
+                        "title": "Naam"
                     },
-                    "isSearchable": true
+                    "en": {
+                        "title": "Name"
+                    }
                 },
-                {
-                    "label": "locatie",
-                    "type": "text",
-                    "languages": {
-                        "nl": {
-                            "title": "Locatie"
-                        },
-                        "en": {
-                            "title": "Location"
-                        }
+                "isSearchable": true
+            }, {
+                "label": "locatie",
+                "type": "text",
+                "languages": {
+                    "nl": {
+                        "title": "Locatie"
                     },
-                    "isSearchable": true
+                    "en": {
+                        "title": "Location"
+                    }
                 },
-                {
-                    "label": "adres",
-                    "type": "text",
-                    "languages": {
-                        "nl": {
-                            "title": "Adres",
-                            "section": "Contact"
-                        },
-                        "en": {
-                            "title": "Address",
-                            "section": "Contact"
-                        }
+                "isSearchable": true
+            }, {
+                "label": "adres",
+                "type": "text",
+                "languages": {
+                    "nl": {
+                        "title": "Adres",
+                        "section": "Contact"
                     },
-                    "isSearchable": true
+                    "en": {
+                        "title": "Address",
+                        "section": "Contact"
+                    }
                 },
-                {
-                    "label": "postcode",
-                    "type": "text",
-                    "languages": {
-                        "nl": {
-                            "title": "Postcode",
-                            "section": "Contact"
-                        },
-                        "en": {
-                            "title": "Zip code",
-                            "section": "Contact"
-                        }
+                "isSearchable": true
+            }, {
+                "label": "postcode",
+                "type": "text",
+                "languages": {
+                    "nl": {
+                        "title": "Postcode",
+                        "section": "Contact"
                     },
-                    "isSearchable": true
+                    "en": {
+                        "title": "Zip code",
+                        "section": "Contact"
+                    }
                 },
-                {
-                    "label": "plaats",
-                    "type": "text",
-                    "languages": {
-                        "nl": {
-                            "title": "Plaats",
-                            "section": "Contact"
-                        },
-                        "en": {
-                            "title": "Location",
-                            "section": "Contact"
-                        }
+                "isSearchable": true
+            }, {
+                "label": "plaats",
+                "type": "text",
+                "languages": {
+                    "nl": {
+                        "title": "Plaats",
+                        "section": "Contact"
                     },
-                    "isSearchable": true
+                    "en": {
+                        "title": "Location",
+                        "section": "Contact"
+                    }
                 },
-                {
-                    "label": "telefoonalgemeen",
-                    "type": "text",
-                    "languages": {
-                        "nl": {
-                            "title": "Telefoon algemeen",
-                            "section": "Contact"
-                        },
-                        "en": {
-                            "title": "Telephone general",
-                            "section": "Contact"
-                        }
+                "isSearchable": true
+            }, {
+                "label": "telefoonalgemeen",
+                "type": "text",
+                "languages": {
+                    "nl": {
+                        "title": "Telefoon algemeen",
+                        "section": "Contact"
                     },
-                    "isSearchable": false
+                    "en": {
+                        "title": "Telephone general",
+                        "section": "Contact"
+                    }
                 },
-                {
-                    "label": "telefoonSEH",
-                    "type": "text",
-                    "languages": {
-                        "nl": {
-                            "title": "Telefoon SEH",
-                            "section": "Contact"
-                        },
-                        "en": {
-                            "title": "Telephone ER",
-                            "section": "Contact"
-                        }
+                "isSearchable": false
+            }, {
+                "label": "telefoonSEH",
+                "type": "text",
+                "languages": {
+                    "nl": {
+                        "title": "Telefoon SEH",
+                        "section": "Contact"
                     },
-                    "isSearchable": false
+                    "en": {
+                        "title": "Telephone ER",
+                        "section": "Contact"
+                    }
                 },
-                {
-                    "label": "bedden",
-                    "type": "number",
-                    "languages": {
-                        "nl": {
-                            "title": "Aantal bedden"
-                        },
-                        "en": {
-                            "title": "Number of beds"
-                        }
+                "isSearchable": false
+            }, {
+                "label": "bedden",
+                "type": "number",
+                "languages": {
+                    "nl": {
+                        "title": "Aantal bedden"
                     },
-                    "isSearchable": false
-                }
-            ]
+                    "en": {
+                        "title": "Number of beds"
+                    }
+                },
+                "isSearchable": false
+            }]
         },
         "Brandweerkazerne": {
             "name": "Brandweerkazerne",
@@ -2834,559 +2825,525 @@
     "baselayers": {
 
     },
-    "groups": [
-        {
-            "title": "Flight Radar",
-            "description": "Demonstrates WMS layers.",
-            "clustering": false,
-            "layers": [
-                {
-                    "id": "FlightRadar",
-                    "type": "dynamicgeojson",
-                    "url" :  "/fr"
-                }
-            ]
+    "groups": [{
+        "title": "Flight Radar",
+        "description": "Demonstrates WMS layers.",
+        "clustering": false,
+        "layers": [{
+            "id": "FlightRadar",
+            "type": "dynamicgeojson",
+            "url": "/fr"
+        }]
+    }, {
+        "languages": {
+            "nl": {
+                "title": "Locaties",
+                "description": "Demonstreert kaartlagen gebaseerd op specifieke locaties"
+            },
+            "en": {
+                "title": "Features",
+                "description": "Demonstrates layers based on points"
+            }
         },
-        {
+        "clustering": true,
+        "clusterLevel": 12,
+        "layers": [{
+            "id": "Hospitals",
+            "reference": "Hospitals",
             "languages": {
                 "nl": {
-                    "title": "Locaties",
-                    "description": "Demonstreert kaartlagen gebaseerd op specifieke locaties"
+                    "title": "Ziekenhuizen",
+                    "description": "De locaties van de Nederlandse ziekenhuizen."
                 },
                 "en": {
-                    "title": "Features",
-                    "description": "Demonstrates layers based on points"
+                    "title": "Hospitals",
+                    "description": "These are the locations of the Dutch hospitals."
                 }
             },
-            "clustering": true,
-            "clusterLevel": 12,
-            "layers": [
-                {
-                    "id": "Hospitals",
-                    "reference": "Hospitals",
-                    "languages": {
-                        "nl": {
-                            "title": "Ziekenhuizen",
-                            "description": "De locaties van de Nederlandse ziekenhuizen."
-                        },
-                        "en": {
-                            "title": "Hospitals",
-                            "description": "These are the locations of the Dutch hospitals."
-                        }
-                    },
-                    "type": "GeoJson",
-                    "url": "data/projects/20141104_csMap/Ziekenhuizen.json",
-                    "enabled": false,
-                    "opacity": 100
-                },
-                {
-                    "id": "firestation",
-                    "reference": "firestation",
-                    "languages": {
-                        "nl": {
-                            "title": "Brandweerkazernes",
-                            "description": "De locaties van de Nederlandse brandweerkazernes en opleidingscentra (Bron: IFV, BAG, 1 november 2014)."
-                        },
-                        "en": {
-                            "title": "Fire stations",
-                            "description": "These are the locations of the fire station. (Source: IFV, BAG, 1 november 2014.)"
-                        }
-                    },
-                    "type": "GeoJson",
-                    "url": "data/projects/20141104_csMap/brandweerposten.json",
-                    "enabled": false,
-                    "opacity": 100
-                },
-                {
-                    "id": "traveltimes",
-                    "reference": "traveltimes",
-                    "languages": {
-                        "nl": {
-                            "title": "Reistijd",
-                            "description": "De reistijd van een brandweerkazerne naar de zorginstelling (Bron: IFV, BAG: 1 november 2014)."
-                        },
-                        "en": {
-                            "title": "Travel times",
-                            "description": "This is the travel time from the nearest fire station to a care institute. (Bron: IFV, BAG: 1 november 2014.)"
-                        }
-                    },
-                    "type": "GeoJson",
-                    "url": "data/projects/20141104_csMap/aanrijtijden.json",
-                    "enabled": false,
-                    "opacity": 100
-                },
-				{
-                    "id": "Emmen",
-                    "reference": "Emmen",
-                    "languages": {
-                        "nl": {
-                            "title": "Emmen",
-                            "description": "Emmen."
-                        },
-                        "en": {
-                            "title": "Emmen",
-                            "description": "Emmen."
-                        }
-                    },
-                    "type": "GeoJson",
-                    "url": "data/projects/20141104_csMap/woningen_emmen.json",
-                    "enabled": false,
-                    "opacity": 100
-                }
-            ]
-        },
-        {
-            "title": "WMS",
-            "description": "Demonstrates WMS layers.",
-            "clustering": false,
-            "oneLayerActive": true,
-            "layers": [
-                {
-                    "id": "bag",
-                    "reference": "bag",
-                    "languages": {
-                        "nl": {
-                            "title": "BAG",
-                            "description": "Basis Administratie Gebouwen (Bron: Kadaster, via PDOK.nl)."
-                        },
-                        "en": {
-                            "title": "BAG (Cadastre)",
-                            "description": "Dutch Cadastre's Basis Administratie Gebouwen. (Source: PDOK.nl.)"
-                        }
-                    },
-                    "type": "wms",
-                    "wmsLayers": "pand,ligplaats,standplaats,verblijfsobject",
-                    "url": "http://geodata.nationaalgeoregister.nl/bagviewer/wms?",
-                    "enabled": false,
-                    "opacity": 25
-                },
-                {
-                    "id": "us",
-                    "reference": "us",
-                    "title": "US",
-                    "type": "wms",
-                    "wmsLayers": "NoiseTrafficLden55dB",
-                    "url": "http://practice.tno.nl:8080/geoserver/rasters/wms?",
-                    "enabled": false,
-                    "opacity": 50
-                },
-                {
-                    "id": "cbs",
-                    "reference": "cbs",
-                    "languages": {
-                        "nl": {
-                            "title": "CBS provincie data",
-                            "description": "(Bron: CBS, via PDOK.nl)."
-                        },
-                        "en": {
-                            "title": "CBS Provinces",
-                            "description": "Dutch Provinces. (Source: PDOK.nl.)"
-                        }
-                    },
-                    "type": "wms",
-                    "wmsLayers": "cbsprovincies2012",
-                    "url": "http://geodata.nationaalgeoregister.nl/cbsprovincies/wms?",
-                    "enabled": false,
-                    "opacity": 50
-                },
-                {
-                    "id": "aan",
-                    "reference": "aan",
-                    "languages": {
-                        "nl": {
-                            "title": "Agrarisch gebied",
-                            "description": "Agrarisch Areaal Nederland (AAN). Geografische afbakening van landbouwgrond in Nederland (grond die wordt gebruikt als bouwland, blijvend grasland of de teelt van blijvende gewassen). (Source: PDOK.nl.)"
-                        },
-                        "en": {
-                            "title": "Agricultural areas",
-                            "description": "Agrarisch Areaal Nederland (AAN). Geografische afbakening van landbouwgrond in Nederland (grond die wordt gebruikt als bouwland, blijvend grasland of de teelt van blijvende gewassen). (Source: PDOK.nl.)"
-                        }
-                    },
-                    "type": "wms",
-                    "wmsLayers": "aan",
-                    "url": "http://geodata.nationaalgeoregister.nl/aan/wms?",
-                    "enabled": false,
-                    "opacity": 50
-                },
-                {
-                    "id": "ahn",
-                    "reference": "ahn",
-                    "languages": {
-                        "nl": {
-                            "title": "AHN",
-                            "description": "Actuele Hoogtekaart Nederland (Source: PDOK.nl.)"
-                        },
-                        "en": {
-                            "title": "AHN2",
-                            "description": "Dutch height map, 0.5m, ruw. (Source: PDOK.nl.)"
-                        }
-                    },
-                    "type": "wms",
-                    "wmsLayers": "ahn2_05m_ruw",
-                    "url": "http://geodata.nationaalgeoregister.nl/ahn2/wms?",
-                    "enabled": false,
-                    "opacity": 50
-                },
-                {
-                    "id": "buurten",
-                    "reference": "buurten",
-                    "languages": {
-                        "nl": {
-                            "title": "Buurten",
-                            "description": "Het Bestand Wijk- en Buurtkaart 2013 bevat de geometrie van alle buurten in Nederland (Source: PDOK.nl.)"
-                        },
-                        "en": {
-                            "title": "Boroughs",
-                            "description": "From the Dutch Census, CBS (Source: PDOK.nl.)"
-                        }
-                    },
-                    "type": "wms",
-                    "wmsLayers": "cbs_buurten_2013",
-                    "url": "http://geodata.nationaalgeoregister.nl/wijkenbuurten2013/wms?",
-                    "enabled": false,
-                    "opacity": 50
-                },
-                {
-                    "id": "top10terreinen",
-                    "reference": "top10terreinen",
-                    "languages": {
-                        "nl": {
-                            "title": "TOP10NL Terreinen",
-                            "description": "Terreinen (Source: PDOK.nl.)"
-                        },
-                        "en": {
-                            "title": "TOP10NL Terrains",
-                            "description": "Terreinen (Source: PDOK.nl.)"
-                        }
-                    },
-                    "type": "wms",
-                    "wmsLayers": "terreinen",
-                    "url": "http://geodata.nationaalgeoregister.nl/top10nl/wms?",
-                    "enabled": false,
-                    "opacity": 50
-                }
-            ]
-        },
-        {
+            "type": "GeoJson",
+            "url": "data/projects/20141104_csMap/Ziekenhuizen.json",
+            "enabled": false,
+            "opacity": 100
+        }, {
+            "id": "firestation",
+            "reference": "firestation",
             "languages": {
                 "nl": {
-                    "title": "Gebieden",
-                    "description": "Demonstreert lagen gebaseerd op gebieden."
+                    "title": "Brandweerkazernes",
+                    "description": "De locaties van de Nederlandse brandweerkazernes en opleidingscentra (Bron: IFV, BAG, 1 november 2014)."
                 },
                 "en": {
-                    "title": "Areas",
-                    "description": "Demonstrates layers based on regions."
+                    "title": "Fire stations",
+                    "description": "These are the locations of the fire station. (Source: IFV, BAG, 1 november 2014.)"
                 }
             },
-            "clustering": false,
-            "oneLayerActive": true,
-            "layers": [
+            "type": "GeoJson",
+            "url": "data/projects/20141104_csMap/brandweerposten.json",
+            "enabled": false,
+            "opacity": 100
+        }, {
+            "id": "traveltimes",
+            "reference": "traveltimes",
+            "languages": {
+                "nl": {
+                    "title": "Reistijd",
+                    "description": "De reistijd van een brandweerkazerne naar de zorginstelling (Bron: IFV, BAG: 1 november 2014)."
+                },
+                "en": {
+                    "title": "Travel times",
+                    "description": "This is the travel time from the nearest fire station to a care institute. (Bron: IFV, BAG: 1 november 2014.)"
+                }
+            },
+            "type": "GeoJson",
+            "url": "data/projects/20141104_csMap/aanrijtijden.json",
+            "enabled": false,
+            "opacity": 100
+        }, {
+            "id": "Emmen",
+            "reference": "Emmen",
+            "languages": {
+                "nl": {
+                    "title": "Emmen",
+                    "description": "Emmen."
+                },
+                "en": {
+                    "title": "Emmen",
+                    "description": "Emmen."
+                }
+            },
+            "type": "GeoJson",
+            "url": "data/projects/20141104_csMap/woningen_emmen.json",
+            "enabled": false,
+            "opacity": 100
+        }]
+    }, {
+        "title": "WMS",
+        "description": "Demonstrates WMS layers.",
+        "clustering": false,
+        "oneLayerActive": true,
+        "layers": [{
+            "id": "bag",
+            "reference": "bag",
+            "languages": {
+                "nl": {
+                    "title": "BAG",
+                    "description": "Basis Administratie Gebouwen (Bron: Kadaster, via PDOK.nl)."
+                },
+                "en": {
+                    "title": "BAG (Cadastre)",
+                    "description": "Dutch Cadastre's Basis Administratie Gebouwen. (Source: PDOK.nl.)"
+                }
+            },
+            "type": "wms",
+            "wmsLayers": "pand,ligplaats,standplaats,verblijfsobject",
+            "url": "http://geodata.nationaalgeoregister.nl/bagviewer/wms?",
+            "enabled": false,
+            "opacity": 25
+        }, {
+            "id": "us",
+            "reference": "us",
+            "title": "US",
+            "type": "wms",
+            "wmsLayers": "NoiseTrafficLden55dB",
+            "url": "http://practice.tno.nl:8080/geoserver/rasters/wms?",
+            "enabled": false,
+            "opacity": 50
+        }, {
+            "id": "cbs",
+            "reference": "cbs",
+            "languages": {
+                "nl": {
+                    "title": "CBS provincie data",
+                    "description": "(Bron: CBS, via PDOK.nl)."
+                },
+                "en": {
+                    "title": "CBS Provinces",
+                    "description": "Dutch Provinces. (Source: PDOK.nl.)"
+                }
+            },
+            "type": "wms",
+            "wmsLayers": "cbsprovincies2012",
+            "url": "http://geodata.nationaalgeoregister.nl/cbsprovincies/wms?",
+            "enabled": false,
+            "opacity": 50
+        }, {
+            "id": "aan",
+            "reference": "aan",
+            "languages": {
+                "nl": {
+                    "title": "Agrarisch gebied",
+                    "description": "Agrarisch Areaal Nederland (AAN). Geografische afbakening van landbouwgrond in Nederland (grond die wordt gebruikt als bouwland, blijvend grasland of de teelt van blijvende gewassen). (Source: PDOK.nl.)"
+                },
+                "en": {
+                    "title": "Agricultural areas",
+                    "description": "Agrarisch Areaal Nederland (AAN). Geografische afbakening van landbouwgrond in Nederland (grond die wordt gebruikt als bouwland, blijvend grasland of de teelt van blijvende gewassen). (Source: PDOK.nl.)"
+                }
+            },
+            "type": "wms",
+            "wmsLayers": "aan",
+            "url": "http://geodata.nationaalgeoregister.nl/aan/wms?",
+            "enabled": false,
+            "opacity": 50
+        }, {
+            "id": "ahn",
+            "reference": "ahn",
+            "languages": {
+                "nl": {
+                    "title": "AHN",
+                    "description": "Actuele Hoogtekaart Nederland (Source: PDOK.nl.)"
+                },
+                "en": {
+                    "title": "AHN2",
+                    "description": "Dutch height map, 0.5m, ruw. (Source: PDOK.nl.)"
+                }
+            },
+            "type": "wms",
+            "wmsLayers": "ahn2_05m_ruw",
+            "url": "http://geodata.nationaalgeoregister.nl/ahn2/wms?",
+            "enabled": false,
+            "opacity": 50
+        }, {
+            "id": "buurten",
+            "reference": "buurten",
+            "languages": {
+                "nl": {
+                    "title": "Buurten",
+                    "description": "Het Bestand Wijk- en Buurtkaart 2013 bevat de geometrie van alle buurten in Nederland (Source: PDOK.nl.)"
+                },
+                "en": {
+                    "title": "Boroughs",
+                    "description": "From the Dutch Census, CBS (Source: PDOK.nl.)"
+                }
+            },
+            "type": "wms",
+            "wmsLayers": "cbs_buurten_2013",
+            "url": "http://geodata.nationaalgeoregister.nl/wijkenbuurten2013/wms?",
+            "enabled": false,
+            "opacity": 50
+        }, {
+            "id": "top10terreinen",
+            "reference": "top10terreinen",
+            "languages": {
+                "nl": {
+                    "title": "TOP10NL Terreinen",
+                    "description": "Terreinen (Source: PDOK.nl.)"
+                },
+                "en": {
+                    "title": "TOP10NL Terrains",
+                    "description": "Terreinen (Source: PDOK.nl.)"
+                }
+            },
+            "type": "wms",
+            "wmsLayers": "terreinen",
+            "url": "http://geodata.nationaalgeoregister.nl/top10nl/wms?",
+            "enabled": false,
+            "opacity": 50
+        }]
+    }, {
+        "languages": {
+            "nl": {
+                "title": "Gebieden",
+                "description": "Demonstreert lagen gebaseerd op gebieden."
+            },
+            "en": {
+                "title": "Areas",
+                "description": "Demonstrates layers based on regions."
+            }
+        },
+        "clustering": false,
+        "oneLayerActive": true,
+        "layers": [
 
-                {
-                    "id": "9d1dc210f8f5474f977c9d0f24df2ff8",
-                    "reference": "zorgkantoor",
-                    "title": "Health regions",
-                    "description": "Data at the health office regions. (Source: CBS, BAG, TNO, DigiMV.)",
-                    "type": "GeoJson",
-                    "url": "data/projects/20141104_csMap/Regio ZK ZZP CBS.json",
-                    "enabled": false,
-                    "opacity": 100
-                },
-                {
-                    "id": "veiligheidsregio",
-                    "reference": "veiligheidsregio",
-                    "languages": {
-                        "nl": {
-                            "title": "Veiligheidsregios",
-                            "description": "Statistische data per veiligheidsregio. (Bron: CBS, Regioatlas. Geactualiseerd: 1 november 2014.)"
-                        },
-                        "en": {
-                            "title": "Safety region",
-                            "description": "Statistical data per safety region. (Source: CBS, Regioatlas: 1 november 2014.)"
-                        }
+            {
+                "id": "9d1dc210f8f5474f977c9d0f24df2ff8",
+                "reference": "zorgkantoor",
+                "title": "Health regions",
+                "description": "Data at the health office regions. (Source: CBS, BAG, TNO, DigiMV.)",
+                "type": "GeoJson",
+                "url": "data/projects/20141104_csMap/Regio ZK ZZP CBS.json",
+                "enabled": false,
+                "opacity": 100
+            }, {
+                "id": "veiligheidsregio",
+                "reference": "veiligheidsregio",
+                "languages": {
+                    "nl": {
+                        "title": "Veiligheidsregios",
+                        "description": "Statistische data per veiligheidsregio. (Bron: CBS, Regioatlas. Geactualiseerd: 1 november 2014.)"
                     },
-                    "type": "GeoJson",
-                    "url": "data/projects/20141104_csMap/veiligheidsregios.json",
-                    "enabled": false,
-                    "opacity": 100
+                    "en": {
+                        "title": "Safety region",
+                        "description": "Statistical data per safety region. (Source: CBS, Regioatlas: 1 november 2014.)"
+                    }
                 },
-                {
-                    "id": "gemeentes",
-                    "reference": "gemeentes",
-                    "languages": {
-                        "nl": {
-                            "title": "Gemeentes",
-                            "description": "Statistische data per gemeente. (Bron: CBS, BAG, TNO, DigiMV. Geactualiseerd: 1 november 2014.)"
-                        },
-                        "en": {
-                            "title": "Towns",
-                            "description": "Statistical data per city in Dutch. (Source: CBS, BAG, TNO, DigiMV. Geactualiseerd: 1 november 2014.)"
-                        }
+                "type": "GeoJson",
+                "url": "data/projects/20141104_csMap/veiligheidsregios.json",
+                "enabled": false,
+                "opacity": 100
+            }, {
+                "id": "gemeentes",
+                "reference": "gemeentes",
+                "languages": {
+                    "nl": {
+                        "title": "Gemeentes",
+                        "description": "Statistische data per gemeente. (Bron: CBS, BAG, TNO, DigiMV. Geactualiseerd: 1 november 2014.)"
                     },
-                    "type": "GeoJson",
-                    "url": "data/projects/20141104_csMap/gemeente.json",
-                    "enabled": false,
-                    "opacity": 100
+                    "en": {
+                        "title": "Towns",
+                        "description": "Statistical data per city in Dutch. (Source: CBS, BAG, TNO, DigiMV. Geactualiseerd: 1 november 2014.)"
+                    }
                 },
-                {
-                    "id": "cities2",
-                    "reference": "cities2",
-                    "languages": {
-                        "nl": {
-                            "title": "Gemeentes (vertaald)",
-                            "description": "Statistische data per gemeente. (Bron: CBS, BAG, TNO, DigiMV. Geactualiseerd: 1 november 2014.)"
-                        },
-                        "en": {
-                            "title": "Towns (localised)",
-                            "description": "Statistical data per city. (Source: CBS, BAG, TNO, DigiMV. Geactualiseerd: 1 november 2014.)"
-                        }
+                "type": "GeoJson",
+                "url": "data/projects/20141104_csMap/gemeente.json",
+                "enabled": false,
+                "opacity": 100
+            }, {
+                "id": "cities2",
+                "reference": "cities2",
+                "languages": {
+                    "nl": {
+                        "title": "Gemeentes (vertaald)",
+                        "description": "Statistische data per gemeente. (Bron: CBS, BAG, TNO, DigiMV. Geactualiseerd: 1 november 2014.)"
                     },
-                    "type": "GeoJson",
-                    "url": "data/projects/20141104_csMap/localized_city_data.json",
-                    "enabled": false,
-                    "opacity": 100
+                    "en": {
+                        "title": "Towns (localised)",
+                        "description": "Statistical data per city. (Source: CBS, BAG, TNO, DigiMV. Geactualiseerd: 1 november 2014.)"
+                    }
                 },
-                {
-                    "id": "topo_cities",
-                    "reference": "topo_cities",
-                    "title": "TopoJSON Cities",
-                    "description": "Statistical data per city. (Source: CBS, BAG, TNO, DigiMV. Geactualiseerd: 1 november 2014.)",
-                    "type": "TopoJson",
-                    "url": "data/projects/20141104_csMap/gemeente.topo.json",
-                    "enabled": false,
-                    "opacity": 100
-                },
-                {
-                    "id": "p4",
-                    "reference": "p4",
-                    "title": "P4 topojson",
-                    "description": "Statistical data per city. (Source: CBS, BAG, TNO, DigiMV. Geactualiseerd: 1 november 2014.)",
-                    "type": "TopoJson",
-                    "url": "data/projects/20141104_csMap/postcode4-nl.topo.json",
-                    "enabled": false,
-                    "opacity": 100
-                },
-                {
-                    "id": "p4geo",
-                    "reference": "p4geo",
-                    "title": "P4 geojson",
-                    "description": "Statistical data per city. (Source: CBS, BAG, TNO, DigiMV. Geactualiseerd: 1 november 2014.)",
-                    "type": "TopoJson",
-                    "url": "data/projects/20141104_csMap/postcode4-nl.geo.json",
-                    "enabled": false,
-                    "opacity": 100
-                }
-            ]
+                "type": "GeoJson",
+                "url": "data/projects/20141104_csMap/localized_city_data.json",
+                "enabled": false,
+                "opacity": 100
+            }, {
+                "id": "topo_cities",
+                "reference": "topo_cities",
+                "title": "TopoJSON Cities",
+                "description": "Statistical data per city. (Source: CBS, BAG, TNO, DigiMV. Geactualiseerd: 1 november 2014.)",
+                "type": "TopoJson",
+                "url": "data/projects/20141104_csMap/gemeente.topo.json",
+                "enabled": false,
+                "opacity": 100
+            }, {
+                "id": "p4",
+                "reference": "p4",
+                "title": "P4 topojson",
+                "description": "Statistical data per city. (Source: CBS, BAG, TNO, DigiMV. Geactualiseerd: 1 november 2014.)",
+                "type": "TopoJson",
+                "url": "data/projects/20141104_csMap/postcode4-nl.topo.json",
+                "enabled": false,
+                "opacity": 100
+            }, {
+                "id": "p4geo",
+                "reference": "p4geo",
+                "title": "P4 geojson",
+                "description": "Statistical data per city. (Source: CBS, BAG, TNO, DigiMV. Geactualiseerd: 1 november 2014.)",
+                "type": "TopoJson",
+                "url": "data/projects/20141104_csMap/postcode4-nl.geo.json",
+                "enabled": false,
+                "opacity": 100
+            }
+        ]
+    }, {
+        "languages": {
+            "nl": {
+                "title": "Hierarchische data",
+                "description": "Hierarchische data."
+            },
+            "en": {
+                "title": "Hierarchical data",
+                "description": "Hierarchical data."
+            }
         },
-		{
+        "oneLayerActive": true,
+        "clustering": true,
+        "clusterLevel": 15,
+        "layers": [{
+            "description": "Huisartsen in Nederland",
+            "type": "hierarchy",
+            "hierarchySettings": {
+                "referenceList": [
+                    "gemeentes"
+                ]
+            },
+            "title": "Huisartsen",
+            "url": "data/projects/20141104_csMap/huisartsen.json",
+            "opacity": 50
+        }, {
+            "description": "Verzorgingshuizen in Nederland",
+            "type": "hierarchy",
+            "hierarchySettings": {
+                "referenceList": [
+                    "gemeentes"
+                ]
+            },
+            "title": "Verzorgingshuizen",
+            "url": "data/projects/20141104_csMap/verzorgingshuizen.json",
+            "opacity": 50
+        }]
+    }, {
+        "languages": {
+            "nl": {
+                "title": "Heatmaps",
+                "description": "Demonstreert heatmap lagen gebaseerd op features."
+            },
+            "en": {
+                "title": "Heatmaps",
+                "description": "Demonstrates heatmap layers based on features."
+            }
+        },
+        "clustering": false,
+        "oneLayerActive": true,
+        "layers": [{
+            "id": "heatmaphospital",
+            "reference": "heatmaphospital",
             "languages": {
                 "nl": {
-                    "title": "Hierarchische data",
-                    "description": "Hierarchische data."
+                    "title": "Heatmap hospital-firestations",
+                    "description": "Prefer hospitals, avoid firestations"
                 },
                 "en": {
-                    "title": "Hierarchical data",
-                    "description": "Hierarchical data."
+                    "title": "Heatmap hospital-firestations",
+                    "description": "Prefereer ziekenhuizen, vermijd brandweerkazernes"
                 }
             },
-			"oneLayerActive": true,
-			"clustering": true,
-			"clusterLevel": 15,
-            "layers": [
-                {
-                	"description" : "Huisartsen in Nederland",
-                	"type" : "hierarchy",
-                	"hierarchySettings" : {
-                		"referenceList" : [
-                			"gemeentes"
-                		]
-                	},
-                	"title" : "Huisartsen",
-                	"url" : "data/projects/20141104_csMap/huisartsen.json",
-                	"opacity" : 50
+            "description": "Prefer hospitals, avoid firestations",
+            "type": "Heatmap",
+            "heatmapSettings": {
+                "referenceList": [
+                    "Hospitals",
+                    "firestation"
+                ],
+                "minZoom": 10,
+                "maxZoom": 15,
+                "intensityScale": 3,
+                "resolution": 2
+            },
+            "heatmapItems": [{
+                "title": "Ziekenhuis",
+                "featureType": {
+                    "name": "Ziekenhuis"
                 },
-				{
-                	"description" : "Verzorgingshuizen in Nederland",
-                	"type" : "hierarchy",
-                	"hierarchySettings" : {
-                		"referenceList" : [
-                			"gemeentes"
-                		]
-                	},
-                	"title" : "Verzorgingshuizen",
-                	"url" : "data/projects/20141104_csMap/verzorgingshuizen.json",
-                	"opacity" : 50
+                "weight": 0,
+                "userWeight": 3,
+                "isSelected": true,
+                "idealityMeasure": {
+                    "idealDistance": 700,
+                    "atLocation": 0.1,
+                    "lostInterestDistance": 2000
+                },
+                "heatspots": []
+            }, {
+                "title": "Brandweerkazerne",
+                "featureType": {
+                    "name": "Brandweerkazerne"
+                },
+                "weight": 0,
+                "userWeight": -2,
+                "isSelected": true,
+                "idealityMeasure": {
+                    "idealDistance": 300,
+                    "atLocation": 0.6,
+                    "lostInterestDistance": 2000
+                },
+                "heatspots": []
+            }],
+            "enabled": false,
+            "opacity": 100
+        }, {
+            "id": "emmen_energy",
+            "reference": "emmen_energy",
+            "languages": {
+                "nl": {
+                    "title": "Emmen Energylabels",
+                    "description": "Emmen Energylabels"
+                },
+                "en": {
+                    "title": "Emmen Energylabels",
+                    "description": "Emmen Energylabels"
                 }
-            ]
-        },
-		{
-			"languages" : {
-				"nl" : {
-					"title" : "Heatmaps",
-					"description" : "Demonstreert heatmap lagen gebaseerd op features."
-				},
-				"en" : {
-					"title" : "Heatmaps",
-					"description" : "Demonstrates heatmap layers based on features."
-				}
-			},
-			"clustering" : false,
-			"oneLayerActive" : true,
-			"layers" : [{
-					"id" : "heatmaphospital",
-					"reference" : "heatmaphospital",
-					"languages" : {
-						"nl" : {
-							"title" : "Heatmap hospital-firestations",
-							"description" : "Prefer hospitals, avoid firestations"
-						},
-						"en" : {
-							"title" : "Heatmap hospital-firestations",
-							"description" : "Prefereer ziekenhuizen, vermijd brandweerkazernes"
-						}
-					},
-					"description" : "Prefer hospitals, avoid firestations",
-					"type" : "Heatmap",
-					"heatmapSettings" : {
-						"referenceList" : [
-							"Hospitals",
-							"firestation"
-						],
-						"minZoom" : 10,
-						"maxZoom" : 15,
-						"intensityScale" : 3,
-						"resolution" : 2
-					},
-					"heatmapItems" : [{
-							"title" : "Ziekenhuis",
-							"featureType" : {
-								"name" : "Ziekenhuis"
-							},
-							"weight" : 0,
-							"userWeight" : 3,
-							"isSelected" : true,
-							"idealityMeasure" : {
-								"idealDistance" : 700,
-								"atLocation" : 0.1,
-								"lostInterestDistance" : 2000
-							},
-							"heatspots" : []
-						}, {
-							"title" : "Brandweerkazerne",
-							"featureType" : {
-								"name" : "Brandweerkazerne"
-							},
-							"weight" : 0,
-							"userWeight" : -2,
-							"isSelected" : true,
-							"idealityMeasure" : {
-								"idealDistance" : 300,
-								"atLocation" : 0.6,
-								"lostInterestDistance" : 2000
-							},
-							"heatspots" : []
-						}
-					],
-					"enabled" : false,
-					"opacity" : 100
-					}, {
-						"id" : "emmen_energy",
-						"reference" : "emmen_energy",
-						"languages" : {
-							"nl" : {
-								"title" : "Emmen Energylabels",
-								"description" : "Emmen Energylabels"
-							},
-							"en" : {
-								"title" : "Emmen Energylabels",
-								"description" : "Emmen Energylabels"
-							}
-						},
-						"description" : "Emmen Energylabels",
-						"type" : "Heatmap",
-						"heatmapSettings" : {
-							"referenceList" : [
-								"Emmen"
-							],
-							"minZoom" : 10,
-							"maxZoom" : 16,
-							"intensityScale" : 1,
-							"resolution" : 1
-						},
-						"heatmapItems" : [{
-								"title" : "A",
-								"featureType" : {
-									"name" : "Emmen"
-								},
-								"weight" : 0.3333333333333333,
-								"userWeight" : 2,
-								"isSelected" : true,
-								"idealityMeasure" : {
-									"idealDistance" : 50,
-									"atLocation" : 0.8,
-									"lostInterestDistance" : 500
-								},
-								"propertyTitle" : "Energielabel",
-								"propertyLabel" : "energielabel",
-								"optionIndex" : 1,
-								"heatspots" : []
-							}, {
-								"title" : "B",
-								"featureType" : {
-									"name" : "Emmen"
-								},
-								"weight" : 0.16666666666666666,
-								"userWeight" : 1,
-								"isSelected" : true,
-								"idealityMeasure" : {
-									"idealDistance" : 50,
-									"atLocation" : 0.5,
-									"lostInterestDistance" : 500
-								},
-								"propertyTitle" : "Energielabel",
-								"propertyLabel" : "energielabel",
-								"optionIndex" : 2,
-								"heatspots" : []
-							}, {
-								"title" : "F",
-								"featureType" : {
-									"name" : "Emmen"
-								},
-								"weight" : -0.16666666666666666,
-								"userWeight" : -1,
-								"isSelected" : true,
-								"idealityMeasure" : {
-									"idealDistance" : 50,
-									"atLocation" : 1,
-									"lostInterestDistance" : 500
-								},
-								"propertyTitle" : "Energielabel",
-								"propertyLabel" : "energielabel",
-								"optionIndex" : 6,
-								"heatspots" : []
-							}, {
-								"title" : "G",
-								"featureType" : {
-									"name" : "Emmen"
-								},
-								"weight" : -0.3333333333333333,
-								"userWeight" : -2,
-								"isSelected" : true,
-								"idealityMeasure" : {
-									"idealDistance" : 100,
-									"atLocation" : 1,
-									"lostInterestDistance" : 800
-								},
-								"propertyTitle" : "Energielabel",
-								"propertyLabel" : "energielabel",
-								"optionIndex" : 7,
-								"heatspots" : []
-							}
-						],
-						"enabled" : false,
-						"opacity" : 100
-					}
-					]
-		}
-	]
+            },
+            "description": "Emmen Energylabels",
+            "type": "Heatmap",
+            "heatmapSettings": {
+                "referenceList": [
+                    "Emmen"
+                ],
+                "minZoom": 10,
+                "maxZoom": 16,
+                "intensityScale": 1,
+                "resolution": 1
+            },
+            "heatmapItems": [{
+                "title": "A",
+                "featureType": {
+                    "name": "Emmen"
+                },
+                "weight": 0.3333333333333333,
+                "userWeight": 2,
+                "isSelected": true,
+                "idealityMeasure": {
+                    "idealDistance": 50,
+                    "atLocation": 0.8,
+                    "lostInterestDistance": 500
+                },
+                "propertyTitle": "Energielabel",
+                "propertyLabel": "energielabel",
+                "optionIndex": 1,
+                "heatspots": []
+            }, {
+                "title": "B",
+                "featureType": {
+                    "name": "Emmen"
+                },
+                "weight": 0.16666666666666666,
+                "userWeight": 1,
+                "isSelected": true,
+                "idealityMeasure": {
+                    "idealDistance": 50,
+                    "atLocation": 0.5,
+                    "lostInterestDistance": 500
+                },
+                "propertyTitle": "Energielabel",
+                "propertyLabel": "energielabel",
+                "optionIndex": 2,
+                "heatspots": []
+            }, {
+                "title": "F",
+                "featureType": {
+                    "name": "Emmen"
+                },
+                "weight": -0.16666666666666666,
+                "userWeight": -1,
+                "isSelected": true,
+                "idealityMeasure": {
+                    "idealDistance": 50,
+                    "atLocation": 1,
+                    "lostInterestDistance": 500
+                },
+                "propertyTitle": "Energielabel",
+                "propertyLabel": "energielabel",
+                "optionIndex": 6,
+                "heatspots": []
+            }, {
+                "title": "G",
+                "featureType": {
+                    "name": "Emmen"
+                },
+                "weight": -0.3333333333333333,
+                "userWeight": -2,
+                "isSelected": true,
+                "idealityMeasure": {
+                    "idealDistance": 100,
+                    "atLocation": 1,
+                    "lostInterestDistance": 800
+                },
+                "propertyTitle": "Energielabel",
+                "propertyLabel": "energielabel",
+                "optionIndex": 7,
+                "heatspots": []
+            }],
+            "enabled": false,
+            "opacity": 100
+        }]
+    }]
 }

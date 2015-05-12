@@ -1077,28 +1077,6 @@ declare module Translations {
     }
 }
 
-declare module BaseMapList {
-    /**
-      * Module
-      */
-    var myModule: any;
-}
-
-declare module BaseMapList {
-    interface IBaseMapScope extends ng.IScope {
-        vm: BaseMapListCtrl;
-    }
-    class BaseMapListCtrl {
-        private $scope;
-        private $mapService;
-        private $messageBusService;
-        private scope;
-        static $inject: string[];
-        constructor($scope: IBaseMapScope, $mapService: csComp.Services.MapService, $messageBusService: csComp.Services.MessageBusService);
-        selectBaseLayer(key: any): void;
-    }
-}
-
 declare module Charts {
     class ChartHelpers {
         /**
@@ -1177,6 +1155,28 @@ declare module Helpers.ContextMenu {
       * Module
       */
     var myModule: any;
+}
+
+declare module BaseMapList {
+    /**
+      * Module
+      */
+    var myModule: any;
+}
+
+declare module BaseMapList {
+    interface IBaseMapScope extends ng.IScope {
+        vm: BaseMapListCtrl;
+    }
+    class BaseMapListCtrl {
+        private $scope;
+        private $mapService;
+        private $messageBusService;
+        private scope;
+        static $inject: string[];
+        constructor($scope: IBaseMapScope, $mapService: csComp.Services.MapService, $messageBusService: csComp.Services.MessageBusService);
+        selectBaseLayer(key: any): void;
+    }
 }
 
 declare module Dashboard {
@@ -2317,32 +2317,6 @@ declare module Mca {
     }
 }
 
-declare module MapElement {
-    /**
-      * Module
-      */
-    var myModule: any;
-}
-
-declare module MapElement {
-    interface IMapElementScope extends ng.IScope {
-        vm: MapElementCtrl;
-        mapid: string;
-        initMap: Function;
-    }
-    class MapElementCtrl {
-        private $scope;
-        private $layerService;
-        private mapService;
-        private $messageBusService;
-        private scope;
-        private locale;
-        static $inject: string[];
-        constructor($scope: IMapElementScope, $layerService: csComp.Services.LayerService, mapService: csComp.Services.MapService, $messageBusService: csComp.Services.MessageBusService);
-        initMap(): void;
-    }
-}
-
 declare module OfflineSearch {
     /**
       * Module
@@ -2490,6 +2464,32 @@ declare module OfflineSearch {
     }
 }
 
+declare module MapElement {
+    /**
+      * Module
+      */
+    var myModule: any;
+}
+
+declare module MapElement {
+    interface IMapElementScope extends ng.IScope {
+        vm: MapElementCtrl;
+        mapid: string;
+        initMap: Function;
+    }
+    class MapElementCtrl {
+        private $scope;
+        private $layerService;
+        private mapService;
+        private $messageBusService;
+        private scope;
+        private locale;
+        static $inject: string[];
+        constructor($scope: IMapElementScope, $layerService: csComp.Services.LayerService, mapService: csComp.Services.MapService, $messageBusService: csComp.Services.MessageBusService);
+        initMap(): void;
+    }
+}
+
 declare module ProjectSettings {
     /**
       * Module
@@ -2543,13 +2543,6 @@ declare module StyleList {
         static $inject: string[];
         constructor($scope: IStyleListScope, $layerService: csComp.Services.LayerService);
     }
-}
-
-declare module Voting {
-    /**
-      * Module
-      */
-    var myModule: any;
 }
 
 declare module Timeline {
@@ -2606,6 +2599,13 @@ declare module Timeline {
         */
         loadLocales(): void;
     }
+}
+
+declare module Voting {
+    /**
+      * Module
+      */
+    var myModule: any;
 }
 
 declare module WidgetEdit {
@@ -3130,17 +3130,6 @@ declare module csComp.Services {
     var myModule: any;
 }
 
-declare module csComp.Services {
-    class TimeService {
-        private $messageBusService;
-        static $inject: string[];
-        map: L.Map;
-        baseLayers: any;
-        private activeBaseLayer;
-        constructor($messageBusService: csComp.Services.MessageBusService);
-    }
-}
-
 declare module csComp.Search {
     interface ISearchFormScope extends ng.IScope {
         vm: SearchFormCtrl;
@@ -3152,6 +3141,17 @@ declare module csComp.Search {
         static $inject: string[];
         constructor($scope: ISearchFormScope, $mapService: csComp.Services.MapService);
         doSearch(): void;
+    }
+}
+
+declare module csComp.Services {
+    class TimeService {
+        private $messageBusService;
+        static $inject: string[];
+        map: L.Map;
+        baseLayers: any;
+        private activeBaseLayer;
+        constructor($messageBusService: csComp.Services.MessageBusService);
     }
 }
 
