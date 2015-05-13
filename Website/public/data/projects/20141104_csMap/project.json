@@ -42,7 +42,7 @@
             "height": "100%"
         }]
     }, {
-                }
+
         "id": "flight",
         "name": "Flights",
         "showTimeline": true,
@@ -72,27 +72,8 @@
                     "sensor": "datasource/test2"
                 }]
             }
-        }],
-                },
-                {
-                    "directive": "indicators",
-                    "left": "275px",
-                    "top": "10px",
-                    "width": "255px",
-                    "height": "435px",
-                    "data": {
-                        "title": "Sensor Data 2",
-                        "indicators": [
-                            {
-                                "visual": "sparkline",
-                                "sensor": "datasource/test2"
-                            }
-                        ]
-                    }
-        "viewBounds": {
-            "southWest": [50.7, 3.3],
-            "northEast": [53.5, 7.3]
-        }
+        }]
+
     }, {
         "id": "health",
         "name": "Health",
