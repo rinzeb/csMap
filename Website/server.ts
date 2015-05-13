@@ -26,7 +26,8 @@ var messageBus    = new MessageBus();
 var config = new ConfigurationService('./configuration.json');
 
 // all environments
-server.set('port', '3002');
+var port = "3002";
+server.set('port', port);
 server.set('views', path.join(__dirname, 'views'));
 server.set('view engine', 'jade');
 server.use(express.favicon());
@@ -35,6 +36,8 @@ server.use(express.json());
 server.use(express.urlencoded());
 server.use(express.methodOverride());
 server.use(server.router);
+
+config.add("server", "http://localhost:" + port);
 
 var planes = new fr.FlightRadar(cm, "FlightRadar");
 planes.Start();
@@ -45,9 +48,8 @@ ds.Start();
 server.get("/datasource", ds.GetDataSource);
 
 var bagDatabase = new BagDatabase(config);
-server.get(config["resolveAddress"], (req, res) => bagDatabase.lookupAddress(req, res));
-
-var mapLayerFactory = new MapLayerFactory(config, messageBus);
+// server.get(config["resolveAddress"], (req, res) => bagDatabase.lookupAddress(req, res));
+var mapLayerFactory = new MapLayerFactory(bagDatabase, messageBus);
 server.post('/projecttemplate', (req, res) => mapLayerFactory.process(req, res));
 
 server.use(express.static(path.join(__dirname, 'public')));

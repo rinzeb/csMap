@@ -8,6 +8,7 @@ var appName = 'csWebApp';
 var gulp = require('gulp'),
     insert = require('gulp-insert'),
     uglify = require('gulp-uglify'),
+    useref = require('gulp-useref'),
     rename = require('gulp-rename'),
     debug = require('gulp-debug'),
     cache = require('gulp-cached'),

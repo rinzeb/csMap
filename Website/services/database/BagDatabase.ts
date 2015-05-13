@@ -1,6 +1,7 @@
 import express              = require('express');
 import ConfigurationService = require('../configuration/ConfigurationService');
 import pg                   = require('pg');
+import Location             = require('./Location');
 
 /**
  * Export a connection to the BAG database.
@@ -10,31 +11,12 @@ class BagDatabase {
 
     constructor(config: ConfigurationService) {
         this.connectionString = process.env.DATABASE_URL || config["bagConnectionString"];
+        (<any>pg).defaults.poolSize = 20;
     }
 
-    private query(client: pg.Client, res: express.Response, sql: string) {
-        var results: Object[] = [];
-        // SQL Query > Select Data
-        var query = client.query(sql);
-
-        // Stream results back one row at a time
-        query.on('row', function(row) {
-            results.push(row);
-        });
-
-        // After all data is returned, close connection and return results
-        query.on('end', function() {
-            client.end();
-            return res.json(results);
-        });
-
-        // Handle Errors
-        query.on('error', function(err) {
-            console.log(err);
-        });
-
-    }
-
+    /**
+     * Format the zip code so spaces are removed and the letters are all capitals.
+     */
     private formatZipCode(zipCode: string) {
         if (!zipCode)
             return null;
@@ -49,28 +31,85 @@ class BagDatabase {
         }
     }
 
-    private formatHouseNumber(houseNumber: string) {
-		if (!houseNumber) return null;
-		var formattedHouseNumber = houseNumber.replace(/^\D+|\D.*$/g, "");
-		if (!formattedHouseNumber) {
-			return null;
-		} else {
-			return +formattedHouseNumber;
-		}
+    /**
+     * Format the house number such that we keep an actual number, e.g. 1a -> 1.
+     */
+    private formatHouseNumber(houseNumber: string|number): number {
+        if (!houseNumber) return null;
+        if (typeof houseNumber === 'number') {
+            return houseNumber;
+        } else {
+            var formattedHouseNumber = houseNumber.replace(/^\D+|\D.*$/g, "");
+            if (!formattedHouseNumber) {
+                return null;
+            } else {
+                return +formattedHouseNumber;
+            }
+        }
 	}
 
+    /**
+     * Lookup the address from the BAG.
+     */
+    public lookupBagAddress(zip: string, houseNumber: string, callback: (addresses: Location[]) => void) {
+        var zipCode: string = this.formatZipCode(zip);
+        if (!zipCode) {
+            console.log('No zip code: ' + zip);
+            callback(null);
+            return;
+        }
+        var houseNr: number = this.formatHouseNumber(houseNumber);
+        if (!houseNr) {
+            console.log('No house number: ' + houseNumber);
+            callback(null);
+            return;
+        }
+
+        pg.connect(this.connectionString, (err, client, done) => {
+            if (err) {
+                console.log(err);
+                callback(null);
+                return;
+            }
+            //var sql = `SELECT openbareruimtenaam, huisnummer, huisletter, huisnummertoevoeging, gemeentenaam, provincienaam, ST_X(ST_Transform(geopunt, 4326)) as lon, ST_Y(ST_Transform(geopunt, 4326)) as lat FROM adres WHERE adres.postcode='${zipCode}' AND adres.huisnummer=${houseNumber}`;
+            var sql = `SELECT ST_X(ST_Transform(geopunt, 4326)) as lon, ST_Y(ST_Transform(geopunt, 4326)) as lat FROM adres WHERE adres.postcode='${zipCode}' AND adres.huisnummer=${houseNr}`;
+            client.query(sql, (err, result) => {
+                done();
+                if (err) {
+                    console.log(err);
+                    console.log(`Cannot find zip: ${zipCode}, houseNumber: ${houseNumber}`);
+                    callback(null);
+                } else {
+                    callback(result.rows);
+                }
+            });
+        });
+    }
+
+    /**
+     * Lookup the address from the BAG.
+     */
     public lookupAddress(req: express.Request, res: express.Response) {
-        // Get a Postgres client from the connection pool
         var zipCode: string = this.formatZipCode(req.params.zip);
         if (!zipCode) return res.send(400, 'zip code is missing');
         var houseNumber: number = this.formatHouseNumber(req.params.number);
         if (!houseNumber) return res.send(400, 'house number is missing');
 
         pg.connect(this.connectionString, (err, client, done) => {
+            if (err) {
+                console.log(err);
+                return;
+            }
             var sql = `SELECT openbareruimtenaam, huisnummer, huisletter, huisnummertoevoeging, gemeentenaam, provincienaam, ST_X(ST_Transform(geopunt, 4326)) as lon, ST_Y(ST_Transform(geopunt, 4326)) as lat FROM adres WHERE adres.postcode='${zipCode}' AND adres.huisnummer=${houseNumber}`;
-            this.query(client, res, sql);
+            client.query(sql, (err, result) => {
+                done();
+                if (err) {
+                    console.log(`Cannot find zip: ${zipCode}, houseNumber: ${houseNumber}`);
+                    return;
+                }
+                res.json(result.rows);
+            });
         });
     }
-
 }
 export = BagDatabase;

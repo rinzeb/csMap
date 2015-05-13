@@ -12,3 +12,6 @@ Website/public/js/cs/
 Website/server.js
 Website/services/**/*.js
 Website/public/app/app.js
+Website/dist/ClientConnection.js
+Website/dist/
+Website/public/data/projects/AHTI/
