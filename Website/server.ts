@@ -41,11 +41,11 @@ config.add("server", "http://localhost:" + port);
 
 var pr = new dp.DynamicProjectService(server);
 pr.Start();
-server.get("/fr", planes.GetLayer);
-
-//var planes = new fr.FlightRadar(cm, "FlightRadar");
-//planes.Start();
 //server.get("/fr", planes.GetLayer);
+
+var planes = new fr.FlightRadar(cm, "FlightRadar");
+planes.Start();
+server.get("/fr", planes.GetLayer);
 
 var ds = new DataSource.DataSourceService(cm,"DataSource");
 ds.Start();

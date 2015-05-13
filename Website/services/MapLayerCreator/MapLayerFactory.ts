@@ -31,7 +31,7 @@ interface ILayerTemplate {
     layerDefinition: ILayerDefinition[];
     propertyTypes:   csComp.Services.IPropertyType[];
     properties:      csComp.Services.IProperty[]
-}
+} 
 
 /** A factory class to create new map layers based on input, e.g. from Excel */
 class MapLayerFactory {

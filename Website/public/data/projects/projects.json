@@ -121,13 +121,16 @@
        }
     ],
     "projects" :  [
-        {
-            "title": "csMap",
-            "url": "data/projects/20141104_csMap/project.json"
-        },
-        {
-            "title": "test",
-            "url": "data/projects/20141104_csMap/project.json"
-        }
+      {
+          "title": "smart cycling",
+          "url": "data/projects/smartcycling/project.json"
+      },
+      {
+          "title": "csMap",
+          "url": "data/projects/20141104_csMap/project.json"
+      }
+
+
+
     ]
 }

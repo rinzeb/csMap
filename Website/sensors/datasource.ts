@@ -18,7 +18,7 @@ module DynamicProject
 module DataSource {
     export class SensorSet {
         title: string;
-        type: string;
+        type: string; 
         timestamps: number[] = [];
         values: any[] = [];
         activeValue: any;
