@@ -1,4 +1,5 @@
 import express              = require('express');
+import fs                   = require('fs');
 import http                 = require('http');
 import MessageBus           = require('../bus/MessageBus');
 import pg                   = require('pg');
@@ -44,6 +45,7 @@ class MapLayerFactory {
         var template: ILayerTemplate = req.body;
         var ld = template.layerDefinition[0];
         this.createMapLayer(template, (geojson) => {
+            // fs.writeFileSync("c:/Temp/excel_export.json", JSON.stringify(geojson));
             this.messageBus.publish('dynamic_project_layer', 'created', {
                 project   : ld.projectTitle,
                 reference : ld.reference,
@@ -61,6 +63,9 @@ class MapLayerFactory {
                 "Default": {
                     name: "Default",
                     style: {
+                        iconUri:     ld.iconUri,
+                        iconWidth:   ld.iconSize,
+                        iconHeight:  ld.iconSize,
                         stroke:      ld.strokeWidth > 0,
                         strokeColor: ld.strokeColor || "black",
                         fillColor:   ld.fillColor || "yellow",
@@ -95,11 +100,11 @@ class MapLayerFactory {
             var zip = prop[zipCode].replace(/ /g, '');
             var nmb = prop[houseNumber];
             this.bag.lookupBagAddress(zip, nmb, (locations: Location[]) => {
-                console.log(todo);
+                //console.log(todo);
                 todo--;
                 if (!locations || locations.length === 0) {
                     console.log(`Cannot find location with zip: ${zip}, houseNumber: ${nmb}`);
-                } else {                
+                } else {
                     features.push(this.createFeature(locations[0].lon, locations[0].lat, prop));
                 }
                 if (todo <= 0) callback();
