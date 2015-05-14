@@ -54,7 +54,7 @@ server.get("/datasource", ds.GetDataSource);
 
 var bagDatabase = new BagDatabase(config);
 // server.get(config["resolveAddress"], (req, res) => bagDatabase.lookupAddress(req, res));
-var mapLayerFactory = new MapLayerFactory(bagDatabase, messageBus);
+var mapLayerFactory = new MapLayerFactory(config, messageBus);
 server.post('/projecttemplate', (req, res) => mapLayerFactory.process(req, res));
 
 server.use(express.static(path.join(__dirname, 'public')));

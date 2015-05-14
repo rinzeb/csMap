@@ -44,7 +44,10 @@
         "./server/dynamic/ClientConnection.ts",
         "./server/dynamic/Datasource.ts",
         "./server/dynamic/DynamicProject.ts",
+        "./services/MapLayerCreator/IGeoJsonFeature.ts",
         "./services/MapLayerCreator/MapLayerFactory.ts",
-        "./services/database/BagDatabase.ts"
+        "./services/database/BagDatabase.ts",
+        "./services/database/IBagAddress.ts",
+        "./services/database/Location.ts"
     ]
 }
