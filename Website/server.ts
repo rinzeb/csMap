@@ -1,14 +1,16 @@
+require('rootpath')();
 ﻿import express              = require('express');
 import http                 = require('http');
 import path                 = require('path');
 import offlineSearch        = require('cs-offline-search');
-import cc                   = require("./ClientConnection");
+import cc                   = require("server/dynamic/ClientConnection");
 import MapLayerFactory      = require('./services/MapLayerCreator/MapLayerFactory');
-import fr                   = require("./layers/FlightRadar");
-import DataSource           = require("./sensors/DataSource");
-import MessageBus           = require('./services/bus/MessageBus');
+import fr                   = require("server/Layers/FlightRadar");
+import DataSource           = require("server/dynamic/DataSource");
+import MessageBus           = require('server/bus/MessageBus');
 import BagDatabase          = require('./services/database/BagDatabase');
-import ConfigurationService = require('./services/configuration/ConfigurationService');
+import ConfigurationService = require('server/configuration/ConfigurationService');
+import DynamicProject       = require("server/dynamic/DynamicProject");
 
 /**
  * Create a search index file which can be loaded statically.
@@ -39,9 +41,8 @@ server.use(server.router);
 
 config.add("server", "http://localhost:" + port);
 
-var pr = new dp.DynamicProjectService(server);
-pr.Start();
-//server.get("/fr", planes.GetLayer);
+var pr = new DynamicProject.DynamicProjectService(server,cm);
+pr.Start(server);
 
 var planes = new fr.FlightRadar(cm, "FlightRadar");
 planes.Start();

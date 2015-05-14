@@ -121,6 +121,7 @@
        }
     ],
     "projects" :  [
+
       {
           "title": "csMap",
           "url": "data/projects/20141104_csMap/project.json"
@@ -128,8 +129,11 @@
       {
           "title": "smart cycling",
           "url": "data/projects/smartcycling/project.json"
+      },
+      {
+        "title" : "dynamic",
+        "url" : "project/dynamicexample"
       }
-
 
 
 
