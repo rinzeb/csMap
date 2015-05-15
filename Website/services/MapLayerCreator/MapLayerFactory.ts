@@ -1,8 +1,8 @@
 require('rootpath')();
 import express              = require('express');
-import MessageBus           = require('server/bus/MessageBus');
+import MessageBus           = require('ServerComponents/bus/MessageBus');
 import pg                   = require('pg');
-import ConfigurationService = require('server/configuration/ConfigurationService');
+import ConfigurationService = require('ServerComponents/configuration/ConfigurationService');
 
 interface ILayerDefinition {
     reference:     string,
@@ -31,7 +31,7 @@ interface ILayerTemplate {
 
 /** A factory class to create new map layers based on input, e.g. from Excel */
 class MapLayerFactory {
-    constructor(private configService: ConfigurationService, private messageBus: MessageBus) {
+    constructor(private configService: ConfigurationService, private messageBus: MessageBus.MessageBusService) {
         this.connect();
     }
 

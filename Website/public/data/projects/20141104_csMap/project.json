@@ -28,7 +28,19 @@
         "name": "Home",
         "showTimeline": true,
         "showLeftmenu": true,
-        "showMap": true
+        "showMap": true,
+        "widgets": [{
+            "directive": "text-filter",
+            "left": "10px",
+            "top": "10px",
+                    "borderwidth" : "3px",
+                    "borderradius" : "5px",
+            "width": "255px",
+            "height": "435px",
+            "data": {
+                "title": "Sensor Data 1"
+            }
+        }]
     }, {
         "id": "datatable",
         "name": "Table",

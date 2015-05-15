@@ -3,14 +3,14 @@ require('rootpath')();
 import http                 = require('http');
 import path                 = require('path');
 import offlineSearch        = require('cs-offline-search');
-import cc                   = require("server/dynamic/ClientConnection");
+import cc                   = require("ServerComponents/dynamic/ClientConnection");
 import MapLayerFactory      = require('./services/MapLayerCreator/MapLayerFactory');
-import fr                   = require("server/Layers/FlightRadar");
-import DataSource           = require("server/dynamic/DataSource");
-import MessageBus           = require('server/bus/MessageBus');
+import fr                   = require("ServerComponents/Layers/FlightRadar");
+import DataSource           = require("ServerComponents/dynamic/DataSource");
+import MessageBus           = require('ServerComponents/bus/MessageBus');
 import BagDatabase          = require('./services/database/BagDatabase');
-import ConfigurationService = require('server/configuration/ConfigurationService');
-import DynamicProject       = require("server/dynamic/DynamicProject");
+import ConfigurationService = require('ServerComponents/configuration/ConfigurationService');
+import DynamicProject       = require("ServerComponents/dynamic/DynamicProject");
 
 /**
  * Create a search index file which can be loaded statically.
@@ -24,8 +24,9 @@ var offlineSearchManager = new offlineSearch('public/data/projects/projects.json
 var server        = express();
 var httpServer    = require('http').Server(server);
 var cm            = new cc.ConnectionManager(httpServer);
-var messageBus    = new MessageBus();
+var messageBus    = new MessageBus.MessageBusService();
 var config = new ConfigurationService('./configuration.json');
+
 
 // all environments
 var port = "3002";
