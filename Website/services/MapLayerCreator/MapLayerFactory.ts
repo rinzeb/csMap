@@ -2,35 +2,34 @@ import express              = require('express');
 import fs                   = require('fs');
 import http                 = require('http');
 import MessageBus           = require('../bus/MessageBus');
-import pg                   = require('pg');
 import ConfigurationService = require('../configuration/ConfigurationService');
 import Location             = require('../database/Location');
 import BagDatabase          = require('../database/BagDatabase');
 import IGeoJsonFeature      = require('./IGeoJsonFeature');
 
 interface ILayerDefinition {
-    projectTitle:  string,
-    reference:     string,
-    group:         string,
-    layerTitle:    string,
-    description:   string,
-    geometryType:  string,
-    parameter1:    string,
-    parameter2:    string,
-    parameter3:    string,
-    iconUri:       string,
-    iconSize:      number,
-    fillColor:     string,
-    strokeColor:   string,
-    strokeWidth:   number,
-    isEnabled:     boolean,
-    useClustering: boolean,
+    projectTitle:  string;
+    reference:     string;
+    group:         string;
+    layerTitle:    string;
+    description:   string;
+    geometryType:  string;
+    parameter1:    string;
+    parameter2:    string;
+    parameter3:    string;
+    iconUri:       string;
+    iconSize:      number;
+    fillColor:     string;
+    strokeColor:   string;
+    strokeWidth:   number;
+    isEnabled:     boolean;
+    useClustering: boolean;
     opacity:       number
 }
 
 interface ILayerTemplate {
-    layerDefinition: ILayerDefinition[],
-    propertyTypes:   csComp.Services.IPropertyType[],
+    layerDefinition: ILayerDefinition[];
+    propertyTypes:   csComp.Services.IPropertyType[];
     properties:      csComp.Services.IProperty[]
 }
 
