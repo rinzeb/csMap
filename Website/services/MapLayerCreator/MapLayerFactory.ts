@@ -50,6 +50,7 @@ class MapLayerFactory {
                 reference : ld.reference,
                 geojson   : geojson,
                 enabled   : ld.isEnabled });
+            console.log("Created and published layer");
         });
     }
 
@@ -89,7 +90,31 @@ class MapLayerFactory {
                 }
                 this.createPointFeature(ld.parameter1, ld.parameter2, features, template.properties, () => { callback(geojson) });
                 break;
+            case "CBS_Provincie_op_naam":
+                if (!ld.parameter1) {
+                    console.log("Error: Parameter1 should be the name of the column containing the zip code!")
+                    return;
+                }
+                this.createPolygonFeature(ld.parameter1, features, template.properties, () => { callback(geojson)});
+                break;
         }
+    }
+
+    private createPolygonFeature(province: string, features: IGeoJsonFeature[], properties: csComp.Services.IProperty[], callback: Function) {
+      if (!properties) callback();
+      var todo = properties.length;
+      properties.forEach((prop) => {
+          var prov = prop[province].replace(/ /g, '');
+          this.bag.lookupBagProvince(prov, (coordinates: JSON[]) => {
+              todo--;
+              if (coordinates && coordinates.length > 0 && coordinates[0].hasOwnProperty('area')) {
+                  features.push(this.createFeatureFromGeoJson(coordinates[0], prop));
+              } else {
+                  console.log(`Cannot find province with name: ${prov}`);
+              }
+              if (todo <= 0) callback();
+          });
+      });
     }
 
     private createPointFeature(zipCode: string, houseNumber: string, features: IGeoJsonFeature[], properties: csComp.Services.IProperty[], callback: Function) {
@@ -111,15 +136,31 @@ class MapLayerFactory {
         });
     }
 
-    private createFeature(lon: number, lat: number, properties: csComp.Services.IProperty): IGeoJsonFeature {
+
+    private createFeatureFromGeoJson(geojson: JSON, properties: csComp.Services.IProperty): IGeoJsonFeature {
+      if (geojson.hasOwnProperty('type')&& geojson.hasOwnProperty('coordinates')) {
         return {
-			type: "Feature",
-			geometry: {
-				type: "Point",
-				coordinates: [ lon, lat ]
-			},
-			properties: properties
-		}
+          type: "Feature",
+          geometry: {
+            type: geojson['type'],
+            coordinates: geojson['coordinates']
+          },
+          properties: properties
+        }
+      } else {
+        return;
+      }
+    }
+
+    private createFeature(lon: number, lat: number, properties: csComp.Services.IProperty): IGeoJsonFeature {
+      return {
+        type: "Feature",
+        geometry: {
+          type: "Point",
+          coordinates: [ lon, lat ]
+        },
+        properties: properties
+      }
     }
 }
 export = MapLayerFactory;

@@ -48,6 +48,33 @@ class BagDatabase {
         }
 	}
 
+  public lookupBagProvince(name: string, callback: (coordinates: JSON[]) => void) {
+    if (!name) {
+        console.log('No province with name: ' + name);
+        callback(null);
+        return;
+    }
+    pg.connect(this.connectionString, (err, client, done) => {
+        if (err) {
+            console.log(err);
+            callback(null);
+            return;
+        }
+        //var sql = `SELECT openbareruimtenaam, huisnummer, huisletter, huisnummertoevoeging, gemeentenaam, provincienaam, ST_X(ST_Transform(geopunt, 4326)) as lon, ST_Y(ST_Transform(geopunt, 4326)) as lat FROM adres WHERE adres.postcode='${zipCode}' AND adres.huisnummer=${houseNumber}`;
+        var sql = `SELECT ST_AsGeoJSON(ST_Transform(geovlak, 4326)) as area FROM bagactueel.provincie WHERE provincie.provincienaam='${name}'`;
+        client.query(sql, (err, result) => {
+            done();
+            if (err) {
+                console.log(err);
+                console.log(`Cannot find province: ${name}`);
+                callback(null);
+            } else {
+                callback(result.rows);
+            }
+        });
+    });
+  }
+
     /**
      * Lookup the address from the BAG.
      */
