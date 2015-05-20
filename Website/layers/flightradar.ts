@@ -1,7 +1,8 @@
+require('rootpath')();
 ﻿import express = require('express');
 import http = require('http');
-import DynamicProject = require("./../sensors/datasource");
-import ClientConnection = require("./../ClientConnection");
+import DynamicProject = require("ServerComponents/dynamic/datasource");
+import ClientConnection = require("ServerComponents/dynamic/ClientConnection");
 
 module FlightRadar {
 
