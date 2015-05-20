@@ -57,6 +57,8 @@ class MapLayerFactory {
     public createMapLayer(template: ILayerTemplate, callback: (Object) => void) {
         var ld = template.layerDefinition[0];
         var features: IGeoJsonFeature[] = [];
+        //Convert StringFormats
+        this.convertStringFormats(template.propertyTypes);
         var geojson = {
             type: "FeatureCollection",
             featureTypes: {
@@ -203,6 +205,30 @@ class MapLayerFactory {
         },
         properties: properties
       }
+    }
+
+    private convertStringFormats(properties) {
+      properties.forEach(function (prop) {
+        if (prop.hasOwnProperty("stringFormat")) {
+          switch (prop["stringFormat"]) {
+            case "One_decimal":
+              prop["stringFormat"] = "{0:#,#.#}";
+              break;
+            case "Two_decimals":
+              prop["stringFormat"] = "{0:#,#.##}";
+              break;
+            case "Euro_no_decimals":
+              prop["stringFormat"] = "€{0:#,#}";
+              break;
+            case "Euro_two_decimals":
+              prop["stringFormat"] = "€{0:#,#.00}";
+              break;
+            default:
+              console.log("stringFormat \'" + prop["stringFormat"] + "\' not found.");
+              break;
+          }
+        }
+      });
     }
 }
 export = MapLayerFactory;
