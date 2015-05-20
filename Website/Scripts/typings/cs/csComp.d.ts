@@ -397,6 +397,7 @@ declare module csComp.Services {
         nameLabel?: string;
         fillColor?: string;
         strokeColor?: string;
+        height?: number;
         opacity?: number;
         fillOpacity?: number;
         stroke?: boolean;
@@ -405,6 +406,9 @@ declare module csComp.Services {
         iconWidth?: number;
         iconHeight?: number;
         iconUri?: string;
+        modelUri?: string;
+        modelScale?: number;
+        modelMinimumPixelSize?: number;
         cornerRadius?: number;
         maxTitleResolution?: string;
         rotate?: number;

@@ -2576,6 +2576,8 @@
                 "iconWidth": 32,
                 "iconHeight": 32,
                 "iconUri": "images/vliegtuig.png",
+                "modelUri": "models/plane.gltf",
+                "modelScale": 100.0,
                 "rotateProperty": "Track"
             },
             "propertyTypeKeys": "PlaneType;Speed;Altitude;Track"
