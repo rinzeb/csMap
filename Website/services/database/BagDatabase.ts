@@ -48,6 +48,33 @@ class BagDatabase {
         }
 	}
 
+  public lookupBagArea(sqlTable: string, sqlColumn: string, name: string, callback: (coordinates: JSON[]) => void) {
+    if (!name) {
+        console.log('No area with name: ' + name);
+        callback(null);
+        return;
+    }
+    pg.connect(this.connectionString, (err, client, done) => {
+        if (err) {
+            console.log(err);
+            callback(null);
+            return;
+        }
+        //var sql = `SELECT openbareruimtenaam, huisnummer, huisletter, huisnummertoevoeging, gemeentenaam, provincienaam, ST_X(ST_Transform(geopunt, 4326)) as lon, ST_Y(ST_Transform(geopunt, 4326)) as lat FROM adres WHERE adres.postcode='${zipCode}' AND adres.huisnummer=${houseNumber}`;
+        var sql = `SELECT ST_AsGeoJSON(ST_Transform(geovlak, 4326)) as area FROM ${sqlTable} WHERE ${sqlColumn}='${name}'`;
+        client.query(sql, (err, result) => {
+            done();
+            if (err) {
+                console.log(err);
+                console.log(`Cannot find province: ${name}`);
+                callback(null);
+            } else {
+                callback(result.rows);
+            }
+        });
+    });
+  }
+
     /**
      * Lookup the address from the BAG.
      */
@@ -72,7 +99,7 @@ class BagDatabase {
                 return;
             }
             //var sql = `SELECT openbareruimtenaam, huisnummer, huisletter, huisnummertoevoeging, gemeentenaam, provincienaam, ST_X(ST_Transform(geopunt, 4326)) as lon, ST_Y(ST_Transform(geopunt, 4326)) as lat FROM adres WHERE adres.postcode='${zipCode}' AND adres.huisnummer=${houseNumber}`;
-            var sql = `SELECT ST_X(ST_Transform(geopunt, 4326)) as lon, ST_Y(ST_Transform(geopunt, 4326)) as lat FROM adres WHERE adres.postcode='${zipCode}' AND adres.huisnummer=${houseNr}`;
+            var sql = `SELECT ST_X(ST_Transform(geopunt, 4326)) as lon, ST_Y(ST_Transform(geopunt, 4326)) as lat FROM bagactueel.adres WHERE adres.postcode='${zipCode}' AND adres.huisnummer=${houseNr}`;
             client.query(sql, (err, result) => {
                 done();
                 if (err) {
