@@ -9,7 +9,6 @@
   },
   "dependencies": {
     "chokidar": "^1.0.1",
-    "cs-offline-search": "0.0.8",
     "express": "3.4.4",
     "pg": "^4.3.0",
     "rootpath": "^0.1.2",

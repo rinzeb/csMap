@@ -2,7 +2,7 @@ require('rootpath')();
 ﻿import express              = require('express');
 import http                 = require('http');
 import path                 = require('path');
-import offlineSearch        = require('cs-offline-search');
+//import offlineSearch        = require('cs-offline-search');
 import cc                   = require("ServerComponents/dynamic/ClientConnection");
 import MapLayerFactory      = require('./services/MapLayerCreator/MapLayerFactory');
 import fr                   = require("ServerComponents/Layers/FlightRadar");
@@ -15,10 +15,10 @@ import DynamicProject       = require("ServerComponents/dynamic/DynamicProject")
 /**
  * Create a search index file which can be loaded statically.
  */
-var offlineSearchManager = new offlineSearch('public/data/projects/projects.json', {
-    propertyNames: ['Name', 'plaatnaam', 'postcode', 'Postcode', 'straat', 'loc_straat', 'KvK', 'gemeente', 'plaats', 'Naam_van_het_concern_DigiMV_2012'],
-    stopWords    : ['de', 'het', 'een', 'en', 'van', 'aan']
-});
+// var offlineSearchManager = new offlineSearch('public/data/projects/projects.json', {
+//     propertyNames: ['Name', 'plaatnaam', 'postcode', 'Postcode', 'straat', 'loc_straat', 'KvK', 'gemeente', 'plaats', 'Naam_van_het_concern_DigiMV_2012'],
+//     stopWords    : ['de', 'het', 'een', 'en', 'van', 'aan']
+// });
 
 // setup socket.io object
 var server        = express();
@@ -66,9 +66,9 @@ if ('development' == server.get('env')) {
     server.use(express.errorHandler());
 }
 
-//server.get('/', (req, res) => {
+// server.get('/', (req, res) => {
 //    res.render('index.html');
-//});
+// });
 //server.get('/', routes.index);
 //server.get('/users', user.list);
 
