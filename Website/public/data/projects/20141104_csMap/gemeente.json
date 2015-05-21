@@ -17,7 +17,8 @@
 					"label" : "Name",
 					"type" : "text",
 					"title" : "Naam",
-					"visibleInCallOut" : false,
+					"section" : "CBS",
+					"visibleInCallOut" : true,
 					"canEdit" : true,
 					"isSearchable" : false
 				}, {

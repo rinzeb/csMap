@@ -19,9 +19,9 @@ var gulp = require('gulp'),
 
 gulp.task('built_csComp', function() {
     return gulp.src('../../../csWeb/csComp/js/**/*.js')
-        .pipe(debug({
-            title: 'built_csComp:'
-        }))
+        // .pipe(debug({
+        //     title: 'built_csComp:'
+        // }))
         // .pipe(debug({title: 'before ordering:'}))
         // .pipe(order([
         //     "translations/locale-nl.js"
@@ -30,6 +30,41 @@ gulp.task('built_csComp', function() {
         .pipe(concat('csComp.js'))
         .pipe(gulp.dest('./public/cs/js'));
 });
+
+gulp.task('copy_csServerComp', function() {
+    return gulp.src('../../../csWeb/csServerComp/ServerComponents/**/*.js')
+        //.pipe(concat('csServerComp.js'))
+        .pipe(gulp.dest('./ServerComponents'));
+});
+
+gulp.task('built_csServerComp.d.ts', function() {
+    gulp.src('../../../csWeb/csServerComp/ServerComponents/**/*.d.ts')
+        .pipe(plumber())
+      //  .pipe(concat('csServerComp.d.ts'))
+        .pipe(gulp.dest('./ServerComponents'));
+        //.pipe(gulp.dest('./public/cs/js'));
+});
+
+gulp.task('copy_csServerComp_scripts', function() {
+    return gulp.src('../../../csWeb/csServerComp/Scripts/**/*.ts')
+        //.pipe(concat('csComp.js'))
+        .pipe(gulp.dest('./Scripts'));
+});
+
+gulp.task('built_csComp_classes', function() {
+    return gulp.src('../../../csWeb/csComp/classes/**/*.ts')
+        // .pipe(debug({
+        //     title: 'built_csComp_classes:'
+        // }))
+        // .pipe(debug({title: 'before ordering:'}))
+        // .pipe(order([
+        //     "translations/locale-nl.js"
+        // ]))
+        // .pipe(debug({title: 'after ordering:'}))
+        .pipe(concat('csCompClasses.ts'))
+        .pipe(gulp.dest('../../../csWeb/csServerComp/classes'));
+});
+
 
 gulp.task('built_csComp.d.ts', function() {
     gulp.src('../../../csWeb/csComp/js/**/*.d.ts')
@@ -43,7 +78,10 @@ gulp.task('built_csComp.d.ts', function() {
         .pipe(insert.prepend('/// <reference path="../leaflet/leaflet.d.ts" />\r\n'))
         .pipe(insert.prepend('/// <reference path="../crossfilter/crossfilter.d.ts" />\r\n'))
         .pipe(gulp.dest('Scripts/typings/cs'));
+        //.pipe(gulp.dest('./public/cs/js'));
 });
+
+
 
 gulp.task('create_templateCache', function() {
     console.log('Creating templateCache.')
@@ -53,9 +91,9 @@ gulp.task('create_templateCache', function() {
     }
 
     gulp.src('../../../csWeb/csComp/**/*.tpl.html')
-        .pipe(debug({
-            title: 'create_templateCache:'
-        }))
+        // .pipe(debug({
+        //     title: 'create_templateCache:'
+        // }))
         .pipe(templateCache(options))
         .pipe(gulp.dest('public/cs/js'))
 })
@@ -97,9 +135,9 @@ gulp.task('minify_csComp', function() {
 
 gulp.task('include_js', function() {
     gulp.src('../../../csWeb/csComp/includes/js/**/*.*')
-        .pipe(debug({
-            title: 'include_js:'
-        }))
+        // .pipe(debug({
+        //     title: 'include_js:'
+        // }))
         .pipe(plumber())
         .pipe(gulp.dest('./public/cs/js'));
 });
@@ -116,9 +154,13 @@ gulp.task('include_images', function() {
         .pipe(gulp.dest('./public/cs/images/'));
 });
 
-
 gulp.task('watch', function() {
+    gulp.watch('../../../csWeb/csServerComp/ServerComponents/**/*.js', ['copy_csServerComp']);
+    gulp.watch('../../../csWeb/csServerComp/Scripts/**/*.ts', ['copy_csServerComp_scripts']);
+    gulp.watch('../../../csWeb/csServerComp/ServerComponents/**/*.d.ts', ['built_csServerComp.d.ts']);
+
     gulp.watch('../../../csWeb/csComp/js/**/*.js', ['built_csComp']);
+    //gulp.watch('../../../csWeb/csComp/classes/*.ts', ['built_csComp_classes']);
     gulp.watch('../../../csWeb/csComp/js/**/*.d.ts', ['built_csComp.d.ts']);
     gulp.watch('../../../csWeb/csComp/**/*.tpl.html', ['create_templateCache']);
     gulp.watch('../../../csWeb/csComp/includes/**/*.css', ['include_css']);
@@ -126,4 +168,4 @@ gulp.task('watch', function() {
     gulp.watch('../../../csWeb/csComp/includes/images/*.*', ['include_images']);
 });
 
-gulp.task('default', ['create_templateCache', 'built_csComp', 'built_csComp.d.ts', 'include_css', 'include_js', 'include_images', 'watch']);
+gulp.task('default', ['create_templateCache', 'copy_csServerComp','built_csServerComp.d.ts','copy_csServerComp_scripts','built_csComp','built_csComp.d.ts', 'include_css', 'include_js', 'include_images', 'watch']);

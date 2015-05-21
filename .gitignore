@@ -15,3 +15,7 @@ Website/public/app/app.js
 Website/dist/ClientConnection.js
 Website/dist/
 Website/public/data/projects/AHTI/
+Website/server/
+Website/Scripts/typings/cs/csComp.d.ts
+Website/public/data/projects/smartcycling/
+Website/ServerComponents/

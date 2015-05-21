@@ -1,21 +1,22 @@
+require('rootpath')();
 ﻿import express = require('express');
 import http = require('http');
-import ClientConnection = require("./../ClientConnection");
+import DynamicProject = require("ServerComponents/dynamic/datasource");
+import ClientConnection = require("ServerComponents/dynamic/ClientConnection");
 
 module FlightRadar {
 
-    export class IDynamicLayer {
-        Connection: ClientConnection.ConnectionManager;
-        GetLayer: Function;
-        layerId: string;
 
-    }
 
-    export class FlightRadar implements IDynamicLayer {
+    export class FlightRadar  {
 
         public static result;
 
         constructor (public Connection: ClientConnection.ConnectionManager, public layerId : string)
+        {
+        }
+
+        public GetDataSource()
         {
 
         }
@@ -94,7 +95,7 @@ module FlightRadar {
                         if (s[0] != "" && s[1] != null && s[2] != null && s[0] != null) {
                             var sit = {
                                 "type": "Feature",
-                                "geometry": { "type": "Point", "coordinates": [s[2], s[1]] },
+                                "geometry": { "type": "Point", "coordinates": [s[2], s[1], s[4]] },
                                 "properties": {
                                     "id": s[0],
                                     "FeatureTypeId": "plane",
@@ -127,7 +128,7 @@ module FlightRadar {
 
                     FlightRadar.result = active;
 
-                    console.log(FlightRadar.result.features.length);
+                    //console.log(FlightRadar.result.features.length);
                     // ID to avoid having duplicate _id keys (still need to know why this happens)
                     FlightRadar.result._id = "Flightradar_" + new Date().getTime();
 

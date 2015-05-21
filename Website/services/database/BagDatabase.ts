@@ -1,5 +1,6 @@
+require('rootpath')();
 import express              = require('express');
-import ConfigurationService = require('../configuration/ConfigurationService');
+import ConfigurationService = require('ServerComponents/configuration/ConfigurationService');
 import pg                   = require('pg');
 import Location             = require('./Location');
 
