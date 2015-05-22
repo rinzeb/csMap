@@ -158,7 +158,19 @@
         "name": "No Map",
         "showTimeline": false,
         "showLeftmenu": true,
-        "showMap": false
+        "showMap": false,
+        "widgets": [{
+            "directive": "markdownwidget",
+            "title": "Test",
+            "left": "10px",
+            "top": "10px",
+            "width": "650px",
+            "height": "350px",
+            "data": {
+                "url": "data/projects/20141104_csMap/test.md",
+                "content": "# Hello World #\n | a | b | c | d | \n |---|---|---|---| \n | 1 | 2 | 3 | 4 |"
+            }
+        }]
     }],
     "expertMode": 3,
     "userPrivileges": {

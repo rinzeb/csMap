@@ -190,6 +190,7 @@ module App {
         'LocalStorageModule',
         'angularUtils.directives.dirPagination',
         'pascalprecht.translate',
+        'wiz.markdown',
         'ngCookies'
     ])
         .config(localStorageServiceProvider => {

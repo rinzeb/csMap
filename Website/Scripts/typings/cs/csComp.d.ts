@@ -1099,7 +1099,7 @@ declare module csComp {
         * Load a JavaScript or CSS file dynamically by adding it to the end of the HEAD section in your document.
         * See also: http://www.javascriptkit.com/javatutors/loadjavascriptcss.shtml
         */
-        static loadJsCssfile(filename: string, filetype: FileType, callback?: Function): void;
+        static loadJsCssfile(filename: string, filetype: FileType, callback?: (evt: Event) => void): void;
     }
 }
 
@@ -1112,6 +1112,28 @@ declare module Translations {
 declare module Translations {
     class Dutch {
         static locale: ng.translate.ITranslationTable;
+    }
+}
+
+declare module BaseMapList {
+    /**
+      * Module
+      */
+    var myModule: any;
+}
+
+declare module BaseMapList {
+    interface IBaseMapScope extends ng.IScope {
+        vm: BaseMapListCtrl;
+    }
+    class BaseMapListCtrl {
+        private $scope;
+        private $mapService;
+        private $messageBusService;
+        private scope;
+        static $inject: string[];
+        constructor($scope: IBaseMapScope, $mapService: csComp.Services.MapService, $messageBusService: csComp.Services.MessageBusService);
+        selectBaseLayer(key: any): void;
     }
 }
 
@@ -1185,28 +1207,6 @@ declare module Charts {
             bottom: number;
             left: number;
         };
-    }
-}
-
-declare module BaseMapList {
-    /**
-      * Module
-      */
-    var myModule: any;
-}
-
-declare module BaseMapList {
-    interface IBaseMapScope extends ng.IScope {
-        vm: BaseMapListCtrl;
-    }
-    class BaseMapListCtrl {
-        private $scope;
-        private $mapService;
-        private $messageBusService;
-        private scope;
-        static $inject: string[];
-        constructor($scope: IBaseMapScope, $mapService: csComp.Services.MapService, $messageBusService: csComp.Services.MessageBusService);
-        selectBaseLayer(key: any): void;
     }
 }
 
@@ -1565,27 +1565,6 @@ declare module FilterList {
         private scope;
         static $inject: string[];
         constructor($scope: IFilterListScope, $layerService: csComp.Services.LayerService);
-    }
-}
-
-declare module Filters {
-    /**
-      * Module
-      */
-    var myModule: any;
-    interface IFilterScope extends ng.IScope {
-        timestamps: number[];
-        sensor: number[];
-        width?: number;
-        height?: number;
-        closed?: boolean;
-        margin?: {
-            top: number;
-            right: number;
-            bottom: number;
-            left: number;
-        };
-        showaxis?: boolean;
     }
 }
 
@@ -2442,6 +2421,13 @@ declare module Helpers.Resize {
     var myModule: any;
 }
 
+declare module ShowModal {
+    /**
+      * Module
+      */
+    var myModule: any;
+}
+
 declare module StyleList {
     /**
       * Module
@@ -2460,13 +2446,6 @@ declare module StyleList {
         static $inject: string[];
         constructor($scope: IStyleListScope, $layerService: csComp.Services.LayerService);
     }
-}
-
-declare module ShowModal {
-    /**
-      * Module
-      */
-    var myModule: any;
 }
 
 declare module Timeline {
@@ -3036,49 +3015,6 @@ declare module csComp.Services {
     }
 }
 
-declare module Dashboard {
-    /**
-      * Module
-      */
-    var myModule: any;
-}
-
-declare module Dashboard {
-    interface IDashboardScope extends ng.IScope {
-        vm: DashboardCtrl;
-        gridsterOptions: any;
-        dashboard: csComp.Services.Dashboard;
-        container: string;
-        param: any;
-        initDashboard: Function;
-        minus: Function;
-    }
-    interface IWidgetScope extends ng.IScope {
-        data: any;
-    }
-    class DashboardCtrl {
-        private $scope;
-        private $compile;
-        private $layerService;
-        private $mapService;
-        private $messageBusService;
-        private $dashboardService;
-        private $templateCache;
-        private scope;
-        private project;
-        static $inject: string[];
-        constructor($scope: IDashboardScope, $compile: any, $layerService: csComp.Services.LayerService, $mapService: csComp.Services.MapService, $messageBusService: csComp.Services.MessageBusService, $dashboardService: csComp.Services.DashboardService, $templateCache: any);
-        toggleWidget(widget: csComp.Services.IWidget): void;
-        updateWidget(w: csComp.Services.IWidget): void;
-        checkMap(): void;
-        checkLayers(): void;
-        checkViewbound(): void;
-        checkTimeline(): void;
-        isReady(widget: csComp.Services.IWidget): void;
-        updateDashboard(): void;
-    }
-}
-
 declare module DashboarHeaderdSelection {
     /**
       * Module
@@ -3180,11 +3116,55 @@ declare module WidgetEdit {
     }
 }
 
+declare module Dashboard {
+    /**
+      * Module
+      */
+    var myModule: any;
+}
+
+declare module Dashboard {
+    interface IDashboardScope extends ng.IScope {
+        vm: DashboardCtrl;
+        gridsterOptions: any;
+        dashboard: csComp.Services.Dashboard;
+        container: string;
+        param: any;
+        initDashboard: Function;
+        minus: Function;
+    }
+    interface IWidgetScope extends ng.IScope {
+        data: any;
+    }
+    class DashboardCtrl {
+        private $scope;
+        private $compile;
+        private $layerService;
+        private $mapService;
+        private $messageBusService;
+        private $dashboardService;
+        private $templateCache;
+        private scope;
+        private project;
+        static $inject: string[];
+        constructor($scope: IDashboardScope, $compile: any, $layerService: csComp.Services.LayerService, $mapService: csComp.Services.MapService, $messageBusService: csComp.Services.MessageBusService, $dashboardService: csComp.Services.DashboardService, $templateCache: any);
+        toggleWidget(widget: csComp.Services.IWidget): void;
+        updateWidget(w: csComp.Services.IWidget): void;
+        checkMap(): void;
+        checkLayers(): void;
+        checkViewbound(): void;
+        checkTimeline(): void;
+        isReady(widget: csComp.Services.IWidget): void;
+        updateDashboard(): void;
+    }
+}
+
 declare module Filters {
     interface IBarFilterScope extends ng.IScope {
         vm: BarFilterCtrl;
         filter: csComp.Services.GroupFilter;
         options: Function;
+        editMode: boolean;
     }
     class BarFilterCtrl {
         $scope: IBarFilterScope;
@@ -3199,29 +3179,9 @@ declare module Filters {
         private dcChart;
         initBarFilter(): void;
         private updateFilter();
+        updateRange(): void;
         remove(): void;
     }
-}
-
-declare module Filters {
-    /**
-      * Module
-      */
-    var myModule: any;
-}
-
-declare module Filters {
-    /**
-      * Module
-      */
-    var myModule: any;
-}
-
-declare module Filters {
-    /**
-      * Module
-      */
-    var myModule: any;
 }
 
 declare module Filters {
@@ -3290,6 +3250,36 @@ declare module Indicators {
         updateIndicator(i: indicator): void;
         private checkLayers();
         selectIndicator(i: indicator): void;
+    }
+}
+
+declare module MarkdownWidget {
+    /**
+      * Module
+      */
+    var myModule: any;
+}
+
+declare module MarkdownWidget {
+    class MarkdownWidgetData {
+        title: string;
+        content: string;
+        url: string;
+    }
+    interface IMarkdownWidgetScope extends ng.IScope {
+        vm: MarkdownWidgetCtrl;
+        data: MarkdownWidgetData;
+    }
+    class MarkdownWidgetCtrl {
+        private $scope;
+        private $timeout;
+        private $layerService;
+        private $messageBus;
+        private $mapService;
+        private scope;
+        private widget;
+        static $inject: string[];
+        constructor($scope: IMarkdownWidgetScope, $timeout: ng.ITimeoutService, $layerService: csComp.Services.LayerService, $messageBus: csComp.Services.MessageBusService, $mapService: csComp.Services.MapService);
     }
 }
 
