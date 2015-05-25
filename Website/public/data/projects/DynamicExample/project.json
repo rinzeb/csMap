@@ -49,21 +49,7 @@
 
     },
     "groups": [
-        {
-            "title": "Test Group",
-            "description": "Test",
-            "clustering": false,
-            "layers":
-            [{
-              "id": "ndw",
-              "description": "Statistical data per city. (Source: CBS, BAG, TNO, DigiMV. Geactualiseerd: 1 november 2014.)",
-              "type": "GeoJSON",
-              "url": "data/projects/dynamicexample/test/export1.json",
-"enabled":true}
 
-            ]
-
-        }
 
     ]
 }

@@ -159,6 +159,9 @@
         "showTimeline": false,
         "showLeftmenu": true,
         "showMap": false,
+        "showRightmenu" : false,
+        "showBackgroundImage" : true,
+        "backgroundimage" : "images/amsterdam.jpg",
         "widgets": [{
             "directive": "markdownwidget",
             "title": "Test",

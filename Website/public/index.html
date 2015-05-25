@@ -227,7 +227,8 @@
           </div>
       </div>
       <dashboardirective container="main" style="display:table-cell;width:100%;vertical-align: top;" dashboard="vm.$dashboardService.mainDashboard"></dashboardirective> <!-- class="dashboard-directive" -->
-      <div class="rightpanel" style="background-color: transparent;">
+
+      <div class="rightpanel" ng-show="vm.$layerService.visual.rightPanelVisible" style="background-color: transparent;">
             <div id="rightpanelTabContainer" class="tabbable tabs-left" style="display:table;height:100%;padding:0px;">
                 <!-- Nav tabs -->
                 <!--<div id="rightPanelToggle">
@@ -239,11 +240,11 @@
                             <span class="fa fa-info fa-lg"></span>
                         </a>
                     </li>
-                    <li class="rightPanelTab rightPanelTabAnimated" ng-show="vm.$dashboardService.editWidgetMode">
+                    <!-- <li class="rightPanelTab rightPanelTabAnimated" ng-show="vm.$dashboardService.editWidgetMode">
                         <a href="#widgetEdit" style="" data-toggle="tab">
                             <span class="fa fa-tachometer fa-lg"></span>
                         </a>
-                    </li>
+                    </li> -->
                     <li class="rightPanelTab rightPanelTabAnimated" ng-show="featureSelected">
                         <a href="#linkedData" style="" data-toggle="tab">
                             <span class="fa fa-link fa-lg"></span>
@@ -259,9 +260,9 @@
                     <div class="tab-pane active" id="info">
                         <featureprops class="rightpanel-content"></featureprops>
                     </div>
-                    <div class="tab-pane" ng-show="vm.$dashboardService.editWidgetMode" style="width:355px" id="widgetEdit">
+                    <!-- <div class="tab-pane" ng-show="vm.$dashboardService.editWidgetMode" style="width:355px" id="widgetEdit">
                       <widgetedit ng-show="vm.$dashboardService.editWidgetMode"></widgetedit>
-                    </div>
+                    </div> -->
                     <div class="tab-pane" id="linkedData">
                         <featurerelations class="rightpanel-content"></featurerelations>
                     </div>

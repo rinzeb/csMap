@@ -121,7 +121,11 @@
        }
     ],
     "projects" :  [
-
+      {
+        "title" : "dynamic",
+        "url" : "project/dynamicexample",
+        "dynamic" : true        
+      },
       {
           "title": "csMap",
           "url": "data/projects/20141104_csMap/project.json"
