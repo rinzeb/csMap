@@ -31,6 +31,7 @@
     <link rel="stylesheet" href="bower_components/leaflet.locatecontrol/src/L.Control.Locate.css" />
     <link rel="stylesheet" href="bower_components/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" />
     <link rel="stylesheet" href="http://daneden.github.io/animate.css/animate.min.css" />
+    <link rel="stylesheet" href="bower_components/spectrum/spectrum.css" rel="stylesheet" />
     <!-- <link rel="stylesheet" href="bower_components/circliful/css/jquery.circliful.css" type="text/css" /> -->
 
     <!-- common sense style sheets -->
@@ -74,6 +75,8 @@
     <script src="bower_components/jquery-ui/jquery-ui.min.js"></script>
     <script src="bower_components/underscore/underscore-min.js"></script>
     <script src="bower_components/moment/min/moment.min.js"></script>
+    <script src="bower_components/spectrum/spectrum.js"></script>
+    <script src="cs/js/angular-spectrum-colorpicker.min.js"></script>
     <script src="cs/js/stringformat-1.09.min.min.js"></script>
     <script src="cs/js/stringformat.nl-NL.min.js"></script>
     <script src="cs/js/xbbcode.min.js"></script>
@@ -246,6 +249,11 @@
                             <span class="fa fa-link fa-lg"></span>
                         </a>
                     </li>
+                    <li class="rightPanelTab rightPanelTabAnimated" ng-show="featureSelected">
+                        <a href="#featureTypeEdit" style="" data-toggle="tab">
+                            <span class="fa fa-link fa-lg"></span>
+                        </a>
+                    </li>
                 </ul>
                 <div id="rightpanelTabPanes" class="tab-content" style="display: table-cell; vertical-align:top; width:100%; height:100%; background-color: white;">
                     <div class="tab-pane active" id="info">
@@ -257,6 +265,11 @@
                     <div class="tab-pane" id="linkedData">
                         <featurerelations class="rightpanel-content"></featurerelations>
                     </div>
+                    <div class="tab-pane" id="featureTypeEdit">
+                        <featuretypes class="rightpanel-content"></featuretypes>
+                    </div>
+
+
                 </div>
             </div>
         </div>

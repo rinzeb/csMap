@@ -190,8 +190,8 @@ module App {
         'LocalStorageModule',
         'angularUtils.directives.dirPagination',
         'pascalprecht.translate',
-        'wiz.markdown',
-        'ngCookies'
+        'ngCookies','angularSpectrumColorpicker',
+        'wiz.markdown'
     ])
         .config(localStorageServiceProvider => {
             localStorageServiceProvider.prefix = 'csMap';

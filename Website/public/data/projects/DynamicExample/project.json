@@ -1,4 +1,4 @@
-{   
+{
     "title": "Dynamic Example",
     "description": "csMap is developed by the Dutch Research Organisation TNO, in first instance for the Dutch Ministry of Health (VWS).",
     "url": "https://github.com/TNOCS/csMap",
@@ -21,8 +21,7 @@
             "showTimeline": true,
             "showLeftmenu": true,
             "showMap": true,
-            "visiblelayers": [
-            ]
+            "visiblelayers": []
         }
 
       ],
@@ -36,7 +35,15 @@
 
     },
     "featureTypes": {
-
+      "public\\data\\projects\\DynamicExample\\test\\export1.geojson_Default" :
+      {
+        "name": "Link",
+        "style": {
+            "drawingMode": "Line",
+            "strokeWidth": 1,
+            "strokeColor" : "black"
+        }
+      }
     },
     "baselayers": {
 
@@ -45,7 +52,16 @@
         {
             "title": "Test Group",
             "description": "Test",
-            "clustering": false
+            "clustering": false,
+            "layers":
+            [{
+              "id": "ndw",
+              "description": "Statistical data per city. (Source: CBS, BAG, TNO, DigiMV. Geactualiseerd: 1 november 2014.)",
+              "type": "GeoJSON",
+              "url": "data/projects/dynamicexample/test/export1.json",
+"enabled":true}
+
+            ]
 
         }
 

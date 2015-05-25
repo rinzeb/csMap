@@ -3260,7 +3260,49 @@
             "url": "data/projects/20141104_csMap/verzorgingshuizen.json",
             "opacity": 50
         }]
-    }, {
+    },
+    { "title" : "3D",
+    "clustering" : false,
+    "oneLayerActive" : true,
+    "layers" : [
+      {
+                   "id": "3Dtestamsterdam",
+                   "reference": "3D Test Amsterdam",
+                   "languages": {
+                       "nl": {
+                           "title": "3D Buildings Amsterdam",
+                           "description": "TOP10NL."
+                       },
+                       "en": {
+                           "title": "3D Buildings Amsterdam",
+                           "description": "TOP10NL."
+                       }
+                   },
+                   "type": "GeoJson",
+                   "url": "data/projects/20141104_csMap/amsterdam.json",
+                   "enabled": false,
+                   "opacity": 100
+       }, {
+                   "id": "3Dtestamsterdamarena",
+                   "reference": "3D Test Amsterdam Arena",
+                   "languages": {
+                       "nl": {
+                           "title": "3D Buildings Amsterdam Arena",
+                           "description": "TOP10NL."
+                       },
+                       "en": {
+                           "title": "3D Buildings Amsterdam Arena",
+                           "description": "TOP10NL."
+                       }
+                   },
+                   "type": "GeoJson",
+                   "url": "data/projects/20141104_csMap/arena.json",
+                   "enabled": false,
+                   "opacity": 100
+       }
+      ]},
+
+    {
         "languages": {
             "nl": {
                 "title": "Heatmaps",

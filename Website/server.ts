@@ -42,7 +42,12 @@ server.use(server.router);
 
 config.add("server", "http://localhost:" + port);
 
-var pr = new DynamicProject.DynamicProjectService(server,cm);
+// Couple the application to the Swagger module.
+var swagger = require("swagger-node-express").createNew(server);
+
+
+
+var pr = new DynamicProject.DynamicProjectService(server,cm,messageBus);
 pr.Start(server);
 
 var planes = new fr.FlightRadar(cm, "FlightRadar");
@@ -55,7 +60,7 @@ server.get("/datasource", ds.GetDataSource);
 
 var bagDatabase = new BagDatabase(config);
 // server.get(config["resolveAddress"], (req, res) => bagDatabase.lookupAddress(req, res));
-var mapLayerFactory = new MapLayerFactory(config, messageBus);
+var mapLayerFactory = new MapLayerFactory(bagDatabase, messageBus);
 server.post('/projecttemplate', (req, res) => mapLayerFactory.process(req, res));
 
 server.use(express.static(path.join(__dirname, 'public')));
