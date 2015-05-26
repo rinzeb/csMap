@@ -252,7 +252,7 @@ input[type="checkbox"] { margin: 0; }
 
 .rightpanel {
     height: 100%;
-    width:400px;
+    max-width:400px;
     display:table-cell;
     pointer-events: all;
     right: 0;
