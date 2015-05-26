@@ -34,17 +34,6 @@
     "propertyTypeData": {
 
     },
-    "featureTypes": {
-      "public\\data\\projects\\DynamicExample\\test\\export1.geojson_Default" :
-      {
-        "name": "Link",
-        "style": {
-            "drawingMode": "Line",
-            "strokeWidth": 1,
-            "strokeColor" : "black"
-        }
-      }
-    },
     "baselayers": {
 
     },

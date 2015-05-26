@@ -116,7 +116,7 @@
         "url": "data/projects/smartcycling/project.json"
     }, {
         "title": "dynamic",
-        "url": "project/dynamicexample",
+        "url": "data/projects/DynamicExample/project.json",
         "dynamic": true
     }]
 }

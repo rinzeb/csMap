@@ -37,7 +37,22 @@ interface ILayerTemplate {
 
 /** A factory class to create new map layers based on input, e.g. from Excel */
 class MapLayerFactory {
-    constructor(private bag: BagDatabase, private messageBus: MessageBus.MessageBusService) {}
+
+    templateFiles: csComp.Services.IProperty[];
+
+    constructor(private bag: BagDatabase, private messageBus: MessageBus.MessageBusService) {
+        var fileList: csComp.Services.IProperty[] = [];
+        fs.readdir("public/data/templates", function (err, files) {
+          if(err) {
+            console.log("Error while looking for templates");
+          } else {
+            files.forEach((f) => {
+              fileList[f.replace(/\.[^/.]+$/, "")] = ("public/data/templates/" + f); // Filter extension from key and store in dictionary
+            });
+          }
+        });
+        this.templateFiles = fileList;
+    }
 
     public process(req: express.Request, res: express.Response) {
         res.writeHead(200, {'Content-Type': 'text/html'});
@@ -45,14 +60,14 @@ class MapLayerFactory {
         console.log('Received project template. Processing...');
         var template: ILayerTemplate = req.body;
         var ld = template.layerDefinition[0];
-
         this.createMapLayer(template, (geojson) => {
 
-            // fs.writeFileSync("c:/Temp/excel_export.json", JSON.stringify(geojson));
+            fs.writeFileSync("C:/Users/bruiningrw/Projects/CommonSense/apps/csMap/Website/public/data/projects/DynamicExample/" + ld.group + "/" + ld.layerTitle + ".json", JSON.stringify(geojson));
 
             this.messageBus.publish('dynamic_project_layer', 'created', {
                 project   : ld.projectTitle,
                 reference : ld.reference,
+                group     : ld.group,
                 geojson   : geojson,
                 enabled   : ld.isEnabled });
         });
@@ -61,6 +76,9 @@ class MapLayerFactory {
     public createMapLayer(template: ILayerTemplate, callback: (Object) => void) {
         var ld = template.layerDefinition[0];
         var features: IGeoJsonFeature[] = [];
+
+        // Check propertyTypeData for time-based data
+        this.convertTimebasedPropertyData(template.propertyTypes);
         var geojson = {
             type: "FeatureCollection",
             featureTypes: {
@@ -81,6 +99,7 @@ class MapLayerFactory {
             },
             features: features
         };
+
         // Add geometry
         switch (ld.geometryType) {
             case "Postcode6_en_huisnummer":
@@ -94,10 +113,47 @@ class MapLayerFactory {
                 }
                 this.createPointFeature(ld.parameter1, ld.parameter2, features, template.properties, () => { callback(geojson) });
                 break;
+            case "Zorgkantoorregio":
+                if(!ld.parameter1) {
+                  console.log("Error: Parameter1 should be the name of the column containing the zorgkantoor!")
+                  return;
+                }
+                this.createPolygonFeature(ld.geometryType, ld.parameter1,features,template.properties, () => { callback(geojson) });
+                break;
         }
 
         return geojson;
 
+    }
+
+    private convertTimebasedPropertyData(propertyTypes: csComp.Services.IPropertyType[]) {
+      if (!propertyTypes) return;
+      propertyTypes.forEach((pt) => {
+        if (pt.hasOwnProperty("targetProperty")) {
+          // TODO: Convert to "sensors":[  #,#,#,# ];
+        }
+      });
+    }
+
+    private createPolygonFeature(templateName:string, par1: string, features: IGeoJsonFeature[], properties: csComp.Services.IProperty[], callback: Function) {
+      if (!properties) callback();
+      if (!this.templateFiles.hasOwnProperty(templateName)) {
+        console.log("Error: could not find template: " + templateName);
+        callback();
+      }
+      var templateUrl: string = this.templateFiles[templateName];
+      var templateFile = fs.readFileSync(templateUrl);
+      var templateJson = JSON.parse(templateFile.toString());
+
+      var fts = templateJson.features;
+      fts.forEach((f) => {
+        var p0 = properties[0];
+        console.log(JSON.stringify(p0));
+        if (f.properties["Name"] === p0[par1]) {
+          console.log(p0[par1]);
+        }
+      })
+      callback();
     }
 
     private createPointFeature(zipCode: string, houseNumber: string, features: IGeoJsonFeature[], properties: csComp.Services.IProperty[], callback: Function) {
