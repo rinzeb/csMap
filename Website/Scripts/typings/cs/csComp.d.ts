@@ -2268,27 +2268,6 @@ declare module MapElement {
     }
 }
 
-declare module ProjectSettings {
-    /**
-      * Module
-      */
-    var myModule: any;
-}
-
-declare module ProjectSettings {
-    interface IProjectSettingsScope extends ng.IScope {
-        vm: ProjectSettingsCtrl;
-    }
-    class ProjectSettingsCtrl {
-        private $scope;
-        private $modal;
-        private $layerService;
-        private scope;
-        static $inject: string[];
-        constructor($scope: IProjectSettingsScope, $modal: any, $layerService: csComp.Services.LayerService);
-    }
-}
-
 declare module OfflineSearch {
     /**
       * Module
@@ -2433,6 +2412,51 @@ declare module OfflineSearch {
          */
         onSelect(selectedItem: OfflineSearchResultViewModel): void;
         private selectFeature(layerId, featureIndex);
+    }
+}
+
+declare module ProjectHeaderSelection {
+    /**
+      * Module
+      */
+    var myModule: any;
+}
+
+declare module ProjectHeaderSelection {
+    interface IProjectHeaderSelectionScope extends ng.IScope {
+        vm: ProjectHeaderSelectionCtrl;
+    }
+    class ProjectHeaderSelectionCtrl {
+        private $scope;
+        $layerService: csComp.Services.LayerService;
+        $dashboardService: csComp.Services.DashboardService;
+        private $mapService;
+        $messageBusService: csComp.Services.MessageBusService;
+        scope: any;
+        project: csComp.Services.SolutionProject;
+        static $inject: string[];
+        constructor($scope: any, $layerService: csComp.Services.LayerService, $dashboardService: csComp.Services.DashboardService, $mapService: csComp.Services.MapService, $messageBusService: csComp.Services.MessageBusService);
+    }
+}
+
+declare module ProjectSettings {
+    /**
+      * Module
+      */
+    var myModule: any;
+}
+
+declare module ProjectSettings {
+    interface IProjectSettingsScope extends ng.IScope {
+        vm: ProjectSettingsCtrl;
+    }
+    class ProjectSettingsCtrl {
+        private $scope;
+        private $modal;
+        private $layerService;
+        private scope;
+        static $inject: string[];
+        constructor($scope: IProjectSettingsScope, $modal: any, $layerService: csComp.Services.LayerService);
     }
 }
 
@@ -2742,71 +2766,6 @@ declare module csComp.Services {
 }
 
 declare module csComp.Services {
-    interface IMapLayersScope extends ng.IScope {
-        map: L.Map;
-        vm: MapCtrl;
-    }
-    class MapCtrl {
-        private $scope;
-        private $location;
-        private $mapService;
-        static $inject: string[];
-        constructor($scope: IMapLayersScope, $location: ng.ILocationService, $mapService: MapService);
-    }
-}
-
-declare module csComp.Services {
-    class MapService {
-        private $localStorageService;
-        private $timeout;
-        private $messageBusService;
-        private static expertModeKey;
-        static $inject: string[];
-        map: L.Map;
-        baseLayers: any;
-        private activeBaseLayer;
-        mapVisible: boolean;
-        timelineVisible: boolean;
-        rightMenuVisible: boolean;
-        expertMode: Expertise;
-        constructor($localStorageService: angular.local.storage.ILocalStorageService<any>, $timeout: ng.ITimeoutService, $messageBusService: csComp.Services.MessageBusService);
-        /**
-      * The expert mode can either be set manually, e.g. using this directive, or by setting the expertMode property in the
-      * project.json file. In neither are set, we assume that we are dealing with an expert, so all features should be enabled.
-      *
-      * Precedence:
-      * - when a declaration is absent, assume Expert.
-      * - when the mode is set in local storage, take that value.
-      * - when the mode is set in the project.json file, take that value.
-      */
-        private initExpertMode();
-        isExpert: boolean;
-        isIntermediate: boolean;
-        initMap(): void;
-        changeBaseLayer(layerObj: L.ILayer): void;
-        invalidate(): void;
-        /**
-         * Zoom to a location on the map.
-         */
-        zoomToLocation(center: L.LatLng, zoomFactor?: number): void;
-        /**
-         * Zoom to a feature on the map.
-         */
-        zoomTo(feature: IFeature, zoomLevel?: number): void;
-        /**
-         * Compute the bounding box.
-         * Returns [min_x, max_x, min_y, max_y]
-         */
-        private getBoundingBox(arr);
-        getMap(): L.Map;
-    }
-    /**
-      * Module
-      */
-    var myModule: any;
-}
-
-declare module csComp.Services {
     interface ILayerSource {
         title: string;
         service: ILayerService;
@@ -3042,14 +3001,68 @@ declare module csComp.Services {
 }
 
 declare module csComp.Services {
-    class TimeService {
+    interface IMapLayersScope extends ng.IScope {
+        map: L.Map;
+        vm: MapCtrl;
+    }
+    class MapCtrl {
+        private $scope;
+        private $location;
+        private $mapService;
+        static $inject: string[];
+        constructor($scope: IMapLayersScope, $location: ng.ILocationService, $mapService: MapService);
+    }
+}
+
+declare module csComp.Services {
+    class MapService {
+        private $localStorageService;
+        private $timeout;
         private $messageBusService;
+        private static expertModeKey;
         static $inject: string[];
         map: L.Map;
         baseLayers: any;
         private activeBaseLayer;
-        constructor($messageBusService: csComp.Services.MessageBusService);
+        mapVisible: boolean;
+        timelineVisible: boolean;
+        rightMenuVisible: boolean;
+        expertMode: Expertise;
+        constructor($localStorageService: angular.local.storage.ILocalStorageService<any>, $timeout: ng.ITimeoutService, $messageBusService: csComp.Services.MessageBusService);
+        /**
+      * The expert mode can either be set manually, e.g. using this directive, or by setting the expertMode property in the
+      * project.json file. In neither are set, we assume that we are dealing with an expert, so all features should be enabled.
+      *
+      * Precedence:
+      * - when a declaration is absent, assume Expert.
+      * - when the mode is set in local storage, take that value.
+      * - when the mode is set in the project.json file, take that value.
+      */
+        private initExpertMode();
+        isExpert: boolean;
+        isIntermediate: boolean;
+        initMap(): void;
+        changeBaseLayer(layerObj: L.ILayer): void;
+        invalidate(): void;
+        /**
+         * Zoom to a location on the map.
+         */
+        zoomToLocation(center: L.LatLng, zoomFactor?: number): void;
+        /**
+         * Zoom to a feature on the map.
+         */
+        zoomTo(feature: IFeature, zoomLevel?: number): void;
+        /**
+         * Compute the bounding box.
+         * Returns [min_x, max_x, min_y, max_y]
+         */
+        private getBoundingBox(arr);
+        getMap(): L.Map;
     }
+    /**
+      * Module
+      */
+    var myModule: any;
 }
 
 declare module csComp.Search {
@@ -3063,6 +3076,17 @@ declare module csComp.Search {
         static $inject: string[];
         constructor($scope: ISearchFormScope, $mapService: csComp.Services.MapService);
         doSearch(): void;
+    }
+}
+
+declare module csComp.Services {
+    class TimeService {
+        private $messageBusService;
+        static $inject: string[];
+        map: L.Map;
+        baseLayers: any;
+        private activeBaseLayer;
+        constructor($messageBusService: csComp.Services.MessageBusService);
     }
 }
 
@@ -3125,9 +3149,9 @@ declare module DashboarHeaderdSelection {
     class DashboardHeaderSelectionCtrl {
         private $scope;
         private $layerService;
-        private $dashboardService;
+        $dashboardService: csComp.Services.DashboardService;
         private $mapService;
-        private $messageBusService;
+        $messageBusService: csComp.Services.MessageBusService;
         scope: any;
         project: csComp.Services.SolutionProject;
         static $inject: string[];
@@ -3381,72 +3405,6 @@ declare module Indicators {
 }
 
 declare module csComp.Services {
-    class CesiumRenderer implements IMapRenderer {
-        title: string;
-        service: LayerService;
-        viewer: any;
-        camera: any;
-        scene: any;
-        features: {
-            [key: string]: any;
-        };
-        init(service: LayerService): void;
-        enable(): void;
-        setUpMouseHandlers(): void;
-        disable(): void;
-        addLayer(layer: ProjectLayer): void;
-        removeLayer(layer: ProjectLayer): void;
-        updateMapFilter(group: ProjectGroup): void;
-        addGroup(group: ProjectGroup): void;
-        removeGroup(group: ProjectGroup): void;
-        removeFeature(feature: IFeature): void;
-        updateFeature(feature: IFeature): void;
-        addFeature(feature: IFeature): void;
-        createFeature(feature: IFeature): any;
-        private createPolygon(coordinates);
-        private createMultiPolygon(coordinates);
-    }
-}
-
-declare module csComp.Services {
-    class LeafletRenderer implements IMapRenderer {
-        title: string;
-        service: LayerService;
-        $messageBusService: MessageBusService;
-        private popup;
-        init(service: LayerService): void;
-        enable(): void;
-        disable(): void;
-        addGroup(group: ProjectGroup): void;
-        removeLayer(layer: ProjectLayer): void;
-        private getLeafletStyle(style);
-        addLayer(layer: ProjectLayer): void;
-        /***
-         * Update map markers in cluster after changing filter
-         */
-        updateMapFilter(group: ProjectGroup): void;
-        removeGroup(group: ProjectGroup): void;
-        removeFeature(feature: IFeature): void;
-        updateFeature(feature: IFeature): void;
-        addFeature(feature: IFeature): any;
-        /**
-         * add a feature
-         */
-        createFeature(feature: IFeature): any;
-        /**
-         * create icon based of feature style
-         */
-        getPointIcon(feature: IFeature): any;
-        /***
-         * Show tooltip with name, styles & filters.
-         */
-        showFeatureTooltip(e: any, group: ProjectGroup): void;
-        hideFeatureTooltip(e: any): void;
-        updateFeatureTooltip(e: any): void;
-    }
-}
-
-declare module csComp.Services {
     class GeoJsonSource implements ILayerSource {
         service: LayerService;
         title: string;
@@ -3534,5 +3492,71 @@ declare module csComp.Services {
         layerMenuOptions(layer: ProjectLayer): [[string, Function]];
         addLayer(layer: ProjectLayer, callback: Function): void;
         removeLayer(layer: ProjectLayer): void;
+    }
+}
+
+declare module csComp.Services {
+    class CesiumRenderer implements IMapRenderer {
+        title: string;
+        service: LayerService;
+        viewer: any;
+        camera: any;
+        scene: any;
+        features: {
+            [key: string]: any;
+        };
+        init(service: LayerService): void;
+        enable(): void;
+        setUpMouseHandlers(): void;
+        disable(): void;
+        addLayer(layer: ProjectLayer): void;
+        removeLayer(layer: ProjectLayer): void;
+        updateMapFilter(group: ProjectGroup): void;
+        addGroup(group: ProjectGroup): void;
+        removeGroup(group: ProjectGroup): void;
+        removeFeature(feature: IFeature): void;
+        updateFeature(feature: IFeature): void;
+        addFeature(feature: IFeature): void;
+        createFeature(feature: IFeature): any;
+        private createPolygon(coordinates);
+        private createMultiPolygon(coordinates);
+    }
+}
+
+declare module csComp.Services {
+    class LeafletRenderer implements IMapRenderer {
+        title: string;
+        service: LayerService;
+        $messageBusService: MessageBusService;
+        private popup;
+        init(service: LayerService): void;
+        enable(): void;
+        disable(): void;
+        addGroup(group: ProjectGroup): void;
+        removeLayer(layer: ProjectLayer): void;
+        private getLeafletStyle(style);
+        addLayer(layer: ProjectLayer): void;
+        /***
+         * Update map markers in cluster after changing filter
+         */
+        updateMapFilter(group: ProjectGroup): void;
+        removeGroup(group: ProjectGroup): void;
+        removeFeature(feature: IFeature): void;
+        updateFeature(feature: IFeature): void;
+        addFeature(feature: IFeature): any;
+        /**
+         * add a feature
+         */
+        createFeature(feature: IFeature): any;
+        /**
+         * create icon based of feature style
+         */
+        getPointIcon(feature: IFeature): any;
+        /***
+         * Show tooltip with name, styles & filters.
+         */
+        showFeatureTooltip(e: any, group: ProjectGroup): void;
+        hideFeatureTooltip(e: any): void;
+        updateFeatureTooltip(e: any): void;
     }
 }
