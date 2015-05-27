@@ -25,7 +25,7 @@ var server        = express();
 var httpServer    = require('http').Server(server);
 var cm            = new cc.ConnectionManager(httpServer);
 var messageBus    = new MessageBus.MessageBusService();
-var config = new ConfigurationService('./configuration.json');
+var config        = new ConfigurationService('./configuration.json');
 
 
 // all environments

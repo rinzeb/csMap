@@ -26,7 +26,8 @@ interface ILayerDefinition {
     strokeWidth:   number,
     isEnabled:     boolean,
     useClustering: boolean,
-    opacity:       number
+    opacity:       number,
+    nameLabel:     string
 }
 
 interface ILayerTemplate {
@@ -77,7 +78,7 @@ class MapLayerFactory {
     public createMapLayer(template: ILayerTemplate, callback: (Object) => void) {
         var ld = template.layerDefinition[0];
         var features: IGeoJsonFeature[] = [];
-        //Convert StringFormats
+        // Convert StringFormats (from a readable key to StringFormat notation)
         this.convertStringFormats(template.propertyTypes);
         // Check propertyTypeData for time-based data
         var timestamps = this.convertTimebasedPropertyData(template);
@@ -91,10 +92,11 @@ class MapLayerFactory {
                         iconWidth:   ld.iconSize,
                         iconHeight:  ld.iconSize,
                         stroke:      ld.strokeWidth > 0,
-                        strokeColor: ld.strokeColor || "black",
-                        fillColor:   ld.fillColor || "yellow",
+                        strokeColor: ld.strokeColor || "#000",
+                        fillColor:   ld.fillColor || "#ff0",
                         opacity:     ld.opacity || 0.5,
-                        fillOpacity: ld.opacity || 0.5
+                        fillOpacity: ld.opacity || 0.5,
+                        nameLabel:   ld.nameLabel
                     },
                     propertyTypeData: template.propertyTypes
                 }
@@ -115,7 +117,7 @@ class MapLayerFactory {
                     console.log("Error: Parameter2 should be the name of the column containing the house number!")
                     return;
                 }
-                this.createPointFeature(ld.parameter1, ld.parameter2, features, template.properties, () => { callback(geojson) });
+                this.createPointFeature(ld.parameter1, ld.parameter2, features, template.properties, template.sensors || [], () => { callback(geojson) });
                 break;
             case "CBS_Provincie_op_naam":
             case "CBS_Gemeente_op_naam":
@@ -132,23 +134,35 @@ class MapLayerFactory {
 
     }
 
+    /**
+     * This function extracts the timestamps and sensorvalues from the
+     * template.propertyTypes. Every sensorvalue is parsed as propertyType in
+     * MS Excel, which should be converted to a sensor-array for each feature.
+     * @param  {ILayerTemplate} template : The input template coming from MS Excel
+     * @return {array} timestamps        : An array with all date/times converted to milliseconds
+     */
     private convertTimebasedPropertyData(template: ILayerTemplate) {
       var propertyTypes: csComp.Services.IPropertyType[] = template.propertyTypes;
       if (!propertyTypes) return;
       var timestamps = [];
       var targetProperties = [];
-      var realPropertyTypes:csComp.Services.IPropertyType[] = []; //To filter out propertyTypes that are actually a timestamp value
+      var realPropertyTypes:csComp.Services.IPropertyType[] = []; //Filter out propertyTypes that are actually a timestamp value
       propertyTypes.forEach((pt) => {
         if (pt.hasOwnProperty("targetProperty")) {
-          targetProperties.push(pt["targetProperty"]);
-          timestamps.push(this.convertTime(pt["date"], pt["time"]));
+          //Prevent duplicate properties
+          if (targetProperties.indexOf(pt["targetProperty"]) < 0) targetProperties.push(pt["targetProperty"]);
+          //Prevent duplicate timestamps
+          var timestamp = this.convertTime(pt["date"], pt["time"]);
+          if (timestamps.indexOf(timestamp) < 0) timestamps.push(timestamp);
         } else {
           realPropertyTypes.push(pt);
         }
       });
       template.propertyTypes = realPropertyTypes;
-      if (timestamps.length <= 0) return timestamps;
+      //if (timestamps.length <= 0) return timestamps;
 
+      // If the data contains time-based values, convert the corresponding properties
+      // to a sensor array.
       var properties: csComp.Services.IProperty[] = template.properties;
       var realProperties: csComp.Services.IProperty[] = []; //To filter out properties that are actually a sensor value
       var realSensors: csComp.Services.IProperty[] = [];
@@ -171,7 +185,7 @@ class MapLayerFactory {
         realSensors.push(sensors);
         realProperties.push(realProperty);
       });
-      template.sensors = realSensors;
+      if (realSensors.length > 0) template.sensors = realSensors;
       template.properties = realProperties;
       return timestamps;
     }
@@ -206,10 +220,10 @@ class MapLayerFactory {
       callback();
     }
 
-    private createPointFeature(zipCode: string, houseNumber: string, features: IGeoJsonFeature[], properties: csComp.Services.IProperty[], callback: Function) {
+    private createPointFeature(zipCode: string, houseNumber: string, features: IGeoJsonFeature[], properties: csComp.Services.IProperty[], sensors: csComp.Services.IProperty[], callback: Function) {
         if (!properties) callback();
         var todo = properties.length;
-        properties.forEach((prop) => {
+        properties.forEach((prop, index) => {
             var zip = prop[zipCode].replace(/ /g, '');
             var nmb = prop[houseNumber];
             this.bag.lookupBagAddress(zip, nmb, (locations: Location[]) => {
@@ -218,22 +232,26 @@ class MapLayerFactory {
                 if (!locations || locations.length === 0) {
                     console.log(`Cannot find location with zip: ${zip}, houseNumber: ${nmb}`);
                 } else {
-                    features.push(this.createFeature(locations[0].lon, locations[0].lat, prop));
+                    features.push(this.createFeature(locations[0].lon, locations[0].lat, prop, sensors[index] || {}));
                 }
                 if (todo <= 0) callback();
             });
         });
     }
 
-    private createFeature(lon: number, lat: number, properties: csComp.Services.IProperty): IGeoJsonFeature {
-        return {
-			type: "Feature",
-			geometry: {
-				type: "Point",
-				coordinates: [ lon, lat ]
-			},
-			properties: properties
-		}
+    private createFeature(lon: number, lat: number, properties: csComp.Services.IProperty, sensors?: csComp.Services.IProperty): IGeoJsonFeature {
+        var gjson = {
+                			type: "Feature",
+                			geometry: {
+                				type: "Point",
+                				coordinates: [ lon, lat ]
+                			},
+                			properties: properties
+                		}
+        if (sensors !== {}) {
+          gjson["sensors"] = sensors;
+        }
+        return gjson;
     }
 
     private convertTime(date: string, time: string) : number{
@@ -244,6 +262,7 @@ class MapLayerFactory {
       d.setFullYear(year);
       d.setMonth(month-1);
       d.setDate(day);
+      //TODO: Take time into account
       var timeInMs = d.getTime();
       console.log("Converted " + date + " " + time + " to " + d.toDateString() + " (" + d.getTime() + " ms)");
       return timeInMs;
