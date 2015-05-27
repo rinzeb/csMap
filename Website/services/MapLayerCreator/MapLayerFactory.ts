@@ -32,7 +32,8 @@ interface ILayerDefinition {
 interface ILayerTemplate {
     layerDefinition: ILayerDefinition[],
     propertyTypes:   csComp.Services.IPropertyType[],
-    properties:      csComp.Services.IProperty[]
+    properties:      csComp.Services.IProperty[],
+    sensors?:        csComp.Services.IProperty[]
 }
 
 /** A factory class to create new map layers based on input, e.g. from Excel */
@@ -123,7 +124,7 @@ class MapLayerFactory {
                   console.log("Error: Parameter1 should be the name of the column containing the zorgkantoor!")
                   return;
                 }
-                this.createPolygonFeature(ld.geometryType, ld.parameter1,features,template.properties, () => { callback(geojson) });
+                this.createPolygonFeature(ld.geometryType, ld.parameter1,features,template.properties, template.sensors || [], () => { callback(geojson) });
                 break;
         }
 
@@ -135,19 +136,47 @@ class MapLayerFactory {
       var propertyTypes: csComp.Services.IPropertyType[] = template.propertyTypes;
       if (!propertyTypes) return;
       var timestamps = [];
+      var targetProperties = [];
       var realPropertyTypes:csComp.Services.IPropertyType[] = []; //To filter out propertyTypes that are actually a timestamp value
       propertyTypes.forEach((pt) => {
         if (pt.hasOwnProperty("targetProperty")) {
-          var targetProp: string = pt["targetProperty"];
+          targetProperties.push(pt["targetProperty"]);
           timestamps.push(this.convertTime(pt["date"], pt["time"]));
+        } else {
           realPropertyTypes.push(pt);
         }
       });
       template.propertyTypes = realPropertyTypes;
+      if (timestamps.length <= 0) return timestamps;
+
+      var properties: csComp.Services.IProperty[] = template.properties;
+      var realProperties: csComp.Services.IProperty[] = []; //To filter out properties that are actually a sensor value
+      var realSensors: csComp.Services.IProperty[] = [];
+      properties.forEach((p) => {
+        var realProperty:csComp.Services.IProperty = {};
+        var sensors: csComp.Services.IProperty = {};
+        targetProperties.forEach((tp: string)=>{
+          sensors[tp] = [];
+        });
+        for (var key in p) {
+          if (p.hasOwnProperty(key)) {
+            var itemName: string = key.substr(0, key.length-6);
+            if (targetProperties.indexOf(itemName) >= 0) {
+              sensors[itemName].push(p[key]);
+            } else {
+              realProperty[itemName] = p[key];
+            }
+          }
+        }
+        realSensors.push(sensors);
+        realProperties.push(realProperty);
+      });
+      template.sensors = realSensors;
+      template.properties = realProperties;
       return timestamps;
     }
 
-    private createPolygonFeature(templateName:string, par1: string, features: IGeoJsonFeature[], properties: csComp.Services.IProperty[], callback: Function) {
+    private createPolygonFeature(templateName:string, par1: string, features: IGeoJsonFeature[], properties: csComp.Services.IProperty[], sensors: csComp.Services.IProperty[], callback: Function) {
       if (!properties) callback();
       if (!this.templateFiles.hasOwnProperty(templateName)) {
         console.log("Error: could not find template: " + templateName);
@@ -158,7 +187,7 @@ class MapLayerFactory {
       var templateJson = JSON.parse(templateFile.toString());
 
       var fts = templateJson.features;
-      properties.forEach((p) => {
+      properties.forEach((p, index) => {
         fts.forEach((f) => {
           if (f.properties["Name"].indexOf(p[par1]) >= 0) {
             console.log(p[par1]);
@@ -167,6 +196,9 @@ class MapLayerFactory {
         			geometry: f.geometry,
         			properties: p
         		}
+            if (sensors.length > 0) {
+              featureJson["sensors"] = sensors[index];
+            }
             features.push(featureJson);
           }
         })
