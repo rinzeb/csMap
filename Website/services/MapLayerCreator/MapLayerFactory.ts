@@ -62,7 +62,7 @@ class MapLayerFactory {
         var ld = template.layerDefinition[0];
         this.createMapLayer(template, (geojson) => {
 
-            fs.writeFileSync("C:/Users/bruiningrw/Projects/CommonSense/apps/csMap/Website/public/data/projects/DynamicExample/" + ld.group + "/" + ld.layerTitle + ".json", JSON.stringify(geojson));
+            fs.writeFileSync("public/data/projects/DynamicExample/" + ld.group + "/" + ld.layerTitle + ".json", JSON.stringify(geojson));
 
             this.messageBus.publish('dynamic_project_layer', 'created', {
                 project   : ld.projectTitle,
@@ -76,9 +76,10 @@ class MapLayerFactory {
     public createMapLayer(template: ILayerTemplate, callback: (Object) => void) {
         var ld = template.layerDefinition[0];
         var features: IGeoJsonFeature[] = [];
-
+        //Convert StringFormats
+        this.convertStringFormats(template.propertyTypes);
         // Check propertyTypeData for time-based data
-        this.convertTimebasedPropertyData(template.propertyTypes);
+        var timestamps = this.convertTimebasedPropertyData(template);
         var geojson = {
             type: "FeatureCollection",
             featureTypes: {
@@ -99,7 +100,9 @@ class MapLayerFactory {
             },
             features: features
         };
-
+        if (timestamps.length > 0) {
+          geojson["timestamps"] = JSON.parse(JSON.stringify(timestamps));
+        }
         // Add geometry
         switch (ld.geometryType) {
             case "Postcode6_en_huisnummer":
@@ -113,6 +116,8 @@ class MapLayerFactory {
                 }
                 this.createPointFeature(ld.parameter1, ld.parameter2, features, template.properties, () => { callback(geojson) });
                 break;
+            case "CBS_Provincie_op_naam":
+            case "CBS_Gemeente_op_naam":
             case "Zorgkantoorregio":
                 if(!ld.parameter1) {
                   console.log("Error: Parameter1 should be the name of the column containing the zorgkantoor!")
@@ -126,13 +131,20 @@ class MapLayerFactory {
 
     }
 
-    private convertTimebasedPropertyData(propertyTypes: csComp.Services.IPropertyType[]) {
+    private convertTimebasedPropertyData(template: ILayerTemplate) {
+      var propertyTypes: csComp.Services.IPropertyType[] = template.propertyTypes;
       if (!propertyTypes) return;
+      var timestamps = [];
+      var realPropertyTypes:csComp.Services.IPropertyType[] = []; //To filter out propertyTypes that are actually a timestamp value
       propertyTypes.forEach((pt) => {
         if (pt.hasOwnProperty("targetProperty")) {
-          // TODO: Convert to "sensors":[  #,#,#,# ];
+          var targetProp: string = pt["targetProperty"];
+          timestamps.push(this.convertTime(pt["date"], pt["time"]));
+          realPropertyTypes.push(pt);
         }
       });
+      template.propertyTypes = realPropertyTypes;
+      return timestamps;
     }
 
     private createPolygonFeature(templateName:string, par1: string, features: IGeoJsonFeature[], properties: csComp.Services.IProperty[], callback: Function) {
@@ -190,6 +202,39 @@ class MapLayerFactory {
 			},
 			properties: properties
 		}
+    }
+
+    private convertTime(date: string, time: string) : number{
+      var d = new Date();
+      d.setFullYear(Number(date.substr(0,4)));
+      d.setMonth(Number(date.substr(4,6)));
+      d.setDate(Number(date.substr(6,8)));
+      var timeInMs = d.getTime();
+      return timeInMs;
+    }
+
+    private convertStringFormats(properties) {
+      properties.forEach(function (prop) {
+        if (prop.hasOwnProperty("stringFormat")) {
+          switch (prop["stringFormat"]) {
+            case "One_decimal":
+              prop["stringFormat"] = "{0:#,#.#}";
+              break;
+            case "Two_decimals":
+              prop["stringFormat"] = "{0:#,#.##}";
+              break;
+            case "Euro_no_decimals":
+              prop["stringFormat"] = "€{0:#,#}";
+              break;
+            case "Euro_two_decimals":
+              prop["stringFormat"] = "€{0:#,#.00}";
+              break;
+            default:
+              console.log("stringFormat \'" + prop["stringFormat"] + "\' not found.");
+              break;
+          }
+        }
+      });
     }
 }
 export = MapLayerFactory;
