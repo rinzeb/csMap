@@ -146,13 +146,19 @@ class MapLayerFactory {
       var templateJson = JSON.parse(templateFile.toString());
 
       var fts = templateJson.features;
-      fts.forEach((f) => {
-        var p0 = properties[0];
-        console.log(JSON.stringify(p0));
-        if (f.properties["Name"] === p0[par1]) {
-          console.log(p0[par1]);
-        }
-      })
+      properties.forEach((p) => {
+        fts.forEach((f) => {
+          if (f.properties["Name"].indexOf(p[par1]) >= 0) {
+            console.log(p[par1]);
+            var featureJson : IGeoJsonFeature = {
+        			type: "Feature",
+        			geometry: f.geometry,
+        			properties: p
+        		}
+            features.push(featureJson);
+          }
+        })
+      });
       callback();
     }
 
