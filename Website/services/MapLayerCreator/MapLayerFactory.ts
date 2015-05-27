@@ -237,11 +237,15 @@ class MapLayerFactory {
     }
 
     private convertTime(date: string, time: string) : number{
-      var d = new Date();
-      d.setFullYear(Number(date.substr(0,4)));
-      d.setMonth(Number(date.substr(4,6)));
-      d.setDate(Number(date.substr(6,8)));
+      var year = Number(date.substr(0,4));
+      var month = Number(date.substr(4,2));
+      var day = Number(date.substr(6,2));
+      var d = new Date(0);
+      d.setFullYear(year);
+      d.setMonth(month-1);
+      d.setDate(day);
       var timeInMs = d.getTime();
+      console.log("Converted " + date + " " + time + " to " + d.toDateString() + " (" + d.getTime() + " ms)");
       return timeInMs;
     }
 
