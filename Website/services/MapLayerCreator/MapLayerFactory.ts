@@ -64,16 +64,19 @@ class MapLayerFactory {
         var ld = template.layerDefinition[0];
         this.createMapLayer(template, (geojson) => {
 
-            if (!fs.existsSync("public/data/projects/DynamicExample")) fs.mkdirSync("public/data/projects/DynamicExample");
-            if (!fs.existsSync("public/data/projects/DynamicExample/" + ld.group)) fs.mkdirSync("public/data/projects/DynamicExample/" + ld.group);
-            fs.writeFileSync("public/data/projects/DynamicExample/" + ld.group + "/" + ld.layerTitle + ".json", JSON.stringify(geojson));
+            //if (!fs.existsSync("public/data/projects/DynamicExample")) fs.mkdirSync("public/data/projects/DynamicExample");
+            //if (!fs.existsSync("public/data/projects/DynamicExample/" + ld.group)) fs.mkdirSync("public/data/projects/DynamicExample/" + ld.group);
+            //fs.writeFileSync("public/data/projects/DynamicExample/" + ld.group + "/" + ld.layerTitle + ".json", JSON.stringify(geojson));
 
-            this.messageBus.publish('dynamic_project_layer', 'created', {
-                project   : ld.projectTitle,
-                reference : ld.reference,
-                group     : ld.group,
-                geojson   : geojson,
-                enabled   : ld.isEnabled });
+            var data = {
+                project      : ld.projectTitle,
+                layerTitle   : ld.layerTitle,
+                reference    : ld.reference,
+                useClustering: ld.useClustering,
+                group        : ld.group,
+                geojson      : geojson,
+                enabled      : ld.isEnabled };
+            this.messageBus.publish('dynamic_project_layer', 'created', data);
         });
     }
 
