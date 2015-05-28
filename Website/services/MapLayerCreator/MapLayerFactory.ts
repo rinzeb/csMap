@@ -71,6 +71,7 @@ class MapLayerFactory {
             var data = {
                 project      : ld.projectTitle,
                 layerTitle   : ld.layerTitle,
+                description  : ld.description,
                 reference    : ld.reference,
                 useClustering: ld.useClustering,
                 group        : ld.group,
