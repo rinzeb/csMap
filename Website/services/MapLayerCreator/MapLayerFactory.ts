@@ -25,9 +25,11 @@ interface ILayerDefinition {
     strokeColor:   string,
     strokeWidth:   number,
     isEnabled:     boolean,
+    clusterLevel:  number,
     useClustering: boolean,
     opacity:       number,
-    nameLabel:     string
+    nameLabel:     string,
+    includeOriginalProperties: boolean
 }
 
 interface ILayerTemplate {
@@ -73,6 +75,7 @@ class MapLayerFactory {
                 layerTitle   : ld.layerTitle,
                 description  : ld.description,
                 reference    : ld.reference,
+                clusterLevel : ld.clusterLevel,
                 useClustering: ld.useClustering,
                 group        : ld.group,
                 geojson      : geojson,
@@ -125,14 +128,12 @@ class MapLayerFactory {
                 }
                 this.createPointFeature(ld.parameter1, ld.parameter2, features, template.properties, template.sensors || [], () => { callback(geojson) });
                 break;
-            case "CBS_Provincie_op_naam":
-            case "CBS_Gemeente_op_naam":
-            case "Zorgkantoorregio":
+            default:
                 if(!ld.parameter1) {
-                  console.log("Error: Parameter1 should be the name of the column containing the zorgkantoor!")
+                  console.log("Error: At least parameter1 should contain a value!")
                   return;
                 }
-                this.createPolygonFeature(ld.geometryType, ld.parameter1,features,template.properties, template.sensors || [], () => { callback(geojson) });
+                this.createPolygonFeature(ld.geometryType, ld.parameter1, ld.includeOriginalProperties, features,template.properties, template.propertyTypes, template.sensors || [], () => { callback(geojson) });
                 break;
         }
 
@@ -144,6 +145,8 @@ class MapLayerFactory {
      * This function extracts the timestamps and sensorvalues from the
      * template.propertyTypes. Every sensorvalue is parsed as propertyType in
      * MS Excel, which should be converted to a sensor-array for each feature.
+     * Note: Each propertyname is appended with a 6-digit number, as JSON objects
+     * need unique keys. These are trimmed in this function.
      * @param  {ILayerTemplate} template : The input template coming from MS Excel
      * @return {array} timestamps        : An array with all date/times converted to milliseconds
      */
@@ -196,7 +199,7 @@ class MapLayerFactory {
       return timestamps;
     }
 
-    private createPolygonFeature(templateName:string, par1: string, features: IGeoJsonFeature[], properties: csComp.Services.IProperty[], sensors: csComp.Services.IProperty[], callback: Function) {
+    private createPolygonFeature(templateName:string, par1: string, inclTemplProps: boolean, features: IGeoJsonFeature[], properties: csComp.Services.IProperty[], propertyTypes: csComp.Services.IPropertyType[], sensors: csComp.Services.IProperty[], callback: Function) {
       if (!properties) callback();
       if (!this.templateFiles.hasOwnProperty(templateName)) {
         console.log("Error: could not find template: " + templateName);
@@ -206,11 +209,25 @@ class MapLayerFactory {
       var templateFile = fs.readFileSync(templateUrl);
       var templateJson = JSON.parse(templateFile.toString());
 
+      if (inclTemplProps) {
+        templateJson.featureTypes["Default"].propertyTypeData.forEach((ft) => {
+          if (!properties[0].hasOwnProperty[ft.label] && ft.label !== "Name") { //Do not overwrite input data, only add new items
+            propertyTypes.push(ft);
+          }
+        });
+      }
       var fts = templateJson.features;
       properties.forEach((p, index) => {
         fts.forEach((f) => {
           if (f.properties["Name"].indexOf(p[par1]) >= 0) {
             console.log(p[par1]);
+            if (inclTemplProps) {
+              for (var key in f.properties) {
+                if (!p.hasOwnProperty[key] && key !== "Name") { //Do not overwrite input data, only add new items
+                  p[key] = f.properties[key];
+                }
+              }
+            }
             var featureJson : IGeoJsonFeature = {
         			type: "Feature",
         			geometry: f.geometry,
