@@ -1085,7 +1085,7 @@
             "tot": [13, 16, 12, 14, 18, 22, 18, 6, 5, 4, 8, 3, 17, 22]
         },
         "properties": {
-            "Name": "Zorgkantoor Amstelland en De Meerlanden",
+            "Name": "Amstelland en De Meerlanden",
             "Totaal_ZZP": 4261,
             "Totaal_ZZP_VVT": 3008,
             "Totaal_ZZP_GHZ": 1145,
@@ -1244,7 +1244,7 @@
             "tot": [14, 25, 13, 8, 20, 21, 21, 26, 28, 12, 26, 15, 7, 4]
         },
         "properties": {
-            "Name": "Zorgkantoor Amsterdam",
+            "Name": "Amsterdam",
             "Totaal_ZZP": 10906,
             "Totaal_ZZP_VVT": 6321,
             "Totaal_ZZP_GHZ": 2082,
@@ -1466,7 +1466,7 @@
             "tot": [14, 6, 3, 3, 8, 3, 6, 10, 10, 9, 4, 5, 6, 8]
         },
         "properties": {
-            "Name": "Zorgkantoor Apeldoorn / Zutphen",
+            "Name": "Apeldoorn / Zutphen",
             "Totaal_ZZP": 7803,
             "Totaal_ZZP_VVT": 4155,
             "Totaal_ZZP_GHZ": 2162,
@@ -1759,7 +1759,7 @@
             "tot": [4, 4, 6, 6, 8, 2, 7, 1, 6, 4, 5, 6, 3, 9]
         },
         "properties": {
-            "Name": "Zorgkantoor Arnhem",
+            "Name": "Arnhem",
             "Totaal_ZZP": 16429,
             "Totaal_ZZP_VVT": 9902,
             "Totaal_ZZP_GHZ": 4804,
@@ -1915,7 +1915,7 @@
             "tot": [9, 6, 3, 1, 3, 6, 5, 2, 4, 5, 5, 6, 9, 6]
         },
         "properties": {
-            "Name": "Zorgkantoor Delft Westland Oostland",
+            "Name": "Delft Westland Oostland",
             "Totaal_ZZP": 4981,
             "Totaal_ZZP_VVT": 2708,
             "Totaal_ZZP_GHZ": 1797,
@@ -2115,7 +2115,7 @@
             "tot": [6, 7, 4, 4, 4, 1, 1, 1, 3, 5, 6, 3, 3, 7]
         },
         "properties": {
-            "Name": "Zorgkantoor Drenthe",
+            "Name": "Drenthe",
             "Totaal_ZZP": 10345,
             "Totaal_ZZP_VVT": 4783,
             "Totaal_ZZP_GHZ": 3524,
@@ -2326,7 +2326,7 @@
             "tot": [1, 1, 4, 2, 1, 2, 2, 2, 1, 0, 1, 3, 3, 0]
         },
         "properties": {
-            "Name": "Zorgkantoor Flevoland",
+            "Name": "Flevoland",
             "Totaal_ZZP": 2530,
             "Totaal_ZZP_VVT": 1274,
             "Totaal_ZZP_GHZ": 1102,
@@ -2692,7 +2692,7 @@
             "tot": [38, 40, 47, 43, 49, 48, 51, 58, 56, 1, 60, 53, 50, 47]
         },
         "properties": {
-            "Name": "Zorgkantoor Friesland",
+            "Name": "Friesland",
             "Totaal_ZZP": 10849,
             "Totaal_ZZP_VVT": 6242,
             "Totaal_ZZP_GHZ": 3344,
@@ -2941,7 +2941,7 @@
             "tot": [5, 1, 1, 1, 1, 7, 2, 3, 1, 5, 5, 1, 3, 1]
         },
         "properties": {
-            "Name": "Zorgkantoor Groningen",
+            "Name": "Groningen",
             "Totaal_ZZP": 10028,
             "Totaal_ZZP_VVT": 6419,
             "Totaal_ZZP_GHZ": 3233,
@@ -3084,7 +3084,7 @@
             "tot": [17, 13, 12, 11, 22, 11, 10, 20, 11, 9, 7, 6, 8, 6]
         },
         "properties": {
-            "Name": "Zorgkantoor Haaglanden",
+            "Name": "Haaglanden",
             "Totaal_ZZP": 12251,
             "Totaal_ZZP_VVT": 7946,
             "Totaal_ZZP_GHZ": 2499,
@@ -3234,7 +3234,7 @@
             "tot": [9, 5, 3, 1, 4, 8, 6, 1, 3, 5, 4, 5, 3, 10]
         },
         "properties": {
-            "Name": "Zorgkantoor Kennemerland",
+            "Name": "Kennemerland",
             "Totaal_ZZP": 8171,
             "Totaal_ZZP_VVT": 4723,
             "Totaal_ZZP_GHZ": 2432,
@@ -3407,7 +3407,7 @@
             "tot": [23, 17, 27, 17, 20, 21, 14, 13, 7, 10, 5, 5, 7, 10]
         },
         "properties": {
-            "Name": "Zorgkantoor Midden-Brabant",
+            "Name": "Midden-Brabant",
             "Totaal_ZZP": 9578,
             "Totaal_ZZP_VVT": 5047,
             "Totaal_ZZP_GHZ": 3473,
@@ -3566,7 +3566,7 @@
             "tot": [7, 1, 2, 5, 8, 4, 5, 8, 6, 8, 7, 7, 3, 3]
         },
         "properties": {
-            "Name": "Zorgkantoor Midden-Holland",
+            "Name": "Midden-Holland",
             "Totaal_ZZP": 3148,
             "Totaal_ZZP_VVT": 2261,
             "Totaal_ZZP_GHZ": 869,
@@ -3729,7 +3729,7 @@
             "tot": [11, 2, 4, 6, 5, 11, 34, 16, 15, 0, 6, 4, 6, 5]
         },
         "properties": {
-            "Name": "Zorgkantoor Midden-IJssel",
+            "Name": "Midden-IJssel",
             "Totaal_ZZP": 3649,
             "Totaal_ZZP_VVT": 1795,
             "Totaal_ZZP_GHZ": 1357,
@@ -3855,7 +3855,7 @@
             "tot": [1, 6, 6, 1, 0, 3, 1, 2, 5, 5, 2, 0, 2, 3]
         },
         "properties": {
-            "Name": "Zorgkantoor Nieuwe Waterweg Noord",
+            "Name": "Nieuwe Waterweg Noord",
             "Totaal_ZZP": 3310,
             "Totaal_ZZP_VVT": 2550,
             "Totaal_ZZP_GHZ": 650,
@@ -4078,7 +4078,7 @@
             "tot": [23, 18, 11, 5, 3, 9, 8, 7, 5, 9, 5, 6, 6, 2]
         },
         "properties": {
-            "Name": "Zorgkantoor Nijmegen",
+            "Name": "Nijmegen",
             "Totaal_ZZP": 9222,
             "Totaal_ZZP_VVT": 4683,
             "Totaal_ZZP_GHZ": 3702,
@@ -4298,7 +4298,7 @@
             "tot": [1, 1, 2, 4, 3, 4, 1, 1, 2, 1, 3, 2, 2, 4]
         },
         "properties": {
-            "Name": "Zorgkantoor Noord- en Midden-Limburg",
+            "Name": "Noord- en Midden-Limburg",
             "Totaal_ZZP": 7690,
             "Totaal_ZZP_VVT": 4241,
             "Totaal_ZZP_GHZ": 2551,
@@ -4524,7 +4524,7 @@
             "tot": [7, 8, 4, 2, 3, 4, 11, 12, 7, 10, 2, 4, 2, 4]
         },
         "properties": {
-            "Name": "Zorgkantoor Noord-Holland Noord",
+            "Name": "Noord-Holland Noord",
             "Totaal_ZZP": 10076,
             "Totaal_ZZP_VVT": 5893,
             "Totaal_ZZP_GHZ": 3450,
@@ -4745,7 +4745,7 @@
             "tot": [6, 6, 9, 7, 13, 18, 10, 6, 4, 3, 2, 4, 4, 0]
         },
         "properties": {
-            "Name": "Zorgkantoor Noord-Oost Brabant",
+            "Name": "Noord-Oost Brabant",
             "Totaal_ZZP": 11741,
             "Totaal_ZZP_VVT": 6919,
             "Totaal_ZZP_GHZ": 3462,
@@ -4922,7 +4922,7 @@
             "tot": [13, 13, 5, 11, 13, 21, 4, 9, 7, 20, 10, 11, 10, 8]
         },
         "properties": {
-            "Name": "Zorgkantoor Rotterdam",
+            "Name": "Rotterdam",
             "Totaal_ZZP": 13717,
             "Totaal_ZZP_VVT": 8530,
             "Totaal_ZZP_GHZ": 2625,
@@ -5090,7 +5090,7 @@
             "tot": [7, 1, 2, 2, 6, 11, 5, 18, 4, 2, 3, 4, 6, 3]
         },
         "properties": {
-            "Name": "Zorgkantoor 't Gooi",
+            "Name": "'t Gooi",
             "Totaal_ZZP": 4546,
             "Totaal_ZZP_VVT": 3830,
             "Totaal_ZZP_GHZ": 430,
@@ -5274,7 +5274,7 @@
             "tot": [4, 0, 0, 14, 5, 1, 10, 5, 0, 1, 1, 0, 2, 3]
         },
         "properties": {
-            "Name": "Zorgkantoor Twente",
+            "Name": "Twente",
             "Totaal_ZZP": 10258,
             "Totaal_ZZP_VVT": 6358,
             "Totaal_ZZP_GHZ": 3663,
@@ -5524,7 +5524,7 @@
             "tot": [21, 15, 36, 9, 27, 21, 23, 25, 27, 19, 24, 7, 9, 17]
         },
         "properties": {
-            "Name": "Zorgkantoor Utrecht",
+            "Name": "Utrecht",
             "Totaal_ZZP": 21418,
             "Totaal_ZZP_VVT": 11684,
             "Totaal_ZZP_GHZ": 6279,
@@ -5693,7 +5693,7 @@
             "tot": [2, 2, 6, 4, 3, 4, 1, 5, 7, 3, 3, 6, 19, 14]
         },
         "properties": {
-            "Name": "Zorgkantoor Waardenland",
+            "Name": "Waardenland",
             "Totaal_ZZP": 7522,
             "Totaal_ZZP_VVT": 4122,
             "Totaal_ZZP_GHZ": 2863,
@@ -5939,7 +5939,7 @@
             "tot": [13, 16, 8, 8, 13, 11, 6, 17, 10, 25, 9, 8, 2, 7]
         },
         "properties": {
-            "Name": "Zorgkantoor West-Brabant",
+            "Name": "West-Brabant",
             "Totaal_ZZP": 11127,
             "Totaal_ZZP_VVT": 6610,
             "Totaal_ZZP_GHZ": 3411,
@@ -6115,7 +6115,7 @@
             "tot": [13, 12, 7, 2, 7, 4, 1, 5, 2, 2, 3, 2, 8, 2]
         },
         "properties": {
-            "Name": "Zorgkantoor Zaanstreek / Waterland",
+            "Name": "Zaanstreek / Waterland",
             "Totaal_ZZP": 4822,
             "Totaal_ZZP_VVT": 3093,
             "Totaal_ZZP_GHZ": 1331,
@@ -6681,7 +6681,7 @@
             "tot": [7, 6, 4, 8, 9, 7, 4, 6, 4, 10, 10, 4, 12, 12]
         },
         "properties": {
-            "Name": "Zorgkantoor Zeeland",
+            "Name": "Zeeland",
             "Totaal_ZZP": 6192,
             "Totaal_ZZP_VVT": 3867,
             "Totaal_ZZP_GHZ": 1780,
@@ -6847,7 +6847,7 @@
             "tot": [15, 10, 31, 12, 18, 22, 29, 26, 20, 13, 19, 22, 24, 10]
         },
         "properties": {
-            "Name": "Zorgkantoor Zuid-Holland Noord",
+            "Name": "Zuid-Holland Noord",
             "Totaal_ZZP": 9705,
             "Totaal_ZZP_VVT": 4893,
             "Totaal_ZZP_GHZ": 4059,
@@ -7098,7 +7098,7 @@
             "tot": [5, 8, 4, 2, 2, 5, 4, 4, 2, 0, 3, 4, 0, 3]
         },
         "properties": {
-            "Name": "Zorgkantoor Zuid-Hollandse Eilanden",
+            "Name": "Zuid-Hollandse Eilanden",
             "Totaal_ZZP": 4748,
             "Totaal_ZZP_VVT": 3347,
             "Totaal_ZZP_GHZ": 820,
@@ -7275,7 +7275,7 @@
             "tot": [18, 11, 5, 11, 15, 19, 6, 13, 10, 8, 8, 12, 8, 7]
         },
         "properties": {
-            "Name": "Zorgkantoor Zuid-Oost Brabant",
+            "Name": "Zuid-Oost Brabant",
             "Totaal_ZZP": 10508,
             "Totaal_ZZP_VVT": 5817,
             "Totaal_ZZP_GHZ": 3851,
@@ -7471,7 +7471,7 @@
             "tot": [18, 6, 15, 5, 10, 9, 8, 11, 14, 11, 10, 7, 8, 5]
         },
         "properties": {
-            "Name": "Zorgkantoor Zuid-Limburg",
+            "Name": "Zuid-Limburg",
             "Totaal_ZZP": 11245,
             "Totaal_ZZP_VVT": 7546,
             "Totaal_ZZP_GHZ": 2597,
@@ -7802,7 +7802,7 @@
             "tot": [10, 10, 7, 7, 13, 14, 22, 13, 4, 2, 5, 3, 52, 4]
         },
         "properties": {
-            "Name": "Zorgkantoor Zwolle",
+            "Name": "Zwolle",
             "Totaal_ZZP": 11163,
             "Totaal_ZZP_VVT": 5086,
             "Totaal_ZZP_GHZ": 4387,

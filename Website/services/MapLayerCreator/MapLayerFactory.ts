@@ -222,19 +222,19 @@ class MapLayerFactory {
 
       if (inclTemplProps) {
         templateJson.featureTypes["Default"].propertyTypeData.forEach((ft) => {
-          if (!properties[0].hasOwnProperty[ft.label] && ft.label !== "Name") { //Do not overwrite input data, only add new items
+          if (!properties[0].hasOwnProperty(ft.label) && ft.label !== "Name") { //Do not overwrite input data, only add new items
             propertyTypes.push(ft);
           }
         });
       }
       var fts = templateJson.features;
       properties.forEach((p, index) => {
-        fts.forEach((f) => {
-          if (f.properties["Name"].indexOf(p[par1]) >= 0) {
+        fts.some((f) => {
+          if (f.properties["Name"] === p[par1]) {
             console.log(p[par1]);
             if (inclTemplProps) {
               for (var key in f.properties) {
-                if (!p.hasOwnProperty[key] && key !== "Name") { //Do not overwrite input data, only add new items
+                if (!p.hasOwnProperty(key) && key !== "Name") { //Do not overwrite input data, only add new items
                   p[key] = f.properties[key];
                 }
               }
@@ -248,6 +248,9 @@ class MapLayerFactory {
               featureJson["sensors"] = sensors[index];
             }
             features.push(featureJson);
+            return true;
+          } else {
+            return false;
           }
         })
       });
