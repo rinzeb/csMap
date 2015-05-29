@@ -128,6 +128,17 @@ class MapLayerFactory {
                 }
                 this.createPointFeature(ld.parameter1, ld.parameter2, features, template.properties, template.sensors || [], () => { callback(geojson) });
                 break;
+            case "Latitude_and_longitude":
+                if (!ld.parameter1) {
+                    console.log("Error: Parameter1 should be the name of the column containing the latitude!")
+                    return;
+                }
+                if (!ld.parameter2) {
+                    console.log("Error: Parameter2 should be the name of the column containing the longitude!")
+                    return;
+                }
+                this.createLatLonFeature(ld.parameter1, ld.parameter2, features, template.properties, template.sensors || [], () => { callback(geojson) });
+                break;
             default:
                 if(!ld.parameter1) {
                   console.log("Error: At least parameter1 should contain a value!")
@@ -241,6 +252,20 @@ class MapLayerFactory {
         })
       });
       callback();
+    }
+
+    private createLatLonFeature(latString: string, lonString: string, features: IGeoJsonFeature[], properties: csComp.Services.IProperty[], sensors: csComp.Services.IProperty[], callback: Function) {
+        if (!properties) callback();
+        properties.forEach((prop, index) => {
+          var lat = prop[latString];
+          var lon = prop[lonString];
+          if (isNaN(lat) || isNaN(lon)) {
+            console.log("Error: Not a valid coordinate ( " + lat + ", " + lon + ")");
+          } else {
+            features.push(this.createFeature(lon, lat, prop, sensors[index] || {}));
+          }
+        });
+        callback();
     }
 
     private createPointFeature(zipCode: string, houseNumber: string, features: IGeoJsonFeature[], properties: csComp.Services.IProperty[], sensors: csComp.Services.IProperty[], callback: Function) {
