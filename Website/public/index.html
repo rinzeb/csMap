@@ -208,45 +208,23 @@
       </div>
       <dashboardirective container="main" style="display:table-cell;width:100%;vertical-align: top;" dashboard="vm.$dashboardService.mainDashboard"></dashboardirective> <!-- class="dashboard-directive" -->
 
-      <div class="rightpanel" ng-show="vm.$layerService.visual.rightPanelVisible" style="background-color: transparent;">
-            <div id="rightpanelTabContainer" class="tabbable tabs-left" style="display:table;height:100%;padding:0px;">
-                <!-- Nav tabs -->
-                <!--<div id="rightPanelToggle">
-                        <i class="fa fa-2x fa-chevron-right" style="margin-left: 10px;margin-top: 108px;"></i>
-                    </div>-->
-                <ul id="rightpanelTabs" class="nav nav-tabs" style="margin-right:0px;width:50px; height:100%; display:table-cell">
-                    <li class="rightPanelTab rightPanelTabAnimated active" style="margin-top:50px" ng-show="featureSelected">
-                        <a href="#info" style="" data-toggle="tab">
-                            <span class="fa fa-info fa-lg"></span>
-                        </a>
-                    </li>
-                    <!-- <li class="rightPanelTab rightPanelTabAnimated" ng-show="vm.$dashboardService.editWidgetMode">
-                        <a href="#widgetEdit" style="" data-toggle="tab">
-                            <span class="fa fa-tachometer fa-lg"></span>
-                        </a>
-                    </li> -->
-                    <li class="rightPanelTab rightPanelTabAnimated" ng-show="featureSelected">
-                        <a href="#linkedData" style="" data-toggle="tab">
-                            <span class="fa fa-link fa-lg"></span>
-                        </a>
-                    </li>
-                </ul>
-                <div id="rightpanelTabPanes" class="tab-content" style="display: table-cell; vertical-align:top; width:100%; height:100%; background-color: white;">
-                    <div class="tab-pane active" id="info">
-                        <featureprops class="rightpanel-content"></featureprops>
-                    </div>
-                    <!-- <div class="tab-pane" ng-show="vm.$dashboardService.editWidgetMode" style="width:355px" id="widgetEdit">
-                      <widgetedit ng-show="vm.$dashboardService.editWidgetMode"></widgetedit>
-                    </div> -->
-                    <div class="tab-pane" id="linkedData">
-                        <featurerelations class="rightpanel-content"></featurerelations>
-                    </div>
-                </div>
-            </div>
-        </div>
+      <div class="rightpanel" style="position:absolute">
+          <div id="rightpanelTabContainer" class="tabbable tabs-left" style="display:table; height:100%; padding:0px;">
+              <!-- Nav tabs -->
+              <ul id="rightpanelTabs" class="nav nav-tabs" style="margin-right:0px; width:50px; height:100%; display:table-cell">
+                <li style="margin-top:10px" ng-style="!vm.$layerService.visual.rightPanelVisible && {'opacity':0}" ng-click="vm.$layerService.visual.rightPanelVisible = false">
+                    <a class="rightpanel-hidetab">
+                        <span class="fa fa-2x fa-chevron-right"></span>
+                    </a>
+                </li>
+              </ul>
+              <div id="rightpanelTabPanes" ng-show="vm.$layerService.visual.rightPanelVisible" class="tab-content" style="display: table-cell; vertical-align:top; width:100%; height:100%; background-color: white;">
+              </div>
+          </div>
+      </div>
 
         <!-- Right menu items -->
-        <script>
+        <!-- <script>
             $('#rightpanelTabs a').click(function(e) {
                 var tab = $(this);
                 if (tab.parent('li').hasClass('tab-toggle')) {
@@ -271,7 +249,7 @@
                     $('.leaflet-control-locate').css('visibility', 'hidden');
                 }
             });
-        </script>
+        </script> -->
         </div>
 
     <!--Loading spinner-->

@@ -250,12 +250,9 @@ input[type="checkbox"] { margin: 0; }
     z-index: 100;
 }
 
-
-
 .rightpanel {
-    background: white;
     height: 100%;
-    width:400px;
+    max-width:400px;
     display:table-cell;
     pointer-events: all;
     right: 0;
@@ -268,7 +265,7 @@ input[type="checkbox"] { margin: 0; }
 
 .rightpanel-content {
     display: inline-block;
-    
+
 }
 
 .rightpanel .nav {

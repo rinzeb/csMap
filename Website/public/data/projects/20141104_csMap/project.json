@@ -2982,23 +2982,6 @@
             "url": "data/projects/20141104_csMap/aanrijtijden.json",
             "enabled": false,
             "opacity": 100
-        }, {
-            "id": "Emmen",
-            "reference": "Emmen",
-            "languages": {
-                "nl": {
-                    "title": "Emmen",
-                    "description": "Emmen."
-                },
-                "en": {
-                    "title": "Emmen",
-                    "description": "Emmen."
-                }
-            },
-            "type": "GeoJson",
-            "url": "data/projects/20141104_csMap/woningen_emmen.json",
-            "enabled": false,
-            "opacity": 100
         }]
     }, {
         "title": "WMS",
@@ -3197,7 +3180,7 @@
                 "type": "GeoJson",
                 "url": "data/projects/20141104_csMap/localized_city_data.json",
                 "enabled": false,
-                "opacity": 100
+                "opacity": 50
             }, {
                 "id": "topo_cities",
                 "reference": "topo_cities",
@@ -3225,8 +3208,28 @@
                 "url": "data/projects/20141104_csMap/postcode4-nl.geo.json",
                 "enabled": false,
                 "opacity": 100
-            }
-        ]
+            }, {
+            "id": "ESRIGrid",
+            "reference": "Esri",
+            "languages": {
+                "nl": {
+                    "title": "ESRI Grid",
+                    "description": "Test voor het inlezen van een ESRI Grid bestand."
+                },
+                "en": {
+                    "title": "ESRI Grid",
+                    "description": "Test reading an ESRI Grid file."
+                }
+            },
+            "type": "grid",
+            "renderType": "geojson",
+            "dataSourceParameters": {
+                "gridType": "esri"
+                },
+            "url": "data/projects/20141104_csMap/esri_ascii_grid.txt",
+            "enabled": false,
+            "opacity": 50
+        }]
     }, {
         "languages": {
             "nl": {
