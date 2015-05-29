@@ -3,6 +3,7 @@ import express              = require('express');
 import ConfigurationService = require('ServerComponents/configuration/ConfigurationService');
 import pg                   = require('pg');
 import Location             = require('./Location');
+import IBagOptions          = require('../database/IBagOptions');
 
 /**
  * Export a connection to the BAG database.
@@ -79,7 +80,7 @@ class BagDatabase {
     /**
      * Lookup the address from the BAG.
      */
-    public lookupBagAddress(zip: string, houseNumber: string, callback: (addresses: Location[]) => void) {
+    public lookupBagAddress(zip: string, houseNumber: string, bagOptions: IBagOptions, callback: (addresses: Location[]) => void) {
         var zipCode: string = this.formatZipCode(zip);
         if (!zipCode) {
             console.log('No zip code: ' + zip);
@@ -100,7 +101,21 @@ class BagDatabase {
                 return;
             }
             //var sql = `SELECT openbareruimtenaam, huisnummer, huisletter, huisnummertoevoeging, gemeentenaam, provincienaam, ST_X(ST_Transform(geopunt, 4326)) as lon, ST_Y(ST_Transform(geopunt, 4326)) as lat FROM adres WHERE adres.postcode='${zipCode}' AND adres.huisnummer=${houseNumber}`;
-            var sql = `SELECT ST_X(ST_Transform(geopunt, 4326)) as lon, ST_Y(ST_Transform(geopunt, 4326)) as lat FROM bagactueel.adres WHERE adres.postcode='${zipCode}' AND adres.huisnummer=${houseNr}`;
+            var sql;
+            switch (bagOptions) {
+              case IBagOptions.OnlyCoordinates:
+                  sql = `SELECT ST_X(ST_Transform(geopunt, 4326)) as lon, ST_Y(ST_Transform(geopunt, 4326)) as lat FROM bagactueel.adres WHERE adres.postcode='${zipCode}' AND adres.huisnummer=${houseNr}`;
+                  break;
+              case IBagOptions.WithBouwjaar:
+                  sql = `SELECT ST_X(ST_Transform(adres.geopunt, 4326)) as lon, ST_Y(ST_Transform(adres.geopunt, 4326)) as lat, pand.bouwjaar as bouwjaar FROM bagactueel.adres, bagactueel.verblijfsobjectpand, bagactueel.verblijfsobject, bagactueel.pand WHERE adres.postcode='${zipCode}' AND adres.huisnummer=${houseNr}  AND adres.adresseerbaarobject = verblijfsobject.identificatie AND adres.adresseerbaarobject = verblijfsobjectpand.identificatie AND verblijfsobjectpand.gerelateerdpand = pand.identificatie`;
+                  break;
+              case IBagOptions.All:
+                  sql = `SELECT ST_X(ST_Transform(geopunt, 4326)) as lon, ST_Y(ST_Transform(geopunt, 4326)) as lat FROM bagactueel.adres WHERE adres.postcode='${zipCode}' AND adres.huisnummer=${houseNr}`;
+                  break;
+              default:
+                  console.log("Error: Unknown IBagOptions");
+                  break;
+            }
             client.query(sql, (err, result) => {
                 done();
                 if (err) {

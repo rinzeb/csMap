@@ -7,6 +7,7 @@ import fs                   = require('fs');
 import http                 = require('http');
 import Location             = require('../database/Location');
 import BagDatabase          = require('../database/BagDatabase');
+import IBagOptions          = require('../database/IBagOptions');
 import IGeoJsonFeature      = require('./IGeoJsonFeature');
 
 interface ILayerDefinition {
@@ -126,7 +127,29 @@ class MapLayerFactory {
                     console.log("Error: Parameter2 should be the name of the column containing the house number!")
                     return;
                 }
-                this.createPointFeature(ld.parameter1, ld.parameter2, features, template.properties, template.sensors || [], () => { callback(geojson) });
+                this.createPointFeature(ld.parameter1, ld.parameter2, IBagOptions.OnlyCoordinates, features, template.properties, template.propertyTypes, template.sensors || [], () => { callback(geojson) });
+                break;
+            case "Postcode6_en_huisnummer_met_bouwjaar":
+                if (!ld.parameter1) {
+                    console.log("Error: Parameter1 should be the name of the column containing the zip code!")
+                    return;
+                }
+                if (!ld.parameter2) {
+                    console.log("Error: Parameter2 should be the name of the column containing the house number!")
+                    return;
+                }
+                this.createPointFeature(ld.parameter1, ld.parameter2, IBagOptions.WithBouwjaar, features, template.properties, template.propertyTypes, template.sensors || [], () => { callback(geojson) });
+                break;
+            case "Postcode6_en_huisnummer_met_bag":
+                if (!ld.parameter1) {
+                    console.log("Error: Parameter1 should be the name of the column containing the zip code!")
+                    return;
+                }
+                if (!ld.parameter2) {
+                    console.log("Error: Parameter2 should be the name of the column containing the house number!")
+                    return;
+                }
+                this.createPointFeature(ld.parameter1, ld.parameter2, IBagOptions.All, features, template.properties, template.propertyTypes, template.sensors || [], () => { callback(geojson) });
                 break;
             case "Latitude_and_longitude":
                 if (!ld.parameter1) {
@@ -271,18 +294,26 @@ class MapLayerFactory {
         callback();
     }
 
-    private createPointFeature(zipCode: string, houseNumber: string, features: IGeoJsonFeature[], properties: csComp.Services.IProperty[], sensors: csComp.Services.IProperty[], callback: Function) {
+    private createPointFeature(zipCode: string, houseNumber: string, bagOptions: IBagOptions, features: IGeoJsonFeature[], properties: csComp.Services.IProperty[], propertyTypes: csComp.Services.IPropertyType[], sensors: csComp.Services.IProperty[], callback: Function) {
         if (!properties) callback();
         var todo = properties.length;
         properties.forEach((prop, index) => {
             var zip = prop[zipCode].replace(/ /g, '');
             var nmb = prop[houseNumber];
-            this.bag.lookupBagAddress(zip, nmb, (locations: Location[]) => {
+            this.bag.lookupBagAddress(zip, nmb, bagOptions, (locations: Location[]) => {
                 //console.log(todo);
                 todo--;
                 if (!locations || locations.length === 0) {
                     console.log(`Cannot find location with zip: ${zip}, houseNumber: ${nmb}`);
                 } else {
+                    for (var key in locations[0]) {
+                      if (key !== "lon" && key !== "lat") {
+                        if (locations[0][key]) {
+                          prop[(key.charAt(0).toUpperCase()+key.slice(1))] = locations[0][key];
+                          this.createPropertyType((key.charAt(0).toUpperCase()+key.slice(1)), propertyTypes);
+                        }
+                      }
+                    }
                     features.push(this.createFeature(locations[0].lon, locations[0].lat, prop, sensors[index] || {}));
                 }
                 if (todo <= 0) callback();
@@ -303,6 +334,29 @@ class MapLayerFactory {
           gjson["sensors"] = sensors;
         }
         return gjson;
+    }
+
+    private createPropertyType(name: string, propertyTypes: csComp.Services.IPropertyType[]) {
+      if(!name) return;
+      var propertyTypeExists = false;
+      propertyTypes.some((pt) => {
+        if (pt.label.toLowerCase() === name.toLowerCase()) {
+          propertyTypeExists = true;
+          return true;
+        } else {
+          return false;
+        }
+      });
+      if(propertyTypeExists) return;
+      var propType: csComp.Services.IPropertyType  = {
+                    label: name,
+                    titel: name,
+                    type: "text",
+                    visibleInCallOut: true,
+                    canEdit: true,
+                    isSearchable: false
+                  };
+      propertyTypes.push(propType);
     }
 
     private convertTime(date: string, time: string) : number{
