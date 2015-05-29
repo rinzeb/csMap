@@ -310,7 +310,7 @@ class MapLayerFactory {
                       if (key !== "lon" && key !== "lat") {
                         if (locations[0][key]) {
                           prop[(key.charAt(0).toUpperCase()+key.slice(1))] = locations[0][key];
-                          this.createPropertyType((key.charAt(0).toUpperCase()+key.slice(1)), propertyTypes);
+                          this.createPropertyType(propertyTypes, (key.charAt(0).toUpperCase()+key.slice(1)), "BAG");
                         }
                       }
                     }
@@ -336,7 +336,7 @@ class MapLayerFactory {
         return gjson;
     }
 
-    private createPropertyType(name: string, propertyTypes: csComp.Services.IPropertyType[]) {
+    private createPropertyType(propertyTypes: csComp.Services.IPropertyType[], name: string, section?: string) {
       if(!name) return;
       var propertyTypeExists = false;
       propertyTypes.some((pt) => {
@@ -356,6 +356,7 @@ class MapLayerFactory {
                     canEdit: true,
                     isSearchable: false
                   };
+      if (section) propType["section"] = section;
       propertyTypes.push(propType);
     }
 
