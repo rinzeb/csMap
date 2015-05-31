@@ -104,4 +104,6 @@ gulp.task('watch', function () {
     gulp.watch('../../../csWeb/csComp/includes/images/*.*', ['include_images']);
 });
 
-gulp.task('default', ['addref_csComp', 'addref_csServerComp', 'minify_csComp', 'minify_csServerComp', 'convertTemplates2Ts', 'include_js','include_css','include_images','watch']);
+// The common default task for gulp is to build (minify, sass, wire dependencies, ...).
+// Use `gulp watch` to update as sources change.
+gulp.task('default', ['addref_csComp', 'addref_csServerComp', 'minify_csComp', 'minify_csServerComp', 'convertTemplates2Ts', 'include_js','include_css','include_images']);
