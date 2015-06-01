@@ -116,6 +116,8 @@ class MapLayerFactory {
         if (timestamps.length > 0) {
           geojson["timestamps"] = JSON.parse(JSON.stringify(timestamps));
         }
+        // Convert dates (from a readable key to a JavaScript Date string notation)
+        this.convertDateProperties(template.propertyTypes, template.properties);
         // Add geometry
         switch (ld.geometryType) {
             case "Postcode6_en_huisnummer":
@@ -361,6 +363,7 @@ class MapLayerFactory {
     }
 
     private convertTime(date: string, time: string) : number{
+      if (date.length < 6) return 0;
       var year = Number(date.substr(0,4));
       var month = Number(date.substr(4,2));
       var day = Number(date.substr(6,2));
@@ -372,6 +375,22 @@ class MapLayerFactory {
       var timeInMs = d.getTime();
       console.log("Converted " + date + " " + time + " to " + d.toDateString() + " (" + d.getTime() + " ms)");
       return timeInMs;
+    }
+
+    private convertDateProperties(propertyTypes: csComp.Services.IPropertyType[], properties: csComp.Services.IProperty[]){
+      if (!propertyTypes || ! properties) return;
+      propertyTypes.forEach((pt) => {
+        if (pt.hasOwnProperty("type") && pt["type"] === "date") {
+          var name = pt["title"]; //Store name of the property with type "date"
+          properties.forEach((p) => {
+            if (p.hasOwnProperty(name)) {
+              var timeInMs = this.convertTime(p[name], ""); //TODO: Add Time compatibility
+              var d = new Date(timeInMs);
+              p[name] = d.toString();
+            }
+          });
+        }
+      });
     }
 
     private convertStringFormats(properties) {
