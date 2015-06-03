@@ -128,20 +128,22 @@
         "preview": "http://a.basemaps.cartocdn.com/light_nolabels/11/673/1051.png"
     }],
     "projects": [
-{
-        "title": "csMap",
-        "url": "data/projects/20141104_csMap/project.json"
-    }, {
+      {
+              "title": "csMap",
+              "url": "data/projects/20141104_csMap/project.json"
+          },
+      {
+          "title": "Highways",
+          "url": "data/projects/20141104_csMap/projectHighway.json"
+      },
+ {
         "title": "smart cycling",
         "url": "data/projects/smartcycling/project.json"
     }, {
         "title": "Dynamic Example",
         "url": "data/projects/DynamicExample/project.json",
         "dynamic": true
-    },
-    {
-        "title": "Highways",
-        "url": "data/projects/20141104_csMap/projectHighway.json"
     }
+
     ]
 }
