@@ -27,6 +27,7 @@
         "./Scripts/typings/d3/d3.d.ts",
         "./Scripts/typings/dc/dc.d.ts",
         "./Scripts/typings/express/express.d.ts",
+        "./Scripts/typings/form-data/form-data.d.ts",
         "./Scripts/typings/jquery/jquery.d.ts",
         "./Scripts/typings/leaflet/control-sidebar.d.ts",
         "./Scripts/typings/leaflet/leaflet.d.ts",
