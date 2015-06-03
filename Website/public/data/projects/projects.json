@@ -133,7 +133,7 @@
         "title": "smart cycling",
         "url": "data/projects/smartcycling/project.json"
     }, {
-        "title": "dynamic",
+        "title": "Dynamic Example",
         "url": "data/projects/DynamicExample/project.json",
         "dynamic": true
     }]
